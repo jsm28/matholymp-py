@@ -1,0 +1,1604 @@
+# Website generation for matholymp package.
+
+# Copyright 2014 Joseph Samuel Myers.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see
+# <https://www.gnu.org/licenses/>.
+
+# Additional permission under GNU GPL version 3 section 7:
+
+# If you modify this program, or any covered work, by linking or
+# combining it with the OpenSSL project's OpenSSL library (or a
+# modified version of that library), containing parts covered by the
+# terms of the OpenSSL or SSLeay licenses, the licensors of this
+# program grant you additional permission to convey the resulting
+# work.  Corresponding Source for a non-source form of such a
+# combination shall include the source code for the parts of OpenSSL
+# used as well as that of the covered work.
+
+"""
+This module provides the SiteGenerator class that can be used to
+generate a whole website or individual pages or page fragments.
+"""
+
+import cgi
+import os
+import os.path
+import re
+
+from matholymp.collate import coll_get_sort_key
+from matholymp.fileutil import write_utf8_csv, write_text_to_file
+
+__all__ = ['SiteGenerator']
+
+class SiteGenerator(object):
+
+    """
+    A SiteGenerator supports website generation for a particular
+    EventGroup and configuration data describing options for how the
+    site is generated from it.
+    """
+
+    def __init__(self, cfg, event_group, out_dir=None):
+        """
+        Initialise a SiteGenerator from the given configuration
+        information and EventGroup.
+        """
+        self._cfg = cfg
+        self._data = event_group
+        self._out_dir = out_dir
+        self._url_base_rel = re.sub('^https?://[^/]*', '',
+                                    self._cfg['url_base'])
+        if out_dir is not None:
+            self._auto_out_dir = os.path.join(out_dir, cfg['short_name_url'],
+                                              'auto')
+
+    def write_html_to_file(self, out_text, title, header, out_path):
+        """Write HTML text to a file in standard template."""
+        long_title = cgi.escape(self._data.long_name) + ': ' + title
+        short_title = cgi.escape(self._data.short_name) + ': ' + header
+        page_data = { 'title': long_title,
+                      'header': short_title,
+                      'body': out_text }
+        text = self._cfg['page_template'] % page_data
+        out_file_name = os.path.join(self._out_dir, *out_path)
+        out_file_name = os.path.join(out_file_name,
+                                     'index' + self._cfg['page_suffix'])
+        write_text_to_file(text, out_file_name)
+
+    def write_csv_to_file(self, csv_file_path, rows, keys):
+        """Write a CSV file in the output directory."""
+        csv_file_name = os.path.join(self._out_dir, *csv_file_path)
+        write_utf8_csv(csv_file_name, rows, keys)
+
+    def _attr_text(self, attrs):
+        nattrs = {}
+        for k in attrs:
+            if k.endswith('_'):
+                nk = k[0:len(k)-1]
+            else:
+                nk = k
+            nattrs[nk] = attrs[k]
+        return ''.join([' %s="%s"' % (k, cgi.escape(nattrs[k], quote=True))
+                        for k in sorted(nattrs.keys())])
+
+    def html_element(self, tag, contents, **attrs):
+        """
+        Generate an HTML element with the given name, contents and
+        attributes.  Tag and attribute names are expected to be in
+        lower-case; a single trailing underscore is removed from
+        attribute names to support Python keywords as attribute names.
+        Contents are HTML text; the caller must do any necessary
+        escaping.
+        """
+        return '<%s%s>%s</%s>' % (tag, self._attr_text(attrs), contents, tag)
+
+    def html_element_empty(self, tag, **attrs):
+        """
+        Generate an empty HTML element with the given name and
+        attributes.  Tag and attribute names are expected to be in
+        lower-case; a single trailing underscore is removed from
+        attribute names to support Python keywords as attribute names.
+        """
+        if self._cfg['use_xhtml']:
+            return '<%s%s />' % (tag, self._attr_text(attrs))
+        else:
+            return '<%s%s>' % (tag, self._attr_text(attrs))
+
+    def html_a(self, contents, href, **attrs):
+        """Generate an HTML link."""
+        return self.html_element('a', contents, href=href, **attrs)
+
+    def html_a_external(self, contents, href, **attrs):
+        """Generate an HTML link to an external page."""
+        return self.html_a(contents, href, target='_blank', **attrs)
+
+    def html_img(self, **attrs):
+        return self.html_element_empty('img', **attrs)
+
+    def html_th(self, contents, **attrs):
+        """Generate an HTML th element."""
+        return self.html_element('th', contents, **attrs)
+
+    def html_th_scores(self, contents, **attrs):
+        """Generate an HTML th element, using the CSS for tables of scores."""
+        return self.html_th(contents, class_=self._cfg['scores_css'], **attrs)
+
+    def html_td(self, contents, **attrs):
+        """Generate an HTML td element."""
+        return self.html_element('td', contents, **attrs)
+
+    def html_td_scores(self, contents, **attrs):
+        """Generate an HTML td element, using the CSS for tables of scores."""
+        return self.html_td(contents, class_=self._cfg['scores_css'], **attrs)
+
+    def html_tr(self, contents, **attrs):
+        """Generate an HTML tr element."""
+        return self.html_element('tr', contents, **attrs)
+
+    def html_tr_list(self, contents_list, **attrs):
+        """
+        Generate an HTML tr element, with contents the concatenation of a list.
+        """
+        return self.html_tr(''.join(contents_list), **attrs)
+
+    def html_tr_th_list(self, th_list, **attrs):
+        """
+        Generate an HTML tr element, with contents a sequence of th elements.
+        """
+        return self.html_tr_list([self.html_th(s) for s in th_list], **attrs)
+
+    def html_tr_th_scores_list(self, th_list, **attrs):
+        """
+        Generate an HTML tr element, with contents a sequence of th
+        elements, each using the CSS for tables of scores.
+        """
+        return self.html_tr_list([self.html_th_scores(s) for s in th_list],
+                                 **attrs)
+
+    def html_tr_td_list(self, td_list, **attrs):
+        """
+        Generate an HTML tr element, with contents a sequence of td elements.
+        """
+        return self.html_tr_list([self.html_td(s) for s in td_list], **attrs)
+
+    def html_tr_td_scores_list(self, td_list, **attrs):
+        """
+        Generate an HTML tr element, with contents a sequence of td
+        elements, each using the CSS for tables of scores.
+        """
+        return self.html_tr_list([self.html_td_scores(s) for s in td_list],
+                                 **attrs)
+
+    def html_tr_th_td(self, th, td, **attrs):
+        """
+        Generate an HTML tr element, with contents a th element and a
+        td element.
+        """
+        return self.html_tr_list([self.html_th(th), self.html_td(td)], **attrs)
+
+    def html_thead(self, contents, **attrs):
+        """Generate an HTML thead element."""
+        return self.html_element('thead', contents, **attrs)
+
+    def html_thead_list(self, contents_list, **attrs):
+        """Generate an HTML thead element, with contents a list of rows."""
+        return self.html_thead('\n' + '\n'.join(contents_list) + '\n', **attrs)
+
+    def html_tbody(self, contents, **attrs):
+        """Generate an HTML tbody element."""
+        return self.html_element('tbody', contents, **attrs)
+
+    def html_tbody_list(self, contents_list, **attrs):
+        """Generate an HTML tbody element, with contents a list of rows."""
+        return self.html_tbody('\n' + '\n'.join(contents_list) + '\n', **attrs)
+
+    def html_table(self, contents, **attrs):
+        """Generate an HTML table element."""
+        return self.html_element('table', contents, **attrs)
+
+    def html_table_thead_tbody_list(self, head_list, body_list, **attrs):
+        """
+        Generate an HTML table element, with contents a sequence of
+        header rows and a sequence of body rows, using the CSS for
+        lists.
+        """
+        head = self.html_thead_list(head_list)
+        body = self.html_tbody_list(body_list)
+        return self.html_table('\n' + head + '\n' + body + '\n',
+                               class_=self._cfg['list_css'], **attrs)
+
+    def html_table_list(self, row_list, **attrs):
+        """
+        Generate an HTML table element, with contents a sequence of
+        rows, using the CSS for lists.
+        """
+        return self.html_table('\n' + '\n'.join(row_list) + '\n',
+                               class_=self._cfg['list_css'], **attrs)
+
+    def html_table_list_th_td(self, row_list, **attrs):
+        """
+        Generate an HTML table element, with contents a sequence of
+        rows, each row having a th and a td element, using the CSS for
+        lists.
+        """
+        tr_list = [self.html_tr_th_td(r[0], r[1]) for r in row_list]
+        return self.html_table_list(tr_list, **attrs)
+
+    def home_page_link_for_event(self, e):
+        """Generate a link to an event's home page."""
+        url = e.home_page_url
+        if url is None:
+            return ''
+        return ' (%s)' % self.html_a_external('home page', url)
+
+    def link_for_file(self, path_list, link_body):
+        """Generate a link to a given file on this site."""
+        url = self._url_base_rel + '/'.join(path_list)
+        return self.html_a(link_body, url)
+
+    def link_for_page(self, path_list, link_body):
+        """Generate a link to a given page, ending with '/', on this site."""
+        url = self._url_base_rel + '/'.join(path_list) + '/'
+        return self.html_a(link_body, url)
+
+    def link_for_registration(self, event, reg_path, link_body):
+        """
+        Generate a link to the registration system for a given event
+        on this site.
+        """
+        path_list = ['registration', event.year, reg_path]
+        return self.link_for_file(path_list, link_body)
+
+    def path_for_events(self):
+        """Return the path (a list) of the directory of events."""
+        return [self._cfg['short_name_url_plural']]
+
+    def path_for_event(self, event):
+        """Return the path (a list) of the directory for a given event."""
+        p = self.path_for_events()
+        p.append(self._cfg['short_name_url'] + str(event.id))
+        return p
+
+    def link_for_event(self, event, link_body):
+        """Generate a link to the main page for a given event."""
+        return self.link_for_page(self.path_for_event(event), link_body)
+
+    def path_for_event_countries(self, event):
+        """
+        Return the path (a list) of the directory of countries for a
+        given event.
+        """
+        p = self.path_for_event(event)
+        p.append('countries')
+        return p
+
+    def link_for_event_countries(self, event, link_body):
+        """Generate a link to the list of countries for a given event."""
+        return self.link_for_page(self.path_for_event_countries(event),
+                                  link_body)
+
+    def path_for_event_countries_csv(self, event):
+        """
+        Return the path (a list) of the CSV file of countries for a
+        given event.
+        """
+        p = self.path_for_event_countries(event)
+        p.append('countries.csv')
+        return p
+
+    def link_for_event_countries_csv(self, event, link_body):
+        """Generate a link to the CSV file of countries for a given event."""
+        return self.link_for_file(self.path_for_event_countries_csv(event),
+                                  link_body)
+
+    def path_for_event_people(self, event):
+        """
+        Return the path (a list) of the directory of people for a given event.
+        """
+        p = self.path_for_event(event)
+        p.append('people')
+        return p
+
+    def link_for_event_people(self, event, link_body):
+        """Generate a link to the list of people for a given event."""
+        return self.link_for_page(self.path_for_event_people(event),
+                                  link_body)
+
+    def path_for_event_people_csv(self, event):
+        """
+        Return the path (a list) of the CSV file of people for a given event.
+        """
+        p = self.path_for_event_people(event)
+        p.append('people.csv')
+        return p
+
+    def link_for_event_people_csv(self, event, link_body):
+        """Generate a link to the CSV file of people for a given event."""
+        return self.link_for_file(self.path_for_event_people_csv(event),
+                                  link_body)
+
+    def path_for_event_scoreboard(self, event):
+        """
+        Return the path (a list) of the directory of the scoreboard
+        for a given event.
+        """
+        p = self.path_for_event(event)
+        p.append('scoreboard')
+        return p
+
+    def link_for_event_scoreboard(self, event, link_body):
+        """Generate a link to the scoreboard for a given event."""
+        return self.link_for_page(self.path_for_event_scoreboard(event),
+                                  link_body)
+
+    def path_for_event_scores_csv(self, event):
+        """
+        Return the path (a list) of the CSV file of scores for a given event.
+        """
+        p = self.path_for_event_scoreboard(event)
+        p.append('scores.csv')
+        return p
+
+    def link_for_event_scores_csv(self, event, link_body):
+        """Generate a link to the CSV file of scores for a given event."""
+        return self.link_for_file(self.path_for_event_scores_csv(event),
+                                  link_body)
+
+    def path_for_event_scores_rss(self, event):
+        """
+        Return the path (a list) of the RSS feed of scores for a given event.
+        """
+        p = self.path_for_event_scoreboard(event)
+        p.append('rss.xml')
+        return p
+
+    def link_for_event_scores_rss(self, event, link_body):
+        """Generate a link to the RSS feed of scores for a given event."""
+        return self.link_for_file(self.path_for_event_scores_rss(event),
+                                  link_body)
+
+    def path_for_country_at_event(self, country):
+        """
+        Return the path (a list) of the directory for a given country
+        at a given event.
+        """
+        p = self.path_for_event_countries(country.event)
+        p.append('country' + str(country.country.id))
+        return p
+
+    def link_for_country_at_event(self, country, link_body):
+        """Generate a link to the page for a given country at a given event."""
+        return self.link_for_page(self.path_for_country_at_event(country),
+                                  link_body)
+
+    def path_for_countries(self):
+        """Return the path (a list) of the directory of countries."""
+        return ['countries']
+
+    def path_for_country(self, country):
+        """Return the path (a list) of the directory for a given country."""
+        p = self.path_for_countries()
+        p.append('country' + str(country.id))
+        return p
+
+    def link_for_country(self, country, link_body):
+        """Generate a link to the main page for a given country."""
+        return self.link_for_page(self.path_for_country(country), link_body)
+
+    def path_for_people(self):
+        """Return the path (a list) of the directory of people."""
+        return ['people']
+
+    def path_for_hall_of_fame(self):
+        """Return the path (a list) of the directory of the hall of fame."""
+        p = self.path_for_people()
+        p.append('halloffame')
+        return p
+
+    def link_for_hall_of_fame(self, link_body):
+        """Generate a link to the hall of fame."""
+        return self.link_for_page(self.path_for_hall_of_fame(), link_body)
+
+    def path_for_person(self, person):
+        """Return the path (a list) of the directory for a given person."""
+        p = self.path_for_people()
+        p.append('person' + str(person.id))
+        return p
+
+    def link_for_person(self, person, link_body):
+        """Generate a link to the main page for a given person."""
+        return self.link_for_page(self.path_for_person(person), link_body)
+
+    def path_for_data_events(self):
+        """Return the path (a list) for the data for all events."""
+        return ['data', self._cfg['short_name_url_plural'] + '-all.csv']
+
+    def link_for_data_events(self, link_body):
+        """Generate a link to the data for all events."""
+        return self.link_for_file(self.path_for_data_events(), link_body)
+
+    def path_for_data_papers(self):
+        """Return the path (a list) for the data for all papers."""
+        return ['data', 'papers.csv']
+
+    def link_for_data_papers(self, link_body):
+        """Generate a link to the data for all papers."""
+        return self.link_for_file(self.path_for_data_papers(), link_body)
+
+    def path_for_data_countries(self):
+        """Return the path (a list) for the data for all countries."""
+        return ['data', 'countries-all.csv']
+
+    def link_for_data_countries(self, link_body):
+        """Generate a link to the data for all countries."""
+        return self.link_for_file(self.path_for_data_countries(), link_body)
+
+    def path_for_data_people(self):
+        """Return the path (a list) for the data for all people."""
+        return ['data', 'people-all.csv']
+
+    def link_for_data_people(self, link_body):
+        """Generate a link to the data for all people."""
+        return self.link_for_file(self.path_for_data_people(), link_body)
+
+    def link_for_event_and_host(self, event):
+        """
+        Generate header text referring to an event and its host
+        country, with links.
+        """
+        return ('%s in %s' %
+                (self.link_for_event(event,
+                                     cgi.escape(event.short_name_with_year)),
+                 self.link_for_country(event.host_country,
+                                       cgi.escape(event.host_country_name))))
+
+    def generate_sidebar_out(self):
+        """Generate HTML text for the sidebar."""
+        out_filename = 'sidebar-%s-list%s' % (self._cfg['short_name_url'],
+                                              self._cfg['page_suffix'])
+        sidebar_out = os.path.join(self._auto_out_dir, out_filename)
+        out_list = []
+        for e in self._data.event_list:
+            short_name = cgi.escape(e.short_name_with_year)
+            location = cgi.escape(e.host_location)
+            event_link = self.link_for_event(e, short_name)
+            home_link = self.home_page_link_for_event(e)
+            text = ('<li><strong>%s</strong>, %s%s</li>' %
+                    (event_link, location, home_link))
+            out_list.append(text)
+        out_list.reverse()
+        out_text = '\n'.join(out_list) + '\n'
+        write_text_to_file(out_text, sidebar_out)
+
+    def generate_contact_out(self):
+        """Generate HTML text for contact details."""
+        out_filename = '%s-contact-list%s' % (self._cfg['short_name_url'],
+                                              self._cfg['page_suffix'])
+        contact_out = os.path.join(self._auto_out_dir, out_filename)
+        out_list = []
+        for e in self._data.event_list:
+            short_name = cgi.escape(e.short_name_with_year)
+            contact = cgi.escape(e.contact)
+            if contact:
+                text = ('  <li>For communications about %s,'
+                        ' please contact %s.</li>' %
+                        (short_name, contact))
+                out_list.append(text)
+        out_text = '\n'.join(out_list) + '\n'
+        write_text_to_file(out_text, contact_out)
+
+    def generate_events_summary(self):
+        """Generate a summmary of all events."""
+        text = ''
+        text += ('<p>Details of all %s may also be %s in CSV format,'
+                 ' as may %s.</p>\n' %
+                 (cgi.escape(self._data.short_name_plural),
+                  self.link_for_data_events('downloaded'),
+                  self.link_for_data_papers('a list of all language versions'
+                                            ' of all papers')))
+        head_row_1 = [self.html_th_scores('#', rowspan='2',
+                                          title=('%s number' %
+                                                 self._data.short_name)),
+                      self.html_th_scores('Year', rowspan='2'),
+                      self.html_th_scores('Country', rowspan='2'),
+                      self.html_th_scores('City', rowspan='2'),
+                      self.html_th_scores('Dates', rowspan='2'),
+                      self.html_th_scores('Countries', rowspan='2'),
+                      self.html_th_scores('Contestants', colspan='5')]
+        head_row_2 = [self.html_th_scores('All'),
+                      self.html_th_scores('G', title='Gold'),
+                      self.html_th_scores('S', title='Silver'),
+                      self.html_th_scores('B', title='Bronze'),
+                      self.html_th_scores('HM', title='Honourable Mention')]
+        head_row_list = [self.html_tr_list(head_row_1),
+                         self.html_tr_list(head_row_2)]
+        body_row_list = []
+        for e in self._data.event_list:
+            number = self.link_for_event(e, str(e.id))
+            year = self.link_for_event(e, cgi.escape(e.year))
+            country = self.link_for_country(e.host_country,
+                                            cgi.escape(e.host_country_name))
+            city = cgi.escape(e.host_city)
+            if e.start_date is None or e.end_date is None:
+                dates = ''
+            else:
+                start_date = e.start_date
+                end_date = e.end_date
+                m = re.match('^([0-9]{4})-([0-9]{2})-([0-9]{2})\\Z',
+                             start_date)
+                if not m:
+                    raise ValueError('Bad start date')
+                start_year = m.group(1)
+                start_month = m.group(2)
+                start_day = m.group(3)
+                m = re.match('^([0-9]{4})-([0-9]{2})-([0-9]{2})\\Z', end_date)
+                if not m:
+                    raise ValueError('Bad end date')
+                end_year = m.group(1)
+                end_month = m.group(2)
+                end_day = m.group(3)
+                if start_year != e.year or end_year != e.year:
+                    raise ValueError('Dates not in expected year')
+                start_month = int(start_month)
+                end_month = int(end_month)
+                if start_month < 1 or start_month > 12:
+                    raise ValueError('Bad start month')
+                if end_month < 1 or end_month > 12:
+                    raise ValueError('Bad end month')
+                if start_month > end_month:
+                    raise ValueError('Start month after end month')
+                if start_month == end_month and int(start_day) > int(end_day):
+                    raise ValueError('Start day after end day')
+                # The output is meant to be locale-independent, so
+                # hardcode months here.
+                months = ['January', 'February', 'March', 'April', 'May',
+                          'June', 'July', 'August', 'September', 'October',
+                          'November', 'December']
+                start_month_name = months[start_month - 1]
+                end_month_name = months[end_month - 1]
+                if start_month == end_month:
+                    dates = ('%s&ndash;%s&nbsp;%s' %
+                             (start_day, end_day, end_month_name))
+                else:
+                    dates = ('%s&nbsp;%s&ndash;%s&nbsp;%s' %
+                             (start_day, start_month_name,
+                              end_day, end_month_name))
+            num_contestants = e.num_contestants
+            if num_contestants:
+                num_gold = e.num_awards['Gold Medal']
+                num_silver = e.num_awards['Silver Medal']
+                num_bronze = e.num_awards['Bronze Medal']
+                num_hm = e.num_awards['Honourable Mention']
+                num_countries = e.num_countries
+            else:
+                num_contestants = ''
+                num_gold = ''
+                num_silver = ''
+                num_bronze = ''
+                num_hm = ''
+                num_countries = ''
+            row = self.html_tr_td_scores_list(
+                [number, year, country, city, dates, num_countries,
+                 num_contestants, num_gold, num_silver, num_bronze, num_hm])
+            body_row_list.append(row)
+        body_row_list.reverse()
+        text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
+        text += '\n'
+        title = 'List of %s' % cgi.escape(self._data.short_name_plural)
+        self.write_html_to_file(text, title, title, self.path_for_events())
+
+    def host_year_text(self, c):
+        """Generate text listing years for which one country was host."""
+        host_year_list = [self.link_for_event(e, cgi.escape(e.year))
+                          for e in c.host_list]
+        return ', '.join(host_year_list)
+
+    def generate_countries_summary(self):
+        """Generate a summary of all countries."""
+        text = ''
+        text += ('<p>Details of all countries at all %s may also be'
+                 ' %s in CSV format.</p>\n' %
+                 (cgi.escape(self._data.short_name_plural),
+                  self.link_for_data_countries('downloaded')))
+        head_row_list = [self.html_tr_list(
+                [self.html_th('Code'),
+                 self.html_th('Name'),
+                 self.html_th('First'),
+                 self.html_th('Last'),
+                 self.html_th('#', title=('Number of %s' %
+                                          self._data.short_name_plural)),
+                 self.html_th('Host')])]
+        body_row_list = []
+        countries = sorted(self._data.country_list, key=lambda x:x.sort_key)
+        for c in countries:
+            first_c = c.participation_list[0]
+            last_c = c.participation_list[-1]
+            first_year = cgi.escape(first_c.event.year)
+            last_year = cgi.escape(last_c.event.year)
+            row = [self.link_for_country(c, cgi.escape(c.code)),
+                   self.link_for_country(c, cgi.escape(c.name)),
+                   self.link_for_country_at_event(first_c, first_year),
+                   self.link_for_country_at_event(last_c, last_year),
+                   c.num_participations,
+                   self.host_year_text(c)]
+            body_row_list.append(self.html_tr_td_list(row))
+        text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
+        text += '\n'
+        title = 'Countries'
+        header = 'Countries'
+        self.write_html_to_file(text, title, header, self.path_for_countries())
+
+    def generate_people_summary(self):
+        """Generate a summary of all people."""
+        text = ''
+        hoftxt = ('hall of fame of %s contestants by medal count' %
+                  cgi.escape(self._data.short_name))
+        text += ('<p>A %s is also available.  Details of all people at'
+                 ' all %s may also be %s in CSV format.</p>\n' %
+                 (self.link_for_hall_of_fame(hoftxt),
+                  cgi.escape(self._data.short_name_plural),
+                  self.link_for_data_people('downloaded')))
+        head_row_list = [self.html_tr_th_scores_list(['Given Name',
+                                                      'Family Name',
+                                                      'Participations'])]
+        body_row_list = []
+        for pd in sorted(self._data.person_list,
+                         key=lambda x:x.sort_key_alpha):
+            pd_list = []
+            for p in pd.participation_list:
+                e = p.event
+                year_text = ''
+                year_text += ('%s: ' %
+                              self.link_for_event(e, cgi.escape(e.year)))
+                cl = self.link_for_country_at_event(p.country,
+                                                    cgi.escape(p.country.name))
+                year_text += '%s ' % cl
+                role_text = cgi.escape(p.primary_role)
+                if p.is_contestant and p.award is not None:
+                    role_text += ': %s' % cgi.escape(p.award)
+                if p.guide_for:
+                    glist = sorted(p.guide_for, key=lambda x:x.sort_key)
+                    gtlist = []
+                    for c in glist:
+                        cl = self.link_for_country_at_event(c,
+                                                            cgi.escape(c.name))
+                        gtlist.append(cl)
+                    role_text += ': %s' % ', '.join(gtlist)
+                if p.other_roles:
+                    rs = sorted(p.other_roles,
+                                key=lambda x:coll_get_sort_key(x))
+                    role_text += ', %s' % cgi.escape(', '.join(rs))
+                year_text += '(%s)' % role_text
+                pd_list.append(year_text)
+            row = [self.link_for_person(p.person, cgi.escape(p.given_name)),
+                   self.link_for_person(p.person, cgi.escape(p.family_name)),
+                   ', '.join(pd_list)]
+            body_row_list.append(self.html_tr_td_scores_list(row))
+        text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
+        text += '\n'
+        title = 'People'
+        header = 'People'
+        self.write_html_to_file(text, title, header, self.path_for_people())
+
+    def generate_hall_of_fame(self):
+        """Generate hall of fame by medal count."""
+        text = ''
+        head_row_list = [self.html_tr_list(
+                [self.html_th_scores('Given Name'),
+                 self.html_th_scores('Family Name'),
+                 self.html_th_scores('Country'),
+                 self.html_th_scores('G', title='Gold'),
+                 self.html_th_scores('S', title='Silver'),
+                 self.html_th_scores('B', title='Bronze'),
+                 self.html_th_scores('HM', title='Honourable Mention'),
+                 self.html_th_scores('Participations')])]
+        contestants = sorted(self._data.contestant_list,
+                             key=lambda x:x.sort_key_hall_of_fame)
+        body_row_list = []
+        for p in contestants:
+            row = [self.link_for_person(p, cgi.escape(p.given_name)),
+                   self.link_for_person(p, cgi.escape(p.family_name)),
+                   ', '.join([self.link_for_country(c, cgi.escape(c.code))
+                              for c in p.country_list]),
+                   str(p.num_awards['Gold Medal']),
+                   str(p.num_awards['Silver Medal']),
+                   str(p.num_awards['Bronze Medal']),
+                   str(p.num_awards['Honourable Mention']),
+                   str(p.num_participations)]
+            body_row_list.append(self.html_tr_td_scores_list(row))
+        text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
+        text += '\n'
+        title = 'Hall of Fame'
+        header = 'Hall of Fame'
+        self.write_html_to_file(text, title, header,
+                                self.path_for_hall_of_fame())
+
+    def generate_one_event_summary(self, e):
+        """Generate a summmary of one event."""
+        text = ''
+        row_list = [['%s number' % cgi.escape(e.short_name), str(e.id)],
+                    ['Year', '%s%s' % (cgi.escape(e.year),
+                                       self.home_page_link_for_event(e))],
+                    ['Country',
+                     self.link_for_country(e.host_country,
+                                           cgi.escape(e.host_country_name))],
+                    ['City', cgi.escape(e.host_city or '')],
+                    ['Start date', cgi.escape(e.start_date or '')],
+                    ['End date', cgi.escape(e.end_date or '')],
+                    ['Contact name', cgi.escape(e.contact_name or '')],
+                    ['Contact email', cgi.escape(e.contact_email or '')]]
+        if e.num_contestants:
+            prob_marks = str(e.num_problems)
+            prob_marks += (' (marked out of: %s)' %
+                           '+'.join([str(m) for m in e.marks_per_problem]))
+            more_rows = [['Participating countries',
+                          ('%d (%d %s) (%s)' %
+                           (e.num_countries,
+                            e.num_countries_official,
+                            cgi.escape(self._cfg['official_desc_lc']),
+                            self.link_for_event_countries(e, 'list')))],
+                         ['Contestants',
+                          '%d (%d %s) (%s, %s)' %
+                          (e.num_contestants,
+                           e.num_contestants_official,
+                           cgi.escape(self._cfg['official_desc_lc']),
+                           self.link_for_event_scoreboard(e, 'scoreboard'),
+                           self.link_for_event_people(e,
+                                                      'list of'
+                                                      ' participants'))],
+                         ['Number of exams', str(e.num_exams)],
+                         ['Number of problems', prob_marks],
+                         ['Gold medals',
+                          '%d (%d %s) (scores &ge; %d)' %
+                          (e.num_awards['Gold Medal'],
+                           e.num_awards_official['Gold Medal'],
+                           cgi.escape(self._cfg['official_desc_lc']),
+                           e.gold_boundary)],
+                         ['Silver medals',
+                          '%d (%d %s) (scores &ge; %d)' %
+                          (e.num_awards['Silver Medal'],
+                           e.num_awards_official['Silver Medal'],
+                           cgi.escape(self._cfg['official_desc_lc']),
+                           e.silver_boundary)],
+                         ['Bronze medals',
+                          '%d (%d %s) (scores &ge; %d)' %
+                          (e.num_awards['Bronze Medal'],
+                           e.num_awards_official['Bronze Medal'],
+                           cgi.escape(self._cfg['official_desc_lc']),
+                           e.bronze_boundary)],
+                         ['Honourable mentions',
+                          '%d (%d %s)' %
+                          (e.num_awards['Honourable Mention'],
+                           e.num_awards_official['Honourable Mention'],
+                           cgi.escape(self._cfg['official_desc_lc']))]]
+            row_list.extend(more_rows)
+        text += self.html_table_list_th_td(row_list) + '\n'
+        if e.registration_active:
+            text += ('<p>Lists of currently registered %s and %s'
+                     ' are available, as is the %s.</p>\n' %
+                     (self.link_for_registration(e, 'country', 'countries'),
+                      self.link_for_registration(e, 'person', 'participants'),
+                      self.link_for_registration(e,
+                                                 'person?@template=scoreboard',
+                                                 'live scoreboard')))
+        extra_dir = '/'.join(self.path_for_event(e))
+        text += self._cfg['page_include_extra'] % { 'dir': extra_dir }
+        text += '\n'
+        if e.num_exams:
+            for day in range(1, e.num_exams + 1):
+                papers = [p for p in e.paper_list if p.day == day]
+                if papers:
+                    if e.num_exams == 1:
+                        text += '<h2>Papers</h2>\n'
+                    else:
+                        text += '<h2>Day %d papers</h2>\n' % day
+                    text += '<ul>\n'
+                    for p in papers:
+                        if p.description:
+                            desc = ' (%s)' % p.description
+                        else:
+                            desc = ''
+                        text += ('<li>%s%s</li>\n' %
+                                 (self.html_a(cgi.escape(p.language), p.url),
+                                  cgi.escape(desc)))
+                    text += '</ul>\n'
+        title = cgi.escape(e.short_name_with_year_and_country)
+        header = ('%s in %s' %
+                  (cgi.escape(e.short_name_with_year),
+                   self.link_for_country(e.host_country,
+                                         cgi.escape(e.host_country_name))))
+        self.write_html_to_file(text, title, header, self.path_for_event(e))
+
+    def generate_one_event_countries_summary(self, e):
+        """Generate a summary list of the countries at one event."""
+        text = ''
+        text += ('<p>Details of all countries at this %s may also be %s'
+                 ' in CSV format.</p>\n' %
+                 (cgi.escape(e.short_name),
+                  self.link_for_event_countries_csv(e, 'downloaded')))
+        head_row_list = [self.html_tr_th_list(
+                ['Code', 'Name', cgi.escape(self._cfg['official_desc'])])]
+        body_row_list = []
+        countries = sorted(e.country_list, key=lambda x:x.sort_key)
+        for c in countries:
+            row = self.html_tr_td_list(
+                [self.link_for_country_at_event(c, cgi.escape(c.code)),
+                 self.link_for_country_at_event(c, cgi.escape(c.name)),
+                 c.is_official and 'Yes' or 'No'])
+            body_row_list.append(row)
+        text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
+        text += '\n'
+        title = ('Countries at %s' %
+                 cgi.escape(e.short_name_with_year_and_country))
+        header = 'Countries at ' + self.link_for_event_and_host(e)
+        self.write_html_to_file(text, title, header,
+                                self.path_for_event_countries(e))
+
+    def generate_one_event_people_summary(self, e):
+        """Generate a summary list of the people at one event."""
+        text = ''
+        text += ('<p>Details of all people at this %s may also be %s'
+                 ' in CSV format.</p>\n' %
+                 (cgi.escape(e.short_name),
+                  self.link_for_event_people_csv(e, 'downloaded')))
+        countries = sorted(e.country_list, key=lambda x:x.sort_key)
+        for c in countries:
+            people = sorted(c.person_list, key=lambda x:x.sort_key)
+            cl = self.link_for_country_at_event(c,
+                                                cgi.escape(c.name_with_code))
+            text += '<h2>%s</h2>\n' % cl
+            head_row_list = [self.html_tr_th_list(['Given Name', 'Family Name',
+                                                   'Role'])]
+            body_row_list = []
+            for p in people:
+                row = self.html_tr_td_list(
+                    [self.link_for_person(p.person, cgi.escape(p.given_name)),
+                     self.link_for_person(p.person, cgi.escape(p.family_name)),
+                     cgi.escape(p.primary_role)])
+                body_row_list.append(row)
+            text += self.html_table_thead_tbody_list(head_row_list,
+                                                     body_row_list)
+            text += '\n'
+        title = 'People at ' + cgi.escape(e.short_name_with_year_and_country)
+        header = 'People at ' + self.link_for_event_and_host(e)
+        self.write_html_to_file(text, title, header,
+                                self.path_for_event_people(e))
+
+    def person_scoreboard_header(self, event):
+        """Generate the header for a scoreboard for individual people."""
+        row = [self.html_th_scores('#', title='Rank'),
+               self.html_th_scores('Code'),
+               self.html_th_scores('Name')]
+        row.extend([self.html_th_scores('P%d' % (i + 1))
+                    for i in range(event.num_problems)])
+        row.extend([self.html_th_scores('&Sigma;', title='Total score'),
+                    self.html_th_scores('Award')])
+        return self.html_tr_list(row)
+
+    def person_scoreboard_row(self, p):
+        """Generate the scoreboard row for one person."""
+        scores_row = []
+        for i in range(p.event.num_problems):
+            s = p.problem_scores[i]
+            if s is None:
+                s = ''
+            else:
+                s = str(s)
+            scores_row.append(s)
+        row = [str(p.rank),
+               self.link_for_person(p.person, cgi.escape(p.contestant_code)),
+               self.link_for_person(p.person, cgi.escape(p.name))]
+        row.extend(scores_row)
+        row.extend([str(p.total_score), cgi.escape(p.award or '')])
+        return self.html_tr_td_scores_list(row)
+
+    def country_scoreboard_header(self, show_year, num_problems_to_show):
+        """Generate the header for a scoreboard for countries."""
+        row = []
+        if show_year:
+            row.append(self.html_th_scores('Year'))
+        row.append(self.html_th_scores('#', title='Rank'))
+        if not show_year:
+            row.append(self.html_th_scores('Country'))
+        row.append(self.html_th_scores('Size'))
+        row.extend([self.html_th_scores('P%d' % (i + 1))
+                    for i in range(num_problems_to_show)])
+        row.extend([self.html_th_scores('&Sigma;', title='Total score'),
+                    self.html_th_scores('G', title='Gold'),
+                    self.html_th_scores('S', title='Silver'),
+                    self.html_th_scores('B', title='Bronze'),
+                    self.html_th_scores('HM', title='Honourable Mention')])
+        return self.html_tr_list(row)
+
+    def country_scoreboard_row(self, c, show_year, num_problems_to_show=None):
+        """Generate the scoreboard row for one country."""
+        if num_problems_to_show is None:
+            num_problems_to_show = c.event.num_problems
+        row = []
+        if show_year:
+            row.append(
+                self.link_for_country_at_event(c,
+                                               cgi.escape(c.event.year)))
+        row.append(str(c.rank))
+        if not show_year:
+            row.append(
+                self.link_for_country_at_event(c,
+                                               cgi.escape(c.name_with_code)))
+        row.append(str(c.num_contestants))
+        row.extend([str(t) for t in c.problem_totals])
+        row.extend(['' for i in range(c.event.num_problems,
+                                      num_problems_to_show)])
+        row.extend([str(c.total_score), str(c.num_awards['Gold Medal']),
+                    str(c.num_awards['Silver Medal']),
+                    str(c.num_awards['Bronze Medal']),
+                    str(c.num_awards['Honourable Mention'])])
+        return self.html_tr_td_scores_list(row)
+
+    def generate_one_event_scoreboard(self, e):
+        """Generate a scoreboard for one event."""
+        text = ''
+        rss_file = os.path.join(self._out_dir,
+                                *self.path_for_event_scores_rss(e))
+        if os.access(rss_file, os.F_OK):
+            rss_note = ('  An %s is also available.' %
+                        self.link_for_event_scores_rss(e, 'RSS feed of the'
+                                                       ' scores as they were'
+                                                       ' published'))
+        else:
+            rss_note = ''
+        text += ('<p>The table of scores may also be %s in CSV format.'
+                 '%s</p>\n' %
+                 (self.link_for_event_scores_csv(e, 'downloaded'),
+                  rss_note))
+        countries = e.country_with_contestants_list
+        contestants = sorted(e.contestant_list, key=lambda x:x.sort_key)
+        num_problems = e.num_problems
+
+        text += '<h2>Scores by contestant code</h2>\n'
+        head_row_list = [self.person_scoreboard_header(e)]
+        body_row_list = []
+        for p in contestants:
+            body_row_list.append(self.person_scoreboard_row(p))
+        text += self.html_table_thead_tbody_list(head_row_list, body_row_list,
+                                                 width='100%')
+        text += '\n'
+
+        text += '<h2>Ranked scores</h2>\n'
+        body_row_list = []
+        rank_sorted_contestants = sorted(contestants, key=lambda x:x.rank)
+        for p in rank_sorted_contestants:
+            body_row_list.append(self.person_scoreboard_row(p))
+        text += self.html_table_thead_tbody_list(head_row_list, body_row_list,
+                                                 width='100%')
+        text += '\n'
+
+        text += '<h2>Statistics</h2>\n'
+        text += ('<p>%d gold medals (scores &ge; %d),'
+                 ' %d silver medals (scores &ge; %d),'
+                 ' %d bronze medals (scores &ge; %d),'
+                 ' %d honourable mentions from %d contestants total.</p>\n' %
+                 (e.num_awards['Gold Medal'], e.gold_boundary,
+                  e.num_awards['Silver Medal'], e.silver_boundary,
+                  e.num_awards['Bronze Medal'], e.bronze_boundary,
+                  e.num_awards['Honourable Mention'], e.num_contestants))
+        text += ('<p>From %s teams: %d gold medals, %d silver medals,'
+                 ' %d bronze medals, %d honourable mentions'
+                 ' from %d contestants total.</p>\n' %
+                 (cgi.escape(self._cfg['official_desc_lc']),
+                  e.num_awards_official['Gold Medal'],
+                  e.num_awards_official['Silver Medal'],
+                  e.num_awards_official['Bronze Medal'],
+                  e.num_awards_official['Honourable Mention'],
+                  e.num_contestants_official))
+        head_row_list = [self.html_tr_th_scores_list(
+                ['Total score',
+                 'Candidates',
+                 'Cumulative',
+                 ('Cumulative (%s)' %
+                  cgi.escape(self._cfg['official_desc_lc']))])]
+        body_row_list = []
+        ctot = 0
+        ctot_official = 0
+        for i in range(e.marks_total, -1, -1):
+            this_tot = e.total_stats[i]
+            ctot += this_tot
+            ctot_official += e.total_stats_official[i]
+            row = [str(i), str(this_tot), str(ctot), str(ctot_official)]
+            body_row_list.append(self.html_tr_td_scores_list(row))
+        text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
+        text += '\n'
+
+        text += '<h2>Statistics by problem</h2>\n'
+        row_list = []
+        row = ['']
+        row.extend(['P%d' % (i + 1) for i in range(num_problems)])
+        row_list.append(self.html_tr_th_scores_list(row))
+        for i in range(e.max_marks_per_problem + 1):
+            row = [self.html_th_scores('Score = %d' % i)]
+            for j in range(num_problems):
+                if i <= e.marks_per_problem[j]:
+                    s = str(e.problem_stats[j][i])
+                else:
+                    s = ''
+                row.append(self.html_td_scores(s))
+            row_list.append(self.html_tr_list(row))
+        text += self.html_table_list(row_list)
+        text += '\n'
+
+        text += '<h2>Country results</h2>\n'
+        head_row_list = [self.country_scoreboard_header(False, num_problems)]
+        rank_sorted_countries = sorted(countries, key=lambda x:x.sort_key)
+        rank_sorted_countries = sorted(rank_sorted_countries,
+                                       key=lambda x:x.rank)
+        body_row_list = []
+        for c in rank_sorted_countries:
+            body_row_list.append(self.country_scoreboard_row(c, False))
+        text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
+        text += '\n'
+
+        title = ('Scoreboard for %s' %
+                 cgi.escape(e.short_name_with_year_and_country))
+        header = 'Scoreboard for %s' % self.link_for_event_and_host(e)
+        self.write_html_to_file(text, title, header,
+                                self.path_for_event_scoreboard(e))
+
+    def generate_redirect(self, src_url, src_query_string, dest_url):
+        """Generate a single redirect."""
+        text = ''
+        src_path = re.sub('^https?://[^/]*', '', src_url)
+        text += 'RewriteCond %{REQUEST_URI} ^' + src_path + '$\n'
+        if src_query_string != '':
+            text += 'RewriteCond %{QUERY_STRING} ^' + src_query_string + '$\n'
+        text += 'RewriteRule ^.* ' + dest_url + '? [R=301,L]\n'
+        return text
+
+    def generate_redirect_file(self, src_url, src_query_string, dest_path):
+        """Generate a single redirect to a file."""
+        dest_url = self._cfg['url_base'] + '/'.join(dest_path)
+        return self.generate_redirect(src_url, src_query_string, dest_url)
+
+    def generate_redirect_page(self, src_url, src_query_string, dest_path):
+        """Generate a single redirect to a page (ending with '/')."""
+        dest_url = self._cfg['url_base'] + '/'.join(dest_path) + '/'
+        return self.generate_redirect(src_url, src_query_string, dest_url)
+
+    def generate_one_event_redirects(self, e):
+        """Generate redirects from registration system at one event."""
+        e_redirects_out = os.path.join(self._auto_out_dir,
+                                       'redirects-%d' % e.id)
+        text = ''
+        base_url = ''
+        countries = sorted(e.country_list, key=lambda x:x.sort_key)
+        people = sorted(e.person_list, key=lambda x:x.sort_key)
+        for c in countries:
+            src_url = c.annual_url
+            text += self.generate_redirect_page(
+                src_url, '',
+                self.path_for_country_at_event(c))
+            base_url = re.sub('country[0-9]*$', '', src_url)
+        src_url = base_url + 'country'
+        dest_path = self.path_for_event_countries_csv(e)
+        text += self.generate_redirect_file(src_url, '@action=country_csv',
+                                            dest_path)
+        text += self.generate_redirect_file(src_url, '%40action=country_csv',
+                                            dest_path)
+        src_url = base_url + 'country'
+        dest_path = self.path_for_event_scores_rss(e)
+        text += self.generate_redirect_file(src_url, '@action=scores_rss',
+                                            dest_path)
+        text += self.generate_redirect_file(src_url, '%40action=scores_rss',
+                                            dest_path)
+        src_url = base_url + 'country'
+        dest_path = self.path_for_event_countries(e)
+        text += self.generate_redirect_page(src_url, '', dest_path)
+        for p in people:
+            src_url = p.annual_url
+            dest_path = self.path_for_person(p.person)
+            text += self.generate_redirect_page(src_url, '', dest_path)
+        src_url = base_url + 'person'
+        dest_path = self.path_for_event_scoreboard(e)
+        text += self.generate_redirect_page(src_url, '@template=scoreboard',
+                                            dest_path)
+        text += self.generate_redirect_page(src_url, '%40template=scoreboard',
+                                            dest_path)
+        src_url = base_url + 'person'
+        dest_path = self.path_for_event_people_csv(e)
+        text += self.generate_redirect_file(src_url, '@action=people_csv',
+                                            dest_path)
+        text += self.generate_redirect_file(src_url, '%40action=people_csv',
+                                            dest_path)
+        src_url = base_url + 'person'
+        dest_path = self.path_for_event_scores_csv(e)
+        text += self.generate_redirect_file(src_url, '@action=scores_csv',
+                                            dest_path)
+        text += self.generate_redirect_file(src_url, '%40action=scores_csv',
+                                            dest_path)
+        src_url = base_url + 'person'
+        dest_path = self.path_for_event_people(e)
+        text += self.generate_redirect_page(src_url, '', dest_path)
+        src_url = base_url
+        dest_path = self.path_for_event_countries(e)
+        text += self.generate_redirect_page(src_url, '', dest_path)
+        write_text_to_file(text, e_redirects_out)
+
+    def country_event_text(self, c, h_level, show_photos):
+        """Generate the text for one country at one event."""
+        text = ''
+        text += '<%s>Participants</%s>\n' % (h_level, h_level)
+        c_people = sorted(c.person_list, key=lambda x:x.sort_key)
+        c_contestants = sorted(c.contestant_list, key=lambda x:x.sort_key)
+        c_guides = sorted(c.guide_list, key=lambda x:x.sort_key)
+        c_people.extend(c_guides)
+        hrow = ['Given Name', 'Family Name', 'Role']
+        if show_photos:
+            hrow.append('Photo')
+        head_row_list = [self.html_tr_th_list(hrow)]
+        body_row_list = []
+        for p in c_people:
+            if p.photo_url:
+                photo = self.html_img(width='150', alt='', src=p.photo_url)
+            else:
+                photo = ''
+            row = [self.link_for_person(p.person, cgi.escape(p.given_name)),
+                   self.link_for_person(p.person, cgi.escape(p.family_name)),
+                   cgi.escape(p.primary_role)]
+            if show_photos:
+                row.append(photo)
+            body_row_list.append(self.html_tr_td_list(row))
+        text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
+        text += '\n'
+        if c.num_contestants:
+            text += '<%s>Scores</%s>\n' % (h_level, h_level)
+            head_row_list = [self.person_scoreboard_header(c.event)]
+            body_row_list = []
+            for p in c_contestants:
+                body_row_list.append(self.person_scoreboard_row(p))
+            text += self.html_table_thead_tbody_list(head_row_list,
+                                                     body_row_list,
+                                                     width='100%')
+            text += '\n'
+        return text
+
+    def generate_one_event_country_page(self, c):
+        """Generate a page for one country at one event."""
+        text = ''
+        num_problems = c.event.num_problems
+        if c.flag_url:
+            text += ('<p class="%s">%s</p>\n' %
+                     (self._cfg['photo_css'],
+                      self.html_img(width='300', alt='', src=c.flag_url)))
+        text += self.country_event_text(c, 'h2', True)
+
+        if c.num_contestants:
+            text += '<h2>National results</h2>\n'
+            head_row_list = [self.country_scoreboard_header(False,
+                                                            num_problems)]
+            body_row_list = [self.country_scoreboard_row(c, False)]
+            text += self.html_table_thead_tbody_list(head_row_list,
+                                                     body_row_list)
+            text += '\n'
+
+        title = ('%s at %s' % (c.name_with_code,
+                               c.event.short_name_with_year_and_country))
+        title = cgi.escape(title)
+        header = ('%s (%s) at %s' %
+                  (self.link_for_country(c.country, cgi.escape(c.name)),
+                   self.link_for_country(c.country, cgi.escape(c.code)),
+                   self.link_for_event_and_host(c.event)))
+        self.write_html_to_file(text, title, header,
+                                self.path_for_country_at_event(c))
+
+    def generate_one_country_page(self, cd):
+        """Generate main page for one country."""
+        text = ''
+        if cd.flag_url:
+            text += ('<p class="%s">%s</p>\n' %
+                     (self._cfg['photo_css'],
+                      self.html_img(width='300', alt='', src=cd.flag_url)))
+        host = self.host_year_text(cd)
+        if host:
+            text += ('<p><strong>%s host</strong>: %s.</p>\n' %
+                     (cgi.escape(self._data.short_name), host))
+        year_list = []
+        year_list_table = []
+        c_max_num_problems = cd.max_num_problems
+        for c in cd.participation_list:
+            e = c.event
+            year_text = ''
+            cltxt = ('%s at %s' %
+                     (cgi.escape(c.name_with_code),
+                      cgi.escape(e.short_name_with_year)))
+            hl = self.link_for_country(e.host_country,
+                                       cgi.escape(e.host_country_name))
+            year_text += ('<h2>%s in %s</h2>\n' %
+                          (self.link_for_country_at_event(c, cltxt), hl))
+            year_text += self.country_event_text(c, 'h3', False)
+            year_list.append(year_text)
+            if c.num_contestants:
+                year_list_table.append(
+                    self.country_scoreboard_row(c, True, c_max_num_problems))
+        year_list.reverse()
+        year_list_table.reverse()
+        if year_list_table:
+            text += '<h2>National results</h2>\n'
+            head_row_list = [self.country_scoreboard_header(
+                    True, c_max_num_problems)]
+            text += self.html_table_thead_tbody_list(head_row_list,
+                                                     year_list_table)
+            text += '\n'
+        text += '\n'.join(year_list)
+        title = cgi.escape(cd.name_with_code)
+        self.write_html_to_file(text, title, title, self.path_for_country(cd))
+
+    def generate_one_person_page(self, pd):
+        """Generate main page for one person."""
+        text = ''
+        year_list = []
+        have_age = False
+        for p in pd.participation_list:
+            e = p.event
+            year_text = ''
+            el = self.link_for_event(e, cgi.escape(e.short_name_with_year))
+            year_text += '<h2>%s</h2>\n' % el
+            year_text += '<table>\n<tr><td>\n'
+            cl = self.link_for_country_at_event(p.country,
+                                                cgi.escape(p.country.name))
+            year_rows = [['Country', cl],
+                         ['Given name', cgi.escape(p.given_name)],
+                         ['Family name', cgi.escape(p.family_name)],
+                         ['Primary role', cgi.escape(p.primary_role)]]
+            if p.other_roles:
+                rs = sorted(p.other_roles, key=lambda x:coll_get_sort_key(x))
+                year_rows.append(['Other roles', cgi.escape(', '.join(rs))])
+            if p.guide_for:
+                glist = sorted(p.guide_for, key=lambda x:x.sort_key)
+                gtlist = []
+                for c in glist:
+                    cl = self.link_for_country_at_event(c, cgi.escape(c.name))
+                    gtlist.append(cl)
+                year_rows.append(['Guide for', ', '.join(gtlist)])
+            if p.is_contestant and p.contestant_age is not None:
+                year_rows.append(['Contestant age', str(p.contestant_age)])
+                have_age = True
+            year_text += self.html_table_list_th_td(year_rows) + '\n'
+            year_text += '</td><td>\n'
+            if p.photo_url:
+                year_text += self.html_img(width='200', alt='',
+                                           src=p.photo_url)
+            year_text += '</td></tr>\n</table>\n'
+            if p.is_contestant:
+                year_text += '<h3>Scores</h3>\n'
+                head_row_list = [self.person_scoreboard_header(e)]
+                body_row_list = [self.person_scoreboard_row(p)]
+                year_text += self.html_table_thead_tbody_list(head_row_list,
+                                                              body_row_list,
+                                                              width='100%')
+                year_text += '\n'
+            year_list.append(year_text)
+        year_list.reverse()
+        text += '\n'.join(year_list)
+        if have_age:
+            text += ('<p>Contestant ages are given on %s at each %s.</p>\n' %
+                     (cgi.escape(self._cfg['age_day_desc']),
+                      cgi.escape(self._data.short_name)))
+        title = cgi.escape(pd.name)
+        header = title
+        self.write_html_to_file(text, title, header, self.path_for_person(pd))
+
+    def generate_events_csv(self):
+        """Generate the CSV file for all events."""
+        events_data_output = []
+        for e in self._data.event_list:
+            csv_out = {}
+            csv_out['Number'] = str(e.id)
+            csv_out['Year'] = e.year
+            csv_out['Country Number'] = str(e.host_country.id)
+            csv_out['Country'] = e.host_country_name
+            csv_out['City'] = e.host_city or ''
+            csv_out['Start Date'] = e.start_date or ''
+            csv_out['End Date'] = e.end_date or ''
+            csv_out['Home Page URL'] = e.home_page_url or ''
+            csv_out['Contact Name'] = e.contact_name or ''
+            csv_out['Contact Email'] = e.contact_email or ''
+            csv_out['Number of Exams'] = str(e.num_exams or '')
+            csv_out['Number of Problems'] = str(e.num_problems or '')
+            if e.num_problems:
+                for i in range(self._data.max_num_problems):
+                    if i < e.num_problems:
+                        csv_out['P%d Max' % (i + 1)] = \
+                            str(e.marks_per_problem[i])
+                    else:
+                        csv_out['P%d Max' % (i + 1)] = ''
+            else:
+                for i in range(self._data.max_num_problems):
+                    csv_out['P%d Max' % (i + 1)] = ''
+            if e.num_contestants:
+                csv_out['Gold Boundary'] = str(e.gold_boundary)
+                csv_out['Silver Boundary'] = str(e.silver_boundary)
+                csv_out['Bronze Boundary'] = str(e.bronze_boundary)
+                csv_out['Contestants'] = str(e.num_contestants)
+                csv_out['Gold Medals'] = str(e.num_awards['Gold Medal'])
+                csv_out['Silver Medals'] = str(e.num_awards['Silver Medal'])
+                csv_out['Bronze Medals'] = str(e.num_awards['Bronze Medal'])
+                csv_out['Honourable Mentions'] = \
+                    str(e.num_awards['Honourable Mention'])
+                csv_out['Number of Countries'] = str(e.num_countries)
+                csv_out[self._cfg['official_adj'] + ' Contestants'] = \
+                    str(e.num_contestants_official)
+                csv_out[self._cfg['official_adj'] + ' Gold Medals'] = \
+                    str(e.num_awards_official['Gold Medal'])
+                csv_out[self._cfg['official_adj'] + ' Silver Medals'] = \
+                    str(e.num_awards_official['Silver Medal'])
+                csv_out[self._cfg['official_adj'] + ' Bronze Medals'] = \
+                    str(e.num_awards_official['Bronze Medal'])
+                csv_out[self._cfg['official_adj'] + ' Honourable Mentions'] = \
+                    str(e.num_awards_official['Honourable Mention'])
+                csv_out['Number of ' + self._cfg['official_adj'] +
+                        ' Countries'] = str(e.num_countries_official)
+            else:
+                csv_out['Gold Boundary'] = ''
+                csv_out['Silver Boundary'] = ''
+                csv_out['Bronze Boundary'] = ''
+                csv_out['Contestants'] = ''
+                csv_out['Gold Medals'] = ''
+                csv_out['Silver Medals'] = ''
+                csv_out['Bronze Medals'] = ''
+                csv_out['Honourable Mentions'] = ''
+                csv_out['Number of Countries'] = ''
+                csv_out[self._cfg['official_adj'] + ' Contestants'] = ''
+                csv_out[self._cfg['official_adj'] + ' Gold Medals'] = ''
+                csv_out[self._cfg['official_adj'] + ' Silver Medals'] = ''
+                csv_out[self._cfg['official_adj'] + ' Bronze Medals'] = ''
+                csv_out[self._cfg['official_adj'] + ' Honourable Mentions'] = \
+                    ''
+                csv_out['Number of ' + self._cfg['official_adj'] +
+                        ' Countries'] = ''
+            events_data_output.append(csv_out)
+        events_columns = ['Number', 'Year', 'Country Number', 'Country',
+                          'City', 'Start Date', 'End Date',
+                          'Home Page URL', 'Contact Name',
+                          'Contact Email', 'Number of Exams',
+                          'Number of Problems']
+        events_columns.extend(['P%d Max' % (i + 1)
+                               for i in range(self._data.max_num_problems)])
+        events_columns.extend(['Gold Boundary', 'Silver Boundary',
+                               'Bronze Boundary', 'Contestants',
+                               'Gold Medals', 'Silver Medals',
+                               'Bronze Medals', 'Honourable Mentions',
+                               'Number of Countries',
+                               self._cfg['official_adj'] + ' Contestants',
+                               self._cfg['official_adj'] + ' Gold Medals',
+                               self._cfg['official_adj'] + ' Silver Medals',
+                               self._cfg['official_adj'] + ' Bronze Medals',
+                               self._cfg['official_adj'] +
+                               ' Honourable Mentions',
+                               'Number of ' + self._cfg['official_adj'] +
+                               ' Countries'])
+        self.write_csv_to_file(self.path_for_data_events(), events_data_output,
+                               events_columns)
+
+    def pn_csv_header(self, num_problems):
+        """Return list of Pn headers for CSV file."""
+        return [('P%d' % (i + 1)) for i in range(num_problems)]
+
+    def countries_csv_columns(self, num_problems):
+        """Return list of headers for CSV file of countries."""
+        cols = [self._cfg['num_key'], 'Country Number', 'Annual URL',
+                'Code', 'Name', 'Flag URL', self._cfg['official_desc'],
+                'Contestants', 'Gold Medals', 'Silver Medals', 'Bronze Medals',
+                'Honourable Mentions', 'Total Score', 'Rank']
+        cols.extend(self.pn_csv_header(num_problems))
+        return cols
+
+    def country_csv_data(self, c, num_problems=None):
+        """Return the CSV data for a given country."""
+        if num_problems is None:
+            num_problems = c.event.num_problems
+        csv_out = {}
+        csv_out[self._cfg['num_key']] = str(c.event.id)
+        csv_out['Country Number'] = str(c.country.id)
+        csv_out['Annual URL'] = c.annual_url
+        csv_out['Code'] = c.code
+        csv_out['Name'] = c.name
+        csv_out['Flag URL'] = c.flag_url or ''
+        csv_out[self._cfg['official_desc']] = c.is_official and 'Yes' or 'No'
+        if c.num_contestants:
+            csv_out['Contestants'] = str(c.num_contestants)
+            csv_out['Gold Medals'] = str(c.num_awards['Gold Medal'])
+            csv_out['Silver Medals'] = str(c.num_awards['Silver Medal'])
+            csv_out['Bronze Medals'] = str(c.num_awards['Bronze Medal'])
+            csv_out['Honourable Mentions'] = \
+                str(c.num_awards['Honourable Mention'])
+            csv_out['Total Score'] = str(c.total_score)
+            csv_out['Rank'] = str(c.rank)
+            for i in range(num_problems):
+                if i < c.event.num_problems:
+                    csv_out['P%d' % (i + 1)] = str(c.problem_totals[i])
+                else:
+                    csv_out['P%d' % (i + 1)] = ''
+        else:
+            csv_out['Contestants'] = ''
+            csv_out['Gold Medals'] = ''
+            csv_out['Silver Medals'] = ''
+            csv_out['Bronze Medals'] = ''
+            csv_out['Honourable Mentions'] = ''
+            csv_out['Total Score'] = ''
+            csv_out['Rank'] = ''
+            for i in range(num_problems):
+                csv_out['P%d' % (i + 1)] = ''
+        return csv_out
+
+    def generate_countries_csv(self):
+        """Generate the CSV file for all countries."""
+        countries_sorted = sorted(self._data.country_event_list,
+                                  key=lambda x:x.sort_key)
+        countries_data_output = [self.country_csv_data(
+                c, num_problems=self._data.max_num_problems)
+                                 for c in countries_sorted]
+        countries_columns = \
+            self.countries_csv_columns(self._data.max_num_problems)
+        self.write_csv_to_file(self.path_for_data_countries(),
+                               countries_data_output, countries_columns)
+
+    def generate_one_event_countries_csv(self, e):
+        """Generate the CSV file for countries at one event."""
+        e_countries_sorted = sorted(e.country_list, key=lambda x:x.sort_key)
+        e_countries_data_output = [self.country_csv_data(c)
+                                   for c in e_countries_sorted]
+        e_countries_columns = self.countries_csv_columns(e.num_problems)
+        self.write_csv_to_file(self.path_for_event_countries_csv(e),
+                               e_countries_data_output, e_countries_columns)
+
+    def people_csv_columns(self, num_problems):
+        """Return list of headers for CSV file of people."""
+        cols = [self._cfg['num_key'], 'Country Number', 'Person Number',
+                'Annual URL', 'Country Name', 'Country Code',
+                'Primary Role', 'Other Roles', 'Guide For',
+                'Contestant Code',
+                'Contestant Age', 'Given Name', 'Family Name']
+        cols.extend(self.pn_csv_header(num_problems))
+        cols.extend(['Total', 'Award', 'Photo URL', 'Rank'])
+        return cols
+
+    def person_csv_data(self, p, num_problems=None):
+        """Return the CSV data for a given person."""
+        if num_problems is None:
+            num_problems = p.event.num_problems
+        csv_out = {}
+        csv_out[self._cfg['num_key']] = str(p.event.id)
+        csv_out['Country Number'] = str(p.country.country.id)
+        csv_out['Person Number'] = str(p.person.id)
+        csv_out['Annual URL'] = p.annual_url
+        csv_out['Country Name'] = p.country.name
+        csv_out['Country Code'] = p.country.code
+        csv_out['Primary Role'] = p.primary_role
+        csv_out['Other Roles'] = ','.join(sorted(
+                p.other_roles,
+                key=lambda x:coll_get_sort_key(x)))
+        guide_for = sorted(p.guide_for, key=lambda x:x.sort_key)
+        guide_for = [c.name for c in guide_for]
+        csv_out['Guide For'] = ','.join(guide_for)
+        csv_out['Given Name'] = p.given_name
+        csv_out['Family Name'] = p.family_name
+        csv_out['Photo URL'] = p.photo_url or ''
+        if p.is_contestant:
+            csv_out['Contestant Code'] = p.contestant_code
+            if p.contestant_age is None:
+                csv_out['Contestant Age'] = ''
+            else:
+                csv_out['Contestant Age'] = str(p.contestant_age)
+            for i in range(num_problems):
+                if i < p.event.num_problems:
+                    s = p.problem_scores[i]
+                    if s is None:
+                        s = ''
+                    else:
+                        s = str(s)
+                    csv_out['P%d' % (i + 1)] = s
+                else:
+                    csv_out['P%d' % (i + 1)] = ''
+            csv_out['Total'] = str(p.total_score)
+            csv_out['Award'] = p.award or ''
+            csv_out['Rank'] = str(p.rank)
+        else:
+            csv_out['Contestant Code'] = ''
+            csv_out['Contestant Age'] = ''
+            for i in range(num_problems):
+                csv_out['P%d' % (i + 1)] = ''
+            csv_out['Total'] = ''
+            csv_out['Award'] = ''
+            csv_out['Rank'] = ''
+        return csv_out
+
+    def generate_people_csv(self):
+        """Generate the CSV file for all peoples."""
+        people_sorted = sorted(self._data.person_event_list,
+                               key=lambda x:x.sort_key)
+        people_data_output = [self.person_csv_data(
+                p, num_problems=self._data.max_num_problems)
+                              for p in people_sorted]
+        people_columns = \
+            self.people_csv_columns(self._data.max_num_problems)
+        self.write_csv_to_file(self.path_for_data_people(),
+                               people_data_output, people_columns)
+
+    def generate_one_event_people_csv(self, e):
+        """Generate the CSV file for people at one event."""
+        e_people_sorted = sorted(e.person_list, key=lambda x:x.sort_key)
+        e_people_data_output = [self.person_csv_data(p)
+                                for p in e_people_sorted]
+        e_people_columns = self.people_csv_columns(e.num_problems)
+        self.write_csv_to_file(self.path_for_event_people_csv(e),
+                               e_people_data_output, e_people_columns)
+
+    def scores_csv_columns(self, num_problems):
+        """Return list of headers for CSV file of scores."""
+        cols = ['Country Name', 'Country Code',
+                'Contestant Code', 'Given Name', 'Family Name']
+        cols.extend(self.pn_csv_header(num_problems))
+        cols.extend(['Total', 'Award', 'Rank'])
+        return cols
+
+    def generate_one_event_scores_csv(self, e):
+        """Generate the CSV file for scores at one event."""
+        e_people_sorted = sorted(e.contestant_list, key=lambda x:x.sort_key)
+        e_people_data_output = [self.person_csv_data(p)
+                                for p in e_people_sorted]
+        e_scores_columns = self.scores_csv_columns(e.num_problems)
+        e_scores_data_output = []
+        for d in e_people_data_output:
+            nd = { k: d[k] for k in e_scores_columns }
+            e_scores_data_output.append(nd)
+        self.write_csv_to_file(self.path_for_event_scores_csv(e),
+                               e_scores_data_output, e_scores_columns)
+
+    def generate_site(self):
+        """Generate the complete static site."""
+        self.generate_sidebar_out()
+        self.generate_contact_out()
+        self.generate_events_summary()
+        self.generate_countries_summary()
+        self.generate_people_summary()
+        self.generate_hall_of_fame()
+
+        for e in self._data.event_list:
+            e_extra = os.path.join(self._out_dir, *self.path_for_event(e))
+            e_extra = os.path.join(e_extra, 'extra' + self._cfg['page_suffix'])
+            if not os.access(e_extra, os.F_OK):
+                write_text_to_file('', e_extra)
+            self.generate_one_event_summary(e)
+            if e.num_contestants:
+                self.generate_one_event_countries_summary(e)
+                self.generate_one_event_people_summary(e)
+                self.generate_one_event_scoreboard(e)
+                self.generate_one_event_redirects(e)
+                for c in e.country_list:
+                    self.generate_one_event_country_page(c)
+
+        for c in self._data.country_list:
+            self.generate_one_country_page(c)
+
+        for p in self._data.person_list:
+            self.generate_one_person_page(p)
+
+        self.generate_events_csv()
+        self.generate_countries_csv()
+        self.generate_people_csv()
+
+        for e in self._data.event_list:
+            if e.num_contestants:
+                self.generate_one_event_countries_csv(e)
+                self.generate_one_event_people_csv(e)
+                self.generate_one_event_scores_csv(e)
