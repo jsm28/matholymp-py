@@ -48,6 +48,7 @@ directory for the website, containing the file staticsite.cfg, as its
 working directory.
 """
 
+import argparse
 import os
 import os.path
 import re
@@ -63,9 +64,14 @@ __all__ = ['main']
 def main():
     """Main program for mo-static-import."""
 
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('event_number', help='number of event', type=int)
+    parser.add_argument('input_directory', help='directory with input data')
+    args = vars(parser.parse_args())
+
     top_directory = os.getcwd()
-    event_number = sys.argv[1]
-    input_directory = sys.argv[2]
+    event_number = str(args['event_number'])
+    input_directory = args['input_directory']
 
     data_directory = os.path.join(top_directory, 'data')
 

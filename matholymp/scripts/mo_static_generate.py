@@ -39,6 +39,7 @@ The page template, or a manually created page, should contain links to
 the overall countries/, <event>s/ and people/ pages.
 """
 
+import argparse
 import os
 import os.path
 import sys
@@ -52,6 +53,9 @@ __all__ = ['main']
 
 def main():
     """Main program for mo-static-generate."""
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.parse_args()
 
     top_directory = os.getcwd()
 
