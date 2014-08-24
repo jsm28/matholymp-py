@@ -677,8 +677,7 @@ class SiteGenerator(object):
                         gtlist.append(cl)
                     role_text += ': %s' % ', '.join(gtlist)
                 if p.other_roles:
-                    rs = sorted(p.other_roles,
-                                key=lambda x:coll_get_sort_key(x))
+                    rs = sorted(p.other_roles, key=coll_get_sort_key)
                     role_text += ', %s' % cgi.escape(', '.join(rs))
                 year_text += '(%s)' % role_text
                 pd_list.append(year_text)
@@ -1260,7 +1259,7 @@ class SiteGenerator(object):
                          ['Family name', cgi.escape(p.family_name)],
                          ['Primary role', cgi.escape(p.primary_role)]]
             if p.other_roles:
-                rs = sorted(p.other_roles, key=lambda x:coll_get_sort_key(x))
+                rs = sorted(p.other_roles, key=coll_get_sort_key)
                 year_rows.append(['Other roles', cgi.escape(', '.join(rs))])
             if p.guide_for:
                 glist = sorted(p.guide_for, key=lambda x:x.sort_key)
@@ -1484,9 +1483,8 @@ class SiteGenerator(object):
         csv_out['Country Name'] = p.country.name
         csv_out['Country Code'] = p.country.code
         csv_out['Primary Role'] = p.primary_role
-        csv_out['Other Roles'] = ','.join(sorted(
-                p.other_roles,
-                key=lambda x:coll_get_sort_key(x)))
+        csv_out['Other Roles'] = ','.join(sorted(p.other_roles,
+                                                 key=coll_get_sort_key))
         guide_for = sorted(p.guide_for, key=lambda x:x.sort_key)
         guide_for = [c.name for c in guide_for]
         csv_out['Guide For'] = ','.join(guide_for)
