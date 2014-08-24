@@ -53,7 +53,6 @@ import os
 import os.path
 import re
 import shutil
-import sys
 
 from matholymp.fileutil import read_utf8_csv, write_utf8_csv, \
     make_dirs_for_file, read_config

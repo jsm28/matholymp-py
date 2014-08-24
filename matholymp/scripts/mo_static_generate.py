@@ -42,7 +42,6 @@ the overall countries/, <event>s/ and people/ pages.
 import argparse
 import os
 import os.path
-import sys
 
 from matholymp.data import EventGroup
 from matholymp.csvsource import CSVDataSource
