@@ -112,19 +112,16 @@ def main():
     new_countries_data = read_utf8_csv(input_countries_csv)
     country_index = {}
     for c in new_countries_data:
-        c['Annual URL'] = c['URL']
-        del c['URL']
-        c[cfg_data['num_key']] = event_number
-        if 'Generic Number' in c:
-            country_number = c['Generic Number']
-            del c['Generic Number']
-        else:
-            country_number = ''
+        if c[cfg_data['num_key']] != event_number:
+            raise ValueError('country from wrong event')
+        annual_id = c['Country Number']
+        country_number = c['Generic Number']
+        del c['Generic Number']
         if not country_number:
             max_country_index += 1
             country_number = str(max_country_index)
         c['Country Number'] = country_number
-        country_index[c['Code']] = country_number
+        country_index[annual_id] = country_number
         if c['Flag URL']:
             flag_src_filename = file_url_to_local(c['Flag URL'],
                                                   input_flags_dir,
@@ -159,15 +156,11 @@ def main():
 
     new_people_data = read_utf8_csv(input_people_csv)
     for p in new_people_data:
-        p['Annual URL'] = p['URL']
-        del p['URL']
-        p[cfg_data['num_key']] = event_number
-        p['Country Number'] = country_index[p['Country Code']]
-        if 'Generic Number' in p:
-            person_number = p['Generic Number']
-            del p['Generic Number']
-        else:
-            person_number = ''
+        if p[cfg_data['num_key']] != event_number:
+            raise ValueError('person from wrong event')
+        p['Country Number'] = country_index[p['Country Number']]
+        person_number = p['Generic Number']
+        del p['Generic Number']
         if not person_number:
             max_person_index += 1
             person_number = str(max_person_index)
