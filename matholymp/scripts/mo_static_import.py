@@ -85,7 +85,7 @@ def main():
 
     cfg_file_name = os.path.join(top_directory, 'staticsite.cfg')
     cfg_str_keys = ['num_key', 'url_base', 'short_name_url',
-                    'short_name_url_plural']
+                    'short_name_url_plural', 'official_desc']
     cfg_int_keys = []
     cfg_int_none_keys = []
     cfg_bool_keys = []
@@ -141,7 +141,7 @@ def main():
     countries_data.extend(new_countries_data)
     write_utf8_csv(countries_csv, countries_data,
                    [cfg_data['num_key'], 'Country Number', 'Annual URL',
-                    'Code', 'Name', 'Flag URL', 'Official European'])
+                    'Code', 'Name', 'Flag URL', cfg_data['official_desc']])
 
     people_data = read_utf8_csv(people_csv)
     max_person_index = 0
