@@ -938,6 +938,26 @@ class PersonEvent(object):
         'photo_url',
         """The URL of the registration photo of this person at this event.""")
 
+    first_language = _PersonEventPropertyDS(
+        'first_language',
+        """The first language of this person at this event.""")
+
+    second_language = _PersonEventPropertyDS(
+        'second_language',
+        """The second language of this person at this event.""")
+
+    diet = _PersonEventPropertyDS(
+        'diet',
+        """The dietary requirements of this person at this event.""")
+
+    room_number = _PersonEventPropertyDS(
+        'room_number',
+        """The room number of this person at this event.""")
+
+    phone_number = _PersonEventPropertyDS(
+        'phone_number',
+        """The phone number of this person at this event.""")
+
     def _get_sort_key(self):
         return (self.event.id,
                 coll_get_sort_key(self.country.code),
@@ -949,6 +969,16 @@ class PersonEvent(object):
     sort_key = _PropertyCached(
         'sort_key', _get_sort_key,
         """General-purpose sort key.""")
+
+    def _get_sort_key_exams(self):
+        return (self.event.id,
+                coll_get_sort_key(self.primary_role),
+                coll_get_sort_key(self.country.code),
+                self.person.id)
+
+    sort_key_exams = _PropertyCached(
+        'sort_key_exams', _get_sort_key_exams,
+        """Sort key by contestant number for exams.""")
 
 class Country(object):
 

@@ -52,14 +52,29 @@ class CSVDataSource(DataSource):
         self._papers = {}
         self._countries = {}
         self._people = {}
-        for e in events:
-            eid = int(e['Number'])
-            if eid in self._events:
-                raise ValueError('duplicate event %d' % eid)
+        if events is None:
+            # Data direct from registration system used for generating
+            # documents; no CSV file of event data.
+            eid = cfg['event_number']
+            e = {}
+            e['Number of Exams'] = cfg['num_exams']
+            e['Number of Problems'] = cfg['num_problems']
+            e['Gold Boundary'] = cfg['gold_boundary']
+            e['Silver Boundary'] = cfg['silver_boundary']
+            e['Bronze Boundary'] = cfg['bronze_boundary']
             self._events[eid] = e
             self._papers[eid] = []
             self._countries[eid] = {}
             self._people[eid] = {}
+        else:
+            for e in events:
+                eid = int(e['Number'])
+                if eid in self._events:
+                    raise ValueError('duplicate event %d' % eid)
+                self._events[eid] = e
+                self._papers[eid] = []
+                self._countries[eid] = {}
+                self._people[eid] = {}
         for p in papers:
             eid = int(p[cfg['num_key']])
             self._papers[eid].append(Paper(int(p['Day']), p['Language'],
@@ -154,7 +169,12 @@ class CSVDataSource(DataSource):
                                    'given_name': 'Given Name',
                                    'family_name': 'Family Name',
                                    'award': 'Award',
-                                   'photo_url': 'Photo URL' }
+                                   'photo_url': 'Photo URL',
+                                   'first_language': 'First Language',
+                                   'second_language': 'Second Language',
+                                   'diet': 'Dietary Requirements',
+                                   'room_number': 'Room Number',
+                                   'phone_number': 'Phone Number' }
 
     _person_event_attr_map_int = { '_country_id': 'Country Number',
                                    'contestant_age': 'Contestant Age',
