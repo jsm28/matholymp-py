@@ -45,7 +45,7 @@ import os.path
 
 __all__ = ['read_utf8_csv', 'write_utf8_csv_bytes', 'write_utf8_csv',
            'make_dirs_for_file', 'write_text_to_file', 'read_text_from_file',
-           'read_config']
+           'read_config', 'remove_if_exists']
 
 if _py3:
     _text_open_args = { 'encoding': 'utf-8' }
@@ -143,3 +143,8 @@ def read_config(file_name, section, str_keys, int_keys, int_none_keys,
     for k in bool_keys:
         ret[k] = cfg.getboolean(section, k)
     return ret
+
+def remove_if_exists(file_name):
+    """Remove a file if it exists."""
+    if os.access(file_name, os.F_OK):
+        os.remove(file_name)
