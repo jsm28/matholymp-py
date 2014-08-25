@@ -83,10 +83,10 @@ class DataSource(object):
         Return the value of an attribute for an Event.  Possible names
         are: short_name, long_name, year, _host_country_id,
         host_country_name, host_city, start_date, end_date,
-        home_page_url, contact_name, contact_email, num_problems,
-        marks_per_problem, registration_active, gold_boundary,
-        silver_boundary, bronze_boundary, paper_list, _person_ids,
-        _country_ids.
+        home_page_url, contact_name, contact_email, num_exams,
+        num_problems, marks_per_problem, registration_active,
+        gold_boundary, silver_boundary, bronze_boundary, paper_list,
+        _person_ids, _country_ids.
         """
         raise NotImplementedError
 
@@ -103,7 +103,8 @@ class DataSource(object):
         Return the value of an attribute for a PersonEvent.  Possible
         names are: _country_id, annual_url, primary_role, other_roles,
         _guide_for_ids, contestant_age, given_name, family_name,
-        problem_scores, total_score, award, photo_url.
+        problem_scores, total_score, award, photo_url, first_language,
+        second_language, diet, room_number, phone_number.
         """
         raise NotImplementedError
 
