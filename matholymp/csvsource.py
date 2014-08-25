@@ -57,11 +57,15 @@ class CSVDataSource(DataSource):
             # documents; no CSV file of event data.
             eid = cfg['event_number']
             e = {}
-            e['Number of Exams'] = cfg['num_exams']
-            e['Number of Problems'] = cfg['num_problems']
-            e['Gold Boundary'] = cfg['gold_boundary']
-            e['Silver Boundary'] = cfg['silver_boundary']
-            e['Bronze Boundary'] = cfg['bronze_boundary']
+            e['Year'] = cfg['year']
+            e['Number of Exams'] = str(cfg['num_exams'])
+            e['Number of Problems'] = str(cfg['num_problems'])
+            e['Gold Boundary'] = (cfg['gold_boundary'] is not None and
+                                  str(cfg['gold_boundary']) or '')
+            e['Silver Boundary'] = (cfg['silver_boundary'] is not None and
+                                    str(cfg['silver_boundary']) or '')
+            e['Bronze Boundary'] = (cfg['bronze_boundary'] is not None and
+                                    str(cfg['bronze_boundary']) or '')
             marks_per_problem = cfg['marks_per_problem'].split()
             for i in range(int(cfg['num_problems'])):
                 e['P%d Max' % (i + 1)] = marks_per_problem[i]
