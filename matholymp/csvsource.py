@@ -62,6 +62,9 @@ class CSVDataSource(DataSource):
             e['Gold Boundary'] = cfg['gold_boundary']
             e['Silver Boundary'] = cfg['silver_boundary']
             e['Bronze Boundary'] = cfg['bronze_boundary']
+            marks_per_problem = cfg['marks_per_problem'].split()
+            for i in range(int(cfg['num_problems'])):
+                e['P%d Max' % (i + 1)] = marks_per_problem[i]
             self._events[eid] = e
             self._papers[eid] = []
             self._countries[eid] = {}
