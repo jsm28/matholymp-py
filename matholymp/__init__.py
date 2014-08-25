@@ -33,5 +33,5 @@ maintaining websites for mathematical olympiads, registration of
 participants and associated administration.
 """
 
-__all__ = ['collate', 'csvsource', 'data', 'datasource', 'fileutil',
-           'regdata', 'sitegen']
+__all__ = ['collate', 'csvsource', 'data', 'datasource', 'docgen',
+           'fileutil', 'regdata', 'sitegen']
