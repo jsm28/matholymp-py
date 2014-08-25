@@ -533,6 +533,22 @@ class Event(object):
         'num_contestants_official', _get_num_contestants_official,
         """The number of contestants from official countries at this event.""")
 
+    def _get_contestant_map(self):
+        r = {}
+        for p in self.contestant_list:
+            if p.contestant_code in r:
+                raise ValueError('duplicate contestant code %s' %
+                                 p.contestant_code)
+            r[p.contestant_code] = p
+        return r
+
+    contestant_map = _PropertyCached(
+        'contestant_map', _get_contestant_map,
+        """
+        A mapping from contestant codes to PersonEvent objects for
+        contestants at this event.
+        """)
+
     def _get_num_awards_cond(self, cond):
         if self.scores_final:
             ival = 0
