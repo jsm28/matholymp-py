@@ -181,11 +181,21 @@ class CSVDataSource(DataSource):
                                    'second_language': 'Second Language',
                                    'diet': 'Dietary Requirements',
                                    'room_number': 'Room Number',
-                                   'phone_number': 'Phone Number' }
+                                   'phone_number': 'Phone Number',
+                                   'gender': 'Gender',
+                                   'date_of_birth': 'Date of Birth',
+                                   'tshirt': 'T-Shirt Size',
+                                   'arrival_place': 'Arrival Place',
+                                   'arrival_time': 'Arrival Time',
+                                   'arrival_flight': 'Arrival FLight',
+                                   'departure_place': 'Departure Place',
+                                   'departure_time': 'Departure Time',
+                                   'departure_flight': 'Departure FLight' }
 
     _person_event_attr_map_int = { '_country_id': 'Country Number',
                                    'contestant_age': 'Contestant Age',
-                                   'total_score': 'Total' }
+                                   'total_score': 'Total',
+                                   'generic_id': 'Generic Number' }
 
     def person_event_get_attr(self, person_id, event_id, name):
         if name in CSVDataSource._person_event_attr_map_str:
@@ -239,6 +249,8 @@ class CSVDataSource(DataSource):
                                     'name': 'Name',
                                     'flag_url': 'Flag URL' }
 
+    _country_event_attr_map_int = { 'generic_id': 'Generic Number' }
+
     def country_event_get_attr(self, country_id, event_id, name):
         if name in CSVDataSource._country_event_attr_map_str:
             k = CSVDataSource._country_event_attr_map_str[name]
@@ -246,6 +258,13 @@ class CSVDataSource(DataSource):
             if s == '':
                 s = None
             return s
+        if name in CSVDataSource._country_event_attr_map_int:
+            k = CSVDataSource._country_event_attr_map_int[name]
+            s = self._countries[event_id][country_id][k]
+            if s == '':
+                return None
+            else:
+                return int(s)
         if name == 'is_official':
             k = self._cfg['official_desc']
             s = self._countries[event_id][country_id][k]

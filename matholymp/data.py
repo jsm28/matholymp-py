@@ -974,6 +974,50 @@ class PersonEvent(object):
         'phone_number',
         """The phone number of this person at this event.""")
 
+    generic_id = _PersonEventPropertyDS(
+        'generic_id',
+        """
+        The generic id for this person at this event (when ids used in
+        this EventGroup are those from the registration system rather
+        than permanent generic ids).
+        """)
+
+    gender = _PersonEventPropertyDS(
+        'gender',
+        """The gender of this person at this event.""")
+
+    date_of_birth = _PersonEventPropertyDS(
+        'date_of_birth',
+        """The date of birth of this person at this event.""")
+
+    tshirt = _PersonEventPropertyDS(
+        'tshirt',
+        """The T-shirt size of this person at this event.""")
+
+    arrival_place = _PersonEventPropertyDS(
+        'arrival_place',
+        """The arrival place of this person at this event.""")
+
+    arrival_time = _PersonEventPropertyDS(
+        'arrival_time',
+        """The arrival time of this person at this event.""")
+
+    arrival_flight = _PersonEventPropertyDS(
+        'arrival_flight',
+        """The arrival flight of this person at this event.""")
+
+    departure_place = _PersonEventPropertyDS(
+        'departure_place',
+        """The departure place of this person at this event.""")
+
+    departure_time = _PersonEventPropertyDS(
+        'departure_time',
+        """The departure time of this person at this event.""")
+
+    departure_flight = _PersonEventPropertyDS(
+        'departure_flight',
+        """The departure flight of this person at this event.""")
+
     def _get_sort_key(self):
         return (self.event.id,
                 coll_get_sort_key(self.country.code),
@@ -1268,6 +1312,14 @@ class CountryEvent(object):
     rank = _PropertyCached(
         'rank', _get_rank,
         """The rank of this country at this event.""")
+
+    generic_id = _CountryEventPropertyDS(
+        'generic_id',
+        """
+        The generic id for this country at this event (when ids used
+        in this EventGroup are those from the registration system
+        rather than permanent generic ids).
+        """)
 
     def _get_sort_key(self):
         return (self.event.id,

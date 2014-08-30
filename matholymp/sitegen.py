@@ -1392,16 +1392,21 @@ class SiteGenerator(object):
         """Return list of Pn headers for CSV file."""
         return [('P%d' % (i + 1)) for i in range(num_problems)]
 
-    def countries_csv_columns(self, num_problems):
+    def countries_csv_columns(self, num_problems, reg_system=False):
         """Return list of headers for CSV file of countries."""
         cols = [self._cfg['num_key'], 'Country Number', 'Annual URL',
-                'Code', 'Name', 'Flag URL', self._cfg['official_desc'],
-                'Contestants', 'Gold Medals', 'Silver Medals', 'Bronze Medals',
-                'Honourable Mentions', 'Total Score', 'Rank']
-        cols.extend(self.pn_csv_header(num_problems))
+                'Code', 'Name', 'Flag URL']
+        if reg_system:
+            cols.extend(['Generic Number'])
+        cols.extend([self._cfg['official_desc']])
+        if not reg_system:
+            cols.extend(['Contestants', 'Gold Medals', 'Silver Medals',
+                         'Bronze Medals', 'Honourable Mentions',
+                         'Total Score', 'Rank'])
+            cols.extend(self.pn_csv_header(num_problems))
         return cols
 
-    def country_csv_data(self, c, num_problems=None):
+    def country_csv_data(self, c, num_problems=None, reg_system=False):
         """Return the CSV data for a given country."""
         if num_problems is None:
             num_problems = c.event.num_problems
@@ -1412,31 +1417,37 @@ class SiteGenerator(object):
         csv_out['Code'] = c.code
         csv_out['Name'] = c.name
         csv_out['Flag URL'] = c.flag_url or ''
+        if reg_system:
+            if c.generic_id is None:
+                csv_out['Generic Number'] = ''
+            else:
+                csv_out['Generic Number'] = str(c.generic_id)
         csv_out[self._cfg['official_desc']] = c.is_official and 'Yes' or 'No'
-        if c.num_contestants:
-            csv_out['Contestants'] = str(c.num_contestants)
-            csv_out['Gold Medals'] = str(c.num_awards['Gold Medal'])
-            csv_out['Silver Medals'] = str(c.num_awards['Silver Medal'])
-            csv_out['Bronze Medals'] = str(c.num_awards['Bronze Medal'])
-            csv_out['Honourable Mentions'] = \
-                str(c.num_awards['Honourable Mention'])
-            csv_out['Total Score'] = str(c.total_score)
-            csv_out['Rank'] = str(c.rank)
-            for i in range(num_problems):
-                if i < c.event.num_problems:
-                    csv_out['P%d' % (i + 1)] = str(c.problem_totals[i])
-                else:
+        if not reg_system:
+            if c.num_contestants:
+                csv_out['Contestants'] = str(c.num_contestants)
+                csv_out['Gold Medals'] = str(c.num_awards['Gold Medal'])
+                csv_out['Silver Medals'] = str(c.num_awards['Silver Medal'])
+                csv_out['Bronze Medals'] = str(c.num_awards['Bronze Medal'])
+                csv_out['Honourable Mentions'] = \
+                    str(c.num_awards['Honourable Mention'])
+                csv_out['Total Score'] = str(c.total_score)
+                csv_out['Rank'] = str(c.rank)
+                for i in range(num_problems):
+                    if i < c.event.num_problems:
+                        csv_out['P%d' % (i + 1)] = str(c.problem_totals[i])
+                    else:
+                        csv_out['P%d' % (i + 1)] = ''
+            else:
+                csv_out['Contestants'] = ''
+                csv_out['Gold Medals'] = ''
+                csv_out['Silver Medals'] = ''
+                csv_out['Bronze Medals'] = ''
+                csv_out['Honourable Mentions'] = ''
+                csv_out['Total Score'] = ''
+                csv_out['Rank'] = ''
+                for i in range(num_problems):
                     csv_out['P%d' % (i + 1)] = ''
-        else:
-            csv_out['Contestants'] = ''
-            csv_out['Gold Medals'] = ''
-            csv_out['Silver Medals'] = ''
-            csv_out['Bronze Medals'] = ''
-            csv_out['Honourable Mentions'] = ''
-            csv_out['Total Score'] = ''
-            csv_out['Rank'] = ''
-            for i in range(num_problems):
-                csv_out['P%d' % (i + 1)] = ''
         return csv_out
 
     def generate_countries_csv(self):
@@ -1451,16 +1462,27 @@ class SiteGenerator(object):
         self.write_csv_to_file(self.path_for_data_countries(),
                                countries_data_output, countries_columns)
 
+    def one_event_countries_csv_content(self, e, reg_system=False):
+        """
+        Return a tuple of the data and column headers for the CSV file
+        for countries at one event.
+        """
+        e_countries_sorted = sorted(e.country_list, key=lambda x:x.sort_key)
+        e_countries_data_output = [self.country_csv_data(c,
+                                                         reg_system=reg_system)
+                                   for c in e_countries_sorted]
+        e_countries_columns = self.countries_csv_columns(
+            e.num_problems, reg_system=reg_system)
+        return (e_countries_data_output, e_countries_columns)
+
     def generate_one_event_countries_csv(self, e):
         """Generate the CSV file for countries at one event."""
-        e_countries_sorted = sorted(e.country_list, key=lambda x:x.sort_key)
-        e_countries_data_output = [self.country_csv_data(c)
-                                   for c in e_countries_sorted]
-        e_countries_columns = self.countries_csv_columns(e.num_problems)
+        data = self.one_event_countries_csv_content(e)
         self.write_csv_to_file(self.path_for_event_countries_csv(e),
-                               e_countries_data_output, e_countries_columns)
+                               data[0], data[1])
 
-    def people_csv_columns(self, num_problems):
+    def people_csv_columns(self, num_problems, reg_system=False,
+                           private_data=False):
         """Return list of headers for CSV file of people."""
         cols = [self._cfg['num_key'], 'Country Number', 'Person Number',
                 'Annual URL', 'Country Name', 'Country Code',
@@ -1468,35 +1490,51 @@ class SiteGenerator(object):
                 'Contestant Code',
                 'Contestant Age', 'Given Name', 'Family Name']
         cols.extend(self.pn_csv_header(num_problems))
-        cols.extend(['Total', 'Award', 'Photo URL', 'Rank'])
+        cols.extend(['Total', 'Award', 'Photo URL'])
+        if reg_system:
+            cols.extend(['Generic Number'])
+        if not reg_system:
+            cols.extend(['Rank'])
+        if private_data:
+            cols.extend(['Gender', 'Date of Birth', 'First Language',
+                         'Second Language', 'Dietary Requirements',
+                         'T-Shirt Size', 'Arrival Place', 'Arrival Time',
+                         'Arrival Flight', 'Departure Place',
+                         'Departure Time', 'Departure Flight', 'Room Number',
+                         'Phone Number'])
         return cols
 
-    def person_csv_data(self, p, num_problems=None):
+    def person_csv_data(self, p, num_problems=None, scores_only=False,
+                        reg_system=False, private_data=False):
         """Return the CSV data for a given person."""
         if num_problems is None:
             num_problems = p.event.num_problems
         csv_out = {}
-        csv_out[self._cfg['num_key']] = str(p.event.id)
-        csv_out['Country Number'] = str(p.country.country.id)
-        csv_out['Person Number'] = str(p.person.id)
-        csv_out['Annual URL'] = p.annual_url
+        if not scores_only:
+            csv_out[self._cfg['num_key']] = str(p.event.id)
+            csv_out['Country Number'] = str(p.country.country.id)
+            csv_out['Person Number'] = str(p.person.id)
+            csv_out['Annual URL'] = p.annual_url
         csv_out['Country Name'] = p.country.name
         csv_out['Country Code'] = p.country.code
-        csv_out['Primary Role'] = p.primary_role
-        csv_out['Other Roles'] = ','.join(sorted(p.other_roles,
-                                                 key=coll_get_sort_key))
-        guide_for = sorted(p.guide_for, key=lambda x:x.sort_key)
-        guide_for = [c.name for c in guide_for]
-        csv_out['Guide For'] = ','.join(guide_for)
+        if not scores_only:
+            csv_out['Primary Role'] = p.primary_role
+            csv_out['Other Roles'] = ','.join(sorted(p.other_roles,
+                                                     key=coll_get_sort_key))
+            guide_for = sorted(p.guide_for, key=lambda x:x.sort_key)
+            guide_for = [c.name for c in guide_for]
+            csv_out['Guide For'] = ','.join(guide_for)
         csv_out['Given Name'] = p.given_name
         csv_out['Family Name'] = p.family_name
-        csv_out['Photo URL'] = p.photo_url or ''
+        if not scores_only:
+            csv_out['Photo URL'] = p.photo_url or ''
         if p.is_contestant:
             csv_out['Contestant Code'] = p.contestant_code
-            if p.contestant_age is None:
-                csv_out['Contestant Age'] = ''
-            else:
-                csv_out['Contestant Age'] = str(p.contestant_age)
+            if not scores_only:
+                if p.contestant_age is None:
+                    csv_out['Contestant Age'] = ''
+                else:
+                    csv_out['Contestant Age'] = str(p.contestant_age)
             for i in range(num_problems):
                 if i < p.event.num_problems:
                     s = p.problem_scores[i]
@@ -1509,15 +1547,38 @@ class SiteGenerator(object):
                     csv_out['P%d' % (i + 1)] = ''
             csv_out['Total'] = str(p.total_score)
             csv_out['Award'] = p.award or ''
-            csv_out['Rank'] = str(p.rank)
+            if not reg_system:
+                csv_out['Rank'] = str(p.rank)
         else:
             csv_out['Contestant Code'] = ''
-            csv_out['Contestant Age'] = ''
+            if not scores_only:
+                csv_out['Contestant Age'] = ''
             for i in range(num_problems):
                 csv_out['P%d' % (i + 1)] = ''
             csv_out['Total'] = ''
             csv_out['Award'] = ''
-            csv_out['Rank'] = ''
+            if not reg_system:
+                csv_out['Rank'] = ''
+        if reg_system:
+            if p.generic_id is None:
+                csv_out['Generic Number'] = ''
+            else:
+                csv_out['Generic Number'] = str(p.generic_id)
+        if private_data:
+            csv_out['Gender'] = p.gender or ''
+            csv_out['Date of Birth'] = p.date_of_birth or ''
+            csv_out['First Language'] = p.first_language or ''
+            csv_out['Second Language'] = p.second_language or ''
+            csv_out['Dietary Requirements'] = p.diet or ''
+            csv_out['T-Shirt Size'] = p.tshirt or ''
+            csv_out['Arrival Place'] = p.arrival_place or ''
+            csv_out['Arrival Time'] = p.arrival_time or ''
+            csv_out['Arrival Flight'] = p.arrival_flight or ''
+            csv_out['Departure Place'] = p.departure_place or ''
+            csv_out['Departure Time'] = p.departure_time or ''
+            csv_out['Departure Flight'] = p.departure_flight or ''
+            csv_out['Room Number'] = p.room_number or ''
+            csv_out['Phone Number'] = p.phone_number or ''
         return csv_out
 
     def generate_people_csv(self):
@@ -1532,35 +1593,55 @@ class SiteGenerator(object):
         self.write_csv_to_file(self.path_for_data_people(),
                                people_data_output, people_columns)
 
+    def one_event_people_csv_content(self, e, reg_system=False,
+                                     private_data=False):
+        """
+        Return a tuple of the data and column headers for the CSV file
+        for people at one event.
+        """
+        e_people_sorted = sorted(e.person_list, key=lambda x:x.sort_key)
+        e_people_data_output = [self.person_csv_data(p, reg_system=reg_system,
+                                                     private_data=private_data)
+                                for p in e_people_sorted]
+        e_people_columns = self.people_csv_columns(e.num_problems,
+                                                   reg_system=reg_system,
+                                                   private_data=private_data)
+        return (e_people_data_output, e_people_columns)
+
     def generate_one_event_people_csv(self, e):
         """Generate the CSV file for people at one event."""
-        e_people_sorted = sorted(e.person_list, key=lambda x:x.sort_key)
-        e_people_data_output = [self.person_csv_data(p)
-                                for p in e_people_sorted]
-        e_people_columns = self.people_csv_columns(e.num_problems)
+        data = self.one_event_people_csv_content(e)
         self.write_csv_to_file(self.path_for_event_people_csv(e),
-                               e_people_data_output, e_people_columns)
+                               data[0], data[1])
 
-    def scores_csv_columns(self, num_problems):
+    def scores_csv_columns(self, num_problems, reg_system=False):
         """Return list of headers for CSV file of scores."""
         cols = ['Country Name', 'Country Code',
                 'Contestant Code', 'Given Name', 'Family Name']
         cols.extend(self.pn_csv_header(num_problems))
-        cols.extend(['Total', 'Award', 'Rank'])
+        cols.extend(['Total', 'Award'])
+        if not reg_system:
+            cols.extend(['Rank'])
         return cols
+
+    def one_event_scores_csv_content(self, e, reg_system=False):
+        """
+        Return a tuple of the data and column headers for the CSV file
+        for scores at one event.
+        """
+        e_people_sorted = sorted(e.contestant_list, key=lambda x:x.sort_key)
+        e_scores_data_output = [self.person_csv_data(p, scores_only=True,
+                                                     reg_system=reg_system)
+                                for p in e_people_sorted]
+        e_scores_columns = self.scores_csv_columns(e.num_problems,
+                                                   reg_system=reg_system)
+        return (e_scores_data_output, e_scores_columns)
 
     def generate_one_event_scores_csv(self, e):
         """Generate the CSV file for scores at one event."""
-        e_people_sorted = sorted(e.contestant_list, key=lambda x:x.sort_key)
-        e_people_data_output = [self.person_csv_data(p)
-                                for p in e_people_sorted]
-        e_scores_columns = self.scores_csv_columns(e.num_problems)
-        e_scores_data_output = []
-        for d in e_people_data_output:
-            nd = { k: d[k] for k in e_scores_columns }
-            e_scores_data_output.append(nd)
+        data = self.one_event_scores_csv_content(e)
         self.write_csv_to_file(self.path_for_event_scores_csv(e),
-                               e_scores_data_output, e_scores_columns)
+                               data[0], data[1])
 
     def generate_site(self):
         """Generate the complete static site."""
