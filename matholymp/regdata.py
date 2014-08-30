@@ -33,7 +33,8 @@ This module handles input data downloaded from the registration system.
 
 import os.path
 import re
-import urllib
+
+from matholymp.urlutil import url_unquote
 
 __all__ = ['file_url_to_local']
 
@@ -45,7 +46,7 @@ def file_url_to_local(url, local_dir, type):
     matches = re.match("^([0-9]+)/(.*)", url)
     file_id = matches.group(1)
     file_name = matches.group(2)
-    file_name = urllib.unquote(file_name)
+    file_name = url_unquote(file_name)
     file_name = re.sub('[^a-zA-Z0-9_.]', '_', file_name)
     file_name = re.sub('^.*\\.', type + '.', file_name)
     file_name = re.sub('^[^.]*$', type, file_name)

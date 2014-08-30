@@ -1,4 +1,4 @@
-# Initialise matholymp package.
+# URL handling utilities for matholymp package.
 
 # Copyright 2014 Joseph Samuel Myers.
 
@@ -28,10 +28,18 @@
 # used as well as that of the covered work.
 
 """
-The matholymp package provides a range of functionality for
-maintaining websites for mathematical olympiads, registration of
-participants and associated administration.
+This module provides URL handling support for matholymp use.
 """
 
-__all__ = ['collate', 'csvsource', 'data', 'datasource', 'docgen',
-           'fileutil', 'regdata', 'sitegen', 'urlutil']
+import sys
+_py3 = sys.version_info.major >= 3
+if _py3:
+    import urllib.parse
+    url_quote = urllib.parse.quote
+    url_unquote = urllib.parse.unquote
+else:
+    import urllib
+    url_quote = urllib.quote
+    url_unquote = urllib.unquote
+
+__all__ = ['url_quote', 'url_unquote']

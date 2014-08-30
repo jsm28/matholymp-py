@@ -33,10 +33,9 @@ interfaces to provide the source data about events and the people and
 countries involved in them from which other data is derived.
 """
 
-import urllib
-
 from matholymp.datasource import DataSource
 from matholymp.roundupreg.rounduputil import scores_from_str, contestant_age
+from matholymp.urlutil import url_quote
 
 __all__ = ['RoundupDataSource']
 
@@ -168,7 +167,7 @@ class RoundupDataSource(DataSource):
             else:
                 photo_name = self._db.file.get(photo_id, 'name')
                 photo_url = (self._db.config.TRACKER_WEB + 'file' + photo_id +
-                             '/' + urllib.quote(photo_name))
+                             '/' + url_quote(photo_name))
             return photo_url
         elif name == 'first_language':
             first_language = self._db.person.get(id, 'first_language')
@@ -252,7 +251,7 @@ class RoundupDataSource(DataSource):
             else:
                 flag_name = self._db.file.get(flag_id, 'name')
                 flag_url = (self._db.config.TRACKER_WEB + 'file' + flag_id +
-                            '/' + urllib.quote(flag_name))
+                            '/' + url_quote(flag_name))
             return flag_url
         elif name == 'is_official':
             return self._db.country.get(id, 'official')
