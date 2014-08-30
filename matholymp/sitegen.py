@@ -875,18 +875,25 @@ class SiteGenerator(object):
         self.write_html_to_file(text, title, header,
                                 self.path_for_event_people(e))
 
-    def person_scoreboard_header(self, event):
+    def person_scoreboard_header(self, event, show_rank=True, show_code=True,
+                                 show_name=True, show_award=True):
         """Generate the header for a scoreboard for individual people."""
-        row = [self.html_th_scores('#', title='Rank'),
-               self.html_th_scores('Code'),
-               self.html_th_scores('Name')]
+        row = []
+        if show_rank:
+            row.extend([self.html_th_scores('#', title='Rank')])
+        if show_code:
+            row.extend([self.html_th_scores('Code')])
+        if show_name:
+            row.extend([self.html_th_scores('Name')])
         row.extend([self.html_th_scores('P%d' % (i + 1))
                     for i in range(event.num_problems)])
-        row.extend([self.html_th_scores('&Sigma;', title='Total score'),
-                    self.html_th_scores('Award')])
+        row.extend([self.html_th_scores('&Sigma;', title='Total score')])
+        if show_award:
+            row.extend([self.html_th_scores('Award')])
         return self.html_tr_list(row)
 
-    def person_scoreboard_row(self, p):
+    def person_scoreboard_row(self, p, show_rank=True, show_code=True,
+                              show_name=True, show_award=True, link=True):
         """Generate the scoreboard row for one person."""
         scores_row = []
         for i in range(p.event.num_problems):
@@ -896,11 +903,22 @@ class SiteGenerator(object):
             else:
                 s = str(s)
             scores_row.append(s)
-        row = [str(p.rank),
-               self.link_for_person(p.person, cgi.escape(p.contestant_code)),
-               self.link_for_person(p.person, cgi.escape(p.name))]
+        row = []
+        if show_rank:
+            row.extend([str(p.rank)])
+        if link:
+            linker = self.link_for_person
+        else:
+            def linker(person, text):
+                return text
+        if show_code:
+            row.extend([linker(p.person, cgi.escape(p.contestant_code))])
+        if show_name:
+            row.extend([linker(p.person, cgi.escape(p.name))])
         row.extend(scores_row)
-        row.extend([str(p.total_score), cgi.escape(p.award or '')])
+        row.extend([str(p.total_score)])
+        if show_award:
+            row.extend([cgi.escape(p.award or '')])
         return self.html_tr_td_scores_list(row)
 
     def country_scoreboard_header(self, show_year, num_problems_to_show):
@@ -939,28 +957,20 @@ class SiteGenerator(object):
         row.extend([str(t) for t in c.problem_totals])
         row.extend(['' for i in range(c.event.num_problems,
                                       num_problems_to_show)])
-        row.extend([str(c.total_score), str(c.num_awards['Gold Medal']),
-                    str(c.num_awards['Silver Medal']),
-                    str(c.num_awards['Bronze Medal']),
-                    str(c.num_awards['Honourable Mention'])])
+        row.extend([str(c.total_score),
+                    (c.num_awards['Gold Medal'] is not None and
+                     str(c.num_awards['Gold Medal']) or ''),
+                    (c.num_awards['Silver Medal'] is not None and
+                     str(c.num_awards['Silver Medal']) or ''),
+                    (c.num_awards['Bronze Medal'] is not None and
+                     str(c.num_awards['Bronze Medal']) or ''),
+                    (c.num_awards['Honourable Mention'] is not None and
+                     str(c.num_awards['Honourable Mention']) or '')])
         return self.html_tr_td_scores_list(row)
 
-    def generate_one_event_scoreboard(self, e):
-        """Generate a scoreboard for one event."""
+    def scoreboard_text(self, e):
+        """Return the main text of the scoreboard for one event."""
         text = ''
-        rss_file = os.path.join(self._out_dir,
-                                *self.path_for_event_scores_rss(e))
-        if os.access(rss_file, os.F_OK):
-            rss_note = ('  An %s is also available.' %
-                        self.link_for_event_scores_rss(e, 'RSS feed of the'
-                                                       ' scores as they were'
-                                                       ' published'))
-        else:
-            rss_note = ''
-        text += ('<p>The table of scores may also be %s in CSV format.'
-                 '%s</p>\n' %
-                 (self.link_for_event_scores_csv(e, 'downloaded'),
-                  rss_note))
         countries = e.country_with_contestants_list
         contestants = sorted(e.contestant_list, key=lambda x:x.sort_key)
         num_problems = e.num_problems
@@ -984,23 +994,29 @@ class SiteGenerator(object):
         text += '\n'
 
         text += '<h2>Statistics</h2>\n'
-        text += ('<p>%d gold medals (scores &ge; %d),'
-                 ' %d silver medals (scores &ge; %d),'
-                 ' %d bronze medals (scores &ge; %d),'
-                 ' %d honourable mentions from %d contestants total.</p>\n' %
-                 (e.num_awards['Gold Medal'], e.gold_boundary,
-                  e.num_awards['Silver Medal'], e.silver_boundary,
-                  e.num_awards['Bronze Medal'], e.bronze_boundary,
-                  e.num_awards['Honourable Mention'], e.num_contestants))
-        text += ('<p>From %s teams: %d gold medals, %d silver medals,'
-                 ' %d bronze medals, %d honourable mentions'
-                 ' from %d contestants total.</p>\n' %
-                 (cgi.escape(self._cfg['official_desc_lc']),
-                  e.num_awards_official['Gold Medal'],
-                  e.num_awards_official['Silver Medal'],
-                  e.num_awards_official['Bronze Medal'],
-                  e.num_awards_official['Honourable Mention'],
-                  e.num_contestants_official))
+        if e.scores_final:
+            text += ('<p>%d gold medals (scores &ge; %d),'
+                     ' %d silver medals (scores &ge; %d),'
+                     ' %d bronze medals (scores &ge; %d),'
+                     ' %d honourable mentions from %d contestants'
+                     ' total.</p>\n' %
+                     (e.num_awards['Gold Medal'], e.gold_boundary,
+                      e.num_awards['Silver Medal'], e.silver_boundary,
+                      e.num_awards['Bronze Medal'], e.bronze_boundary,
+                      e.num_awards['Honourable Mention'], e.num_contestants))
+            text += ('<p>From %s teams: %d gold medals, %d silver medals,'
+                     ' %d bronze medals, %d honourable mentions'
+                     ' from %d contestants total.</p>\n' %
+                     (cgi.escape(self._cfg['official_desc_lc']),
+                      e.num_awards_official['Gold Medal'],
+                      e.num_awards_official['Silver Medal'],
+                      e.num_awards_official['Bronze Medal'],
+                      e.num_awards_official['Honourable Mention'],
+                      e.num_contestants_official))
+        else:
+            text += ('<p>%d contestants (%d from %s teams).</p>\n' %
+                     (e.num_contestants, e.num_contestants_official,
+                      cgi.escape(self._cfg['official_desc_lc'])))
         head_row_list = [self.html_tr_th_scores_list(
                 ['Total score',
                  'Candidates',
@@ -1046,6 +1062,32 @@ class SiteGenerator(object):
             body_row_list.append(self.country_scoreboard_row(c, False))
         text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
         text += '\n'
+
+        if not e.scores_final:
+            text += ('<p>The statistics by problem only include the'
+                     ' scores shown on the scoreboard.  Other statistics'
+                     ' treat such blanks as 0.</p>\n')
+
+        return text
+
+    def generate_one_event_scoreboard(self, e):
+        """Generate a scoreboard for one event."""
+        text = ''
+        rss_file = os.path.join(self._out_dir,
+                                *self.path_for_event_scores_rss(e))
+        if os.access(rss_file, os.F_OK):
+            rss_note = ('  An %s is also available.' %
+                        self.link_for_event_scores_rss(e, 'RSS feed of the'
+                                                       ' scores as they were'
+                                                       ' published'))
+        else:
+            rss_note = ''
+        text += ('<p>The table of scores may also be %s in CSV format.'
+                 '%s</p>\n' %
+                 (self.link_for_event_scores_csv(e, 'downloaded'),
+                  rss_note))
+
+        text += self.scoreboard_text(e)
 
         title = ('Scoreboard for %s' %
                  cgi.escape(e.short_name_with_year_and_country))
