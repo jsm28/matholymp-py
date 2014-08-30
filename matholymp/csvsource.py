@@ -272,5 +272,5 @@ class CSVDataSource(DataSource):
                 return True
             if s == 'No':
                 return False
-            raise ValueError('unexecpted official setting %s', s)
+            raise ValueError('unexpected official setting %s', s)
         raise KeyError(name)
