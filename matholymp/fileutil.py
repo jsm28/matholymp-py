@@ -45,7 +45,7 @@ import os.path
 
 __all__ = ['read_utf8_csv', 'write_utf8_csv_bytes', 'write_utf8_csv',
            'make_dirs_for_file', 'write_text_to_file', 'read_text_from_file',
-           'read_config', 'remove_if_exists']
+           'read_config', 'boolean_states', 'remove_if_exists']
 
 if _py3:
     _text_open_args = { 'encoding': 'utf-8' }
@@ -143,6 +143,15 @@ def read_config(file_name, section, str_keys, int_keys, int_none_keys,
     for k in bool_keys:
         ret[k] = cfg.getboolean(section, k)
     return ret
+
+if _py3:
+    # Exported by the standard library from 3.2 onwards.
+    _boolean_states = configparser.BOOLEAN_STATES
+else:
+    _boolean_states = { '1': True, 'yes': True, 'true': True, 'on': True,
+                        '0': False, 'no': False, 'false': False, 'off': False }
+boolean_states = _boolean_states
+"""Mapping of boolean states to values in configuration files."""
 
 def remove_if_exists(file_name):
     """Remove a file if it exists."""
