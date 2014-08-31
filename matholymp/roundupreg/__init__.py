@@ -33,4 +33,5 @@ based on Roundup.
 """
 
 __all__ = ['actions', 'auditors', 'auditorutil', 'roundupsitegen',
-           'roundupsource', 'rounduputil', 'templating', 'userauditor']
+           'roundupsource', 'rounduputil', 'schema', 'templating',
+           'userauditor']
