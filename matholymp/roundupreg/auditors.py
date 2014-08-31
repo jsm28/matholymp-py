@@ -29,45 +29,18 @@
 
 """This module provides auditors for the Roundup registration system."""
 
-__all__ = ['get_new_value', 'require_value', 'audit_event_fields',
-           'audit_country_fields', 'audit_person_fields', 'register_auditors']
+__all__ = ['audit_event_fields', 'audit_country_fields', 'audit_person_fields',
+           'register_auditors']
 
 import re
 
 from roundup.date import Date
 
 from matholymp.fileutil import boolean_states
+from matholymp.roundupreg.auditorutil import get_new_value, require_value
 from matholymp.roundupreg.rounduputil import get_none_country, \
     get_staff_country, any_scores_missing, create_rss
-
-def get_new_value(db, cl, nodeid, newvalues, prop):
-    """
-    Return the new value of a property if one was specified, or the
-    continuing old value if not, or None if this is a new node and no
-    value was specified.
-    """
-    if prop in newvalues:
-        return newvalues[prop]
-    if nodeid is None:
-        return None
-    return cl.get(nodeid, prop)
-
-def require_value(db, cl, nodeid, newvalues, prop, error):
-    """
-    Require a property to have a nonempty value, restoring a previous
-    value from the database if an attempt is made to empty it; return
-    that value.
-    """
-    value = get_new_value(db, cl, nodeid, newvalues, prop)
-    if value:
-        return value
-    if nodeid is None:
-        raise ValueError(error)
-    value = cl.get(nodeid, prop)
-    if not value:
-        raise ValueError(error)
-    newvalues[prop] = value
-    return value
+from matholymp.roundupreg.userauditor import audit_user_fields
 
 def audit_event_fields(db, cl, nodeid, newvalues):
     """Verify medal boundaries can be set and create RSS item for them."""
@@ -302,3 +275,5 @@ def register_auditors(db):
     db.country.audit('create', audit_country_fields)
     db.person.audit('set', audit_person_fields)
     db.person.audit('create', audit_person_fields)
+    db.user.audit('set', audit_user_fields)
+    db.user.audit('create', audit_user_fields)
