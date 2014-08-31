@@ -248,13 +248,13 @@ class DocumentGenerator(object):
         elif (primary_role == 'Deputy Leader' or
               primary_role == 'Observer with Deputy'):
             background_type = 'deputy'
-        elif re.search('Chief Guide', primary_role):
+        elif 'Chief Guide' in primary_role:
             background_type = 'chiefguide'
-        elif re.search('Guide', primary_role):
+        elif 'Guide' in primary_role:
             background_type = 'guide'
-        elif re.search('Coordinator', primary_role):
+        elif 'Coordinator' in primary_role:
             background_type = 'coordinator'
-        elif re.search('Invigilator', primary_role):
+        elif 'Invigilator' in primary_role:
             background_type = 'invigilator'
         else:
             background_type = 'organiser'
