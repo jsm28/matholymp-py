@@ -32,6 +32,6 @@ The matholymp.roundupreg package implements a registration system
 based on Roundup.
 """
 
-__all__ = ['actions', 'auditors', 'auditorutil', 'roundupsitegen',
-           'roundupsource', 'rounduputil', 'schema', 'templating',
-           'userauditor']
+__all__ = ['actions', 'auditors', 'auditorutil', 'initial_data',
+           'roundupsitegen', 'roundupsource', 'rounduputil', 'schema',
+           'templating', 'userauditor']
