@@ -1174,12 +1174,27 @@ class SiteGenerator(object):
         text += self.generate_redirect_page(src_url, '', dest_path)
         write_text_to_file(text, e_redirects_out)
 
+    def country_event_scores_table(self, c, show_rank=True):
+        """
+        Generate the table of contestant scores for one country at one
+        event, given that this country has contestants.
+        """
+        c_contestants = sorted(c.contestant_list, key=lambda x:x.sort_key)
+        head_row_list = [self.person_scoreboard_header(c.event,
+                                                       show_rank=show_rank)]
+        body_row_list = []
+        for p in c_contestants:
+            body_row_list.append(self.person_scoreboard_row(
+                p, show_rank=show_rank))
+        return self.html_table_thead_tbody_list(head_row_list,
+                                                body_row_list,
+                                                width='100%')
+
     def country_event_text(self, c, h_level, show_photos):
         """Generate the text for one country at one event."""
         text = ''
         text += '<%s>Participants</%s>\n' % (h_level, h_level)
         c_people = sorted(c.person_list, key=lambda x:x.sort_key)
-        c_contestants = sorted(c.contestant_list, key=lambda x:x.sort_key)
         c_guides = sorted(c.guide_list, key=lambda x:x.sort_key)
         c_people.extend(c_guides)
         hrow = ['Given Name', 'Family Name', 'Role']
@@ -1202,13 +1217,7 @@ class SiteGenerator(object):
         text += '\n'
         if c.num_contestants:
             text += '<%s>Scores</%s>\n' % (h_level, h_level)
-            head_row_list = [self.person_scoreboard_header(c.event)]
-            body_row_list = []
-            for p in c_contestants:
-                body_row_list.append(self.person_scoreboard_row(p))
-            text += self.html_table_thead_tbody_list(head_row_list,
-                                                     body_row_list,
-                                                     width='100%')
+            text += self.country_event_scores_table(c)
             text += '\n'
         return text
 

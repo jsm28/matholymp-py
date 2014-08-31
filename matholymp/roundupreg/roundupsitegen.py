@@ -61,24 +61,24 @@ class RoundupSiteGenerator(SiteGenerator):
                 'outer_scores_css':
                     db.config.ext['MATHOLYMP_OUTER_SCORES_CLASS'] }
         event_group = EventGroup(RoundupDataSource(db))
+        self.event = event_group.event_list[0]
+        """The unique event described by the Roundup instance."""
         super(RoundupSiteGenerator, self).__init__(cfg, event_group)
 
     def countries_csv_bytes(self):
         """Return the byte contents of the CSV of countries."""
-        e = self._data.event_list[0]
-        data = self.one_event_countries_csv_content(e, reg_system=True)
+        data = self.one_event_countries_csv_content(self.event,
+                                                    reg_system=True)
         return write_utf8_csv_bytes(data[0], data[1])
 
     def scores_csv_bytes(self):
         """Return the byte contents of the CSV of scores."""
-        e = self._data.event_list[0]
-        data = self.one_event_scores_csv_content(e, reg_system=True)
+        data = self.one_event_scores_csv_content(self.event, reg_system=True)
         return write_utf8_csv_bytes(data[0], data[1])
 
     def people_csv_bytes(self, private_data):
         """Return the byte contents of the CSV of people."""
-        e = self._data.event_list[0]
-        data = self.one_event_people_csv_content(e, reg_system=True,
+        data = self.one_event_people_csv_content(self.event, reg_system=True,
                                                  private_data=private_data)
         return write_utf8_csv_bytes(data[0], data[1])
 
@@ -144,8 +144,7 @@ class RoundupSiteGenerator(SiteGenerator):
 
     def this_event_scoreboard_text(self, for_display, display_start):
         """Return the text of the scoreboard for the present event."""
-        e = self._data.event_list[0]
         if for_display:
-            return self.display_scoreboard_text(e, display_start)
+            return self.display_scoreboard_text(self.event, display_start)
         else:
-            return self.scoreboard_text(e)
+            return self.scoreboard_text(self.event)
