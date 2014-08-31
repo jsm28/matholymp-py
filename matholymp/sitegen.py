@@ -845,15 +845,12 @@ class SiteGenerator(object):
         self.write_html_to_file(text, title, header,
                                 self.path_for_event_countries(e))
 
-    def generate_one_event_people_summary(self, e):
-        """Generate a summary list of the people at one event."""
-        text = ''
-        text += ('<p>Details of all people at this %s may also be %s'
-                 ' in CSV format.</p>\n' %
-                 (cgi.escape(e.short_name),
-                  self.link_for_event_people_csv(e, 'downloaded')))
+    def event_people_table(self, e):
+        """Generate the table of people at one event."""
+        ctext_list = []
         countries = sorted(e.country_list, key=lambda x:x.sort_key)
         for c in countries:
+            text = ''
             people = sorted(c.person_list, key=lambda x:x.sort_key)
             cl = self.link_for_country_at_event(c,
                                                 cgi.escape(c.name_with_code))
@@ -869,7 +866,18 @@ class SiteGenerator(object):
                 body_row_list.append(row)
             text += self.html_table_thead_tbody_list(head_row_list,
                                                      body_row_list)
-            text += '\n'
+            ctext_list.append(text)
+        return '\n'.join(ctext_list)
+
+    def generate_one_event_people_summary(self, e):
+        """Generate a summary list of the people at one event."""
+        text = ''
+        text += ('<p>Details of all people at this %s may also be %s'
+                 ' in CSV format.</p>\n' %
+                 (cgi.escape(e.short_name),
+                  self.link_for_event_people_csv(e, 'downloaded')))
+        text += self.event_people_table(e)
+        text += '\n'
         title = 'People at ' + cgi.escape(e.short_name_with_year_and_country)
         header = 'People at ' + self.link_for_event_and_host(e)
         self.write_html_to_file(text, title, header,
