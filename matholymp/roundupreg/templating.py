@@ -251,7 +251,7 @@ def registration_status(db):
     text += ('<p>Some countries may intend to send Observers'
              ' but not have registered them all.</p>\n')
     if details_needed:
-        text += '<table width="100%" class="list">\n'
+        text += '<table class="list">\n'
         text += ('<tr><th>Country</th><th>Person</th>'
                  '<th>Missing data</th></tr>\n')
         text += details_needed
@@ -278,7 +278,7 @@ def registration_status(db):
                                   cgi.escape(db.person.get(p, 'family_name')),
                                   p_needed))
     if s_details_needed:
-        text += '<table width="100%" class="list">\n'
+        text += '<table class="list">\n'
         text += '<tr><th>Person</th><th>Missing data</th></tr>\n'
         text += s_details_needed
         text += '</table>\n'
@@ -306,7 +306,7 @@ def registration_status(db):
                  ' or a more precise location for any Guides'
                  ' (whose room numbers will appear on badges of'
                  ' their team members).</p>\n')
-        text += '<table width="100%" class="list">\n'
+        text += '<table class="list">\n'
         text += '<tr><th>Country</th><th>Person</th><th>Role</th></tr>\n'
         text += rooms_needed
         text += '</table>\n'
