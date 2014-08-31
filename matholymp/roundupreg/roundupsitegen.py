@@ -51,9 +51,13 @@ class RoundupSiteGenerator(SiteGenerator):
         Initialise a RoundupSiteGenerator from the given db object for
         that Roundup instance.
         """
+        html_ver_map = { 'html4': False,
+                         'xhtml': True }
+        use_xhtml = html_ver_map[db.config.HTML_VERSION]
         cfg = { 'num_key': db.config.ext['MATHOLYMP_SHORT_NAME'] + ' Number',
                 'scores_css': db.config.ext['MATHOLYMP_SCORES_CLASS'],
                 'list_css': db.config.ext['MATHOLYMP_LIST_CLASS'],
+                'use_xhtml': use_xhtml,
                 'official_desc': db.config.ext['MATHOLYMP_OFFICIAL_DESC'],
                 'official_desc_lc':
                     db.config.ext['MATHOLYMP_OFFICIAL_DESC_LC'],

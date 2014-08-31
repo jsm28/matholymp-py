@@ -1187,10 +1187,9 @@ class SiteGenerator(object):
         return self.html_table_thead_tbody_list(head_row_list,
                                                 body_row_list)
 
-    def country_event_text(self, c, h_level, show_photos):
-        """Generate the text for one country at one event."""
+    def country_event_people_table(self, c, show_photos):
+        """Generate the table of people for one country at one event."""
         text = ''
-        text += '<%s>Participants</%s>\n' % (h_level, h_level)
         c_people = sorted(c.person_list, key=lambda x:x.sort_key)
         c_guides = sorted(c.guide_list, key=lambda x:x.sort_key)
         c_people.extend(c_guides)
@@ -1211,6 +1210,13 @@ class SiteGenerator(object):
                 row.append(photo)
             body_row_list.append(self.html_tr_td_list(row))
         text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
+        return text
+
+    def country_event_text(self, c, h_level, show_photos):
+        """Generate the text for one country at one event."""
+        text = ''
+        text += '<%s>Participants</%s>\n' % (h_level, h_level)
+        text += self.country_event_people_table(c, show_photos)
         text += '\n'
         if c.num_contestants:
             text += '<%s>Scores</%s>\n' % (h_level, h_level)
