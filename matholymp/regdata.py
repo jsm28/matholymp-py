@@ -43,7 +43,7 @@ def file_url_to_local(url, local_dir, type):
     Convert a registration system download URL for a file to a local path.
     """
     url = re.sub('^.*?/file', '', url)
-    matches = re.match("^([0-9]+)/(.*)", url)
+    matches = re.match('^([0-9]+)/(.*)', url)
     file_id = matches.group(1)
     file_name = matches.group(2)
     file_name = url_unquote(file_name)

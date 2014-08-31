@@ -850,7 +850,7 @@ class PersonEvent(object):
         """)
 
     def _get_is_contestant(self):
-        return self.primary_role.startswith("Contestant ")
+        return self.primary_role.startswith('Contestant ')
 
     is_contestant = _PropertyCached(
         'is_contestant', _get_is_contestant,
@@ -858,7 +858,7 @@ class PersonEvent(object):
 
     def _get_contestant_code(self):
         assert self.is_contestant
-        return self.country.code + self.primary_role[len("Contestant "):]
+        return self.country.code + self.primary_role[len('Contestant '):]
 
     contestant_code = _PropertyCached(
         'contestant_code', _get_contestant_code,

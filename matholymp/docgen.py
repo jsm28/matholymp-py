@@ -119,7 +119,7 @@ class DocumentGenerator(object):
         env['TEXINPUTS'] = os.pathsep.join([self._problems_dir,
                                             self._templates_dir,
                                             ''])
-        subprocess.check_call(["pdflatex", output_file_name],
+        subprocess.check_call(['pdflatex', output_file_name],
                               cwd=self._out_dir,
                               env=env)
 
@@ -208,7 +208,7 @@ class DocumentGenerator(object):
         other_roles = sorted(person.other_roles, key=coll_get_sort_key)
         role = primary_role
         if person.is_contestant:
-            role = "Contestant " + person.contestant_code
+            role = 'Contestant ' + person.contestant_code
         if other_roles:
             role = role + ', ' + ', '.join(other_roles)
         return role
@@ -248,13 +248,13 @@ class DocumentGenerator(object):
         elif (primary_role == 'Deputy Leader' or
               primary_role == 'Observer with Deputy'):
             background_type = 'deputy'
-        elif re.search("Chief Guide", primary_role):
+        elif re.search('Chief Guide', primary_role):
             background_type = 'chiefguide'
-        elif re.search("Guide", primary_role):
+        elif re.search('Guide', primary_role):
             background_type = 'guide'
-        elif re.search("Coordinator", primary_role):
+        elif re.search('Coordinator', primary_role):
             background_type = 'coordinator'
-        elif re.search("Invigilator", primary_role):
+        elif re.search('Invigilator', primary_role):
             background_type = 'invigilator'
         else:
             background_type = 'organiser'
