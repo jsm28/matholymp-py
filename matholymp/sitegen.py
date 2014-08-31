@@ -980,8 +980,7 @@ class SiteGenerator(object):
         body_row_list = []
         for p in contestants:
             body_row_list.append(self.person_scoreboard_row(p))
-        text += self.html_table_thead_tbody_list(head_row_list, body_row_list,
-                                                 width='100%')
+        text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
         text += '\n'
 
         text += '<h2>Ranked scores</h2>\n'
@@ -989,8 +988,7 @@ class SiteGenerator(object):
         rank_sorted_contestants = sorted(contestants, key=lambda x:x.rank)
         for p in rank_sorted_contestants:
             body_row_list.append(self.person_scoreboard_row(p))
-        text += self.html_table_thead_tbody_list(head_row_list, body_row_list,
-                                                 width='100%')
+        text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
         text += '\n'
 
         text += '<h2>Statistics</h2>\n'
@@ -1187,8 +1185,7 @@ class SiteGenerator(object):
             body_row_list.append(self.person_scoreboard_row(
                 p, show_rank=show_rank))
         return self.html_table_thead_tbody_list(head_row_list,
-                                                body_row_list,
-                                                width='100%')
+                                                body_row_list)
 
     def country_event_text(self, c, h_level, show_photos):
         """Generate the text for one country at one event."""
@@ -1306,8 +1303,7 @@ class SiteGenerator(object):
                                                     show_code=show_code,
                                                     show_name=show_name)]
         return self.html_table_thead_tbody_list(head_row_list,
-                                                body_row_list,
-                                                width='100%')
+                                                body_row_list)
 
     def generate_one_person_page(self, pd):
         """Generate main page for one person."""
