@@ -1,4 +1,4 @@
-# Initialise matholymp.roundupreg subpackage.
+# Auditors for Roundup registration system for matholymp package.
 
 # Copyright 2014 Joseph Samuel Myers.
 
@@ -27,10 +27,35 @@
 # combination shall include the source code for the parts of OpenSSL
 # used as well as that of the covered work.
 
-"""
-The matholymp.roundupreg package implements a registration system
-based on Roundup.
-"""
+"""This module provides auditors for the Roundup registration system."""
 
-__all__ = ['actions', 'auditors', 'roundupsitegen', 'roundupsource',
-           'rounduputil', 'templating']
+__all__ = ['get_new_value', 'require_value']
+
+def get_new_value(db, cl, nodeid, newvalues, prop):
+    """
+    Return the new value of a property if one was specified, or the
+    continuing old value if not, or None if this is a new node and no
+    value was specified.
+    """
+    if prop in newvalues:
+        return newvalues[prop]
+    if nodeid is None:
+        return None
+    return cl.get(nodeid, prop)
+
+def require_value(db, cl, nodeid, newvalues, prop, error):
+    """
+    Require a property to have a nonempty value, restoring a previous
+    value from the database if an attempt is made to empty it; return
+    that value.
+    """
+    value = get_new_value(db, cl, nodeid, newvalues, prop)
+    if value:
+        return value
+    if nodeid is None:
+        raise ValueError(error)
+    value = cl.get(nodeid, prop)
+    if not value:
+        raise ValueError(error)
+    newvalues[prop] = value
+    return value
