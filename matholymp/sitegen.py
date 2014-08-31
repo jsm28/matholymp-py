@@ -1292,6 +1292,23 @@ class SiteGenerator(object):
         title = cgi.escape(cd.name_with_code)
         self.write_html_to_file(text, title, title, self.path_for_country(cd))
 
+    def person_event_scores_table(self, p, show_rank=True, show_code=True,
+                                  show_name=True):
+        """
+        Generate the table of scores for one person at one event,
+        given that this person was a contestant there.
+        """
+        head_row_list = [self.person_scoreboard_header(p.event,
+                                                       show_rank=show_rank,
+                                                       show_code=show_code,
+                                                       show_name=show_name)]
+        body_row_list = [self.person_scoreboard_row(p, show_rank=show_rank,
+                                                    show_code=show_code,
+                                                    show_name=show_name)]
+        return self.html_table_thead_tbody_list(head_row_list,
+                                                body_row_list,
+                                                width='100%')
+
     def generate_one_person_page(self, pd):
         """Generate main page for one person."""
         text = ''
@@ -1330,11 +1347,7 @@ class SiteGenerator(object):
             year_text += '</td></tr>\n</table>\n'
             if p.is_contestant:
                 year_text += '<h3>Scores</h3>\n'
-                head_row_list = [self.person_scoreboard_header(e)]
-                body_row_list = [self.person_scoreboard_row(p)]
-                year_text += self.html_table_thead_tbody_list(head_row_list,
-                                                              body_row_list,
-                                                              width='100%')
+                year_text += self.person_event_scores_table(p)
                 year_text += '\n'
             year_list.append(year_text)
         year_list.reverse()
