@@ -32,7 +32,9 @@ This module provides various utility functions for the Roundup
 registration system.
 """
 
+import cgi
 import re
+import time
 
 from roundup.date import Date
 
@@ -40,7 +42,7 @@ __all__ = ['scores_from_str', 'contestant_age', 'get_none_country',
            'get_staff_country', 'normal_country_person',
            'person_is_contestant', 'contestant_code', 'pn_score',
            'scores_final', 'any_scores_missing', 'country_has_contestants',
-           'valid_country_problem']
+           'valid_country_problem', 'create_rss']
 
 def scores_from_str(db, score_str):
     """
@@ -148,3 +150,17 @@ def valid_country_problem(db, form):
     if int(problem) > num_problems:
         return False
     return country_has_contestants(db, country)
+
+def create_rss(db, title, description, **args):
+    """Create an RSS item."""
+    date_text = time.strftime('%a, %d %b %Y %H:%M:%S +0000', time.gmtime())
+    rss_id = db.rss.create(**args)
+    rss_url = db.config.TRACKER_WEB + 'rss' + rss_id
+    rss_text = ('<item>'
+                '<title>%s</title>'
+                '<description>%s</description>'
+                '<pubDate>%s</pubDate>'
+                '<guid isPermaLink="false">%s</guid>'
+                '</item>' % (cgi.escape(title), cgi.escape(description),
+                             cgi.escape(date_text), cgi.escape(rss_url)))
+    db.rss.set(rss_id, text=rss_text)
