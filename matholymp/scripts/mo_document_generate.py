@@ -47,6 +47,7 @@ import argparse
 import os
 import os.path
 
+import matholymp
 from matholymp.data import EventGroup
 from matholymp.docgen import DocumentGenerator
 from matholymp.csvsource import CSVDataSource
@@ -58,6 +59,8 @@ def main():
     """Main program for mo-document-generate."""
 
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s '+matholymp.__version__)
     parser.add_argument('--background', action='store_true',
                         help='include background in output')
     parser.add_argument('--input-directory',

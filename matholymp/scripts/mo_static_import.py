@@ -54,6 +54,7 @@ import os.path
 import re
 import shutil
 
+import matholymp
 from matholymp.fileutil import read_utf8_csv, write_utf8_csv, \
     make_dirs_for_file, read_config
 from matholymp.regdata import file_url_to_local
@@ -64,6 +65,8 @@ def main():
     """Main program for mo-static-import."""
 
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s '+matholymp.__version__)
     parser.add_argument('event_number', help='number of event', type=int)
     parser.add_argument('input_directory', help='directory with input data')
     args = vars(parser.parse_args())

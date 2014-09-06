@@ -43,6 +43,7 @@ import argparse
 import os
 import os.path
 
+import matholymp
 from matholymp.data import EventGroup
 from matholymp.csvsource import CSVDataSource
 from matholymp.fileutil import read_utf8_csv, read_text_from_file, read_config
@@ -54,6 +55,8 @@ def main():
     """Main program for mo-static-generate."""
 
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s '+matholymp.__version__)
     parser.parse_args()
 
     top_directory = os.getcwd()
