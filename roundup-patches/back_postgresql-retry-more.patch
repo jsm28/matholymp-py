@@ -1,0 +1,18 @@
+diff -rupN roundup-1.5.0.orig/roundup/backends/back_postgresql.py roundup-1.5.0/roundup/backends/back_postgresql.py
+--- roundup-1.5.0.orig/roundup/backends/back_postgresql.py	2013-06-17 13:52:53.000000000 +0000
++++ roundup-1.5.0/roundup/backends/back_postgresql.py	2014-09-06 23:48:00.809084295 +0000
+@@ -69,12 +69,12 @@ def db_command(config, command, database
+     conn.set_isolation_level(0)
+     cursor = conn.cursor()
+     try:
+-        for n in range(10):
++        for n in range(100):
+             if pg_command(cursor, command):
+                 return
+     finally:
+         conn.close()
+-    raise RuntimeError('10 attempts to create database failed')
++    raise RuntimeError('100 attempts to create database failed')
+ 
+ def pg_command(cursor, command):
+     '''Execute the postgresql command, which may be blocked by some other

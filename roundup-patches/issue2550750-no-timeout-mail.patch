@@ -1,0 +1,12 @@
+diff -rupN roundup-1.5.0.orig/roundup/cgi/client.py roundup-1.5.0/roundup/cgi/client.py
+--- roundup-1.5.0.orig/roundup/cgi/client.py	2013-06-17 13:52:53.000000000 +0000
++++ roundup-1.5.0/roundup/cgi/client.py	2014-09-06 23:49:39.892708038 +0000
+@@ -1239,6 +1239,8 @@ class Client:
+         """
+         try:
+             call(*args, **kwargs)
++        except socket.timeout:
++            pass
+         except socket.error, err:
+             err_errno = getattr (err, 'errno', None)
+             if err_errno is None:

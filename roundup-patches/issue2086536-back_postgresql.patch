@@ -1,0 +1,75 @@
+diff -rupN roundup-1.5.0.orig/roundup/backends/back_postgresql.py roundup-1.5.0/roundup/backends/back_postgresql.py
+--- roundup-1.5.0.orig/roundup/backends/back_postgresql.py	2013-06-17 13:52:53.000000000 +0000
++++ roundup-1.5.0/roundup/backends/back_postgresql.py	2014-09-06 23:44:45.721710334 +0000
+@@ -9,13 +9,13 @@ __docformat__ = 'restructuredtext'
+ 
+ import os, shutil, time
+ try:
+-    import psycopg
+-    from psycopg import QuotedString
+-    from psycopg import ProgrammingError
+-except:
+-    from psycopg2 import psycopg1 as psycopg
++    from psycopg2            import psycopg1 as psycopg
+     from psycopg2.extensions import QuotedString
+-    from psycopg2.psycopg1 import ProgrammingError
++    from psycopg2.psycopg1   import ProgrammingError
++except ImportError:
++    import psycopg
++    from psycopg             import QuotedString
++    from psycopg             import ProgrammingError
+ import logging
+ 
+ from roundup import hyperdb, date
+@@ -84,23 +84,18 @@ def pg_command(cursor, command):
+     '''
+     try:
+         cursor.execute(command)
+-    except psycopg.ProgrammingError, err:
++    except psycopg.DatabaseError, err:
+         response = str(err).split('\n')[0]
+-        if response.find('FATAL') != -1:
+-            raise RuntimeError(response)
+-        else:
+-            msgs = [
++        if "FATAL" not in response :
++            msgs = (
+                 'is being accessed by other users',
+-                'could not serialize access due to concurrent update',
+-            ]
+-            can_retry = 0
+-            for msg in msgs:
+-                if response.find(msg) == -1:
+-                    can_retry = 1
+-            if can_retry:
+-                time.sleep(1)
+-                return 0
+-            raise RuntimeError(response)
++                'could not serialize access due to concurrent update'
++            )
++            for msg in msgs :
++                if msg in response :
++                    time.sleep(0.1)
++                    return 0
++        raise RuntimeError (response)
+     return 1
+ 
+ def db_exists(config):
+@@ -156,7 +151,7 @@ class Database(rdbms_common.Database):
+ 
+         try:
+             self.load_dbschema()
+-        except psycopg.ProgrammingError, message:
++        except ProgrammingError, message:
+             if str(message).find('schema') == -1:
+                 raise
+             self.rollback()
+@@ -229,7 +224,7 @@ class Database(rdbms_common.Database):
+ 
+         try:
+             self.conn.commit()
+-        except psycopg.ProgrammingError, message:
++        except ProgrammingError, message:
+             # we've been instructed that this commit is allowed to fail
+             if fail_ok and str(message).endswith('could not serialize '
+                     'access due to concurrent update'):

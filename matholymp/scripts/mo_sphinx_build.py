@@ -1,4 +1,4 @@
-# Initialise matholymp.scripts subpackage.
+# Implement mo-sphinx-build script.
 
 # Copyright 2014 Joseph Samuel Myers.
 
@@ -28,9 +28,27 @@
 # used as well as that of the covered work.
 
 """
-The matholymp.scripts package contains the main functions providing
-the user interface to command-line scripts.
+The mo-sphinx-build script generates the formatted HTML documentation
+for matholymp.  It is generated in the working directory, and it is
+expected that the script is located in the matholymp source directory.
 """
 
-__all__ = ['mo_document_generate', 'mo_sphinx_build', 'mo_static_generate',
-           'mo_static_import']
+import argparse
+import os
+import os.path
+import subprocess
+import sys
+
+import matholymp
+
+__all__ = ['main']
+
+def main():
+    """Main program for mo-sphinx-build."""
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s '+matholymp.__version__)
+    parser.parse_args()
+    subprocess.check_call(['sphinx-build', '-b', 'dirhtml',
+                           os.path.join(sys.path[0], 'docs'), os.curdir])
