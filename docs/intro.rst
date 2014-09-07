@@ -96,7 +96,17 @@ appropriately).
 
 The matholymp functionality falls into three main areas.  Although the
 software is designed as an integrated whole, you can also choose to
-use only parts of the functionality.
+use only parts of the functionality.  Whichever parts of the system
+you use, you will be maintaining directories containing configuration
+files and other content such as photos on the static site and LaTeX
+and HTML templates.  It is a good idea to maintain these directories
+in a version control system such as Git in case any problems arise and
+you need to undo a change made.  You will also need to ensure that all
+these directories are included in your system's backup arrangements,
+and ensure that databases for the registration system are backed up as
+well (which typically means the backup process running database dumps
+to ensure the backup contains a consistent state, rather than backing
+up the raw files containing the database).
 
 * :ref:`static-site`.
 * :ref:`online-registration`.
