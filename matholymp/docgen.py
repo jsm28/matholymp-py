@@ -44,8 +44,30 @@ except ImportError:
 
 from matholymp.collate import coll_get_sort_key
 from matholymp.fileutil import read_utf8_csv, write_text_to_file, \
-    read_text_from_file, remove_if_exists
-from matholymp.regdata import file_url_to_local
+    read_text_from_file, read_config, remove_if_exists
+from matholymp.regdata import file_url_to_local, lang_to_filename
+
+__all__ = ['read_docgen_config', 'DocumentGenerator']
+
+def read_docgen_config(top_directory):
+    """Read the configuration file for document generation."""
+    config_file_name = os.path.join(top_directory, 'documentgen.cfg')
+    cfg_str_keys = ['year', 'short_name', 'long_name', 'num_key',
+                    'marks_per_problem', 'badge_phone_desc',
+                    'badge_event_phone', 'badge_emergency_phone',
+                    'badge_event_ordinal', 'badge_event_venue',
+                    'badge_event_dates']
+    cfg_int_keys = ['event_number', 'num_exams', 'num_problems',
+                    'num_contestants_per_team']
+    cfg_int_none_keys = ['gold_boundary', 'silver_boundary', 'bronze_boundary']
+    cfg_bool_keys = ['show_countries_for_guides', 'show_rooms_for_guides',
+                     'paper_print_logo', 'paper_text_left']
+    config_data = read_config(config_file_name, 'matholymp.documentgen',
+                              cfg_str_keys, cfg_int_keys,
+                              cfg_int_none_keys, cfg_bool_keys)
+    config_data['staff_country'] = (config_data['short_name'] + ' ' +
+                                    config_data['year'] + ' Staff')
+    return config_data
 
 class DocumentGenerator(object):
 
@@ -505,21 +527,11 @@ class DocumentGenerator(object):
             days = [str(i + 1) for i in range(self._event.num_exams)]
             day_text = ''
 
-        all_languages = []
+        all_languages = sorted(self._event.language_list,
+                               key=coll_get_sort_key)
         lang_filenames = {}
-
-        for p in self._event.contestant_list:
-            lang1 = p.first_language or ''
-            lang2 = p.second_language or ''
-            if lang1 and lang1 not in all_languages:
-                all_languages.append(lang1)
-                lang1f = re.sub('[^a-zA-Z]', '', lang1)
-                lang_filenames[lang1f] = lang1
-            if lang2 and lang2 not in all_languages:
-                all_languages.append(lang2)
-                lang2f = re.sub('[^a-zA-Z]', '', lang2)
-                lang_filenames[lang2f] = lang2
-        all_languages.sort(key=coll_get_sort_key)
+        for lang in all_languages:
+            lang_filenames[lang_to_filename(lang)] = lang
 
         if id == 'all':
             contestants = self._event.contestant_list
@@ -554,7 +566,7 @@ class DocumentGenerator(object):
                 else:
                     bg_text = ''
                 for lang in languages:
-                    lang_filename = re.sub('[^a-zA-Z]', '', lang)
+                    lang_filename = lang_to_filename(lang)
                     output_file_base = ('paper' + day_text + draft_text +
                                         bg_text + '-' + lang_filename)
                     paper_text = self.one_paper_latex(lang_filename, lang, d,
@@ -581,7 +593,7 @@ class DocumentGenerator(object):
                     lang_list = [p.first_language, p.second_language]
                     lang_list = [lang for lang in lang_list if lang]
                     for lang in lang_list:
-                        lang_filename = re.sub('[^a-zA-Z]', '', lang)
+                        lang_filename = lang_to_filename(lang)
                         paper_text = self.one_paper_latex(lang_filename,
                                                           lang, d,
                                                           'Contestant: ',
@@ -616,7 +628,7 @@ class DocumentGenerator(object):
                         country_langs[c].sort(key=coll_get_sort_key)
                         for i in range(country_leader_counts[c]):
                             for lang in country_langs[c]:
-                                lang_filename = re.sub('[^a-zA-Z]', '', lang)
+                                lang_filename = lang_to_filename(lang)
                                 paper_text = self.one_paper_latex(
                                     lang_filename, lang, d,
                                     'Leaders: ', c)

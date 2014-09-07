@@ -549,6 +549,22 @@ class Event(object):
         contestants at this event.
         """)
 
+    def _get_language_list(self):
+        langs = set()
+        for p in self.contestant_list:
+            if p.first_language:
+                langs.add(p.first_language)
+            if p.second_language:
+                langs.add(p.second_language)
+        return list(langs)
+
+    language_list = _PropertyCached(
+        'language_list', _get_language_list,
+        """
+        A list of all languages for which some contestant at this
+        event requested a paper.
+        """)
+
     def _get_num_awards_cond(self, cond):
         if self.scores_final:
             ival = 0

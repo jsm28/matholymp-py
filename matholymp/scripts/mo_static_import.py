@@ -56,8 +56,9 @@ import shutil
 
 import matholymp
 from matholymp.fileutil import read_utf8_csv, write_utf8_csv, \
-    make_dirs_for_file, read_config
+    make_dirs_for_file
 from matholymp.regdata import file_url_to_local
+from matholymp.sitegen import read_sitegen_config
 
 __all__ = ['main']
 
@@ -86,15 +87,7 @@ def main():
     input_photos_dir = os.path.join(input_directory, 'photos')
     input_scores_rss = os.path.join(input_directory, 'scores-rss.xml')
 
-    cfg_file_name = os.path.join(top_directory, 'staticsite.cfg')
-    cfg_str_keys = ['num_key', 'url_base', 'short_name_url',
-                    'short_name_url_plural', 'official_desc']
-    cfg_int_keys = []
-    cfg_int_none_keys = []
-    cfg_bool_keys = []
-    cfg_data = read_config(cfg_file_name, 'matholymp.staticsite',
-                           cfg_str_keys, cfg_int_keys, cfg_int_none_keys,
-                           cfg_bool_keys)
+    cfg_data = read_sitegen_config(top_directory)
 
     max_num_problems = 0
 

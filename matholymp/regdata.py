@@ -36,7 +36,7 @@ import re
 
 from matholymp.urlutil import url_unquote
 
-__all__ = ['file_url_to_local']
+__all__ = ['file_url_to_local', 'lang_to_filename']
 
 def file_url_to_local(url, local_dir, type):
     """
@@ -51,3 +51,7 @@ def file_url_to_local(url, local_dir, type):
     file_name = re.sub('^.*\\.', type + '.', file_name)
     file_name = re.sub('^[^.]*$', type, file_name)
     return os.path.join(local_dir, type + file_id, file_name)
+
+def lang_to_filename(lang):
+    """Convert a language name to the form used in a filename."""
+    return re.sub('[^a-zA-Z]', '', lang)

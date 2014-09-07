@@ -1,4 +1,4 @@
-# Initialise matholymp.scripts subpackage.
+#! /usr/bin/env python
 
 # Copyright 2014 Joseph Samuel Myers.
 
@@ -27,10 +27,8 @@
 # combination shall include the source code for the parts of OpenSSL
 # used as well as that of the covered work.
 
-"""
-The matholymp.scripts package contains the main functions providing
-the user interface to command-line scripts.
-"""
+"""mo-static-papers-import script wrapper."""
 
-__all__ = ['mo_document_generate', 'mo_sphinx_build', 'mo_static_generate',
-           'mo_static_import', 'mo_static_papers_import']
+import matholymp.scripts.mo_static_papers_import
+
+matholymp.scripts.mo_static_papers_import.main()

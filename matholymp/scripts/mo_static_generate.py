@@ -46,8 +46,8 @@ import os.path
 import matholymp
 from matholymp.data import EventGroup
 from matholymp.csvsource import CSVDataSource
-from matholymp.fileutil import read_utf8_csv, read_text_from_file, read_config
-from matholymp.sitegen import SiteGenerator
+from matholymp.fileutil import read_utf8_csv
+from matholymp.sitegen import read_sitegen_config, SiteGenerator
 
 __all__ = ['main']
 
@@ -61,22 +61,7 @@ def main():
 
     top_directory = os.getcwd()
 
-    cfg_file_name = os.path.join(top_directory, 'staticsite.cfg')
-    cfg_str_keys = ['long_name', 'short_name', 'short_name_plural',
-                    'num_key', 'scores_css', 'list_css', 'photo_css',
-                    'page_suffix', 'page_include_extra', 'url_base',
-                    'short_name_url', 'short_name_url_plural',
-                    'official_desc', 'official_desc_lc', 'official_adj',
-                    'age_day_desc']
-    cfg_int_keys = []
-    cfg_int_none_keys = ['event_active_number']
-    cfg_bool_keys = ['use_xhtml']
-    cfg_data = read_config(cfg_file_name, 'matholymp.staticsite',
-                           cfg_str_keys, cfg_int_keys, cfg_int_none_keys,
-                           cfg_bool_keys)
-
-    template_file_name = os.path.join(top_directory, 'page-template')
-    cfg_data['page_template'] = read_text_from_file(template_file_name)
+    cfg_data = read_sitegen_config(top_directory)
 
     data_directory = os.path.join(top_directory, 'data')
 

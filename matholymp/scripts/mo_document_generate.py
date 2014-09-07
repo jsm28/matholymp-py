@@ -49,9 +49,9 @@ import os.path
 
 import matholymp
 from matholymp.data import EventGroup
-from matholymp.docgen import DocumentGenerator
+from matholymp.docgen import read_docgen_config, DocumentGenerator
 from matholymp.csvsource import CSVDataSource
-from matholymp.fileutil import read_utf8_csv, read_config
+from matholymp.fileutil import read_utf8_csv
 
 __all__ = ['main']
 
@@ -76,22 +76,7 @@ def main():
     cmdline_data = vars(parser.parse_args())
     top_directory = os.getcwd()
     templates_dir = os.path.join(top_directory, 'templates')
-    config_file_name = os.path.join(top_directory, 'documentgen.cfg')
-    cfg_str_keys = ['year', 'short_name', 'long_name', 'num_key',
-                    'marks_per_problem', 'badge_phone_desc',
-                    'badge_event_phone', 'badge_emergency_phone',
-                    'badge_event_ordinal', 'badge_event_venue',
-                    'badge_event_dates']
-    cfg_int_keys = ['event_number', 'num_exams', 'num_problems',
-                    'num_contestants_per_team']
-    cfg_int_none_keys = ['gold_boundary', 'silver_boundary', 'bronze_boundary']
-    cfg_bool_keys = ['show_countries_for_guides', 'show_rooms_for_guides',
-                     'paper_print_logo', 'paper_text_left']
-    config_data = read_config(config_file_name, 'matholymp.documentgen',
-                              cfg_str_keys, cfg_int_keys,
-                              cfg_int_none_keys, cfg_bool_keys)
-    config_data['staff_country'] = (config_data['short_name'] + ' ' +
-                                    config_data['year'] + ' Staff')
+    config_data = read_docgen_config(top_directory)
     if not cmdline_data['input_directory']:
         cmdline_data['input_directory'] = os.path.join(top_directory, 'data')
     if not cmdline_data['output_directory']:
