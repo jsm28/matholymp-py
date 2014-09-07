@@ -233,6 +233,10 @@ In both cases, you may omit the :samp:`--day {day}` option if you are
 adding all papers at the same time, and must omit it if there is only
 one day at the competition.
 
+If the papers being added to the website have corrections relative to
+the versions used in the exam, you may wish to edit the Description
+column in :file:`papers.csv` to note this.
+
 Adding data after an event
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 

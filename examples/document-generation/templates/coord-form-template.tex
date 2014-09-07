@@ -1,0 +1,72 @@
+\documentclass[a4paper]{article}
+\usepackage[a4paper,scale=1.0]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{ifthen}
+\usepackage{graphicx}
+\usepackage{eso-pic}
+\setlength{\unitlength}{1mm}
+\newlength{\matholymptmplength}
+\renewcommand{\arraystretch}{2.0}%
+\newcommand{\spacebox}[1]{%
+\settowidth{\matholymptmplength}{\hbox{#1}}%
+\addtolength{\matholymptmplength}{4mm}%
+\begin{minipage}{\matholymptmplength}%
+\vspace*{2mm}%
+\hfil%
+#1%
+\hfil%
+\vspace*{2mm}%
+\end{minipage}%
+}
+\newcommand{\formrow}[1]{%
+\textsf{#1} & \\ \hline%
+}%
+\newcommand{\oneform}[3]{%
+\ClearShipoutPicture%
+\AddToShipoutPicture{%
+\setlength{\unitlength}{1mm}%
+\put(149,242){\includegraphics[width=50mm,trim=0mm 7mm 0mm 0mm,clip]{logo.pdf}}%
+\put(151,236){\huge\textsf{\textbf{@@short_name@@ @@year@@}}}%
+\put(146,231){\small\textsf{@@long_name@@}}%
+}%
+\begin{picture}(204,297)%
+\put(3,278){\frame{\spacebox{\Huge\textsf{Country: \textbf{#1}}}}}%
+\put(3,258){\frame{\spacebox{\Huge\textsf{Problem: \textbf{#2}}}}}%
+\put(20,170){%
+\Huge%
+\begin{tabular}{|c|c|}%
+\hline%
+\textsf{\textbf{Contestant}} & \textsf{\qquad\textbf{Mark}\qquad} \\ \hline%
+#3%
+\end{tabular}%
+}%
+\put(20,75){%
+\Huge%
+\begin{tabular}{|l|c|}%
+\hline%
+& \textsf{\qquad\qquad\textbf{Signed}\qquad\qquad} \\ \hline%
+\textsf{\textbf{Team Leader}} & \\ \hline%
+\textsf{\textbf{Coordinator}} & \\ \hline%
+\end{tabular}%
+}%
+\put(20,25){%
+\parbox{15cm}{%
+\textsf{This form must be signed by both the Team Leader and a
+  Coordinator once marks have been agreed.  A copy of this form will
+  be submitted for data entry by the coordination team and another is
+  available for the Team Leader to retain.  Leaders should check the
+  online scores before the final Jury meeting to verify that all
+  scores for their teams have been entered correctly.}%
+}}%
+\end{picture}%
+\clearpage%
+}
+\newcommand{\twoforms}[3]{%
+\oneform{#1}{#2}{#3}%
+\oneform{#1}{#2}{#3}%
+}
+\pagestyle{empty}
+\begin{document}%
+@@coord_forms@@%
+\end{document}
