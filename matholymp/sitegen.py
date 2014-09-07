@@ -1131,10 +1131,19 @@ class SiteGenerator(object):
         people = sorted(e.person_list, key=lambda x:x.sort_key)
         for c in countries:
             src_url = c.annual_url
-            text += self.generate_redirect_page(
-                src_url, '',
-                self.path_for_country_at_event(c))
-            base_url = re.sub('country[0-9]*$', '', src_url)
+            if src_url:
+                text += self.generate_redirect_page(
+                    src_url, '',
+                    self.path_for_country_at_event(c))
+                this_base_url = re.sub('country[0-9]*$', '', src_url)
+                if base_url:
+                    if this_base_url != base_url:
+                        raise ValueError('annual URL inconsistency: %s != %s'
+                                         % (base_url, this_base_url))
+                else:
+                    base_url = this_base_url
+        if not base_url:
+            return
         src_url = base_url + 'country'
         dest_path = self.path_for_event_countries_csv(e)
         text += self.generate_redirect_file(src_url, '@action=country_csv',
@@ -1152,8 +1161,9 @@ class SiteGenerator(object):
         text += self.generate_redirect_page(src_url, '', dest_path)
         for p in people:
             src_url = p.annual_url
-            dest_path = self.path_for_person(p.person)
-            text += self.generate_redirect_page(src_url, '', dest_path)
+            if src_url:
+                dest_path = self.path_for_person(p.person)
+                text += self.generate_redirect_page(src_url, '', dest_path)
         src_url = base_url + 'person'
         dest_path = self.path_for_event_scoreboard(e)
         text += self.generate_redirect_page(src_url, '@template=scoreboard',
@@ -1487,7 +1497,7 @@ class SiteGenerator(object):
         csv_out = {}
         csv_out[self._cfg['num_key']] = str(c.event.id)
         csv_out['Country Number'] = str(c.country.id)
-        csv_out['Annual URL'] = c.annual_url
+        csv_out['Annual URL'] = c.annual_url or ''
         csv_out['Code'] = c.code
         csv_out['Name'] = c.name
         csv_out['Flag URL'] = c.flag_url or ''
@@ -1588,7 +1598,7 @@ class SiteGenerator(object):
             csv_out[self._cfg['num_key']] = str(p.event.id)
             csv_out['Country Number'] = str(p.country.country.id)
             csv_out['Person Number'] = str(p.person.id)
-            csv_out['Annual URL'] = p.annual_url
+            csv_out['Annual URL'] = p.annual_url or ''
         csv_out['Country Name'] = p.country.name
         csv_out['Country Code'] = p.country.code
         if not scores_only:
