@@ -2,3 +2,319 @@
 
 Online registration
 ===================
+
+Matholymp provides support for an online registration system based on
+Roundup.  See the `Roundup installation documentation
+<http://roundup-tracker.org/docs/installation.html>`_ for general
+information about how to install Roundup (including other Python
+packages you may need to install for the database back ends), while
+noting that there are some patches (see :ref:`roundup-patches`) it may
+be useful to apply before installing Roundup, and that the email
+interface is not used.
+
+The online registration system makes limited details of registered
+participants public online immediately, and a full online scoreboard
+during coordination.  Full details (both public and non-public) of
+registered participants can be downloaded when logged in to an
+administrative account.
+
+Example files
+-------------
+
+Various example files are provided in the
+:file:`examples/online-registration/` directory in the matholymp
+source distribution.  It is recommended that you copy that directory
+to form your Roundup instance directory (the "tracker home"), and then
+adapt the files as needed for your event.  Do not use
+:command:`roundup-admin install`, since none of the default templates
+it can install are being used.
+
+Having copied the examples, you then need to customise the following
+files:
+
+* :file:`config.ini` (the comments at the top indicate the settings
+  that are most likely to need changing).
+
+* :file:`extensions/config.ini` (see the comments in the file for
+  details of the individual settings).
+
+* :file:`html/page.html` (you may wish to make this file match the
+  overall page style used for the static site, although this is not
+  required; at least, the stylesheet and shortcut icon URLs will need
+  updating, and it should be possible to use the same files for those
+  as on the static site).
+
+* :file:`html/dpage.html` (a simplified page style used for a very
+  plain version of the scoreboard for projection; this should probably
+  not try to match the static site; the `style used for EGMO
+  <https://www.egmo.org/egmo-scoredisplay.css>`_ may give useful
+  ideas, or indeed be usable more or less as-is.
+
+* In addition, you need to create a directory :file:`db/`, containing
+  a file :file:`db/backend_name`, whose contents name the Roundup back
+  end to use (most likely ``mysql`` or ``postgresql`` for production
+  use, possibly ``anydbm`` for testing).
+
+You may wish to customise other page templates to fine-tune them for
+your event (for example, if this is the first event of this kind, to
+hide the interface for entering URLs for previous participation by
+countries and people), but they should be usable without such changes.
+
+Initialising and running Roundup
+--------------------------------
+
+There are many different possible ways to set up and use Roundup
+described in the Roundup documentation.  The following approach is
+suggested as known to work for matholymp uses, but is not the only
+one.
+
+Create a user account and corresponding group for use in running
+Roundup (e.g., ``roundup-xmo``).  This user account and group should
+own the :file:`db/` directory, but should not own or have write access
+to any other files in the Roundup instance.  They should be able to
+read all files in the instance.  The ``config.ini`` file should have
+its group set to this group, and be group-readable but not
+world-readable, because it contains the database password; other files
+may be world-readable.
+
+Arrange to run Roundup with the provided :command:`roundup-server`,
+running as that user and group, listening on some (fairly arbitrary)
+high port on internal interfaces only.  Set up an init script (or
+systemd unit file, etc.) to start the server, as the appropriate user
+and group, on boot.  This script may usefully call the
+:command:`server-ctl` script included in the Roundup source
+distribution, or an adapted version thereof.
+
+Set up Apache to provide SSL access (and no unencrypted access, to
+avoid issues with logins over unencrypted connections) to the site.
+Enable `mod_proxy
+<http://httpd.apache.org/docs/current/mod/mod_proxy.html>`_, but only
+as a reverse proxy, not as a forward proxy (that is, ``ProxyRequests
+Off``).  Set it up to forward requests for appropriate URLs to the
+internal server; inside the relevant ``VirtualHost``, put something
+like:
+
+.. parsed-literal::
+
+   ProxyPass /registration/*year*/ \http://localhost:*port*/*name*/
+
+where *name* is the instance name passed on the
+:command:`roundup-server` command line (:samp:`-p {port}
+{name}={instance-directory}`).
+
+Before starting the server for the first time, the database needs to
+be initialised.  Ensure the database user named in :file:`config.ini`
+exists and has appropriate permissions to create databases.  (You can
+remove those permissions after initialisation.)  Then run, as the
+Roundup user:
+
+.. parsed-literal::
+
+   roundup-admin -i *instance-directory* initialise
+
+and enter the initial password you wish to use for the ``admin``
+user.  Having done this, you can then start the server.
+
+If, after starting the server, you change either of the
+:file:`config.ini` files, you need to restart the server for it to
+load the new configuration.  This is not needed for changes to the
+HTML templates.
+
+Online registration tasks
+-------------------------
+
+The following describes how to do various tasks with the online
+registration system.  Most can be done with the web interface
+(generally requiring to be logged in to an administrative account),
+but some require use of :command:`roundup-admin` from the command
+line.  All such commands should be run as the user set up for running
+Roundup.
+
+Adding and editing miscellaneous items
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can add and edit many kinds of items with an administrative
+account (e.g., :guilabel:`Add T-shirt Size`).  In particular, at an
+early stage of setup you should use :guilabel:`Add Arrival/Departure
+Point` to add details of the places (e.g., airports) where
+participants may arrive or depart (one of which is likely to be "Own
+travel arrangements" or similar, for local staff not needing airport
+transport).  There may also be local roles to add (:guilabel:`Add
+Role`).
+
+Extra administrative users can be added, with their roles set to
+``Admin``.
+
+Adding countries
+^^^^^^^^^^^^^^^^
+
+If it seems likely that participants from the country will want papers
+in a language not currently listed in the system, add that language
+(:guilabel:`Add Language`).
+
+Create the country (:guilabel:`Add Country`), including uploading a
+(PNG) flag image.  Create a user for registration of people from that
+country, choosing a password for that user and assigning it roles
+``User,Register``.  Send details of that user and password to the
+appropriate contact for that country.
+
+Once the participating countries have been added, it's appropriate to
+link to the registration system from the static site.  Set
+``event_active_number`` in :file:`staticsite.cfg`; see
+:ref:`static-site` for details.
+
+Registering staff
+^^^^^^^^^^^^^^^^^
+
+Staff can be registered, using an administrative account, in the
+special country automatically created for them.
+
+Monitoring registration
+^^^^^^^^^^^^^^^^^^^^^^^
+
+There is a :guilabel:`Registration Status` link to a page with a
+summary of possible issues with the registration data, and it is
+useful to keep a watch on this page and to chase up countries that are
+late in completing all required information.
+
+In addition to the points listed on this page, there are some things
+you should check manually from time to time.
+
+* If any photos uploaded are excessively large (more than 1.5MB file
+  size is probably excessive), download them, scale them down and
+  upload the smaller photo on that person's page; although not
+  strictly required, this will make the site quicker for users and may
+  also speed up printing name badges.  If any photos are not in JPEG
+  or PNG format, convert them and upload the converted version; other
+  formats may not work for name badge generation.  (Future versions of
+  matholymp may add more automation in this area.)
+
+* If some names are entered with all-uppercase surnames, convert them
+  to mixed case for consistency.
+
+* If a person is registered without a link for previous participation,
+  check the list of previous participants and add a link if it seems
+  that person did in fact participate previously (checking with the
+  relevant country if necessary).
+
+Closing registration
+^^^^^^^^^^^^^^^^^^^^
+
+At some point before the event, use :guilabel:`Set medal boundaries or
+disable registration` to disable registration (including all changes
+by participating countries to registered details of participants), so
+that any countries with late changes to participants need to go
+through the organisers to ensure the organisers can update logistical
+arrangements to handle the changes.
+
+Allocating room numbers
+^^^^^^^^^^^^^^^^^^^^^^^
+
+If room numbers are entered in the registration system, they can then
+go on name badges automatically (including name badges showing the
+room number of one's guide and those of other team members).  Room
+numbers should be allocated and entered in the registration system
+manually (there is no automation for allocating rooms or uploading
+room numbers, although if desired the XMLRPC interface to Roundup
+could be used for bulk upload of this or other data).
+
+Removing people or countries
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To remove a person, use the command line:
+
+.. parsed-literal::
+
+   roundup-admin -i *instance-directory* retire personN
+
+To remove a country, first remove all people from that country,
+individually, as above.  Use the web interface to edit each guide
+listing that country in "Guide for" so they no longer list that
+country.  Then use the command line to remove the registration user
+for that country, and the country itself:
+
+.. parsed-literal::
+
+   roundup-admin -i *instance-directory* retire userM
+   roundup-admin -i *instance-directory* retire countryN
+
+A web interface for removing people and countries may be added in
+future versions.
+
+If it is necessary to restore a person or country after removal,
+:command:`roundup-admin restore` can be used.
+
+Removing a photo
+^^^^^^^^^^^^^^^^
+
+If, after a photo is uploaded to the registration system, the person
+concerned objects to it being there, it can be removed with:
+
+.. parsed-literal::
+
+   roundup-admin -i *instance-directory* set personN files=
+
+To complete the removal you should also retire the ``file`` object:
+
+.. parsed-literal::
+
+   roundup-admin -i *instance-directory* retire fileM
+
+You should also rename or remove the file itself under the :file:`db/`
+directory, or truncate it, or change its permissions, so that it
+becomes unavailable over the web.  (Note that that this may break
+:command:`roundup-admin export` if it cannot find or read the file.
+As explained in the `Roundup administration documentation
+<http://roundup-tracker.org/docs/admin_guide.html#tracker-backup>`_,
+use of `roundup-admin export` is not a recommended backup approach,
+but if you are using it then you should consider the effects of
+removing files.)
+
+Scoring
+^^^^^^^
+
+Score can be entered (:guilabel:`Enter scores`) with an administrative
+account, or one with roles ``User,Score``.
+
+An administrative account can enter medal boundaries (:guilabel:`Set
+medal boundaries or disable registration`).
+
+During the event
+^^^^^^^^^^^^^^^^
+
+At some point during the event you should determine if any registered
+people have not turned up.  If so, remove them as described above so
+that records for them are not transferred to the static site after the
+event.
+
+If someone requests a change to the selected languages for exams,
+ensure that the change is made in the registration system and that an
+updated version of the data about people is downloaded for use in
+generating papers.  If someone indicates that their registered name
+should be corrected, again, make that change online so that it is
+reflected in the final data transferred to the static site.
+
+At appropriate points during the event, add papers to the static site,
+and then add the final results to the static site.  See
+:ref:`static-site` for detailed instructions.
+
+After the final results have been added to the static site, when
+non-public registration data is no longer needed you can set up the
+redirects from registration system URLs to the static site (see
+:ref:`static-site`), and shut down the Roundup server.  After an
+appropriate lapse of time for safety, if you are satisfied all the
+public data is correctly on the static site you can then delete the
+database from the database server, and the contents of the :file:`db/`
+directory.
+
+Displaying scores
+^^^^^^^^^^^^^^^^^
+
+A very plain version of the scoreboard that displays four countries on
+a page and automatically rotates through all countries is available
+for showing on screens or projecting at the olympiad site.  The system
+driving the display should run a (full-screen) browser pointed to the
+page ``person?@template=scoredisplay`` within the registration system.
+This browser does not need to be logged in; as with the main
+scoreboard, the display version is public (although it is not linked
+to from other pages, given the limited use of it).

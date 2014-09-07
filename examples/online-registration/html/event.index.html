@@ -1,0 +1,37 @@
+<tal:block metal:use-macro="templates/page/macros/icing">
+<title metal:fill-slot="head_title" i18n:translate="">Event listing - <span
+ i18n:name="tracker" tal:replace="config/TRACKER_NAME" /></title>
+<span metal:fill-slot="body_title" tal:omit-tag="python:1"
+ i18n:translate="">Event listing</span>
+<td class="content" metal:fill-slot="content">
+
+<span tal:condition="python:not (context.is_view_ok()
+ or request.user.hasRole('Anonymous'))"
+ i18n:translate="">You are not allowed to view this page.</span>
+
+<span tal:condition="python:not context.is_view_ok()
+ and request.user.hasRole('Anonymous')"
+ i18n:translate="">Please login with your username and password.</span>
+
+<table width="100%" tal:condition="context/is_view_ok" class="list">
+<tr>
+ <th i18n:translate="">Year</th>
+ <th i18n:translate="">Gold</th>
+ <th i18n:translate="">Silver</th>
+ <th i18n:translate="">Bronze</th>
+</tr>
+<tal:block repeat="event context/list">
+<tr tal:attributes="class python:['normal', 'alt'][repeat['event'].index%6/3]">
+ <td>
+  <a tal:attributes="href string:event${event/id}"
+     tal:content="event/year">year</a>
+ </td>
+ <td tal:content="event/gold"></td>
+ <td tal:content="event/silver"></td>
+ <td tal:content="event/bronze"></td>
+</tr>
+</tal:block>
+</table>
+</td>
+
+</tal:block>

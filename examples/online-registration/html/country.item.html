@@ -1,0 +1,169 @@
+<tal:doc metal:use-macro="templates/page/macros/icing"
+define="edit_ok context/is_edit_ok"
+>
+<title metal:fill-slot="head_title">
+<tal:if condition="context/id" i18n:translate=""
+ >Country <tal:x content="context/id" i18n:name="id"
+ />: <tal:x content="context/name" i18n:name="title"
+ /> - <tal:x content="config/TRACKER_NAME" i18n:name="tracker"
+/></tal:if>
+<tal:if condition="not:context/id" i18n:translate=""
+ >New Country - <span tal:replace="config/TRACKER_NAME" i18n:name="tracker"
+/></tal:if>
+</title>
+<metal:slot fill-slot="more-javascript">
+<script metal:use-macro="templates/page/macros/user_utils"></script>
+<script type="text/javascript" src="@@file/help_controls.js"></script>
+</metal:slot>
+<tal:block metal:fill-slot="body_title"
+  define="edit_ok context/is_edit_ok">
+ <span tal:condition="python: not (context.id or edit_ok)"
+  tal:omit-tag="python:1" i18n:translate="">New Country</span>
+ <span tal:condition="python: not context.id and edit_ok"
+  tal:omit-tag="python:1" i18n:translate="">New Country Editing</span>
+ <span tal:condition="python: context.id and not edit_ok"
+  tal:omit-tag="python:1" i18n:translate="">Country<tal:x
+  replace="context/id" i18n:name="id" /></span>
+ <span tal:condition="python: context.id and edit_ok"
+  tal:omit-tag="python:1" i18n:translate="">Country<tal:x
+  replace="context/id" i18n:name="id" /> Editing</span>
+</tal:block>
+
+<td class="content" metal:fill-slot="content">
+
+<p tal:condition="python:not (context.is_view_ok()
+ or request.user.hasRole('Anonymous'))" i18n:translate="">
+ You are not allowed to view this page.</p>
+
+<p tal:condition="python:not context.is_view_ok()
+ and request.user.hasRole('Anonymous')" i18n:translate="">
+ Please login with your username and password.</p>
+
+<div tal:condition="context/is_view_ok">
+
+<form method="POST"
+      name="itemSynopsis"
+      tal:define="required python:'code name'.split()"
+      enctype="multipart/form-data"
+      tal:attributes="action context/designator;
+      onSubmit python:'return checkRequiredFields(\'%s\')'%'\', \''.join(required);
+      ">
+<table class="form" tal:define="
+  th_label templates/page/macros/th_label;
+  normal_input templates/page/macros/user_normal_input;
+  edit_ok context/is_edit_ok;
+  ">
+ <tr tal:define="name string:code; label string:Code; value context/code; edit_ok edit_ok">
+  <th class="required" metal:use-macro="th_label">Code</th>
+  <td><input name="code" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:define="name string:name; label string:Name; value context/name; edit_ok edit_ok">
+  <th class="required" metal:use-macro="th_label">Name</th>
+  <td><input name="name" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:define="name string:official; label python:db._db.config.ext['MATHOLYMP_OFFICIAL_LONG_DESC']; value context/official; edit_ok edit_ok">
+  <th class="required" metal:use-macro="th_label"><tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_OFFICIAL_LONG_DESC']" /></th>
+  <tal:if condition="context/id">
+   <td tal:content="structure context/official/field">official</td>
+  </tal:if>
+  <tal:if condition="not:context/id">
+   <td><input type="radio" checked="checked" name="official" value="yes">Yes<input type="radio" name="official" value="no">No</td>
+  </tal:if>
+ </tr>
+
+ <tr tal:condition="context/is_edit_ok">
+  <td colspan="2">If this country has participated at a previous <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_SHORT_NAME']" />, please enter the corresponding <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_GENERIC_URL_DESC']" /> (for example, <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_GENERIC_URL_BASE']+'countries/country1234/'" />) below; otherwise, leave this box blank.</td>
+ </tr>
+
+ <tr tal:define="name string:generic_url; label python:db._db.config.ext['MATHOLYMP_GENERIC_URL_DESC']; value context/generic_url; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label"><tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_GENERIC_URL_DESC']" /></th>
+  <td><input name="generic_url" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:condition="context/is_edit_ok">
+  <th i18n:translate="">Upload flag</th>
+  <td colspan=3><input type="file" name="@file" size="20"></td>
+ </tr>
+
+ <tr tal:condition="edit_ok">
+  <td>
+   &nbsp;
+   <input type="hidden" name="@template" value="item">
+   <input type="hidden" name="@required" value="name,code,official"
+          tal:attributes="value python:','.join(required)">
+  </td>
+  <td><input type="submit" value="save" tal:replace="structure context/submit"><!--submit button here-->
+    <input type=reset>
+  </td>
+ </tr>
+</table>
+</form>
+
+<tal:block tal:condition="not:context/id" i18n:translate="">
+<table class="form">
+<tr>
+ <td>Note:&nbsp;</td>
+ <th class="required">highlighted</th>
+ <td>&nbsp;fields are required.  Please
+ use <a href="https://www.imo-official.org/countries.aspx" target="_blank">standard
+ IMO country codes</a> where possible.</td>
+</tr>
+</table>
+</tal:block>
+
+<tal:block tal:condition="context/id">
+
+<tal:block tal:condition="context/generic_url">
+<p><a tal:attributes="href context/generic_url">Previous <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_SHORT_NAME']" /> participation details</a> available.</p>
+</tal:block>
+
+<tal:block tal:condition="context/files">
+<table>
+<tr>
+  <td><img width="200" alt="" tal:attributes="src context/files/download_url"></td>
+</tr>
+</table>
+</tal:block>
+
+<tal:block tal:condition="python:not db._db.country.is_retired(context.id)">
+
+<tal:block tal:condition="python:db._db.country.get(context.id,
+			  'name') != 'None'">
+
+<h2>Registered participants from this country</h2>
+
+<tal:block tal:replace="structure
+			python:utils.country_people_table(db._db,
+			context.id)" />
+
+<tal:block tal:condition="python:utils.country_has_contestants(db._db, context.id)">
+<h2 tal:condition="python:utils.scores_final(db._db)">Final Scores</h2>
+<h2 tal:condition="python:not utils.scores_final(db._db)">Live Scores</h2>
+
+<p>An <a tal:attributes="href
+			 string:country${context/id}?@action=scores_rss">RSS
+			 feed of new scores for this country</a> is
+			 also available.</p>
+
+<tal:block tal:replace="structure
+			python:utils.country_scores_table(db._db,
+			context.id)" />
+</tal:block>
+
+</tal:block>
+
+</tal:block>
+
+</tal:block>
+
+<tal:block tal:condition="context/is_edit_ok">
+<tal:block tal:condition="context/id" tal:replace="structure context/history" />
+</tal:block>
+
+</div>
+
+</td>
+
+</tal:doc>

@@ -1,0 +1,35 @@
+<tal:block metal:use-macro="templates/page/macros/icing">
+<title metal:fill-slot="head_title" i18n:translate="">Scoreboard - <span
+ i18n:name="tracker" tal:replace="config/TRACKER_NAME" /></title>
+<metal:slot fill-slot="maybe-refresh">
+<meta http-equiv="Refresh" content="300">
+</metal:slot>
+<tal:block metal:fill-slot="body_title">
+ <span tal:condition="python:not utils.scores_final(db._db)" tal:omit-tag="python:1" i18n:translate="">Live Scoreboard</span>
+ <span tal:condition="python:utils.scores_final(db._db)" tal:omit-tag="python:1" i18n:translate="">Final Scoreboard</span>
+</tal:block>
+
+<td class="content" metal:fill-slot="content">
+
+<span tal:condition="python:not (context.is_view_ok()
+ or request.user.hasRole('Anonymous'))"
+ i18n:translate="">You are not allowed to view this page.</span>
+
+<span tal:condition="python:not context.is_view_ok()
+ and request.user.hasRole('Anonymous')"
+ i18n:translate="">Please login with your username and password.</span>
+
+<span tal:condition="context/is_view_ok">
+
+<p tal:condition="context/is_view_ok">The table of scores may also
+  be <a href="person?@action=scores_csv">downloaded in UTF-8 CSV
+  format</a>.  An <a href="country?@action=scores_rss">RSS feed of
+  new scores</a> is also available.</p>
+
+<tal:block tal:replace="structure python:utils.scoreboard(db._db, False, 0)" />
+
+</span>
+
+</td>
+
+</tal:block>

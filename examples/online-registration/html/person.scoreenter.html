@@ -1,0 +1,80 @@
+<tal:block metal:use-macro="templates/page/macros/icing">
+<title metal:fill-slot="head_title" i18n:translate="">Enter Scores - <span
+ i18n:name="tracker" tal:replace="config/TRACKER_NAME" /></title>
+<span metal:fill-slot="body_title" tal:omit-tag="python:1"
+ i18n:translate="">Enter scores</span>
+
+<td class="content" metal:fill-slot="content">
+
+<span tal:condition="python:not (request.user.hasPermission('Score')
+ or request.user.hasRole('Anonymous'))"
+ i18n:translate="">You are not allowed to view this page.</span>
+
+<span tal:condition="python:not request.user.hasPermission('Score')
+ and request.user.hasRole('Anonymous')"
+ i18n:translate="">Please login with your username and password.</span>
+
+<span tal:condition="python:request.user.hasPermission('Score')">
+
+<span tal:condition="python:not utils.valid_country_problem(db._db,
+		     request.form)">
+<p class="error-message">Invalid country or
+  problem, <a href="person?@template=scoreselect">please enter
+  another</a>.</p>
+</span>
+
+<span tal:condition="python:utils.valid_country_problem(db._db,
+		     request.form)">
+
+<h2 tal:content="python:'Entering scores for ' +
+		 db._db.country.getnode(request.form['country'].value).name
+		 + ' ('
+		 + db._db.country.getnode(request.form['country'].value).code
+		 + ') problem ' + request.form['problem'].value"></h2>
+
+<form method="POST"
+      name="itemSynopsis"
+      enctype="multipart/form-data"
+      tal:attributes="action request/classname"
+      >
+<table class="form" tal:define="
+  th_label templates/page/macros/th_label;
+  normal_input templates/page/macros/user_normal_input;
+  edit_ok true;
+  ">
+
+<tal:block repeat="person python:utils.people_from_country(db, request.form['country'].value)">
+<tal:block tal:condition="python:utils.person_is_contestant(db._db, person.id)">
+<tr tal:define="name python:utils.contestant_code(db._db,
+		person.id); label
+		python:utils.contestant_code(db._db, person.id);
+		value python:utils.pn_score(db._db, person.id,
+		int(request.form['problem'].value))">
+<th metal:use-macro="th_label" tal:content="label"></th>
+<td><input tal:attributes="name name; id name" metal:use-macro="normal_input"></td>
+</tr>
+</tal:block>
+</tal:block>
+
+<tr>
+<td>
+<input type="hidden" name="country" tal:attributes="value python:request.form['country'].value">
+<input type="hidden" name="problem" tal:attributes="value python:request.form['problem'].value">
+<input type="hidden" name="@template" value="scoreselect">
+<input type="hidden" name="@action" value="score">
+</td>
+<td>
+<input type="submit" value="Save these scores">
+</td>
+</tr>
+
+</table>
+</form>
+
+</span>
+
+</span>
+
+</td>
+
+</tal:block>

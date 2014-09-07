@@ -1,0 +1,300 @@
+<tal:doc metal:use-macro="templates/page/macros/icing"
+define="edit_ok context/is_edit_ok"
+>
+<title metal:fill-slot="head_title">
+<tal:if condition="context/id" i18n:translate=""
+ >Person <tal:x content="context/id" i18n:name="id"
+ />: <tal:x content="context/given_name"
+ /> <tal:x content="context/family_name" i18n:name="title"
+ /> - <tal:x content="config/TRACKER_NAME" i18n:name="tracker"
+/></tal:if>
+<tal:if condition="not:context/id" i18n:translate=""
+ >New Person - <span tal:replace="config/TRACKER_NAME" i18n:name="tracker"
+/></tal:if>
+</title>
+<metal:slot fill-slot="more-javascript">
+<script metal:use-macro="templates/page/macros/user_utils"></script>
+<script type="text/javascript" src="@@file/help_controls.js"></script>
+</metal:slot>
+<tal:block metal:fill-slot="body_title"
+  define="edit_ok context/is_edit_ok">
+ <span tal:condition="python: not (context.id or edit_ok)"
+  tal:omit-tag="python:1" i18n:translate="">New Person</span>
+ <span tal:condition="python: not context.id and edit_ok"
+  tal:omit-tag="python:1" i18n:translate="">New Person Editing</span>
+ <span tal:condition="python: context.id and not edit_ok"
+  tal:omit-tag="python:1" i18n:translate="">Person<tal:x
+  replace="context/id" i18n:name="id" /></span>
+ <span tal:condition="python: context.id and edit_ok"
+  tal:omit-tag="python:1" i18n:translate="">Person<tal:x
+  replace="context/id" i18n:name="id" /> Editing</span>
+</tal:block>
+
+<td class="content" metal:fill-slot="content">
+
+<p tal:condition="python:not (context.is_view_ok()
+ or request.user.hasRole('Anonymous'))" i18n:translate="">
+ You are not allowed to view this page.</p>
+
+<p tal:condition="python:not context.is_view_ok()
+ and request.user.hasRole('Anonymous')" i18n:translate="">
+ Please login with your username and password.</p>
+
+<div tal:condition="context/is_view_ok">
+
+<p tal:condition="python:context.is_edit_ok() and
+		  utils.normal_country_person(db._db, request.user.id)
+		  and not db._db.event.get('1',
+		  'registration_enabled')">Registration is now
+		  disabled, please contact the event organisers to change
+		  details of registered participants.</p>
+
+<tal:block tal:condition="not:context/id" i18n:translate="">
+<table class="form">
+<tr>
+ <td>Note:&nbsp;</td>
+ <th class="required">highlighted</th>
+ <td>&nbsp;fields are required.</td>
+</tr>
+</table>
+<table class="form">
+<tr>
+ <td>Date of birth is required for contestants.</td>
+</tr>
+</table>
+<table class="form">
+<tr>
+ <td>You can edit participant information and add a photo and
+ arrival/departure details after initial registration.</td>
+</tr>
+</table>
+</tal:block>
+
+<form method="POST"
+      name="itemSynopsis"
+      tal:define="required python:'country given_name family_name gender primary_role first_language tshirt'.split()"
+      enctype="multipart/form-data"
+      tal:attributes="action context/designator;
+      onSubmit python:'return checkRequiredFields(\'%s\')'%'\', \''.join(required);
+      ">
+<table class="form" tal:define="
+  th_label templates/page/macros/th_label;
+  normal_input templates/page/macros/user_normal_input;
+  edit_ok context/is_edit_ok;
+  ">
+ <tr tal:condition="python:utils.normal_country_person(db._db,
+  request.user.id)" tal:define="name string:country; label string:Country; value context/country; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Country</th>
+  <td tal:content="structure python:context.country.menu(html_kwargs =
+  { 'id' : 'country' }, id = request.user.country.id)">country</td>
+ </tr>
+
+ <tr tal:condition="python:not utils.normal_country_person(db._db,
+  request.user.id)" tal:define="name string:country; label string:Country; value context/country; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Country</th>
+  <td tal:content="structure python:context.country.menu(html_kwargs =
+  { 'id' : 'country' })">country</td>
+ </tr>
+
+ <tr tal:define="name string:given_name; label string:Given name; value context/given_name; edit_ok edit_ok">
+  <th class="required" metal:use-macro="th_label">Given name</th>
+  <td><input name="given_name" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:define="name string:family_name; label string:Family name; value context/family_name; edit_ok edit_ok">
+  <th class="required" metal:use-macro="th_label">Family name</th>
+  <td><input name="family_name" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:define="name string:gender; label string:Gender; value context/gender; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label">Gender</th>
+  <td tal:content="structure python:context.gender.menu(html_kwargs =
+  { 'id' : 'gender' })">gender</td>
+ </tr>
+
+ <tr tal:define="name string:Date_of_birth; label string:Date of birth; value context/date_of_birth; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+  <th class="required" metal:use-macro="th_label">Date of birth</th>
+  <td tal:content="structure
+  python:context.date_of_birth.field(id='date_of_birth')"></td>
+ </tr>
+
+ <tr tal:condition="python:utils.normal_country_person(db._db,
+  request.user.id)" tal:define="name string:primary_role; label string:Primary role; value context/primary_role; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Primary role</th>
+  <td tal:content="structure python:context.primary_role.menu(html_kwargs =
+  { 'id' : 'primary_role' }, isadmin = 'False')">primary_role">primary_role</td>
+ </tr>
+
+ <tr tal:condition="python:not utils.normal_country_person(db._db,
+  request.user.id)" tal:define="name string:primary_role; label string:Primary role; value context/primary_role; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Primary role</th>
+  <td tal:content="structure python:context.primary_role.menu(html_kwargs =
+  { 'id' : 'primary_role' })">primary_role">primary_role</td>
+ </tr>
+
+ <tr tal:condition="python:(context.is_edit_ok() and not
+  utils.normal_country_person(db._db, request.user.id)) or (context.id
+  and context.other_roles)" tal:define="name string:other_roles; label string:Other roles (staff only); value context/other_roles; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Other roles (staff only)</th>
+  <td tal:content="structure context/other_roles/menu">other_roles</td>
+ </tr>
+
+ <tr tal:condition="python:(context.is_edit_ok() and not
+  utils.normal_country_person(db._db, request.user.id)) or (context.id
+  and context.guide_for)" tal:define="name string:guide_for; label string:Guide for (guides only); value context/guide_for; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Guide for (guides only)</th>
+  <td tal:content="structure context/guide_for/menu">guide_for</td>
+ </tr>
+
+ <tr tal:define="name string:first_language; label string:First language; value context/first_language; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label">First language</th>
+  <td tal:content="structure python:context.first_language.menu(html_kwargs =
+  { 'id' : 'first_language' })">first_language">first_language</td>
+ </tr>
+
+ <tr tal:define="name string:second_language; label string:Second language; value context/second_language; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label">Second language</th>
+  <td tal:content="structure context/second_language/menu">second_language</td>
+ </tr>
+
+ <tr tal:define="name string:diet; label string:Dietary requirements; value context/diet; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label">Dietary requirements</th>
+  <td><textarea rows="5" cols="40" tal:replace="structure context/diet/multiline"></textarea></td>
+ </tr>
+
+ <tr tal:define="name string:tshirt; label string:T-shirt size; value context/tshirt; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label">T-shirt size</th>
+  <td tal:content="structure python:context.tshirt.menu(html_kwargs =
+  { 'id' : 'tshirt' })">tshirt">tshirt</td>
+ </tr>
+
+ <tr tal:condition="python:context.is_edit_ok() and
+  (utils.normal_country_person(db._db, request.user.id) or (context.id
+  and db._db.person.get(context.id, 'country') !=
+  db._db.country.lookup('None') and db._db.person.get(context.id, 'country') !=
+  db._db.country.lookup(db._db.config.ext['MATHOLYMP_SHORT_NAME'] + ' ' + db._db.config.ext['MATHOLYMP_YEAR'] + ' Staff')))">
+  <th></th>
+  <td tal:condition="context/id" tal:content="structure
+  python:utils.country_travel_copy_options(db._db,
+  db._db.person.get(context.id, 'country'), context.id)"></td>
+  <td tal:condition="python:not context.id" tal:content="structure
+  python:utils.country_travel_copy_options(db._db,
+  db._db.user.get(request.user.id, 'country'), context.id)"></td>
+ </tr>
+
+ <tr tal:define="name string:arrival_place; label string:Arrival place; value context/arrival_place; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label">Arrival place</th>
+  <td tal:content="structure context/arrival_place/menu">arrival_place</td>
+ </tr>
+
+ <tr tal:define="name string:arrival_time; label string:Arrival time; value context/arrival_time; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label">Arrival time</th>
+  <td tal:content="structure context/arrival_time/field">arrival_time</td>
+ </tr>
+
+ <tr tal:define="name string:arrival_flight; label string:Arrival flight number; value context/arrival_flight; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label">Arrival flight number</th>
+  <td><input name="arrival_flight" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:define="name string:departure_place; label string:Departure place; value context/departure_place; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label">Departure place</th>
+  <td tal:content="structure context/departure_place/menu">departure_place</td>
+ </tr>
+
+ <tr tal:define="name string:departure_time; label string:Departure time; value context/departure_time; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label">Departure time</th>
+  <td tal:content="structure context/departure_time/field">departure_time</td>
+ </tr>
+
+ <tr tal:define="name string:departure_flight; label string:Departure flight number; value context/departure_flight; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label">Departure flight number</th>
+  <td><input name="departure_flight" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:define="name string:room_number; label string:Room number; value context/room_number; edit_ok context/room_number/is_edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label">Room number</th>
+  <td><input name="room_number" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:define="name string:phone_number; label string:Phone number (guides only); value context/phone_number; edit_ok context/phone_number/is_edit_ok" tal:condition="python:(context.is_edit_ok() and not utils.normal_country_person(db._db, request.user.id))">
+  <th metal:use-macro="th_label">Phone number (guides only)</th>
+  <td><input name="phone_number" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:condition="context/is_edit_ok">
+  <td colspan="2">If this person <a tal:attributes="href python:db._db.config.ext['MATHOLYMP_GENERIC_URL_BASE']+'people/'" target="_blank">has participated at a previous <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_SHORT_NAME']" /></a> (in any capacity), please enter the corresponding <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_GENERIC_URL_DESC']" /> (for example, <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_GENERIC_URL_BASE']+'people/person123456/'" />) below; otherwise, leave this box blank.</td>
+ </tr>
+
+ <tr tal:define="name string:generic_url; label python:db._db.config.ext['MATHOLYMP_GENERIC_URL_DESC']; value context/generic_url; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label"><tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_GENERIC_URL_DESC']" /></th>
+  <td><input name="generic_url" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:condition="context/is_edit_ok">
+  <th i18n:translate="">Upload photo</th>
+  <td colspan=3><input type="file" name="@file" size="20"></td>
+ </tr>
+
+ <tr tal:condition="edit_ok">
+  <td>
+   &nbsp;
+   <input type="hidden" name="@template" value="item">
+   <input type="hidden" name="@required" value="country,given_name,family_name,gender,primary_role,first_language,tshirt"
+          tal:attributes="value python:','.join(required)">
+  </td>
+  <td><input type="submit" value="save" tal:replace="structure context/submit"><!--submit button here-->
+    <input type=reset>
+  </td>
+ </tr>
+</table>
+</form>
+
+<table class="form" tal:condition="context/is_edit_ok">
+<tr>
+ <td>Enter arrival and departure times in the form <span tal:replace="python:db._db.config.ext['MATHOLYMP_DATE_TEMPLATE']" />.hh:mm.</td>
+</tr>
+<tr>
+ <td>Room numbers will be assigned by event organisers.</td>
+</tr>
+</table>
+
+<tal:block tal:condition="context/files">
+<table>
+<tr>
+  <td><img width="200" alt="" tal:attributes="src context/files/download_url"></td>
+</tr>
+</table>
+</tal:block>
+
+<tal:block tal:condition="context/id">
+<tal:block tal:condition="context/generic_url">
+<p><a tal:attributes="href context/generic_url">Previous <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_SHORT_NAME']" /> participation details</a> available.</p>
+</tal:block>
+<tal:block tal:condition="python:utils.person_is_contestant(db._db, context.id)">
+<p>Contestant age on <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_AGE_DAY_DESC']" />:
+<tal:block tal:replace="python:utils.contestant_age(db._db,
+			context.id)" />.</p>
+<tal:block tal:condition="python:not db._db.person.is_retired(context.id)">
+<h2 tal:condition="python:utils.scores_final(db._db)">Final Scores</h2>
+<h2 tal:condition="python:not utils.scores_final(db._db)">Live Scores</h2>
+<tal:block tal:replace="structure
+			python:utils.person_scores_table(db._db,
+			context.id)" />
+</tal:block>
+</tal:block>
+</tal:block>
+
+<tal:block tal:condition="context/is_edit_ok">
+<tal:block tal:condition="context/id">
+<tal:block tal:condition="not:options/error_message | nothing">
+<tal:block tal:replace="structure context/history" />
+</tal:block>
+</tal:block>
+</tal:block>
+
+</div>
+
+</td>
+
+</tal:doc>

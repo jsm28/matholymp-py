@@ -1,0 +1,33 @@
+<tal:block metal:use-macro="templates/page/macros/icing">
+<title metal:fill-slot="head_title" i18n:translate="">T-shirt size listing - <span
+ i18n:name="tracker" tal:replace="config/TRACKER_NAME" /></title>
+<span metal:fill-slot="body_title" tal:omit-tag="python:1"
+ i18n:translate="">T-shirt size listing</span>
+<td class="content" metal:fill-slot="content">
+
+<span tal:condition="python:not (context.is_view_ok()
+ or request.user.hasRole('Anonymous'))"
+ i18n:translate="">You are not allowed to view this page.</span>
+
+<span tal:condition="python:not context.is_view_ok()
+ and request.user.hasRole('Anonymous')"
+ i18n:translate="">Please login with your username and password.</span>
+
+<table width="100%" tal:condition="context/is_view_ok" class="list">
+<tr>
+ <th i18n:translate="">Name</th>
+ <th i18n:translate="">Order</th>
+</tr>
+<tal:block repeat="tshirt context/list">
+<tr tal:attributes="class python:['normal', 'alt'][repeat['tshirt'].index%6/3]">
+ <td>
+  <a tal:attributes="href string:tshirt${tshirt/id}"
+     tal:content="tshirt/name">name</a>
+ </td>
+ <td tal:content="tshirt/order">&nbsp</td>
+</tr>
+</tal:block>
+</table>
+</td>
+
+</tal:block>

@@ -1,0 +1,61 @@
+<tal:block metal:use-macro="templates/page/macros/icing">
+<title metal:fill-slot="head_title" i18n:translate="">Select Country
+ and Problem - <span
+ i18n:name="tracker" tal:replace="config/TRACKER_NAME" /></title>
+<span metal:fill-slot="body_title" tal:omit-tag="python:1"
+ i18n:translate="">Select country and problem to enter scores</span>
+
+<td class="content" metal:fill-slot="content">
+
+<span tal:condition="python:not (request.user.hasPermission('Score')
+ or request.user.hasRole('Anonymous'))"
+ i18n:translate="">You are not allowed to view this page.</span>
+
+<span tal:condition="python:not request.user.hasPermission('Score')
+ and request.user.hasRole('Anonymous')"
+ i18n:translate="">Please login with your username and password.</span>
+
+<span tal:condition="python:request.user.hasPermission('Score')">
+
+<form method="GET"
+      name="itemSynopsis"
+      tal:define="required python:'country problem'.split()"
+      tal:attributes="action request/classname;
+      onSubmit python:'return checkRequiredFields(\'%s\')'%'\', \''.join(required);
+      ">
+
+<table class="form" tal:define="
+  th_label templates/page/macros/th_label;
+  normal_input templates/page/macros/user_normal_input;
+  edit_ok true;
+  ">
+
+<tr tal:define="name string:country; label string:Country">
+<th metal:use-macro="th_label">Country</th>
+<td tal:content="structure python:context.country.menu(html_kwargs =
+{ 'id' : 'country' })">country</td>
+</tr>
+
+<tr tal:define="name string:problem; label string:Problem; value string:">
+<th metal:use-macro="th_label">Problem</th>
+<td><input name="problem" id="problem" metal:use-macro="normal_input"></td>
+</tr>
+
+<tr>
+<td>
+<input type="hidden" name="@template" value="scoreenter">
+</td>
+<td>
+<input type="submit" value="Enter scores for this country and problem">
+</td>
+</tr>
+
+</table>
+
+</form>
+
+</span>
+
+</td>
+
+</tal:block>
