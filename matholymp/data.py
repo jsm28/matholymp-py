@@ -148,6 +148,13 @@ class EventGroup(object):
         'long_name',
         """The full name for this kind of event.""")
 
+    distinguish_official = _EventGroupPropertyDS(
+        'distinguish_official',
+        """
+        Whether official countries are distinguished at at least some
+        of this kind of event.
+        """)
+
     _event_ids = _EventGroupPropertyDS(
         '_event_ids',
         """A list of ids for all events.""")
@@ -641,6 +648,21 @@ class Event(object):
     num_countries_official = _PropertyCached(
         'num_countries_official', _get_num_countries_official,
         """The number of official countries with contestants at this event.""")
+
+    def _get_distinguish_official(self):
+        if self.event_group._ds.event_have_attr(self.id,
+                                                'distinguish_official'):
+            return self.event_group._ds.event_get_attr(self.id,
+                                                       'distinguish_official')
+        else:
+            return self.event_group.distinguish_official
+
+    distinguish_official = _PropertyCached(
+        'distinguish_official', _get_distinguish_official,
+        """
+        Whether official and unofficial countries are distinguished at
+        this event.
+        """)
 
     def _get_sort_key(self):
         return self.id
@@ -1214,8 +1236,16 @@ class CountryEvent(object):
         'flag_url',
         """The flag URL of this country at this event.""")
 
-    is_official = _CountryEventPropertyDS(
-        'is_official',
+    def _get_is_official(self):
+        if self.event.distinguish_official:
+            ds = self.country.event_group._ds
+            return ds.country_event_get_attr(self.country.id, self.event.id,
+                                             'is_official')
+        else:
+            return True
+
+    is_official = _PropertyCached(
+        'is_official', _get_is_official,
         """Whether this country is an official country at this event.""")
 
     def _get_person_list(self):

@@ -135,9 +135,14 @@ def main():
             shutil.copyfile(flag_src_filename, flag_dst_filename)
 
     countries_data.extend(new_countries_data)
-    write_utf8_csv(countries_csv, countries_data,
-                   [cfg_data['num_key'], 'Country Number', 'Annual URL',
-                    'Code', 'Name', 'Flag URL', cfg_data['official_desc']])
+    countries_header = [cfg_data['num_key'], 'Country Number', 'Annual URL',
+                        'Code', 'Name', 'Flag URL']
+    if cfg_data['distinguish_official']:
+        countries_header.extend([cfg_data['official_desc']])
+        for c in countries_data:
+            if cfg_data['official_desc'] not in c:
+                c[cfg_data['official_desc']] = ''
+    write_utf8_csv(countries_csv, countries_data, countries_header)
 
     people_data = read_utf8_csv(people_csv)
     max_person_index = 0

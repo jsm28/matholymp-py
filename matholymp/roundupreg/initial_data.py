@@ -54,6 +54,8 @@
 
 """This module provides the Roundup initial data setup."""
 
+from matholymp.roundupreg.rounduputil import distinguish_official
+
 __all__ = ['init_data']
 
 def init_data(env):
@@ -87,8 +89,12 @@ def init_data(env):
 
     # Create country records for administration and special-case users.
     country = db.getclass('country')
-    country.create(code='ZZA', name=staff_country_name, official=False)
-    country.create(code='ZZN', name='None', official=False)
+    if distinguish_official(db):
+        country_extra = { 'official': False }
+    else:
+        country_extra = {}
+    country.create(code='ZZA', name=staff_country_name, **country_extra)
+    country.create(code='ZZN', name='None', **country_extra)
 
     # Create standard roles for olympiad participants.
     matholymprole = db.getclass('matholymprole')

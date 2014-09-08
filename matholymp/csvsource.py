@@ -104,7 +104,8 @@ class CSVDataSource(DataSource):
             self._people[eid][pid] = p
 
     def event_group_get_attr(self, name):
-        if name in ('short_name', 'short_name_plural', 'long_name'):
+        if name in ('short_name', 'short_name_plural', 'long_name',
+                    'distinguish_official'):
             return self._cfg[name]
         if name == '_event_ids':
             return list(self._events.keys())

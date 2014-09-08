@@ -46,10 +46,11 @@ from roundup.cgi.templating import HTMLItem
 
 from matholymp.collate import coll_get_sort_key
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
-from matholymp.roundupreg.rounduputil import contestant_age, \
-    get_none_country, get_staff_country, normal_country_person, \
-    person_is_contestant, contestant_code, pn_score, scores_final, \
-    any_scores_missing, country_has_contestants, valid_country_problem
+from matholymp.roundupreg.rounduputil import distinguish_official, \
+    contestant_age, get_none_country, get_staff_country, \
+    normal_country_person, person_is_contestant, contestant_code, pn_score, \
+    scores_final, any_scores_missing, country_has_contestants, \
+    valid_country_problem
 
 def people_from_country_internal(db, country):
     """
@@ -325,6 +326,7 @@ def registration_status(db):
 
 def register_templating_utils(instance):
     """Register functions for use from page templates with Roundup."""
+    instance.registerUtil('distinguish_official', distinguish_official)
     instance.registerUtil('normal_country_person', normal_country_person)
     instance.registerUtil('person_is_contestant', person_is_contestant)
     instance.registerUtil('people_from_country', people_from_country)

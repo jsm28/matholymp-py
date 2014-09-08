@@ -38,11 +38,18 @@ import time
 
 from roundup.date import Date
 
-__all__ = ['scores_from_str', 'contestant_age', 'get_none_country',
-           'get_staff_country', 'normal_country_person',
+from matholymp.fileutil import boolean_states
+
+__all__ = ['distinguish_official', 'scores_from_str', 'contestant_age',
+           'get_none_country', 'get_staff_country', 'normal_country_person',
            'person_is_contestant', 'contestant_code', 'pn_score',
            'scores_final', 'any_scores_missing', 'country_has_contestants',
            'valid_country_problem', 'create_rss']
+
+def distinguish_official(db):
+    """Return whether this event distinguishes official countries."""
+    dist_off = db.config.ext['MATHOLYMP_DISTINGUISH_OFFICIAL']
+    return boolean_states[dist_off.lower()]
 
 def scores_from_str(db, score_str):
     """

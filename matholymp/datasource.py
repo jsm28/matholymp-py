@@ -48,7 +48,7 @@ class DataSource(object):
         """
         Return the value of an attribute for an EventGroup.  Possible
         names are: short_name, short_name_plural, long_name,
-        _event_ids, _person_ids, _country_ids.
+        distinguish_official, _event_ids, _person_ids, _country_ids.
         """
         raise NotImplementedError
 
@@ -86,7 +86,7 @@ class DataSource(object):
         home_page_url, contact_name, contact_email, num_exams,
         num_problems, marks_per_problem, registration_active,
         gold_boundary, silver_boundary, bronze_boundary, paper_list,
-        _person_ids, _country_ids.
+        _person_ids, _country_ids, distinguish_official.
         """
         raise NotImplementedError
 
@@ -94,7 +94,8 @@ class DataSource(object):
         """
         Return whether this DataSource provides a value of an
         attribute for an Event, or whether it should be inherited from
-        the EventGroup.  Possible names are: short_name, long_name.
+        the EventGroup.  Possible names are: short_name, long_name,
+        distinguish_official.
         """
         return False
 

@@ -22,7 +22,7 @@
 <tr>
  <th i18n:translate="">Code</th>
  <th i18n:translate="">Name</th>
- <th i18n:translate=""><tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_OFFICIAL_DESC']" /></th>
+ <th i18n:translate="" tal:condition="python:utils.distinguish_official(db._db)"><tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_OFFICIAL_DESC']" /></th>
 </tr>
 <tal:block repeat="country context/list">
 <tr tal:attributes="class python:['normal', 'alt'][repeat['country'].index%6/3]">
@@ -34,7 +34,9 @@
   <a tal:attributes="href string:country${country/id}"
      tal:content="country/name">name</a>
  </td>
+<tal:block tal:condition="python:utils.distinguish_official(db._db)">
  <td tal:content="python:country.official.plain()">&nbsp;</td>
+</tal:block>
 </tr>
 </tal:block>
 </table>

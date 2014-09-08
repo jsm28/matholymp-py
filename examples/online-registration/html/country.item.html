@@ -63,6 +63,7 @@ define="edit_ok context/is_edit_ok"
   <td><input name="name" metal:use-macro="normal_input"></td>
  </tr>
 
+<tal:block tal:condition="python:utils.distinguish_official(db._db)">
  <tr tal:define="name string:official; label python:db._db.config.ext['MATHOLYMP_OFFICIAL_LONG_DESC']; value context/official; edit_ok edit_ok">
   <th class="required" metal:use-macro="th_label"><tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_OFFICIAL_LONG_DESC']" /></th>
   <tal:if condition="context/id">
@@ -72,6 +73,7 @@ define="edit_ok context/is_edit_ok"
    <td><input type="radio" checked="checked" name="official" value="yes">Yes<input type="radio" name="official" value="no">No</td>
   </tal:if>
  </tr>
+</tal:block>
 
  <tr tal:condition="context/is_edit_ok">
   <td colspan="2">If this country has participated at a previous <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_SHORT_NAME']" />, please enter the corresponding <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_GENERIC_URL_DESC']" /> (for example, <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_GENERIC_URL_BASE']+'countries/country1234/'" />) below; otherwise, leave this box blank.</td>
@@ -92,6 +94,10 @@ define="edit_ok context/is_edit_ok"
    &nbsp;
    <input type="hidden" name="@template" value="item">
    <input type="hidden" name="@required" value="name,code,official"
+          tal:condition="python:utils.distinguish_official(db._db)"
+          tal:attributes="value python:','.join(required)">
+   <input type="hidden" name="@required" value="name,code"
+          tal:condition="python:not utils.distinguish_official(db._db)"
           tal:attributes="value python:','.join(required)">
   </td>
   <td><input type="submit" value="save" tal:replace="structure context/submit"><!--submit button here-->

@@ -54,6 +54,8 @@
 
 """This module provides the Roundup registration schema."""
 
+from matholymp.roundupreg.rounduputil import distinguish_official
+
 __all__ = ['init_schema']
 
 def init_schema(env):
@@ -84,12 +86,16 @@ def init_schema(env):
                   silver=String(),
                   bronze=String())
 
+    if distinguish_official(db):
+        country_extra = { 'official': Boolean() }
+    else:
+        country_extra = {}
     country = Class(db, 'country',
                     code=String(),
                     name=String(),
-                    official=Boolean(),
                     generic_url=String(),
-                    files=Link('file'))
+                    files=Link('file'),
+                    **country_extra)
     country.setkey('name')
     country.setorderprop('code')
 

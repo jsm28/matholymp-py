@@ -34,7 +34,8 @@ countries involved in them from which other data is derived.
 """
 
 from matholymp.datasource import DataSource
-from matholymp.roundupreg.rounduputil import scores_from_str, contestant_age
+from matholymp.roundupreg.rounduputil import distinguish_official, \
+    scores_from_str, contestant_age
 from matholymp.urlutil import url_quote
 
 __all__ = ['RoundupDataSource']
@@ -62,6 +63,8 @@ class RoundupDataSource(DataSource):
     def event_group_get_attr(self, name):
         if name == 'short_name':
             return self._db.config.ext['MATHOLYMP_SHORT_NAME']
+        elif name == 'distinguish_official':
+            return distinguish_official(self._db)
         elif name == '_event_ids':
             return [int(self._db.config.ext['MATHOLYMP_EVENT_NUMBER'])]
         elif name == '_person_ids':
