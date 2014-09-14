@@ -197,6 +197,11 @@ you should check manually from time to time.
   that person did in fact participate previously (checking with the
   relevant country if necessary).
 
+* If a person is registered without a photo, but the static site has a
+  photo for them from a previous year, upload that photo to the
+  registration system.  (Future versions of matholymp may add more
+  automation in this area.)
+
 Closing registration
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -262,9 +267,11 @@ To complete the removal you should also retire the ``file`` object:
 
 You should also rename or remove the file itself under the :file:`db/`
 directory, or truncate it, or change its permissions, so that it
-becomes unavailable over the web.  (Note that that this may break
-:command:`roundup-admin export` if it cannot find or read the file.
-As explained in the `Roundup administration documentation
+becomes unavailable over the web (this step, and retiring the ``file``
+object, applies to all photos for that person, if more than one was
+uploaded).  (Note that that this may break :command:`roundup-admin
+export` if it cannot find or read the file.  As explained in the
+`Roundup administration documentation
 <http://roundup-tracker.org/docs/admin_guide.html#tracker-backup>`_,
 use of `roundup-admin export` is not a recommended backup approach,
 but if you are using it then you should consider the effects of
