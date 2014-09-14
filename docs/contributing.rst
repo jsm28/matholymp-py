@@ -15,12 +15,17 @@ with the current Git version.  You can then send me diffs generated
 with :command:`git diff` or :command:`git format-patch`, either using
 :command:`git send-email` or with your normal email client (if sending
 with your normal email client, patches should be attached, unless you
-are sure your email client does not change whitespace when including
-something inline).  You can also send Git pull requests if you prefer.
+are sure your email client does not change whitespace, including UTF-8
+BOMs, when including something inline).  You can also send Git pull
+requests if you prefer.
 
 Please keep patches following the existing coding style (which
 generally tries to follow :pep:`8`).  The code is designed so that
 configuration for a particular event can be done in configuration
 files and HTML and LaTeX templates, so if a feature is only
 appropriate for some events please ensure it is appropriately
-configurable rather than always enabled.
+configurable rather than always enabled.  If the new features affect
+parts of the code covered by the automated testsuite (which can be run
+with :command:`mo-run-tests`), please update existing test
+expectations if needed, and add new tests if not adequately covered by
+the existing tests.

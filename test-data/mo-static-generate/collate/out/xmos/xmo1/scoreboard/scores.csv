@@ -1,0 +1,6 @@
+﻿Country Name,Country Code,Contestant Code,Given Name,Family Name,P1,P2,P3,P4,P5,P6,Total,Award,Rank
+Two Three,ABC,ABC1,Nine,Ten,7,7,0,7,7,1,29,Gold Medal,2
+Two Three,ABC,ABC2,Eleven,Twelve,7,0,0,7,0,1,15,Bronze Medal,4
+One Country,DEF,DEF1,One,Two,7,4,0,7,2,1,21,Silver Medal,3
+One Country,DEF,DEF2,Three,Áname,7,0,0,0,2,0,9,Honourable Mention,5
+Four Five,ZYX,ZYX1,Äname,Twelve,7,7,0,7,2,7,30,Gold Medal,1
