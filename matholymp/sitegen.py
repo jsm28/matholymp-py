@@ -53,7 +53,7 @@ def read_sitegen_config(top_directory):
                     'official_desc', 'official_desc_lc', 'official_adj',
                     'age_day_desc']
     cfg_int_keys = []
-    cfg_int_none_keys = ['event_active_number']
+    cfg_int_none_keys = ['rank_top_n', 'event_active_number']
     cfg_bool_keys = ['use_xhtml', 'distinguish_official']
     cfg_data = read_config(cfg_file_name, 'matholymp.staticsite',
                            cfg_str_keys, cfg_int_keys, cfg_int_none_keys,
@@ -968,7 +968,8 @@ class SiteGenerator(object):
             row.extend([cgi.escape(p.award or '')])
         return self.html_tr_td_scores_list(row)
 
-    def country_scoreboard_header(self, show_year, num_problems_to_show):
+    def country_scoreboard_header(self, show_year, num_problems_to_show,
+                                  total_top_n_header):
         """Generate the header for a scoreboard for countries."""
         row = []
         if show_year:
@@ -979,17 +980,25 @@ class SiteGenerator(object):
         row.append(self.html_th_scores('Size'))
         row.extend([self.html_th_scores('P%d' % (i + 1))
                     for i in range(num_problems_to_show)])
-        row.extend([self.html_th_scores('&Sigma;', title='Total score'),
-                    self.html_th_scores('G', title='Gold'),
+        row.extend([self.html_th_scores('&Sigma;', title='Total score')])
+        if total_top_n_header is not None:
+            row.extend([self.html_th_scores(('&Sigma;<sub>%d</sub>' %
+                                             total_top_n_header),
+                                            title=('Total score (top %d)' %
+                                                   total_top_n_header))])
+        row.extend([self.html_th_scores('G', title='Gold'),
                     self.html_th_scores('S', title='Silver'),
                     self.html_th_scores('B', title='Bronze'),
                     self.html_th_scores('HM', title='Honourable Mention')])
         return self.html_tr_list(row)
 
-    def country_scoreboard_row(self, c, show_year, num_problems_to_show=None):
+    def country_scoreboard_row(self, c, show_year, num_problems_to_show=None,
+                               total_top_n=None):
         """Generate the scoreboard row for one country."""
         if num_problems_to_show is None:
             num_problems_to_show = c.event.num_problems
+        if total_top_n is None:
+            total_top_n = c.event.rank_top_n_matters
         row = []
         if show_year:
             row.append(
@@ -1004,8 +1013,10 @@ class SiteGenerator(object):
         row.extend([str(t) for t in c.problem_totals])
         row.extend(['' for i in range(c.event.num_problems,
                                       num_problems_to_show)])
-        row.extend([str(c.total_score),
-                    (c.num_awards['Gold Medal'] is not None and
+        row.extend([str(c.total_score)])
+        if total_top_n:
+            row.extend([str(c.total_score_for_rank)])
+        row.extend([(c.num_awards['Gold Medal'] is not None and
                      str(c.num_awards['Gold Medal']) or ''),
                     (c.num_awards['Silver Medal'] is not None and
                      str(c.num_awards['Silver Medal']) or ''),
@@ -1107,7 +1118,9 @@ class SiteGenerator(object):
         text += '\n'
 
         text += '<h2>Country results</h2>\n'
-        head_row_list = [self.country_scoreboard_header(False, num_problems)]
+        total_top_n_header = e.rank_top_n_if_matters
+        head_row_list = [self.country_scoreboard_header(False, num_problems,
+                                                        total_top_n_header)]
         rank_sorted_countries = sorted(countries, key=lambda x:x.sort_key)
         rank_sorted_countries = sorted(rank_sorted_countries,
                                        key=lambda x:x.rank)
@@ -1116,6 +1129,11 @@ class SiteGenerator(object):
             body_row_list.append(self.country_scoreboard_row(c, False))
         text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
         text += '\n'
+
+        if e.rank_top_n_matters:
+            text += ('<p>Country ranks are determined by the total score of'
+                     ' the top %d contestants from each country.</p>\n' %
+                     e.rank_top_n)
 
         if not e.scores_final:
             text += ('<p>The statistics by problem only include the'
@@ -1302,8 +1320,10 @@ class SiteGenerator(object):
 
         if c.num_contestants:
             text += '<h2>National results</h2>\n'
+            show_top_n = c.event.rank_top_n_if_matters
             head_row_list = [self.country_scoreboard_header(False,
-                                                            num_problems)]
+                                                            num_problems,
+                                                            show_top_n)]
             body_row_list = [self.country_scoreboard_row(c, False)]
             text += self.html_table_thead_tbody_list(head_row_list,
                                                      body_row_list)
@@ -1347,13 +1367,14 @@ class SiteGenerator(object):
             year_list.append(year_text)
             if c.num_contestants:
                 year_list_table.append(
-                    self.country_scoreboard_row(c, True, c_max_num_problems))
+                    self.country_scoreboard_row(c, True, c_max_num_problems,
+                                                False))
         year_list.reverse()
         year_list_table.reverse()
         if year_list_table:
             text += '<h2>National results</h2>\n'
             head_row_list = [self.country_scoreboard_header(
-                    True, c_max_num_problems)]
+                    True, c_max_num_problems, None)]
             text += self.html_table_thead_tbody_list(head_row_list,
                                                      year_list_table)
             text += '\n'

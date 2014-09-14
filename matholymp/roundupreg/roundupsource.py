@@ -65,6 +65,12 @@ class RoundupDataSource(DataSource):
             return self._db.config.ext['MATHOLYMP_SHORT_NAME']
         elif name == 'distinguish_official':
             return distinguish_official(self._db)
+        elif name == 'rank_top_n':
+            s = self._db.config.ext['MATHOLYMP_RANK_TOP_N']
+            if s:
+                return int(s)
+            else:
+                return None
         elif name == '_event_ids':
             return [int(self._db.config.ext['MATHOLYMP_EVENT_NUMBER'])]
         elif name == '_person_ids':

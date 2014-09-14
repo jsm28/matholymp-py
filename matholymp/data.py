@@ -155,6 +155,13 @@ class EventGroup(object):
         of this kind of event.
         """)
 
+    rank_top_n = _EventGroupPropertyDS(
+        'rank_top_n',
+        """
+        The number of contestants considered in determining a
+        country's rank, or None if all contestants considered.
+        """)
+
     _event_ids = _EventGroupPropertyDS(
         '_event_ids',
         """A list of ids for all events.""")
@@ -662,6 +669,51 @@ class Event(object):
         """
         Whether official and unofficial countries are distinguished at
         this event.
+        """)
+
+    def _get_rank_top_n(self):
+        if self.event_group._ds.event_have_attr(self.id, 'rank_top_n'):
+            return self.event_group._ds.event_get_attr(self.id, 'rank_top_n')
+        else:
+            return self.event_group.rank_top_n
+
+    rank_top_n = _PropertyCached(
+        'rank_top_n', _get_rank_top_n,
+        """
+        The number of contestants considered in determining a
+        country's rank, or None if all contestants considered.
+        """)
+
+    def _get_rank_top_n_matters(self):
+        count = self.rank_top_n
+        if count is None:
+            return False
+        for c in self.country_with_contestants_list:
+            if c.num_contestants > count:
+                return True
+        return False
+
+    rank_top_n_matters = _PropertyCached(
+        'rank_top_n_matters', _get_rank_top_n_matters,
+        """
+        Whether country ranks are determined by the total of the
+        scores of a number of contestants that at least sometimes is
+        fewer than all the contestants from that country.
+        """)
+
+    def _get_rank_top_n_if_matters(self):
+        if self.rank_top_n_matters:
+            return self.rank_top_n
+        else:
+            return None
+
+    rank_top_n_if_matters = _PropertyCached(
+        'rank_top_n_if_matters', _get_rank_top_n_if_matters,
+        """
+        The number of contestants considered in determining a
+        country's rank, or None if all contestants considered or this
+        number is in fact at least as big as the number of contestants
+        from each country.
         """)
 
     def _get_sort_key(self):
@@ -1327,6 +1379,20 @@ class CountryEvent(object):
         'total_score', _get_total_score,
         """The total score for contestants from this country at this event.""")
 
+    def _get_total_score_for_rank(self):
+        scores = sorted([p.total_score for p in self.contestant_list],
+                        reverse=True)
+        count = self.event.rank_top_n
+        if count is not None and count < len(scores):
+            scores = scores[0:count]
+        return sum(scores)
+
+    total_score_for_rank = _PropertyCached(
+        'total_score_for_rank', _get_total_score_for_rank,
+        """
+        The total score for ranking purposes for this country at this event.
+        """)
+
     def _get_problem_totals(self):
         r = []
         for n in range(self.event.num_problems):
@@ -1347,11 +1413,11 @@ class CountryEvent(object):
         nrank = 0
         last_score = -1
         for c in sorted(self.event.country_with_contestants_list,
-                        key=lambda x:x.total_score, reverse=True):
+                        key=lambda x:x.total_score_for_rank, reverse=True):
             nrank += 1
-            if c.total_score != last_score:
+            if c.total_score_for_rank != last_score:
                 rank = nrank
-                last_score = c.total_score
+                last_score = c.total_score_for_rank
             c._cache['rank'] = rank
         return self._cache['rank']
 

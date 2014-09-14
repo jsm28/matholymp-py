@@ -105,7 +105,7 @@ class CSVDataSource(DataSource):
 
     def event_group_get_attr(self, name):
         if name in ('short_name', 'short_name_plural', 'long_name',
-                    'distinguish_official'):
+                    'distinguish_official', 'rank_top_n'):
             return self._cfg[name]
         if name == '_event_ids':
             return list(self._events.keys())
