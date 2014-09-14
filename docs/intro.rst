@@ -92,7 +92,8 @@ these modules can be found when the Roundup registration system is run
 (for example, by creating a symbolic link from the
 :file:`site-packages/` directory where Roundup was installed to the
 :file:`matholymp/` directory, or by setting :envvar:`PYTHONPATH`
-appropriately).
+appropriately).  Some parts of the matholymp code have a testsuite,
+which can be run with :command:`mo-run-tests`; all tests should pass.
 
 The matholymp functionality falls into three main areas.  Although the
 software is designed as an integrated whole, you can also choose to
