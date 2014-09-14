@@ -332,10 +332,7 @@ class DocumentGenerator(object):
             template_fields['guide_phone'] = ''
         else:
             guide_list = country.guide_list
-            if len(guide_list) > 1:
-                raise ValueError('Country %s has multiple guides' %
-                                 country.name)
-            if guide_list:
+            if len(guide_list) == 1:
                 g = guide_list[0]
                 template_fields['guide_name'] = g.name
                 template_fields['guide_room'] = g.room_number or ''
