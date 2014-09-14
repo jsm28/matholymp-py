@@ -146,7 +146,7 @@ def read_config(file_name, section, str_keys, int_keys, int_none_keys,
 
 if _py3:
     # Exported by the standard library from 3.2 onwards.
-    _boolean_states = configparser.BOOLEAN_STATES
+    _boolean_states = configparser.RawConfigParser.BOOLEAN_STATES
 else:
     _boolean_states = { '1': True, 'yes': True, 'true': True, 'on': True,
                         '0': False, 'no': False, 'false': False, 'off': False }
