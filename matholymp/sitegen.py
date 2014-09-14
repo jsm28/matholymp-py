@@ -512,7 +512,7 @@ class SiteGenerator(object):
         out_list = []
         for e in self._data.event_list:
             short_name = cgi.escape(e.short_name_with_year)
-            contact = cgi.escape(e.contact)
+            contact = cgi.escape(e.contact or '')
             if contact:
                 text = ('  <li>For communications about %s,'
                         ' please contact %s.</li>' %
@@ -552,7 +552,7 @@ class SiteGenerator(object):
             year = self.link_for_event(e, cgi.escape(e.year))
             country = self.link_for_country(e.host_country,
                                             cgi.escape(e.host_country_name))
-            city = cgi.escape(e.host_city)
+            city = cgi.escape(e.host_city or '')
             if e.start_date is None or e.end_date is None:
                 dates = ''
             else:
