@@ -990,9 +990,19 @@ class SiteGenerator(object):
             row.extend([cgi.escape(p.award or '')])
         return self.html_tr_td_scores_list(row)
 
-    def country_scoreboard_header(self, show_year, num_problems_to_show,
-                                  total_top_n_header, show_hm):
+    def country_scoreboard_header(self, event, country):
         """Generate the header for a scoreboard for countries."""
+        assert event or country
+        if event:
+            show_year = False
+            num_problems_to_show = event.num_problems
+            total_top_n_header = event.rank_top_n_if_matters
+            show_hm = event.honourable_mentions_available
+        else:
+            show_year = True
+            num_problems_to_show = country.max_num_problems
+            total_top_n_header = None
+            show_hm = self._data.honourable_mentions_available
         row = []
         if show_year:
             row.append(self.html_th_scores('Year'))
@@ -1015,15 +1025,19 @@ class SiteGenerator(object):
             row.extend([self.html_th_scores('HM', title='Honourable Mention')])
         return self.html_tr_list(row)
 
-    def country_scoreboard_row(self, c, show_year, num_problems_to_show=None,
-                               total_top_n=None, show_hm=None):
+    def country_scoreboard_row(self, event, c):
         """Generate the scoreboard row for one country."""
-        if num_problems_to_show is None:
-            num_problems_to_show = c.event.num_problems
-        if total_top_n is None:
-            total_top_n = c.event.rank_top_n_matters
-        if show_hm is None:
-            show_hm = c.event.honourable_mentions_available
+        if event:
+            assert event is c.event
+            show_year = False
+            num_problems_to_show = event.num_problems
+            total_top_n = event.rank_top_n_matters
+            show_hm = event.honourable_mentions_available
+        else:
+            show_year = True
+            num_problems_to_show = c.country.max_num_problems
+            total_top_n = None
+            show_hm = self._data.honourable_mentions_available
         row = []
         if show_year:
             row.append(
@@ -1155,17 +1169,13 @@ class SiteGenerator(object):
         text += '\n'
 
         text += '<h2>Country results</h2>\n'
-        total_top_n_header = e.rank_top_n_if_matters
-        show_hm = e.honourable_mentions_available
-        head_row_list = [self.country_scoreboard_header(False, num_problems,
-                                                        total_top_n_header,
-                                                        show_hm)]
+        head_row_list = [self.country_scoreboard_header(e, None)]
         rank_sorted_countries = sorted(countries, key=lambda x:x.sort_key)
         rank_sorted_countries = sorted(rank_sorted_countries,
                                        key=lambda x:x.rank)
         body_row_list = []
         for c in rank_sorted_countries:
-            body_row_list.append(self.country_scoreboard_row(c, False))
+            body_row_list.append(self.country_scoreboard_row(e, c))
         text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
         text += '\n'
 
@@ -1350,7 +1360,6 @@ class SiteGenerator(object):
     def generate_one_event_country_page(self, c):
         """Generate a page for one country at one event."""
         text = ''
-        num_problems = c.event.num_problems
         if c.flag_url:
             text += ('<p class="%s">%s</p>\n' %
                      (self._cfg['photo_css'],
@@ -1359,13 +1368,8 @@ class SiteGenerator(object):
 
         if c.num_contestants:
             text += '<h2>National results</h2>\n'
-            show_top_n = c.event.rank_top_n_if_matters
-            show_hm = c.event.honourable_mentions_available
-            head_row_list = [self.country_scoreboard_header(False,
-                                                            num_problems,
-                                                            show_top_n,
-                                                            show_hm)]
-            body_row_list = [self.country_scoreboard_row(c, False)]
+            head_row_list = [self.country_scoreboard_header(c.event, None)]
+            body_row_list = [self.country_scoreboard_row(c.event, c)]
             text += self.html_table_thead_tbody_list(head_row_list,
                                                      body_row_list)
             text += '\n'
@@ -1393,8 +1397,6 @@ class SiteGenerator(object):
                      (cgi.escape(self._data.short_name), host))
         year_list = []
         year_list_table = []
-        c_max_num_problems = cd.max_num_problems
-        show_hm = self._data.honourable_mentions_available
         for c in cd.participation_list:
             e = c.event
             year_text = ''
@@ -1408,15 +1410,12 @@ class SiteGenerator(object):
             year_text += self.country_event_text(c, 'h3', False)
             year_list.append(year_text)
             if c.num_contestants:
-                year_list_table.append(
-                    self.country_scoreboard_row(c, True, c_max_num_problems,
-                                                False, show_hm=show_hm))
+                year_list_table.append(self.country_scoreboard_row(None, c))
         year_list.reverse()
         year_list_table.reverse()
         if year_list_table:
             text += '<h2>National results</h2>\n'
-            head_row_list = [self.country_scoreboard_header(
-                True, c_max_num_problems, None, show_hm)]
+            head_row_list = [self.country_scoreboard_header(None, cd)]
             text += self.html_table_thead_tbody_list(head_row_list,
                                                      year_list_table)
             text += '\n'
