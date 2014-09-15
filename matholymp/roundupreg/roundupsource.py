@@ -34,6 +34,7 @@ countries involved in them from which other data is derived.
 """
 
 from matholymp.datasource import DataSource
+from matholymp.fileutil import boolean_states
 from matholymp.roundupreg.rounduputil import distinguish_official, \
     scores_from_str, contestant_age
 from matholymp.urlutil import url_quote
@@ -71,6 +72,10 @@ class RoundupDataSource(DataSource):
                 return int(s)
             else:
                 return None
+        elif name == 'honourable_mentions_available':
+            hm_avail = self._db.config.ext['MATHOLYMP_HONOURABLE_'
+                                           'MENTIONS_AVAILABLE']
+            return boolean_states[hm_avail.lower()]
         elif name == '_event_ids':
             return [int(self._db.config.ext['MATHOLYMP_EVENT_NUMBER'])]
         elif name == '_person_ids':

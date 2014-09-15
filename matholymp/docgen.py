@@ -61,7 +61,8 @@ def read_docgen_config(top_directory):
                     'num_contestants_per_team']
     cfg_int_none_keys = ['gold_boundary', 'silver_boundary', 'bronze_boundary']
     cfg_bool_keys = ['show_countries_for_guides', 'show_rooms_for_guides',
-                     'paper_print_logo', 'paper_text_left']
+                     'paper_print_logo', 'paper_text_left',
+                     'honourable_mentions_available']
     config_data = read_config(config_file_name, 'matholymp.documentgen',
                               cfg_str_keys, cfg_int_keys,
                               cfg_int_none_keys, cfg_bool_keys)

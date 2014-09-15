@@ -43,6 +43,8 @@ __all__ = ['EventGroup', 'Event', 'Paper', 'Person', 'PersonEvent',
 _award_types = ['Gold Medal', 'Silver Medal', 'Bronze Medal',
                 'Honourable Mention']
 
+_award_types_no_hm = ['Gold Medal', 'Silver Medal', 'Bronze Medal']
+
 class _LazyMap(collections.Mapping):
 
     """A mapping where values are created dynamically."""
@@ -161,6 +163,25 @@ class EventGroup(object):
         The number of contestants considered in determining a
         country's rank, or None if all contestants considered.
         """)
+
+    honourable_mentions_available = _EventGroupPropertyDS(
+        'honourable_mentions_available',
+        """
+        Whether the rules of at least some of this kind of event
+        include awarding Honourable Mentions to contestants not
+        receiving a medal but with a perfect score on at least one
+        problem.
+        """)
+
+    def _get_award_types(self):
+        if self.honourable_mentions_available:
+            return _award_types
+        else:
+            return _award_types_no_hm
+
+    _award_types = _PropertyCached(
+        '_award_types', _get_award_types,
+        """A list of types of award available at this kind of event.""")
 
     _event_ids = _EventGroupPropertyDS(
         '_event_ids',
@@ -579,18 +600,28 @@ class Event(object):
         event requested a paper.
         """)
 
+    def _get_award_types(self):
+        if self.honourable_mentions_available:
+            return _award_types
+        else:
+            return _award_types_no_hm
+
+    _award_types = _PropertyCached(
+        '_award_types', _get_award_types,
+        """A list of types of award available at this event.""")
+
     def _get_num_awards_cond(self, cond):
         if self.scores_final:
             ival = 0
         else:
             ival = None
         d = {}
-        for k in _award_types:
+        for k in self._award_types:
             d[k] = ival
         if self.scores_final:
             for c in self.country_list:
                 if cond(c):
-                    for k in _award_types:
+                    for k in self._award_types:
                         d[k] += c.num_awards[k]
         return d
 
@@ -716,6 +747,24 @@ class Event(object):
         from each country.
         """)
 
+    def _get_honourable_mentions_available(self):
+        if self.event_group._ds.event_have_attr(
+                self.id,
+                'honourable_mentions_available'):
+            return self.event_group._ds.event_get_attr(
+                self.id,
+                'honourable_mentions_available')
+        else:
+            return self.event_group.honourable_mentions_available
+
+    honourable_mentions_available = _PropertyCached(
+        'honourable_mentions_available', _get_honourable_mentions_available,
+        """
+        Whether the rules of this event include awarding Honourable
+        Mentions to contestants not receiving a medal but with a
+        perfect score on at least one problem.
+        """)
+
     def _get_sort_key(self):
         return self.id
 
@@ -793,7 +842,7 @@ class Person(object):
 
     def _get_num_awards(self):
         d = {}
-        for k in _award_types:
+        for k in self.event_group._award_types:
             d[k] = 0
         for p in self.contestant_list:
             if p.award is not None:
@@ -852,10 +901,14 @@ class Person(object):
         """Alphabetical sort key.""")
 
     def _get_sort_key_hall_of_fame(self):
+        if self.event_group.honourable_mentions_available:
+            hm_count = self.num_awards['Honourable Mention']
+        else:
+            hm_count = 0
         return (-self.num_awards['Gold Medal'],
                 -self.num_awards['Silver Medal'],
                 -self.num_awards['Bronze Medal'],
-                -self.num_awards['Honourable Mention'],
+                -hm_count,
                 coll_get_sort_key(self.family_name),
                 coll_get_sort_key(self.given_name),
                 self.id)
@@ -1005,11 +1058,13 @@ class PersonEvent(object):
             a = 'Silver Medal'
         elif self.total_score >= self.event.bronze_boundary:
             a = 'Bronze Medal'
-        else:
+        elif self.event.honourable_mentions_available:
             a = None
             for n in range(self.event.num_problems):
                 if self.problem_scores[n] == self.event.marks_per_problem[n]:
                     a = 'Honourable Mention'
+        else:
+            a = None
         ds = self.person.event_group._ds
         if ds.person_event_have_attr(self.person.id, self.event.id, 'award'):
             expa = ds.person_event_get_attr(self.person.id, self.event.id,
@@ -1357,7 +1412,7 @@ class CountryEvent(object):
             ival = 0
         else:
             ival = None
-        for k in _award_types:
+        for k in self.event._award_types:
             d[k] = ival
         if self.event.scores_final:
             for p in self.contestant_list:

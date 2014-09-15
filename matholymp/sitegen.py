@@ -54,7 +54,8 @@ def read_sitegen_config(top_directory):
                     'age_day_desc']
     cfg_int_keys = []
     cfg_int_none_keys = ['rank_top_n', 'event_active_number']
-    cfg_bool_keys = ['use_xhtml', 'distinguish_official']
+    cfg_bool_keys = ['use_xhtml', 'distinguish_official',
+                     'honourable_mentions_available']
     cfg_data = read_config(cfg_file_name, 'matholymp.staticsite',
                            cfg_str_keys, cfg_int_keys, cfg_int_none_keys,
                            cfg_bool_keys)
@@ -530,6 +531,10 @@ class SiteGenerator(object):
                   self.link_for_data_events('downloaded'),
                   self.link_for_data_papers('a list of all language versions'
                                             ' of all papers')))
+        awards_colspan = 4
+        if self._data.honourable_mentions_available:
+            awards_colspan += 1
+        awards_colspan = str(awards_colspan)
         head_row_1 = [self.html_th_scores('#', rowspan='2',
                                           title=('%s number' %
                                                  self._data.short_name)),
@@ -538,12 +543,16 @@ class SiteGenerator(object):
                       self.html_th_scores('City', rowspan='2'),
                       self.html_th_scores('Dates', rowspan='2'),
                       self.html_th_scores('Countries', rowspan='2'),
-                      self.html_th_scores('Contestants', colspan='5')]
+                      self.html_th_scores('Contestants',
+                                          colspan=awards_colspan)]
         head_row_2 = [self.html_th_scores('All'),
                       self.html_th_scores('G', title='Gold'),
                       self.html_th_scores('S', title='Silver'),
-                      self.html_th_scores('B', title='Bronze'),
-                      self.html_th_scores('HM', title='Honourable Mention')]
+                      self.html_th_scores('B', title='Bronze')]
+        if self._data.honourable_mentions_available:
+            head_row_2.extend([self.html_th_scores(
+                'HM',
+                title='Honourable Mention')])
         head_row_list = [self.html_tr_list(head_row_1),
                          self.html_tr_list(head_row_2)]
         body_row_list = []
@@ -602,7 +611,10 @@ class SiteGenerator(object):
                 num_gold = e.num_awards['Gold Medal']
                 num_silver = e.num_awards['Silver Medal']
                 num_bronze = e.num_awards['Bronze Medal']
-                num_hm = e.num_awards['Honourable Mention']
+                if e.honourable_mentions_available:
+                    num_hm = e.num_awards['Honourable Mention']
+                else:
+                    num_hm = ''
                 num_countries = e.num_countries
             else:
                 num_contestants = ''
@@ -611,9 +623,11 @@ class SiteGenerator(object):
                 num_bronze = ''
                 num_hm = ''
                 num_countries = ''
-            row = self.html_tr_td_scores_list(
-                [number, year, country, city, dates, num_countries,
-                 num_contestants, num_gold, num_silver, num_bronze, num_hm])
+            row_list = [number, year, country, city, dates, num_countries,
+                        num_contestants, num_gold, num_silver, num_bronze]
+            if self._data.honourable_mentions_available:
+                row_list.extend([num_hm])
+            row = self.html_tr_td_scores_list(row_list)
             body_row_list.append(row)
         body_row_list.reverse()
         text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
@@ -716,15 +730,17 @@ class SiteGenerator(object):
     def generate_hall_of_fame(self):
         """Generate hall of fame by medal count."""
         text = ''
-        head_row_list = [self.html_tr_list(
-                [self.html_th_scores('Given Name'),
-                 self.html_th_scores('Family Name'),
-                 self.html_th_scores('Country'),
-                 self.html_th_scores('G', title='Gold'),
-                 self.html_th_scores('S', title='Silver'),
-                 self.html_th_scores('B', title='Bronze'),
-                 self.html_th_scores('HM', title='Honourable Mention'),
-                 self.html_th_scores('Participations')])]
+        head_row = [self.html_th_scores('Given Name'),
+                    self.html_th_scores('Family Name'),
+                    self.html_th_scores('Country'),
+                    self.html_th_scores('G', title='Gold'),
+                    self.html_th_scores('S', title='Silver'),
+                    self.html_th_scores('B', title='Bronze')]
+        if self._data.honourable_mentions_available:
+            head_row.extend([self.html_th_scores('HM',
+                                                 title='Honourable Mention')])
+        head_row.extend([self.html_th_scores('Participations')])
+        head_row_list = [self.html_tr_list(head_row)]
         contestants = sorted(self._data.contestant_list,
                              key=lambda x:x.sort_key_hall_of_fame)
         body_row_list = []
@@ -735,9 +751,10 @@ class SiteGenerator(object):
                               for c in p.country_list]),
                    str(p.num_awards['Gold Medal']),
                    str(p.num_awards['Silver Medal']),
-                   str(p.num_awards['Bronze Medal']),
-                   str(p.num_awards['Honourable Mention']),
-                   str(p.num_participations)]
+                   str(p.num_awards['Bronze Medal'])]
+            if self._data.honourable_mentions_available:
+                row.extend([str(p.num_awards['Honourable Mention'])])
+            row.extend([str(p.num_participations)])
             body_row_list.append(self.html_tr_td_scores_list(row))
         text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
         text += '\n'
@@ -780,9 +797,12 @@ class SiteGenerator(object):
                 bronze_off = (' (%d %s)' %
                               (e.num_awards_official['Bronze Medal'],
                                cgi.escape(self._cfg['official_desc_lc'])))
-                hm_off = (' (%d %s)' %
-                          (e.num_awards_official['Honourable Mention'],
-                           cgi.escape(self._cfg['official_desc_lc'])))
+                if e.honourable_mentions_available:
+                    hm_off = (' (%d %s)' %
+                              (e.num_awards_official['Honourable Mention'],
+                               cgi.escape(self._cfg['official_desc_lc'])))
+                else:
+                    hm_off = ''
             else:
                 part_c_off = ''
                 cont_off = ''
@@ -814,11 +834,13 @@ class SiteGenerator(object):
                          ['Bronze medals',
                           '%d%s (scores &ge; %d)' %
                           (e.num_awards['Bronze Medal'], bronze_off,
-                           e.bronze_boundary)],
-                         ['Honourable mentions',
-                          '%d%s' %
-                          (e.num_awards['Honourable Mention'], hm_off)]]
+                           e.bronze_boundary)]]
             row_list.extend(more_rows)
+            if e.honourable_mentions_available:
+                more_rows = [['Honourable mentions',
+                              '%d%s' %
+                              (e.num_awards['Honourable Mention'], hm_off)]]
+                row_list.extend(more_rows)
         text += self.html_table_list_th_td(row_list) + '\n'
         if e.registration_active:
             text += ('<p>Lists of currently registered %s and %s'
@@ -969,7 +991,7 @@ class SiteGenerator(object):
         return self.html_tr_td_scores_list(row)
 
     def country_scoreboard_header(self, show_year, num_problems_to_show,
-                                  total_top_n_header):
+                                  total_top_n_header, show_hm):
         """Generate the header for a scoreboard for countries."""
         row = []
         if show_year:
@@ -988,17 +1010,20 @@ class SiteGenerator(object):
                                                    total_top_n_header))])
         row.extend([self.html_th_scores('G', title='Gold'),
                     self.html_th_scores('S', title='Silver'),
-                    self.html_th_scores('B', title='Bronze'),
-                    self.html_th_scores('HM', title='Honourable Mention')])
+                    self.html_th_scores('B', title='Bronze')])
+        if show_hm:
+            row.extend([self.html_th_scores('HM', title='Honourable Mention')])
         return self.html_tr_list(row)
 
     def country_scoreboard_row(self, c, show_year, num_problems_to_show=None,
-                               total_top_n=None):
+                               total_top_n=None, show_hm=None):
         """Generate the scoreboard row for one country."""
         if num_problems_to_show is None:
             num_problems_to_show = c.event.num_problems
         if total_top_n is None:
             total_top_n = c.event.rank_top_n_matters
+        if show_hm is None:
+            show_hm = c.event.honourable_mentions_available
         row = []
         if show_year:
             row.append(
@@ -1021,9 +1046,13 @@ class SiteGenerator(object):
                     (c.num_awards['Silver Medal'] is not None and
                      str(c.num_awards['Silver Medal']) or ''),
                     (c.num_awards['Bronze Medal'] is not None and
-                     str(c.num_awards['Bronze Medal']) or ''),
-                    (c.num_awards['Honourable Mention'] is not None and
-                     str(c.num_awards['Honourable Mention']) or '')])
+                     str(c.num_awards['Bronze Medal']) or '')])
+        if show_hm:
+            hm_text = ''
+            if (c.event.honourable_mentions_available and
+                c.num_awards['Honourable Mention'] is not None):
+                hm_text = str(c.num_awards['Honourable Mention'])
+            row.extend([hm_text])
         return self.html_tr_td_scores_list(row)
 
     def scoreboard_text(self, e):
@@ -1051,24 +1080,32 @@ class SiteGenerator(object):
 
         text += '<h2>Statistics</h2>\n'
         if e.scores_final:
+            hm_text = ''
+            if e.honourable_mentions_available:
+                hm_text = (', %d honourable mentions' %
+                           e.num_awards['Honourable Mention'])
             text += ('<p>%d gold medals (scores &ge; %d),'
                      ' %d silver medals (scores &ge; %d),'
-                     ' %d bronze medals (scores &ge; %d),'
-                     ' %d honourable mentions from %d contestants'
+                     ' %d bronze medals (scores &ge; %d)%s'
+                     ' from %d contestants'
                      ' total.</p>\n' %
                      (e.num_awards['Gold Medal'], e.gold_boundary,
                       e.num_awards['Silver Medal'], e.silver_boundary,
                       e.num_awards['Bronze Medal'], e.bronze_boundary,
-                      e.num_awards['Honourable Mention'], e.num_contestants))
+                      hm_text, e.num_contestants))
             if e.distinguish_official:
+                hm_text = ''
+                if e.honourable_mentions_available:
+                    hm_text = (', %d honourable mentions' %
+                               e.num_awards_official['Honourable Mention'])
                 text += ('<p>From %s teams: %d gold medals, %d silver medals,'
-                         ' %d bronze medals, %d honourable mentions'
+                         ' %d bronze medals%s'
                          ' from %d contestants total.</p>\n' %
                          (cgi.escape(self._cfg['official_desc_lc']),
                           e.num_awards_official['Gold Medal'],
                           e.num_awards_official['Silver Medal'],
                           e.num_awards_official['Bronze Medal'],
-                          e.num_awards_official['Honourable Mention'],
+                          hm_text,
                           e.num_contestants_official))
         else:
             if e.distinguish_official:
@@ -1119,8 +1156,10 @@ class SiteGenerator(object):
 
         text += '<h2>Country results</h2>\n'
         total_top_n_header = e.rank_top_n_if_matters
+        show_hm = e.honourable_mentions_available
         head_row_list = [self.country_scoreboard_header(False, num_problems,
-                                                        total_top_n_header)]
+                                                        total_top_n_header,
+                                                        show_hm)]
         rank_sorted_countries = sorted(countries, key=lambda x:x.sort_key)
         rank_sorted_countries = sorted(rank_sorted_countries,
                                        key=lambda x:x.rank)
@@ -1321,9 +1360,11 @@ class SiteGenerator(object):
         if c.num_contestants:
             text += '<h2>National results</h2>\n'
             show_top_n = c.event.rank_top_n_if_matters
+            show_hm = c.event.honourable_mentions_available
             head_row_list = [self.country_scoreboard_header(False,
                                                             num_problems,
-                                                            show_top_n)]
+                                                            show_top_n,
+                                                            show_hm)]
             body_row_list = [self.country_scoreboard_row(c, False)]
             text += self.html_table_thead_tbody_list(head_row_list,
                                                      body_row_list)
@@ -1353,6 +1394,7 @@ class SiteGenerator(object):
         year_list = []
         year_list_table = []
         c_max_num_problems = cd.max_num_problems
+        show_hm = self._data.honourable_mentions_available
         for c in cd.participation_list:
             e = c.event
             year_text = ''
@@ -1368,13 +1410,13 @@ class SiteGenerator(object):
             if c.num_contestants:
                 year_list_table.append(
                     self.country_scoreboard_row(c, True, c_max_num_problems,
-                                                False))
+                                                False, show_hm=show_hm))
         year_list.reverse()
         year_list_table.reverse()
         if year_list_table:
             text += '<h2>National results</h2>\n'
             head_row_list = [self.country_scoreboard_header(
-                    True, c_max_num_problems, None)]
+                True, c_max_num_problems, None, show_hm)]
             text += self.html_table_thead_tbody_list(head_row_list,
                                                      year_list_table)
             text += '\n'
@@ -1484,8 +1526,12 @@ class SiteGenerator(object):
                 csv_out['Gold Medals'] = str(e.num_awards['Gold Medal'])
                 csv_out['Silver Medals'] = str(e.num_awards['Silver Medal'])
                 csv_out['Bronze Medals'] = str(e.num_awards['Bronze Medal'])
-                csv_out['Honourable Mentions'] = \
-                    str(e.num_awards['Honourable Mention'])
+                if self._data.honourable_mentions_available:
+                    if e.honourable_mentions_available:
+                        csv_out['Honourable Mentions'] = \
+                            str(e.num_awards['Honourable Mention'])
+                    else:
+                        csv_out['Honourable Mentions'] = ''
                 csv_out['Number of Countries'] = str(e.num_countries)
                 if e.distinguish_official:
                     csv_out[self._cfg['official_adj'] + ' Contestants'] = \
@@ -1509,7 +1555,8 @@ class SiteGenerator(object):
                 csv_out['Gold Medals'] = ''
                 csv_out['Silver Medals'] = ''
                 csv_out['Bronze Medals'] = ''
-                csv_out['Honourable Mentions'] = ''
+                if self._data.honourable_mentions_available:
+                    csv_out['Honourable Mentions'] = ''
                 csv_out['Number of Countries'] = ''
             if (self._data.distinguish_official and
                 (not e.distinguish_official or not e.num_contestants)):
@@ -1532,16 +1579,21 @@ class SiteGenerator(object):
         events_columns.extend(['Gold Boundary', 'Silver Boundary',
                                'Bronze Boundary', 'Contestants',
                                'Gold Medals', 'Silver Medals',
-                               'Bronze Medals', 'Honourable Mentions',
-                               'Number of Countries'])
+                               'Bronze Medals'])
+        if self._data.honourable_mentions_available:
+            events_columns.extend(['Honourable Mentions'])
+        events_columns.extend(['Number of Countries'])
         if self._data.distinguish_official:
             events_columns.extend([self._cfg['official_adj'] + ' Contestants',
                                    self._cfg['official_adj'] + ' Gold Medals',
-                                   self._cfg['official_adj'] + ' Silver Medals',
-                                   self._cfg['official_adj'] + ' Bronze Medals',
                                    self._cfg['official_adj'] +
-                                   ' Honourable Mentions',
-                                   'Number of ' + self._cfg['official_adj'] +
+                                   ' Silver Medals',
+                                   self._cfg['official_adj'] +
+                                   ' Bronze Medals'])
+            if self._data.honourable_mentions_available:
+                events_columns.extend([self._cfg['official_adj'] +
+                                       ' Honourable Mentions'])
+            events_columns.extend(['Number of ' + self._cfg['official_adj'] +
                                    ' Countries'])
         self.write_csv_to_file(self.path_for_data_events(), events_data_output,
                                events_columns)
@@ -1551,7 +1603,7 @@ class SiteGenerator(object):
         return [('P%d' % (i + 1)) for i in range(num_problems)]
 
     def countries_csv_columns(self, num_problems, reg_system=False,
-                              distinguish_official=None):
+                              distinguish_official=None, show_hm=None):
         """Return list of headers for CSV file of countries."""
         cols = [self._cfg['num_key'], 'Country Number', 'Annual URL',
                 'Code', 'Name', 'Flag URL']
@@ -1563,13 +1615,17 @@ class SiteGenerator(object):
             cols.extend([self._cfg['official_desc']])
         if not reg_system:
             cols.extend(['Contestants', 'Gold Medals', 'Silver Medals',
-                         'Bronze Medals', 'Honourable Mentions',
-                         'Total Score', 'Rank'])
+                         'Bronze Medals'])
+            if show_hm is None:
+                show_hm = self._data.honourable_mentions_available
+            if show_hm:
+                cols.extend(['Honourable Mentions'])
+            cols.extend(['Total Score', 'Rank'])
             cols.extend(self.pn_csv_header(num_problems))
         return cols
 
     def country_csv_data(self, c, num_problems=None, reg_system=False,
-                         distinguish_official=None):
+                         distinguish_official=None, show_hm=None):
         """Return the CSV data for a given country."""
         if num_problems is None:
             num_problems = c.event.num_problems
@@ -1593,14 +1649,20 @@ class SiteGenerator(object):
                     c.is_official and 'Yes' or 'No'
             else:
                 csv_out[self._cfg['official_desc']] = ''
+        if show_hm is None:
+            show_hm = c.event.honourable_mentions_available
         if not reg_system:
             if c.num_contestants:
                 csv_out['Contestants'] = str(c.num_contestants)
                 csv_out['Gold Medals'] = str(c.num_awards['Gold Medal'])
                 csv_out['Silver Medals'] = str(c.num_awards['Silver Medal'])
                 csv_out['Bronze Medals'] = str(c.num_awards['Bronze Medal'])
-                csv_out['Honourable Mentions'] = \
-                    str(c.num_awards['Honourable Mention'])
+                if show_hm:
+                    if c.event.honourable_mentions_available:
+                        csv_out['Honourable Mentions'] = \
+                            str(c.num_awards['Honourable Mention'])
+                    else:
+                        csv_out['Honourable Mentions'] = ''
                 csv_out['Total Score'] = str(c.total_score)
                 csv_out['Rank'] = str(c.rank)
                 for i in range(num_problems):
@@ -1613,7 +1675,8 @@ class SiteGenerator(object):
                 csv_out['Gold Medals'] = ''
                 csv_out['Silver Medals'] = ''
                 csv_out['Bronze Medals'] = ''
-                csv_out['Honourable Mentions'] = ''
+                if show_hm:
+                    csv_out['Honourable Mentions'] = ''
                 csv_out['Total Score'] = ''
                 csv_out['Rank'] = ''
                 for i in range(num_problems):
@@ -1626,11 +1689,13 @@ class SiteGenerator(object):
                                   key=lambda x:x.sort_key)
         countries_data_output = [self.country_csv_data(
             c, num_problems=self._data.max_num_problems,
-            distinguish_official=self._data.distinguish_official)
+            distinguish_official=self._data.distinguish_official,
+            show_hm=self._data.honourable_mentions_available)
                                  for c in countries_sorted]
         countries_columns = self.countries_csv_columns(
             self._data.max_num_problems,
-            distinguish_official=self._data.distinguish_official)
+            distinguish_official=self._data.distinguish_official,
+            show_hm=self._data.honourable_mentions_available)
         self.write_csv_to_file(self.path_for_data_countries(),
                                countries_data_output, countries_columns)
 
@@ -1645,7 +1710,8 @@ class SiteGenerator(object):
                                    for c in e_countries_sorted]
         e_countries_columns = self.countries_csv_columns(
             e.num_problems, reg_system=reg_system,
-            distinguish_official=e.distinguish_official)
+            distinguish_official=e.distinguish_official,
+            show_hm=e.honourable_mentions_available)
         return (e_countries_data_output, e_countries_columns)
 
     def generate_one_event_countries_csv(self, e):
