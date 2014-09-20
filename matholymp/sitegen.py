@@ -1601,33 +1601,42 @@ class SiteGenerator(object):
         """Return list of Pn headers for CSV file."""
         return [('P%d' % (i + 1)) for i in range(num_problems)]
 
-    def countries_csv_columns(self, num_problems, reg_system=False,
-                              distinguish_official=None, show_hm=None):
+    def countries_csv_columns(self, event, reg_system=False):
         """Return list of headers for CSV file of countries."""
+        if event:
+            num_problems = event.num_problems
+            distinguish_official = event.distinguish_official
+            show_hm = event.honourable_mentions_available
+        else:
+            num_problems = self._data.max_num_problems
+            distinguish_official = self._data.distinguish_official
+            show_hm = self._data.honourable_mentions_available
         cols = [self._cfg['num_key'], 'Country Number', 'Annual URL',
                 'Code', 'Name', 'Flag URL']
         if reg_system:
             cols.extend(['Generic Number'])
-        if distinguish_official is None:
-            distinguish_official = self._data.distinguish_official
         if distinguish_official:
             cols.extend([self._cfg['official_desc']])
         if not reg_system:
             cols.extend(['Contestants', 'Gold Medals', 'Silver Medals',
                          'Bronze Medals'])
-            if show_hm is None:
-                show_hm = self._data.honourable_mentions_available
             if show_hm:
                 cols.extend(['Honourable Mentions'])
             cols.extend(['Total Score', 'Rank'])
             cols.extend(self.pn_csv_header(num_problems))
         return cols
 
-    def country_csv_data(self, c, num_problems=None, reg_system=False,
-                         distinguish_official=None, show_hm=None):
+    def country_csv_data(self, c, event, reg_system=False):
         """Return the CSV data for a given country."""
-        if num_problems is None:
-            num_problems = c.event.num_problems
+        if event:
+            assert event is c.event
+            num_problems = event.num_problems
+            distinguish_official = event.distinguish_official
+            show_hm = event.honourable_mentions_available
+        else:
+            num_problems = self._data.max_num_problems
+            distinguish_official = self._data.distinguish_official
+            show_hm = self._data.honourable_mentions_available
         csv_out = {}
         csv_out[self._cfg['num_key']] = str(c.event.id)
         csv_out['Country Number'] = str(c.country.id)
@@ -1640,16 +1649,12 @@ class SiteGenerator(object):
                 csv_out['Generic Number'] = ''
             else:
                 csv_out['Generic Number'] = str(c.generic_id)
-        if distinguish_official is None:
-            distinguish_official = c.event.distinguish_official
         if distinguish_official:
             if c.event.distinguish_official:
                 csv_out[self._cfg['official_desc']] = \
                     c.is_official and 'Yes' or 'No'
             else:
                 csv_out[self._cfg['official_desc']] = ''
-        if show_hm is None:
-            show_hm = c.event.honourable_mentions_available
         if not reg_system:
             if c.num_contestants:
                 csv_out['Contestants'] = str(c.num_contestants)
@@ -1686,15 +1691,9 @@ class SiteGenerator(object):
         """Generate the CSV file for all countries."""
         countries_sorted = sorted(self._data.country_event_list,
                                   key=lambda x:x.sort_key)
-        countries_data_output = [self.country_csv_data(
-            c, num_problems=self._data.max_num_problems,
-            distinguish_official=self._data.distinguish_official,
-            show_hm=self._data.honourable_mentions_available)
+        countries_data_output = [self.country_csv_data(c, None)
                                  for c in countries_sorted]
-        countries_columns = self.countries_csv_columns(
-            self._data.max_num_problems,
-            distinguish_official=self._data.distinguish_official,
-            show_hm=self._data.honourable_mentions_available)
+        countries_columns = self.countries_csv_columns(None)
         self.write_csv_to_file(self.path_for_data_countries(),
                                countries_data_output, countries_columns)
 
@@ -1704,13 +1703,11 @@ class SiteGenerator(object):
         for countries at one event.
         """
         e_countries_sorted = sorted(e.country_list, key=lambda x:x.sort_key)
-        e_countries_data_output = [self.country_csv_data(c,
+        e_countries_data_output = [self.country_csv_data(c, e,
                                                          reg_system=reg_system)
                                    for c in e_countries_sorted]
-        e_countries_columns = self.countries_csv_columns(
-            e.num_problems, reg_system=reg_system,
-            distinguish_official=e.distinguish_official,
-            show_hm=e.honourable_mentions_available)
+        e_countries_columns = self.countries_csv_columns(e,
+                                                         reg_system=reg_system)
         return (e_countries_data_output, e_countries_columns)
 
     def generate_one_event_countries_csv(self, e):
