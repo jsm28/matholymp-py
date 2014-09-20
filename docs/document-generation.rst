@@ -11,7 +11,9 @@ them, from registration system data.
 :command:`mo-document-generate` expects to be run from a directory
 containing:
 
-* A file :file:`documentgen.cfg` configuring the document generation.
+* A file :file:`documentgen.cfg` configuring the document generation
+  (parts of this file can stay the same from year to year, but parts
+  will need updating for each year's event).
 
 * A subdirectory :file:`templates/` with various LaTeX templates for
   documents and PDF backgrounds and logos.

@@ -36,7 +36,8 @@ files:
   that are most likely to need changing).
 
 * :file:`extensions/config.ini` (see the comments in the file for
-  details of the individual settings).
+  details of the individual settings; note that some of these settings
+  will need updating for each year's event).
 
 * :file:`html/page.html` (you may wish to make this file match the
   overall page style used for the static site, although this is not
