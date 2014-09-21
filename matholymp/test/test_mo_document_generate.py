@@ -58,9 +58,9 @@ class MoDocumentGenerateTestCase(MoScriptTestCase):
             self.doc_list = doc_list_text.split()
 
     def check_script_results(self):
-        for doc in self.doc_list:
-            doc_full = os.path.join(self.out_dir, 'out', doc)
-            self.assertTrue(os.access(doc_full, os.F_OK))
+        doc_have = os.listdir(os.path.join(self.out_dir, 'out'))
+        doc_have = [doc for doc in doc_have if doc.endswith('.pdf')]
+        self.assertEqual(sorted(self.doc_list), sorted(doc_have))
 
 def load_tests(loader, standard_tests, pattern):
     """Return a TestSuite for all the mo-document-generate tests."""
