@@ -1,0 +1,89 @@
+\documentclass[a4paper]{article}
+\usepackage[a4paper,scale=1.0]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{ifthen}
+\usepackage{graphicx}
+\usepackage{eso-pic}
+\usepackage{wallpaper}
+\setlength{\unitlength}{1mm}
+\newlength{\matholymptmplength}
+\newcommand{\spacebox}[1]{%
+\settowidth{\matholymptmplength}{\hbox{#1}}%
+\addtolength{\matholymptmplength}{4mm}%
+\begin{minipage}{\matholymptmplength}%
+\vspace*{2mm}%
+\hfil%
+#1%
+\hfil%
+\vspace*{2mm}%
+\end{minipage}%
+}
+\newcommand{\leftbox}[1]{%
+\settowidth{\matholymptmplength}{#1}%
+\hspace*{-\matholymptmplength}%
+#1%
+}
+\newboolean{matholympprintlogo}
+\setboolean{matholympprintlogo}{@@print_logo@@}
+\newboolean{matholymptextleft}
+\setboolean{matholymptextleft}{@@text_left@@}
+\newcommand{\matholympyear}{@@year@@}
+\newcommand{\matholympshortname}{@@short_name@@}
+\newcommand{\matholymplongname}{@@long_name@@}
+\newboolean{matholympusebackground}
+\setboolean{matholympusebackground}{@@use_background@@}
+\newcommand{\onepaper}[7]{%
+\ClearShipoutPicture%
+\ifthenelse{\boolean{matholympusebackground}}{\ThisURCornerWallPaper{1}{paper-background.pdf}}{}%
+\ifthenelse{\boolean{matholympprintlogo}}{%
+\AddToShipoutPicture{%
+\setlength{\unitlength}{1mm}%
+\put(149,242){\includegraphics[width=50mm,trim=0mm 7mm 0mm 0mm,clip]{logo.pdf}}%
+\put(151,236){\huge\textsf{\textbf{\matholympshortname{} \matholympyear}}}%
+\put(146,231){\small\textsf{\matholymplongname}}%
+}}{}%
+\ifthenelse{\equal{#6}{}}{%
+\ThisURCornerWallPaper{1}{#1.pdf}%
+}{%
+\AddToShipoutPicture*{%
+\AtPageLowerLeft{%
+\parbox[b][\paperheight]{\paperwidth}{%
+\hfill%
+\includegraphics[width=\paperwidth,height=\paperheight,page=#6,keepaspectratio]{#1.pdf}%
+\vfill%
+}%
+}%
+}%
+}%
+\begin{picture}(204,297)%
+\ifthenelse{\boolean{matholymptextleft}}{%
+\put(6,275){\frame{\spacebox{\Huge\textsf{Language: \textbf{#2}}}}}%
+\ifthenelse{\equal{#3}{}}{%
+\ifthenelse{\equal{#6}{}}{}{%
+\put(6,255){\frame{\spacebox{\Huge\textsf{Page: #6 of #7}}}}%
+}}{%
+\put(6,255){\frame{\spacebox{\Huge\textsf{Day: \textbf{#3}%
+\ifthenelse{\equal{#6}{}}{}{ (page #6 of #7)}}}}}}%
+\ifthenelse{\equal{#4}{}}{}{%
+\put(6,236){\frame{\spacebox{\Huge\textsf{#4\textbf{#5}}}}}%
+}%
+}{%
+\put(195,272){\leftbox{\frame{\spacebox{\Huge\textsf{Language: \textbf{#2}}}}}}%
+\ifthenelse{\equal{#3}{}}{%
+\ifthenelse{\equal{#6}{}}{}{%
+\put(195,252){\leftbox{\frame{\spacebox{\Huge\textsf{Page: #6 of #7}}}}}%
+}}{%
+\put(195,252){\leftbox{\frame{\spacebox{\Huge\textsf{Day: \textbf{#3}%
+\ifthenelse{\equal{#6}{}}{}{ (page #6 of #7)}}}}}}}%
+\ifthenelse{\equal{#4}{}}{}{%
+\put(195,233){\leftbox{\frame{\spacebox{\Huge\textsf{#4\textbf{#5}}}}}}%
+}%
+}%
+\end{picture}%
+\clearpage%
+}
+\pagestyle{empty}
+\begin{document}%
+@@papers@@%
+\end{document}
