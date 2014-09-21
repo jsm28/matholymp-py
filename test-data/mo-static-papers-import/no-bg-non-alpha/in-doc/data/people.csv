@@ -1,0 +1,5 @@
+﻿XMO Number,Country Number,Person Number,Annual URL,Country Name,Country Code,Primary Role,Other Roles,Guide For,Contestant Code,Contestant Age,Given Name,Family Name,P1,P2,P3,P4,P5,P6,Total,Award,Photo URL,Generic Number,Gender,Date of Birth,First Language,Second Language,Dietary Requirements,T-Shirt Size,Arrival Place,Arrival Time,Arrival Flight,Departure Place,Departure Time,Departure Flight,Room Number,Phone Number
+2,3,1,https://www.example.org/registration/2015/person1,A Country,PQR,Contestant 1,,,PQR1,15,Some,Person,,,,,,,0,,,,Female,2000-01-01,English,French (Swiss),,M,,,,,,,,
+2,3,2,https://www.example.org/registration/2015/person2,A Country,PQR,Contestant 2,,,PQR2,14,Another,Person,,,,,,,0,,,,Female,2001-01-01,Spanish,,,M,,,,,,,,
+2,3,3,https://www.example.org/registration/2015/person3,A Country,PQR,Leader,,,,,Leader,Only,,,,,,,,,,,Male,,Russian,,,M,,,,,,,,
+2,4,4,https://www.example.org/registration/2015/person4,Another Country,STU,Contestant 1,,,STU1,16,Next,Contestant,,,,,,,0,,,,Female,1999-01-01,German,,,M,,,,,,,,
