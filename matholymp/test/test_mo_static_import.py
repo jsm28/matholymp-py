@@ -1,4 +1,4 @@
-# Initialise matholymp.test subpackage.
+# Test mo-static-import script.
 
 # Copyright 2014 Joseph Samuel Myers.
 
@@ -28,8 +28,34 @@
 # used as well as that of the covered work.
 
 """
-The matholymp.test package contains the matholymp testsuite.
+Tests for mo-static-import script.
 """
 
-__all__ = ['test_mo_document_generate', 'test_mo_static_generate',
-           'test_mo_static_import', 'test_mo_static_papers_import', 'testutil']
+import os.path
+
+from matholymp.fileutil import read_text_from_file
+from matholymp.test.testutil import MoScriptTestCase, load_script_tests
+
+__all__ = ['load_tests', 'MoStaticImportTestCase']
+
+class MoStaticImportTestCase(MoScriptTestCase):
+
+    """
+    A MoStaticImportTestCase object verifies the results of
+    mo-static-import for given inputs.
+    """
+
+    def __init__(self, method_name='runTest', script_dir=None, script=None,
+                 top_dir=None, dir=None):
+        """Initialise a MoStaticImportTestCase."""
+        super(MoStaticImportTestCase, self).__init__(method_name,
+                                                     script_dir, script,
+                                                     top_dir, dir)
+        if dir is not None:
+            assert self.check_dir
+            in_data_dir = os.path.join(self.full_dir, 'in-data')
+            self.args.append(in_data_dir)
+
+def load_tests(loader, standard_tests, pattern):
+    """Return a TestSuite for all the mo-static-import tests."""
+    return load_script_tests('mo-static-import', MoStaticImportTestCase)
