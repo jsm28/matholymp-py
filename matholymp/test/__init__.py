@@ -31,5 +31,5 @@
 The matholymp.test package contains the matholymp testsuite.
 """
 
-__all__ = ['test_mo_static_generate', 'test_mo_static_papers_import',
-           'testutil']
+__all__ = ['test_mo_document_generate', 'test_mo_static_generate',
+           'test_mo_static_papers_import', 'testutil']

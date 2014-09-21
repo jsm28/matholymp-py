@@ -1,0 +1,6 @@
+English BCD1 FOU1 UNG1
+French BCD2
+German BCD1
+Russian CDE1
+
+Only one language: BCD2 CDE1 FOU1 UNG1

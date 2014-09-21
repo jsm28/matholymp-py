@@ -1,0 +1,35 @@
+\documentclass[a5paper,12pt]{article}
+\usepackage[paperwidth=5in,paperheight=3in,scale=1.0]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{ifthen}
+\setlength{\unitlength}{1mm}
+\newlength{\matholymptmplength}
+\newcommand{\spacebox}[1]{%
+\settowidth{\matholymptmplength}{\hbox{#1}}%
+\addtolength{\matholymptmplength}{4mm}%
+\begin{minipage}{\matholymptmplength}%
+\vspace*{2mm}%
+\hfil%
+#1%
+\hfil%
+\vspace*{2mm}%
+\end{minipage}%
+}
+\newcommand{\placecard}[4]{%
+\begin{picture}(120,76)%
+\put(6,59){\Huge\textsf{Contestant code: \textbf{#1}}}%
+\put(6,44){\Large\textsf{Name: \textbf{#2}}}%
+\ifthenelse{\equal{#4}{}}{%
+\put(6,29){\Large\textsf{Language: \textbf{#3}}}%
+}{%
+\put(6,29){\Large\textsf{Language 1: \textbf{#3}}}%
+\put(6,14){\Large\textsf{Language 2: \textbf{#4}}}%
+}
+\end{picture}%
+\clearpage%
+}
+\pagestyle{empty}
+\begin{document}%
+@@desk_labels@@%
+\end{document}

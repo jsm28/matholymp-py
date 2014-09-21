@@ -1,0 +1,185 @@
+\documentclass[a5paper,12pt]{article}%
+\usepackage[a5paper,scale=1.0]{geometry}%
+\usepackage{helvet}%
+\usepackage[T1]{fontenc}%
+\usepackage[utf8]{inputenc}%
+\usepackage{wallpaper}%
+\usepackage{graphicx}%
+\usepackage{color}%
+\usepackage{rotating}%
+\usepackage{ifthen}%
+\setlength{\parindent}{0pt}%
+\setlength{\unitlength}{1mm}%
+\renewcommand{\familydefault}{\sfdefault}%
+%\renewcommand{\rmdefault}{cmss}%
+\newlength{\matholymptmplength}%
+\newlength{\matholymptmplengthb}%
+\newcommand{\onelinetext}[7]{%
+\settowidth{\matholymptmplength}{\hbox{\raggedright#3#7}}%
+\ifthenelse{\lengthtest{\matholymptmplength>#2}}{%
+\settowidth{\matholymptmplength}{\hbox{\raggedright#4#7}}%
+\ifthenelse{\lengthtest{\matholymptmplength>#2}}{%
+\settowidth{\matholymptmplength}{\hbox{\raggedright#5#7}}%
+\ifthenelse{\lengthtest{\matholymptmplength>#2}}{%
+\parbox[#1]{#2}{\raggedright#6#7}%
+}{\parbox[#1]{#2}{\raggedright#5#7}}%
+}{\parbox[#1]{#2}{\raggedright#4#7}}%
+}{\parbox[#1]{#2}{\raggedright#3#7}}%
+}%
+\newcommand{\onelinetextnobox}[6]{%
+\settowidth{\matholymptmplength}{\hbox{\raggedright#2#6}}%
+\ifthenelse{\lengthtest{\matholymptmplength>#1}}{%
+\settowidth{\matholymptmplength}{\hbox{\raggedright#3#6}}%
+\ifthenelse{\lengthtest{\matholymptmplength>#1}}{%
+\settowidth{\matholymptmplength}{\hbox{\raggedright#4#6}}%
+\ifthenelse{\lengthtest{\matholymptmplength>#1}}{%
+#5#6%
+}{#4#6}%
+}{#3#6}%
+}{#2#6}%
+}%
+\newcommand{\heightlimitedbox}[8]{%
+\settodepth{\matholymptmplength}{\parbox[#1]{#2}{\raggedright#4#8}}%
+\settoheight{\matholymptmplengthb}{\parbox[#1]{#2}{\raggedright#4#8}}%
+\addtolength{\matholymptmplength}{\matholymptmplengthb}%
+\ifthenelse{\lengthtest{\matholymptmplength>#3}}{%
+\settodepth{\matholymptmplength}{\parbox[#1]{#2}{\raggedright#5#8}}%
+\settoheight{\matholymptmplengthb}{\parbox[#1]{#2}{\raggedright#5#8}}%
+\addtolength{\matholymptmplength}{\matholymptmplengthb}%
+\ifthenelse{\lengthtest{\matholymptmplength>#3}}{%
+\settodepth{\matholymptmplength}{\parbox[#1]{#2}{\raggedright#6#8}}%
+\settoheight{\matholymptmplengthb}{\parbox[#1]{#2}{\raggedright#6#8}}%
+\addtolength{\matholymptmplength}{\matholymptmplengthb}%
+\ifthenelse{\lengthtest{\matholymptmplength>#3}}{%
+\parbox[#1]{#2}{\raggedright#7#8}%
+}{\parbox[#1]{#2}{\raggedright#6#8}}%
+}{\parbox[#1]{#2}{\raggedright#5#8}}%
+}{\parbox[#1]{#2}{\raggedright#4#8}}%
+}%
+\newboolean{matholymphaveteamrooms}%
+\newboolean{matholympusebackground}%
+% Begin settings that vary from badge to badge.
+% Strictly, not varying from badge to badge, but varying depending on
+% options used.
+\setboolean{matholympusebackground}{@@use_background@@}%
+\newcommand{\matholympbackgroundtype}{@@background_type@@}%
+\newcommand{\matholymprole}{@@role@@}%
+\newcommand{\matholympphoto}{@@photo@@}%
+\newcommand{\matholympname}{@@name@@}%
+% Flags and countries are empty for non-Guide staff.
+\newcommand{\matholympflaga}{@@flaga@@}%
+\newcommand{\matholympcountrya}{@@countrya@@}%
+\newcommand{\matholympflagb}{@@flagb@@}%
+\newcommand{\matholympcountryb}{@@countryb@@}%
+\newcommand{\matholympflagc}{@@flagc@@}%
+\newcommand{\matholympcountryc}{@@countryc@@}%
+\newcommand{\matholympflagd}{@@flagd@@}%
+\newcommand{\matholympcountryd}{@@countryd@@}%
+\newcommand{\matholympflage}{@@flage@@}%
+\newcommand{\matholympcountrye}{@@countrye@@}%
+% The next three are empty for staff.
+\newcommand{\matholympguidename}{@@guide_name@@}%
+\newcommand{\matholympguideroom}{@@guide_room@@}%
+\newcommand{\matholympguidephone}{@@guide_phone@@}%
+\newcommand{\matholymproom}{@@room@@}%
+% Empty if no dietary requirements to be printed.
+\newcommand{\matholympdiet}{@@diet@@}%
+\setboolean{matholymphaveteamrooms}{@@have_team_rooms@@}%
+% Empty for non-Guide staff.
+\newcommand{\matholympteamrooms}{@@team_rooms@@}%
+% End settings that vary from badge to badge.
+% Begin settings that vary from year to year, not badge to badge.
+\newcommand{\matholympphonedesc}{@@phone_desc@@}%
+\newcommand{\matholympphone}{@@event_phone@@}%
+\newcommand{\matholympemergencyphone}{@@emergency_phone@@}%
+\newcommand{\matholympordinal}{@@event_ordinal@@}%
+\newcommand{\matholympshortname}{@@event_short_name@@}%
+\newcommand{\matholympvenue}{@@event_venue@@}%
+\newcommand{\matholympdates}{@@event_dates@@}%
+% End settings that vary from year to year, not badge to badge.
+\ifthenelse{\boolean{matholympusebackground}}{\ThisURCornerWallPaper{1}{lanyard-\matholympbackgroundtype.pdf}}{}%
+\begin{document}%
+\begin{minipage}[t][103mm][s]{148mm}%
+\begin{picture}(148,102)%
+\ifthenelse{\boolean{matholympusebackground}}{%
+\put(20,72){\makebox(73,10){\vbox{\color[rgb]{0.454902,0.447059,0.450980}{\hrule width 73mm height 10mm}}}}%
+\put(20,72){\makebox(73,10){%
+\begin{minipage}{73mm}%
+\begin{center}%
+\textcolor{white}{\matholympordinal{} \matholympshortname, \matholympvenue \\ \matholympdates}
+\end{center}%
+\end{minipage}%
+}}%
+}{}%
+\put(23,0){\makebox(102,19.5){%
+\begin{minipage}{102mm}%
+\begin{center}%
+\onelinetextnobox{102mm}{\Huge}{\huge}{\LARGE}{\Large}{\matholymprole}%
+\end{center}%
+\end{minipage}%
+}}%
+\ifthenelse{\equal{\matholympphoto}{}}{}{\put(15,27){\includegraphics[width=3cm,height=3.75cm,keepaspectratio]{\matholympphoto}}}%
+\put(52,27){\heightlimitedbox{b}{5cm}{19mm}{\large}{\normalsize}{\small}{\footnotesize}{\bf \matholympname}}%
+\ifthenelse{\equal{\matholympcountryd}{}}{%
+% At most three countries.
+\ifthenelse{\equal{\matholympflaga}{}}{}{\put(109,27){\includegraphics[width=2.5cm,height=1.25cm,keepaspectratio]{\matholympflaga}}}%
+\ifthenelse{\equal{\matholympcountrya}{}}{}{\put(109,41){\ifthenelse{\equal{\matholympcountryb}{}}{\heightlimitedbox{b}{3.2cm}{2.8cm}{\normalsize}{\small}{\footnotesize}{\scriptsize}{\matholympcountrya}}{\onelinetext{b}{3.2cm}{\normalsize}{\small}{\footnotesize}{\scriptsize}{\matholympcountrya}}}}%
+\ifthenelse{\equal{\matholympflagb}{}}{}{\put(109,48){\includegraphics[width=2.5cm,height=1.25cm,keepaspectratio]{\matholympflagb}}}%
+\ifthenelse{\equal{\matholympcountryb}{}}{}{\put(109,62){\onelinetext{b}{3.2cm}{\normalsize}{\small}{\footnotesize}{\scriptsize}{\matholympcountryb}}}%
+\ifthenelse{\equal{\matholympflagc}{}}{}{\put(74,48){\includegraphics[width=2.5cm,height=1.25cm,keepaspectratio]{\matholympflagc}}}%
+\ifthenelse{\equal{\matholympcountryc}{}}{}{\put(74,62){\onelinetext{b}{3.2cm}{\normalsize}{\small}{\footnotesize}{\scriptsize}{\matholympcountryc}}}%
+}{%
+% Four or five countries.
+\put(109,21){\includegraphics[width=2.5cm,height=1cm,keepaspectratio]{\matholympflaga}}%
+\put(109,32){\onelinetext{b}{3.2cm}{\normalsize}{\small}{\footnotesize}{\scriptsize}{\matholympcountrya}}%
+\put(109,37){\includegraphics[width=2.5cm,height=1cm,keepaspectratio]{\matholympflagb}}%
+\put(109,48){\onelinetext{b}{3.2cm}{\normalsize}{\small}{\footnotesize}{\scriptsize}{\matholympcountryb}}%
+\put(109,53){\includegraphics[width=2.5cm,height=1cm,keepaspectratio]{\matholympflagc}}%
+\put(109,64){\onelinetext{b}{3.2cm}{\normalsize}{\small}{\footnotesize}{\scriptsize}{\matholympcountryc}}%
+\put(74,37){\includegraphics[width=2.5cm,height=1cm,keepaspectratio]{\matholympflagd}}%
+\put(74,48){\onelinetext{b}{3.2cm}{\normalsize}{\small}{\footnotesize}{\scriptsize}{\matholympcountryd}}%
+\ifthenelse{\equal{\matholympflage}{}}{}{\put(74,53){\includegraphics[width=2.5cm,height=1cm,keepaspectratio]{\matholympflage}}}%
+\ifthenelse{\equal{\matholympcountrye}{}}{}{\put(74,64){\onelinetext{b}{3.2cm}{\normalsize}{\small}{\footnotesize}{\scriptsize}{\matholympcountrye}}}%
+}%
+\end{picture}%
+\par\vspace*{\fill}%
+\end{minipage}%
+\\[0.9mm]%
+\begin{turn}{180}%
+\begin{minipage}[t][103mm][s]{148mm}%
+\begin{picture}(148,102)%
+\ifthenelse{\boolean{matholympusebackground}}{%
+\put(20,72){\makebox(73,10){\vbox{\color[rgb]{0.454902,0.447059,0.450980}{\hrule width 73mm height 10mm}}}}%
+\put(20,72){\makebox(73,10){%
+\begin{minipage}{73mm}%
+\begin{center}%
+\textcolor{white}{\matholympordinal{} \matholympshortname, \matholympvenue \\ \matholympdates}
+\end{center}%
+\end{minipage}%
+}}%
+}{}%
+\put(23,0){\makebox(102,19.5){%
+\begin{minipage}{102mm}%
+\begin{center}%
+\onelinetextnobox{102mm}{\Huge}{\huge}{\LARGE}{\Large}{\matholymprole}%
+\end{center}%
+\end{minipage}%
+}}%
+\put(10,22){\parbox[b]{7cm}{\scriptsize \matholympphonedesc: \matholympphone{} (24 hours/day) \\ %
+National emergency phone number: \textbf{\matholympemergencyphone}}}%
+\ifthenelse{\equal{\matholympguidename}{}}{}{%
+\put(10,42){\parbox[t]{7cm}{\footnotesize \textbf{Guide:}}}%
+\put(22,42){\parbox[t]{7cm}{\footnotesize \matholympguidename \\ %
+Room: \matholympguideroom \\ %
+Phone: \matholympguidephone}}}%
+\put(10,47){\parbox[t]{7cm}{\footnotesize \textbf{Room number: \matholymproom}}}%
+\ifthenelse{\equal{\matholympdiet}{}}{}{%
+\put(10,63){\heightlimitedbox{t}{7cm}{16mm}{\scriptsize}{\tiny}{\tiny}{\tiny}{\textbf{Diet wishes: \matholympdiet}}}}%
+\ifthenelse{\boolean{matholymphaveteamrooms}}{%
+\put(90,63){\heightlimitedbox{t}{5cm}{46mm}{\scriptsize}{\tiny}{\tiny}{\tiny}{\textbf{Rooms of team members:} \\ %
+\matholympteamrooms}}}{}%
+\end{picture}%
+\par\vspace*{\fill}%
+\end{minipage}%
+\end{turn}%
+\end{document}%
