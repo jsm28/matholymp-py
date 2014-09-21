@@ -34,15 +34,72 @@ This module provides utility functions for matholymp testing.
 import filecmp
 import os
 import os.path
+import shutil
+import subprocess
+import sys
+import tempfile
 import unittest
 
-__all__ = ['MoScriptTestCase', 'load_script_tests']
+from matholymp.fileutil import read_text_from_file
+
+__all__ = ['MoScriptTestCase', 'load_script_tests', 'load_tests']
 
 class MoScriptTestCase(unittest.TestCase):
 
     """
     A MoScriptTestCase provides functionality for testing matholymp scripts.
     """
+
+    def __init__(self, method_name='runTest', script_dir=None, script=None,
+                 top_dir=None, dir=None):
+        """Initialise a MoScriptTestCase."""
+        self.script = script
+        if script_dir is not None:
+            self.script_path = os.path.join(script_dir, script)
+        self.dir = dir
+        if dir is not None:
+            self.full_dir = os.path.join(top_dir, dir)
+            self.in_dir = os.path.join(self.full_dir, 'in')
+            expected_out_dir = os.path.join(self.full_dir, 'out')
+            if os.access(expected_out_dir, os.F_OK):
+                self.check_dir = True
+                self.expected_out_dir = expected_out_dir
+            else:
+                self.check_dir = False
+            arg_file = os.path.join(self.full_dir, 'args')
+            if os.access(arg_file, os.F_OK):
+                arg_text = read_text_from_file(arg_file)
+            else:
+                arg_text = ''
+            self.args = arg_text.split()
+        super(MoScriptTestCase, self).__init__(method_name)
+
+    def setUp(self):
+        self.temp_dir = tempfile.mkdtemp()
+        self.out_dir = os.path.join(self.temp_dir, 'out')
+        shutil.copytree(self.in_dir, self.out_dir)
+
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir)
+
+    def runTest(self):
+        returncode = 0
+        try:
+            args = [sys.executable, self.script_path]
+            args.extend(self.args)
+            output = subprocess.check_output(args,
+                                             cwd=self.out_dir,
+                                             stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as e:
+            returncode = e.returncode
+            output = e.output
+        if self.check_dir:
+            self.assertFalse(output)
+        self.assertEqual(returncode, 0)
+        if self.check_dir:
+            self.assert_dirs_equal(self.expected_out_dir, self.out_dir)
+        else:
+            self.check_script_results()
 
     def __str__(self):
         return self.script + ' ' + self.dir
@@ -61,6 +118,13 @@ class MoScriptTestCase(unittest.TestCase):
         dcmp = filecmp.dircmp(dir1, dir2, [])
         self._assert_dcmp_equal(dcmp)
 
+    def check_script_results(self):
+        """
+        Check the results of running a script, if not simply comparing
+        the output directory with expectations.
+        """
+        raise NotImplementedError
+
 def load_script_tests(script, cl):
     """Load the tests for the given script."""
     suite = unittest.TestSuite()
@@ -70,4 +134,9 @@ def load_script_tests(script, cl):
     for d in sorted(os.listdir(test_top_dir)):
         suite.addTest(cl(script_dir=top_dir, script=script,
                          top_dir=test_top_dir, dir=d))
+    return suite
+
+def load_tests(loader, standard_tests, pattern):
+    """Return an empty TestSuite."""
+    suite = unittest.TestSuite()
     return suite

@@ -31,13 +31,6 @@
 Tests for mo-static-generate script.
 """
 
-import os.path
-import shutil
-import subprocess
-import sys
-import tempfile
-import unittest
-
 from matholymp.test.testutil import MoScriptTestCase, load_script_tests
 
 __all__ = ['load_tests', 'MoStaticGenerateTestCase']
@@ -52,37 +45,11 @@ class MoStaticGenerateTestCase(MoScriptTestCase):
     def __init__(self, method_name='runTest', script_dir=None, script=None,
                  top_dir=None, dir=None):
         """Initialise a MoStaticGenerateTestCase."""
-        self.script = script
-        if script_dir is not None:
-            self.script_path = os.path.join(script_dir, script)
-        self.dir = dir
+        super(MoStaticGenerateTestCase, self).__init__(method_name,
+                                                       script_dir, script,
+                                                       top_dir, dir)
         if dir is not None:
-            full_dir = os.path.join(top_dir, dir)
-            self.in_dir = os.path.join(full_dir, 'in')
-            self.expected_out_dir = os.path.join(full_dir, 'out')
-        super(MoStaticGenerateTestCase, self).__init__(method_name)
-
-    def setUp(self):
-        self.temp_dir = tempfile.mkdtemp()
-        self.out_dir = os.path.join(self.temp_dir, 'out')
-        shutil.copytree(self.in_dir, self.out_dir)
-
-    def runTest(self):
-        returncode = 0
-        try:
-            output = subprocess.check_output([sys.executable,
-                                              self.script_path],
-                                             cwd=self.out_dir,
-                                             stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError as e:
-            returncode = e.returncode
-            output = e.output
-        self.assertFalse(output)
-        self.assertEqual(returncode, 0)
-        self.assert_dirs_equal(self.expected_out_dir, self.out_dir)
-
-    def tearDown(self):
-        shutil.rmtree(self.temp_dir)
+            assert self.check_dir
 
 def load_tests(loader, standard_tests, pattern):
     """Return a TestSuite for all the mo-static-generate tests."""

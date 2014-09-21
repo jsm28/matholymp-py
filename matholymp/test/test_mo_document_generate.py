@@ -33,11 +33,6 @@ Tests for mo-document-generate script.
 
 import os
 import os.path
-import shutil
-import subprocess
-import sys
-import tempfile
-import unittest
 
 from matholymp.fileutil import read_text_from_file
 from matholymp.test.testutil import MoScriptTestCase, load_script_tests
@@ -54,55 +49,18 @@ class MoDocumentGenerateTestCase(MoScriptTestCase):
     def __init__(self, method_name='runTest', script_dir=None, script=None,
                  top_dir=None, dir=None):
         """Initialise a MoDocumentGenerateTestCase."""
-        self.script = script
-        if script_dir is not None:
-            self.script_path = os.path.join(script_dir, script)
-        self.dir = dir
-        if dir is not None:
-            full_dir = os.path.join(top_dir, dir)
-            self.in_dir = os.path.join(full_dir, 'in')
-            expected_out_dir = os.path.join(full_dir, 'out')
-            if os.access(expected_out_dir, os.F_OK):
-                self.check_dir = True
-                self.expected_out_dir = expected_out_dir
-            else:
-                self.check_dir = False
-                doc_list_file = os.path.join(full_dir, 'doc-list')
-                doc_list_text = read_text_from_file(doc_list_file)
-                self.doc_list = doc_list_text.split()
-            arg_file = os.path.join(full_dir, 'args')
-            arg_text = read_text_from_file(arg_file)
-            self.args = arg_text.split()
-        super(MoDocumentGenerateTestCase, self).__init__(method_name)
+        super(MoDocumentGenerateTestCase, self).__init__(method_name,
+                                                         script_dir, script,
+                                                         top_dir, dir)
+        if dir is not None and not self.check_dir:
+            doc_list_file = os.path.join(self.full_dir, 'doc-list')
+            doc_list_text = read_text_from_file(doc_list_file)
+            self.doc_list = doc_list_text.split()
 
-    def setUp(self):
-        self.temp_dir = tempfile.mkdtemp()
-        self.out_dir = os.path.join(self.temp_dir, 'out')
-        shutil.copytree(self.in_dir, self.out_dir)
-
-    def runTest(self):
-        returncode = 0
-        try:
-            args = [sys.executable, self.script_path]
-            args.extend(self.args)
-            output = subprocess.check_output(args,
-                                             cwd=self.out_dir,
-                                             stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError as e:
-            returncode = e.returncode
-            output = e.output
-        if self.check_dir:
-            self.assertFalse(output)
-        self.assertEqual(returncode, 0)
-        if self.check_dir:
-            self.assert_dirs_equal(self.expected_out_dir, self.out_dir)
-        else:
-            for doc in self.doc_list:
-                doc_full = os.path.join(self.out_dir, 'out', doc)
-                self.assertTrue(os.access(doc_full, os.F_OK))
-
-    def tearDown(self):
-        shutil.rmtree(self.temp_dir)
+    def check_script_results(self):
+        for doc in self.doc_list:
+            doc_full = os.path.join(self.out_dir, 'out', doc)
+            self.assertTrue(os.access(doc_full, os.F_OK))
 
 def load_tests(loader, standard_tests, pattern):
     """Return a TestSuite for all the mo-document-generate tests."""
