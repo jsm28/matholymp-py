@@ -1,0 +1,9 @@
+#! /bin/sh
+# Run as: sh upload-scores path-to-roundup-admin path-to-instance
+roundup_admin=$1
+instance=$2
+$roundup_admin -i $instance set person3 scores=7,2,0,1,0,0
+$roundup_admin -i $instance set person4 scores=6,3,1,2,0,0
+$roundup_admin -i $instance set person6 scores=6,5,1,7,3,1
+$roundup_admin -i $instance set person10 scores=5,0,0,7,0,0
+$roundup_admin -i $instance set person9 scores=7,3,4,7,0,0
