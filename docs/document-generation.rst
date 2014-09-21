@@ -130,7 +130,9 @@ only for a particular day; the language name is as used in filenames):
 For final papers for exams (this will generate a PDF of each day's
 papers, that includes papers for each contestant in the right
 languages marked with their contestant code, as well as such PDFs of
-papers for leaders in all the languages requested by their students)::
+papers for leaders in all the languages requested by their students;
+omit the :samp:`--day {day}` option if there is only one day at the
+competition)::
 
    mo-document-generate --day 1 paper all
    mo-document-generate --day 2 paper all
