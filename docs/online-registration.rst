@@ -274,9 +274,9 @@ uploaded).  (Note that that this may break :command:`roundup-admin
 export` if it cannot find or read the file.  As explained in the
 `Roundup administration documentation
 <http://roundup-tracker.org/docs/admin_guide.html#tracker-backup>`_,
-use of `roundup-admin export` is not a recommended backup approach,
-but if you are using it then you should consider the effects of
-removing files.)
+use of :command:`roundup-admin export` is not a recommended backup
+approach, but if you are using it then you should consider the effects
+of removing files.)
 
 Scoring
 ^^^^^^^
