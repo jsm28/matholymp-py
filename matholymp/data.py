@@ -157,6 +157,17 @@ class EventGroup(object):
         of this kind of event.
         """)
 
+    def _get_distinguish_official_varies(self):
+        s = {e.distinguish_official for e in self.event_list}
+        return len(s) > 1
+
+    distinguish_official_varies = _PropertyCached(
+        'distinguish_official_varies', _get_distinguish_official_varies,
+        """
+        Whether it varies from event to event whether official
+        countries are distinguished.
+        """)
+
     rank_top_n = _EventGroupPropertyDS(
         'rank_top_n',
         """
@@ -171,6 +182,18 @@ class EventGroup(object):
         include awarding Honourable Mentions to contestants not
         receiving a medal but with a perfect score on at least one
         problem.
+        """)
+
+    def _get_honourable_mentions_available_varies(self):
+        s = {e.honourable_mentions_available for e in self.event_list}
+        return len(s) > 1
+
+    honourable_mentions_available_varies = _PropertyCached(
+        'honourable_mentions_available_varies',
+        _get_honourable_mentions_available_varies,
+        """
+        Whether the rules of this kind of event vary from event to
+        event as to whether Honourable Mentions can be awarded.
         """)
 
     def _get_award_types(self):
@@ -1239,6 +1262,19 @@ class Country(object):
         """
         The maximum number of problems at any event at which this
         country had contestants, or None if no such events.
+        """)
+
+    def _get_honourable_mentions_available(self):
+        for ce in self.participation_list:
+            if ce.num_contestants and ce.event.honourable_mentions_available:
+                return True
+        return False
+
+    honourable_mentions_available = _PropertyCached(
+        'honourable_mentions_available', _get_honourable_mentions_available,
+        """
+        Whether Honourable Mentions were available at at least one
+        event at which this country had contestants.
         """)
 
     def _get_host_list(self):

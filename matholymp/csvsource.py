@@ -35,6 +35,7 @@ involved in them from which other data is derived.
 
 from matholymp.data import Paper
 from matholymp.datasource import DataSource
+from matholymp.fileutil import boolean_states
 
 __all__ = ['CSVDataSource']
 
@@ -147,6 +148,11 @@ class CSVDataSource(DataSource):
                             'silver_boundary': 'Silver Boundary',
                             'bronze_boundary': 'Bronze Boundary' }
 
+    _event_attr_map_bool_maybe = { 'distinguish_official':
+                                       'Distinguish Official Countries',
+                                   'honourable_mentions_available':
+                                       'Honourable Mentions Available' }
+
     def event_get_attr(self, id, name):
         if name in CSVDataSource._event_attr_map_str:
             s = self._events[id][CSVDataSource._event_attr_map_str[name]]
@@ -159,6 +165,10 @@ class CSVDataSource(DataSource):
                 return None
             else:
                 return int(s)
+        if name in CSVDataSource._event_attr_map_bool_maybe:
+            k = CSVDataSource._event_attr_map_bool_maybe[name]
+            s = self._events[id][k]
+            return boolean_states[s.lower()]
         if name == 'marks_per_problem':
             np = int(self._events[id]['Number of Problems'])
             return [int(self._events[id]['P%d Max' % (n + 1)])
@@ -172,6 +182,13 @@ class CSVDataSource(DataSource):
         if name == '_country_ids':
             return list(self._countries[id].keys())
         raise KeyError(name)
+
+    def event_have_attr(self, id, name):
+        if name in CSVDataSource._event_attr_map_bool_maybe:
+            k = CSVDataSource._event_attr_map_bool_maybe[name]
+            if k in self._events[id]:
+                return True
+        return False
 
     _person_event_attr_map_str = { 'annual_url': 'Annual URL',
                                    'primary_role': 'Primary Role',

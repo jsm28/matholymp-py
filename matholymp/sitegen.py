@@ -1002,7 +1002,7 @@ class SiteGenerator(object):
             show_year = True
             num_problems_to_show = country.max_num_problems
             total_top_n_header = None
-            show_hm = self._data.honourable_mentions_available
+            show_hm = country.honourable_mentions_available
         row = []
         if show_year:
             row.append(self.html_th_scores('Year'))
@@ -1037,7 +1037,7 @@ class SiteGenerator(object):
             show_year = True
             num_problems_to_show = c.country.max_num_problems
             total_top_n = None
-            show_hm = self._data.honourable_mentions_available
+            show_hm = c.country.honourable_mentions_available
         row = []
         if show_year:
             row.append(
@@ -1521,6 +1521,17 @@ class SiteGenerator(object):
                 csv_out['Gold Boundary'] = str(e.gold_boundary)
                 csv_out['Silver Boundary'] = str(e.silver_boundary)
                 csv_out['Bronze Boundary'] = str(e.bronze_boundary)
+            else:
+                csv_out['Gold Boundary'] = ''
+                csv_out['Silver Boundary'] = ''
+                csv_out['Bronze Boundary'] = ''
+            if self._data.honourable_mentions_available_varies:
+                csv_out['Honourable Mentions Available'] = \
+                    e.honourable_mentions_available and 'Yes' or 'No'
+            if self._data.distinguish_official_varies:
+                csv_out['Distinguish Official Countries'] = \
+                    e.distinguish_official and 'Yes' or 'No'
+            if e.num_contestants:
                 csv_out['Contestants'] = str(e.num_contestants)
                 csv_out['Gold Medals'] = str(e.num_awards['Gold Medal'])
                 csv_out['Silver Medals'] = str(e.num_awards['Silver Medal'])
@@ -1547,9 +1558,6 @@ class SiteGenerator(object):
                     csv_out['Number of ' + self._cfg['official_adj'] +
                             ' Countries'] = str(e.num_countries_official)
             else:
-                csv_out['Gold Boundary'] = ''
-                csv_out['Silver Boundary'] = ''
-                csv_out['Bronze Boundary'] = ''
                 csv_out['Contestants'] = ''
                 csv_out['Gold Medals'] = ''
                 csv_out['Silver Medals'] = ''
@@ -1576,8 +1584,12 @@ class SiteGenerator(object):
         events_columns.extend(['P%d Max' % (i + 1)
                                for i in range(self._data.max_num_problems)])
         events_columns.extend(['Gold Boundary', 'Silver Boundary',
-                               'Bronze Boundary', 'Contestants',
-                               'Gold Medals', 'Silver Medals',
+                               'Bronze Boundary'])
+        if self._data.honourable_mentions_available_varies:
+            events_columns.extend(['Honourable Mentions Available'])
+        if self._data.distinguish_official_varies:
+            events_columns.extend(['Distinguish Official Countries'])
+        events_columns.extend(['Contestants', 'Gold Medals', 'Silver Medals',
                                'Bronze Medals'])
         if self._data.honourable_mentions_available:
             events_columns.extend(['Honourable Mentions'])

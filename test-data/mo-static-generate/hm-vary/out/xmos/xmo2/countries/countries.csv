@@ -1,0 +1,4 @@
+﻿XMO Number,Country Number,Annual URL,Code,Name,Flag URL,Contestants,Gold Medals,Silver Medals,Bronze Medals,Total Score,Rank,P1,P2,P3,P4,P5,P6
+2,2,https://www.example.org/registration/2015/country2,ABC,Two and Three,https://www.example.org/countries/country2/flag2.png,1,1,0,0,41,1,7,7,7,7,7,6
+2,1,https://www.example.org/registration/2015/country1,DEF,One Country,https://www.example.org/countries/country1/flag2.png,1,0,1,0,27,3,7,7,0,7,5,1
+2,4,https://www.example.org/registration/2015/country3,GHI,New Country,https://www.example.org/countries/country4/flag2.png,2,0,1,0,35,2,14,4,2,1,7,7
