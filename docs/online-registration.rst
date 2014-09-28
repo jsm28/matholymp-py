@@ -39,6 +39,13 @@ files:
   details of the individual settings; note that some of these settings
   will need updating for each year's event).
 
+* :file:`extensions/email-template-new-user` (a template for emails
+  sent automatically to country contacts with details of their
+  accounts for registering participants, if a contact email address is
+  specified when registering a country; Python formats such as
+  ``%(username)s`` in this template are substituted with the relevant
+  details of the country and the automatically created account).
+
 * :file:`html/page.html` (you may wish to make this file match the
   overall page style used for the static site, although this is not
   required; at least, the stylesheet and shortcut icon URLs will need
@@ -154,10 +161,19 @@ in a language not currently listed in the system, add that language
 (:guilabel:`Add Language`).
 
 Create the country (:guilabel:`Add Country`), including uploading a
-(PNG) flag image.  Create a user for registration of people from that
-country, choosing a password for that user and assigning it roles
-``User,Register``.  Send details of that user and password to the
-appropriate contact for that country.
+(PNG) flag image.  If you specify a contact email address (not used
+for any other country) when creating the country, or when subsequently
+editing it, a registration system account will be created
+automatically for that country and details of it will be sent to that
+person and the registration system administrator.  Otherwise, or if
+more than one account is needed for a country, you can create a
+registration system account manually.  (To do so, create a user
+account, specifying that country as its country, choosing a password
+for that user and assigning it roles ``User,Register``.  Send details
+of that user and password to the appropriate contact for that
+country; they are only sent out automatically for users that are
+created automatically by specifying a contact email address when
+creating or editing a country.)
 
 Once the participating countries have been added, it's appropriate to
 link to the registration system from the static site.  Set

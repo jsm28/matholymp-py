@@ -93,6 +93,7 @@ def init_schema(env):
     country = Class(db, 'country',
                     code=String(),
                     name=String(),
+                    contact_email=String(),
                     generic_url=String(),
                     files=Link('file'),
                     **country_extra)

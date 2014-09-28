@@ -63,6 +63,18 @@ define="edit_ok context/is_edit_ok"
   <td><input name="name" metal:use-macro="normal_input"></td>
  </tr>
 
+ <tr tal:condition="context/is_edit_ok">
+  <td colspan="2">If a contact email address is entered, a
+  registration system account will be automatically created for that
+  country if one does not already exist and no other country has an
+  account using that email address.</td>
+ </tr>
+
+ <tr tal:define="name string:contact_email; label string:Contact email; value context/contact_email; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label">Contact email</th>
+  <td><input name="contact_email" metal:use-macro="normal_input"></td>
+ </tr>
+
 <tal:block tal:condition="python:utils.distinguish_official(db._db)">
  <tr tal:define="name string:official; label python:db._db.config.ext['MATHOLYMP_OFFICIAL_LONG_DESC']; value context/official; edit_ok edit_ok">
   <th class="required" metal:use-macro="th_label"><tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_OFFICIAL_LONG_DESC']" /></th>
