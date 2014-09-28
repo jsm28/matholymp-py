@@ -251,19 +251,20 @@ Adding data after an event
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This should be done once the final scores and medal boundaries have
-been approved.  Ensure that the data for the relevant event in
-:file:`{event}s.csv` is complete, including the number of problems,
-the maximum number of marks for each problem and the medal boundaries.
-Remove the number of the event from ``event_active_number`` in
-:file:`staticsite.cfg` (set that variable to empty).  Download the
-following files from the registration system, while not logged in
-administratively, and put them in a directory (*input-directory*
-below) outside the website: the list of countries
-(:file:`countries.csv`), the list of people (:file:`people.csv`), the
-ZIP file of flags (unpack it to form a directory :file:`flags/`), the
-ZIP file of participant photos (unpack it to form a directory
-:file:`photos/`), the RSS feed of scores (save it as
-:file:`scores-rss.xml`).  Then:
+been approved (and once any known corrections to participant names or
+other public details have been entered in the registration system).
+Ensure that the data for the relevant event in :file:`{event}s.csv` is
+complete, including the number of problems, the maximum number of
+marks for each problem and the medal boundaries.  Remove the number of
+the event from ``event_active_number`` in :file:`staticsite.cfg` (set
+that variable to empty).  Download the following files from the
+registration system, while not logged in administratively, and put
+them in a directory (*input-directory* below) outside the website: the
+list of countries (:file:`countries.csv`), the list of people
+(:file:`people.csv`), the ZIP file of flags (unpack it to form a
+directory :file:`flags/`), the ZIP file of participant photos (unpack
+it to form a directory :file:`photos/`), the RSS feed of scores (save
+it as :file:`scores-rss.xml`).  Then:
 
 .. parsed-literal::
 
