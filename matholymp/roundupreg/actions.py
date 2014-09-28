@@ -29,9 +29,9 @@
 
 """This module provides actions for the Roundup registration system."""
 
-__all__ = ['ScoreAction', 'CountryCSVAction', 'ScoresCSVAction',
-           'PeopleCSVAction', 'FlagsZIPAction', 'PhotosZIPAction',
-           'ScoresRSSAction', 'register_actions']
+__all__ = ['ScoreAction', 'RetireCountryAction', 'CountryCSVAction',
+           'ScoresCSVAction', 'PeopleCSVAction', 'FlagsZIPAction',
+           'PhotosZIPAction', 'ScoresRSSAction', 'register_actions']
 
 import cgi
 import io
@@ -44,8 +44,8 @@ from roundup.cgi.exceptions import Unauthorised
 
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import scores_from_str, \
-    person_is_contestant, contestant_code, scores_final, \
-    valid_country_problem, create_rss
+    get_none_country, get_staff_country, person_is_contestant, \
+    contestant_code, scores_final, valid_country_problem, create_rss
 
 class ScoreAction(Action):
 
@@ -99,6 +99,39 @@ class ScoreAction(Action):
         create_rss(self.db, title_text, full_results_text, country=country)
         self.client.ok_message.append('Scores entered for %s problem %s'
                                       % (country_node.name, problem))
+        self.db.commit()
+
+class RetireCountryAction(Action):
+
+    """Action to retire a country."""
+
+    name = 'retire'
+    permissionType = 'Edit'
+
+    def handle(self):
+        """Retire a country, making other consequent changes."""
+        if self.nodeid is None:
+            raise ValueError('No id specified to retire')
+        if not self.hasPermission('Retire', classname=self.classname,
+                                  itemid=self.nodeid):
+            raise Unauthorised('You do not have permission to retire'
+                               ' this country')
+        if self.nodeid == get_none_country(self.db):
+            raise Unauthorised('The special country None cannot be retired')
+        if self.nodeid == get_staff_country(self.db):
+            raise Unauthorised('The special staff country cannot be retired')
+        users = self.db.user.filter(None, {'country': self.nodeid})
+        people = self.db.person.filter(None, {'country': self.nodeid})
+        guides = self.db.person.filter(None, {'guide_for': self.nodeid})
+        for u in users:
+            self.db.user.retire(u)
+        for p in people:
+            self.db.person.retire(p)
+        for g in guides:
+            guide_for = self.db.person.get(g, 'guide_for')
+            guide_for = [gf for gf in guide_for if gf != self.nodeid]
+            self.db.person.set(g, guide_for=guide_for)
+        self.db.country.retire(self.nodeid)
         self.db.commit()
 
 class CountryCSVAction(Action):
@@ -264,6 +297,7 @@ class ScoresRSSAction(Action):
 def register_actions(instance):
     """Register the matholymp actions with Roundup."""
     instance.registerAction('score', ScoreAction)
+    instance.registerAction('retirecountry', RetireCountryAction)
     instance.registerAction('country_csv', CountryCSVAction)
     instance.registerAction('scores_csv', ScoresCSVAction)
     instance.registerAction('people_csv', PeopleCSVAction)

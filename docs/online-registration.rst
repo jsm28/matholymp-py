@@ -227,28 +227,24 @@ could be used for bulk upload of this or other data).
 Removing people or countries
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To remove a person, use the command line:
+When logged in administratively, person and country pages have buttons
+:guilabel:`Remove this person (requires confirmation)` and
+:guilabel:`Remove this country (requires confirmation)`.  Those take
+you to a confirmation page; the removal is only effective if you then
+click on :guilabel:`Confirm removal of this person` or
+:guilabel:`Confirm removal of this country`.
 
-.. parsed-literal::
-
-   roundup-admin -i *instance-directory* retire personN
-
-To remove a country, first remove all people from that country,
-individually, as above.  Use the web interface to edit each guide
-listing that country in "Guide for" so they no longer list that
-country.  Then use the command line to remove the registration user
-for that country, and the country itself:
-
-.. parsed-literal::
-
-   roundup-admin -i *instance-directory* retire userM
-   roundup-admin -i *instance-directory* retire countryN
-
-A web interface for removing people and countries may be added in
-future versions.
+Removing a country this way automatically removes the people from that
+country and the registration user from that country, and removes that
+country from the "Guide for" list for any guides for that country (but
+does not remove the registration of those guides, whether or not they
+are also listed as guides for other countries).
 
 If it is necessary to restore a person or country after removal,
-:command:`roundup-admin restore` can be used.
+:command:`roundup-admin restore` can be used.  When restoring a
+country, note the need to restore each person from that country, the
+registration user for that country, and any guides for that country,
+individually.
 
 Removing a photo
 ^^^^^^^^^^^^^^^^

@@ -1,0 +1,35 @@
+<tal:block metal:use-macro="templates/page/macros/icing">
+<title metal:fill-slot="head_title" i18n:translate="">Confirm Country Removal
+ - <span i18n:name="tracker" tal:replace="config/TRACKER_NAME" /></title>
+<span metal:fill-slot="body_title" tal:omit-tag="python:1"
+ i18n:translate="">Confirm Country Removal</span>
+
+<td class="content" metal:fill-slot="content">
+
+<p tal:condition="python:not (context.is_retire_ok()
+ or request.user.hasRole('Anonymous'))" i18n:translate="">
+ You are not allowed to view this page.</p>
+
+<p tal:condition="python:not context.is_retire_ok()
+ and request.user.hasRole('Anonymous')" i18n:translate="">
+ Please login with your username and password.</p>
+
+<div tal:condition="context/is_retire_ok">
+
+<form method="POST" tal:attributes="action context/designator">
+<table class="form">
+<tr>
+<td>
+<input type="hidden" name="@template" value="item">
+<input type="hidden" name="@action" value="retirecountry">
+<input type="submit" value="Confirm removal of this country">
+</td>
+</tr>
+</table>
+</form>
+
+</div>
+
+</td>
+
+</tal:block>

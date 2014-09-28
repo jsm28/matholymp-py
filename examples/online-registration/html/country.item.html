@@ -120,6 +120,23 @@ define="edit_ok context/is_edit_ok"
 </tal:block>
 
 <tal:block tal:condition="context/id">
+<tal:block tal:condition="python:not db._db.country.is_retired(context.id)">
+<tal:block tal:condition="context/is_retire_ok">
+<form method="GET" tal:attributes="action context/designator">
+<table class="form">
+<tr>
+<td>
+<input type="hidden" name="@template" value="retireconfirm">
+<input type="submit" value="Remove this country (requires confirmation)">
+</td>
+</tr>
+</table>
+</form>
+</tal:block>
+</tal:block>
+</tal:block>
+
+<tal:block tal:condition="context/id">
 
 <tal:block tal:condition="context/generic_url">
 <p><a tal:attributes="href context/generic_url">Previous <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_SHORT_NAME']" /> participation details</a> available.</p>
