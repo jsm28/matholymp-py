@@ -28,6 +28,7 @@ Contents:
    online-registration
    document-generation
    contributing
+   release-notes
    copying
 
 Indices and tables

@@ -79,6 +79,12 @@ have no recommendations regarding whether you should use packaged
 versions where available or build these prerequisites locally; that is
 a matter of personal preference.)
 
+Releases of matholymp are available for download:
+
+* 2014.09.0 (`sources
+  <http://www.polyomino.org.uk/mathematics/olympiad-software/matholymp-2014.09.0.tar.gz>`_,
+  `GPG signature <http://www.polyomino.org.uk/mathematics/olympiad-software/matholymp-2014.09.0.tar.gz.sig>`_).
+
 The current development sources of matholymp are available using `Git
 <http://git-scm.com/>`_::
 
