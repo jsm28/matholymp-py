@@ -30,6 +30,7 @@ Contents:
    contributing
    release-notes
    copying
+   thanks
 
 Indices and tables
 ==================
