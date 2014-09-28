@@ -59,6 +59,9 @@ class ScoreAction(Action):
         if scores_final(self.db):
             raise Unauthorised('Scores cannot be entered after'
                                ' medal boundaries are set')
+        if self.db.event.get('1', 'registration_enabled'):
+            raise Unauthorised('Registration must be disabled before'
+                               ' scores are entered')
         if not valid_country_problem(self.db, self.form):
             raise ValueError('Country or problem invalid or not specified')
         country = self.form['country'].value

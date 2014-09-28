@@ -278,7 +278,9 @@ Scoring
 ^^^^^^^
 
 Score can be entered (:guilabel:`Enter scores`) with an administrative
-account, or one with roles ``User,Score``.
+account, or one with roles ``User,Score``.  Before scores can be
+entered, registration must have been closed by an administrative
+account.
 
 An administrative account can enter medal boundaries (:guilabel:`Set
 medal boundaries or disable registration`).
