@@ -133,6 +133,16 @@ other files can be updated during and after each event by the scripts
 :command:`mo-static-papers-import` and :command:`mo-static-import`, as
 described below.
 
+Some columns in :file:`{event}s.csv` are optional, and are not present
+in the example for EGMO but may be added if certain information varies
+from event to event so cannot go in :file:`staticsite.cfg`.  A column
+``Honourable Mentions Available`` may be used to specify whether the
+rules of a particular event allowed for Honourable Mentions to be
+awarded; a column ``Distinguish Official Countries`` may be used to
+indicate whether there was a distinction between official and
+unofficial countries that should be reflected in the lists of
+countries and results.
+
 Creating the other files initially, with details of past events, is
 more complicated.  You may start with files simply containing the CSV
 header row (with BOM).  That will suffice to add data for new events
