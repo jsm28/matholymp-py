@@ -1,5 +1,5 @@
-Introduction and prerequisites
-==============================
+Introduction, prerequisites and downloads
+=========================================
 
 Matholymp is software for creating and maintaining websites for
 mathematical olympiads, with online registration and support for
