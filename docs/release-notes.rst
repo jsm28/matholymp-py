@@ -13,6 +13,9 @@ your code.
 Next version (unreleased)
 -------------------------
 
+* The registration system can detect some more cases of invalid URLs
+  specified for previous participation.
+
 * A new configuration variable ``matholymp_static_site_directory``
   must be specified in :file:`extensions/config.ini` for the
   registration system.  If this is empty, there is no change in

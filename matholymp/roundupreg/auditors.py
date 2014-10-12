@@ -81,7 +81,7 @@ def audit_country_fields(db, cl, nodeid, newvalues):
         guok = False
         if generic_url.startswith(gubase):
             generic_url = generic_url[len(gubase):]
-            m = re.match('^([0-9]+)/\Z', generic_url)
+            m = re.match('^([1-9][0-9]*)/\Z', generic_url)
             if m:
                 guok = True
                 sdata = static_site_event_group(db)
@@ -213,7 +213,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         guok = False
         if generic_url.startswith(gubase):
             generic_url = generic_url[len(gubase):]
-            m = re.match('^([0-9]+)/\Z', generic_url)
+            m = re.match('^([1-9][0-9]*)/\Z', generic_url)
             if m:
                 guok = True
                 sdata = static_site_event_group(db)
