@@ -13,7 +13,18 @@ your code.
 Next version (unreleased)
 -------------------------
 
-* Only documentation changes so far.
+* A new configuration variable ``matholymp_static_site_directory``
+  must be specified in :file:`extensions/config.ini` for the
+  registration system.  If this is empty, there is no change in
+  functionality from previous versions.  If not empty, it is a
+  filesystem path to the static site (directory with
+  :file:`staticsite.cfg`), either absolute or relative to the Roundup
+  instance directory, on the system running the registration system;
+  this directory must be readably by the registration system, but need
+  not be writable.  This is used by the registration system to access
+  information from the static site (specifically, to check whether
+  URLs for previous participation specified at registration time do
+  relate to some country or person that previously participated).
 
 Version 2014.09.0 (28 September 2014)
 -------------------------------------

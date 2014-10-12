@@ -41,13 +41,10 @@ the overall countries/, <event>s/ and people/ pages.
 
 import argparse
 import os
-import os.path
 
 import matholymp
-from matholymp.data import EventGroup
-from matholymp.csvsource import CSVDataSource
-from matholymp.fileutil import read_utf8_csv
-from matholymp.sitegen import read_sitegen_config, SiteGenerator
+from matholymp.sitegen import read_sitegen_config, sitegen_event_group, \
+    SiteGenerator
 
 __all__ = ['main']
 
@@ -62,22 +59,7 @@ def main():
     top_directory = os.getcwd()
 
     cfg_data = read_sitegen_config(top_directory)
-
-    data_directory = os.path.join(top_directory, 'data')
-
-    events_csv = os.path.join(data_directory,
-                              cfg_data['short_name_url_plural'] + '.csv')
-    countries_csv = os.path.join(data_directory, 'countries.csv')
-    people_csv = os.path.join(data_directory, 'people.csv')
-    papers_csv = os.path.join(data_directory, 'papers.csv')
-
-    events_data = read_utf8_csv(events_csv)
-    countries_data = read_utf8_csv(countries_csv)
-    people_data = read_utf8_csv(people_csv)
-    papers_data = read_utf8_csv(papers_csv)
-
-    all_data = EventGroup(CSVDataSource(cfg_data, events_data, papers_data,
-                                        countries_data, people_data))
+    all_data = sitegen_event_group(top_directory, cfg_data)
 
     sitegen = SiteGenerator(cfg_data, all_data, top_directory)
     sitegen.generate_site()

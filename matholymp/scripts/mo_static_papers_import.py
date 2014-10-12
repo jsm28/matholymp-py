@@ -62,7 +62,7 @@ from matholymp.csvsource import CSVDataSource
 from matholymp.fileutil import read_utf8_csv, write_utf8_csv, \
     make_dirs_for_file
 from matholymp.regdata import lang_to_filename
-from matholymp.sitegen import read_sitegen_config
+from matholymp.sitegen import read_sitegen_config, sitegen_papers_csv
 
 __all__ = ['main']
 
@@ -99,16 +99,13 @@ def main():
     top_directory = os.getcwd()
     input_directory = args['input_directory']
 
-    data_directory = os.path.join(top_directory, 'data')
-
-    papers_csv = os.path.join(data_directory, 'papers.csv')
-
     input_countries_csv = os.path.join(input_directory, 'data',
                                        'countries.csv')
     input_people_csv = os.path.join(input_directory, 'data', 'people.csv')
     input_papers_directory = os.path.join(input_directory, 'out')
 
     cfg_data = read_sitegen_config(top_directory)
+    papers_csv = sitegen_papers_csv(top_directory, cfg_data)
 
     papers_data = read_utf8_csv(papers_csv)
 

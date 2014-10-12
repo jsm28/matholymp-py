@@ -1,4 +1,4 @@
-# Initialise matholymp.roundupreg subpackage.
+# Static site access for Roundup registration system for matholymp package.
 
 # Copyright 2014 Joseph Samuel Myers.
 
@@ -28,10 +28,24 @@
 # used as well as that of the covered work.
 
 """
-The matholymp.roundupreg package implements a registration system
-based on Roundup.
+This module provides access to the static site from the Roundup
+registration system.
 """
 
-__all__ = ['actions', 'auditors', 'auditorutil', 'initial_data', 'reactors',
-           'roundupsitegen', 'roundupsource', 'rounduputil', 'schema',
-           'staticsite', 'templating', 'userauditor']
+import os.path
+
+from matholymp.sitegen import read_sitegen_config, sitegen_event_group
+
+__all__ = ['static_site_event_group']
+
+def static_site_event_group(db):
+    """
+    Return an EventGroup for the static site, or None if static site
+    access is not available.
+    """
+    static_site_path = db.config.ext['MATHOLYMP_STATIC_SITE_DIRECTORY']
+    if not static_site_path:
+        return None
+    static_site_path = os.path.join(db.config.TRACKER_HOME, static_site_path)
+    cfg_data = read_sitegen_config(static_site_path)
+    return sitegen_event_group(static_site_path, cfg_data)

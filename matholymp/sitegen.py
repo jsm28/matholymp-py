@@ -38,10 +38,14 @@ import os.path
 import re
 
 from matholymp.collate import coll_get_sort_key
-from matholymp.fileutil import write_utf8_csv, write_text_to_file, \
-    read_text_from_file, read_config
+from matholymp.csvsource import CSVDataSource
+from matholymp.data import EventGroup
+from matholymp.fileutil import read_utf8_csv, write_utf8_csv, \
+    write_text_to_file, read_text_from_file, read_config
 
-__all__ = ['read_sitegen_config', 'SiteGenerator']
+__all__ = ['read_sitegen_config', 'sitegen_events_csv', 'sitegen_papers_csv',
+           'sitegen_countries_csv', 'sitegen_people_csv',
+           'sitegen_event_group', 'SiteGenerator']
 
 def read_sitegen_config(top_directory):
     """Read the configuration file for site generation."""
@@ -64,6 +68,38 @@ def read_sitegen_config(top_directory):
     cfg_data['page_template'] = read_text_from_file(template_file_name)
 
     return cfg_data
+
+def sitegen_events_csv(top_directory, cfg_data):
+    """Return the path to the CSV file of events."""
+    return os.path.join(top_directory, 'data',
+                        cfg_data['short_name_url_plural'] + '.csv')
+
+def sitegen_papers_csv(top_directory, cfg_data):
+    """Return the path to the CSV file of papers."""
+    return os.path.join(top_directory, 'data', 'papers.csv')
+
+def sitegen_countries_csv(top_directory, cfg_data):
+    """Return the path to the CSV file of papers."""
+    return os.path.join(top_directory, 'data', 'countries.csv')
+
+def sitegen_people_csv(top_directory, cfg_data):
+    """Return the path to the CSV file of papers."""
+    return os.path.join(top_directory, 'data', 'people.csv')
+
+def sitegen_event_group(top_directory, cfg_data):
+    """Return an EventGroup based on the static site data."""
+    events_csv = sitegen_events_csv(top_directory, cfg_data)
+    papers_csv = sitegen_papers_csv(top_directory, cfg_data)
+    countries_csv = sitegen_countries_csv(top_directory, cfg_data)
+    people_csv = sitegen_people_csv(top_directory, cfg_data)
+
+    events_data = read_utf8_csv(events_csv)
+    countries_data = read_utf8_csv(countries_csv)
+    people_data = read_utf8_csv(people_csv)
+    papers_data = read_utf8_csv(papers_csv)
+
+    return EventGroup(CSVDataSource(cfg_data, events_data, papers_data,
+                                    countries_data, people_data))
 
 class SiteGenerator(object):
 

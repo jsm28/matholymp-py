@@ -58,7 +58,8 @@ import matholymp
 from matholymp.fileutil import read_utf8_csv, write_utf8_csv, \
     make_dirs_for_file
 from matholymp.regdata import file_url_to_local
-from matholymp.sitegen import read_sitegen_config
+from matholymp.sitegen import read_sitegen_config, sitegen_countries_csv, \
+    sitegen_people_csv
 
 __all__ = ['main']
 
@@ -76,11 +77,6 @@ def main():
     event_number = str(args['event_number'])
     input_directory = args['input_directory']
 
-    data_directory = os.path.join(top_directory, 'data')
-
-    countries_csv = os.path.join(data_directory, 'countries.csv')
-    people_csv = os.path.join(data_directory, 'people.csv')
-
     input_countries_csv = os.path.join(input_directory, 'countries.csv')
     input_people_csv = os.path.join(input_directory, 'people.csv')
     input_flags_dir = os.path.join(input_directory, 'flags')
@@ -88,6 +84,8 @@ def main():
     input_scores_rss = os.path.join(input_directory, 'scores-rss.xml')
 
     cfg_data = read_sitegen_config(top_directory)
+    countries_csv = sitegen_countries_csv(top_directory, cfg_data)
+    people_csv = sitegen_people_csv(top_directory, cfg_data)
 
     max_num_problems = 0
 

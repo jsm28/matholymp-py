@@ -40,6 +40,7 @@ from matholymp.fileutil import boolean_states
 from matholymp.roundupreg.auditorutil import get_new_value, require_value
 from matholymp.roundupreg.rounduputil import get_none_country, \
     get_staff_country, any_scores_missing, create_rss
+from matholymp.roundupreg.staticsite import static_site_event_group
 from matholymp.roundupreg.userauditor import audit_user_fields
 
 def audit_event_fields(db, cl, nodeid, newvalues):
@@ -74,13 +75,20 @@ def audit_country_fields(db, cl, nodeid, newvalues):
     generic_url = newvalues.get('generic_url', None)
     if generic_url is not None and generic_url != '':
         gudesc = db.config.ext['MATHOLYMP_GENERIC_URL_DESC_PLURAL']
+        gudesc_sing = db.config.ext['MATHOLYMP_GENERIC_URL_DESC']
         gubase = (db.config.ext['MATHOLYMP_GENERIC_URL_BASE'] +
                   'countries/country')
         guok = False
         if generic_url.startswith(gubase):
             generic_url = generic_url[len(gubase):]
-            if re.match('^[0-9]+/\Z', generic_url):
+            m = re.match('^([0-9]+)/\Z', generic_url)
+            if m:
                 guok = True
+                sdata = static_site_event_group(db)
+                if sdata:
+                    if int(m.group(1)) not in sdata.country_map:
+                        raise ValueError(gudesc_sing + ' for previous'
+                                         ' participation not valid')
         if not guok:
             raise ValueError(gudesc + ' for previous participation must'
                              ' be in the form ' + gubase + 'N/')
@@ -199,13 +207,20 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     generic_url = newvalues.get('generic_url', None)
     if generic_url is not None and generic_url != '':
         gudesc = db.config.ext['MATHOLYMP_GENERIC_URL_DESC_PLURAL']
+        gudesc_sing = db.config.ext['MATHOLYMP_GENERIC_URL_DESC']
         gubase = (db.config.ext['MATHOLYMP_GENERIC_URL_BASE'] +
                   'people/person')
         guok = False
         if generic_url.startswith(gubase):
             generic_url = generic_url[len(gubase):]
-            if re.match('^[0-9]+/\Z', generic_url):
+            m = re.match('^([0-9]+)/\Z', generic_url)
+            if m:
                 guok = True
+                sdata = static_site_event_group(db)
+                if sdata:
+                    if int(m.group(1)) not in sdata.person_map:
+                        raise ValueError(gudesc_sing + ' for previous'
+                                         ' participation not valid')
         if not guok:
             raise ValueError(gudesc + ' for previous participation'
                              ' must be in the form ' + gubase + 'N/')
