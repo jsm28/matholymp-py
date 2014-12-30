@@ -95,6 +95,7 @@ def init_schema(env):
                     name=String(),
                     contact_email=String(),
                     generic_url=String(),
+                    reuse_flag=Boolean(),
                     files=Link('file'),
                     **country_extra)
     country.setkey('name')

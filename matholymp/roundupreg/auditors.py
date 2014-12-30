@@ -40,7 +40,8 @@ from matholymp.fileutil import boolean_states
 from matholymp.roundupreg.auditorutil import get_new_value, require_value
 from matholymp.roundupreg.rounduputil import get_none_country, \
     get_staff_country, any_scores_missing, create_rss
-from matholymp.roundupreg.staticsite import static_site_event_group
+from matholymp.roundupreg.staticsite import static_site_event_group, \
+    static_site_file_data
 from matholymp.roundupreg.userauditor import audit_user_fields
 
 def audit_event_fields(db, cl, nodeid, newvalues):
@@ -72,7 +73,7 @@ def audit_country_fields(db, cl, nodeid, newvalues):
     require_value(db, cl, nodeid, newvalues, 'name',
                   'No country name specified')
 
-    generic_url = newvalues.get('generic_url', None)
+    generic_url = get_new_value(db, cl, nodeid, newvalues, 'generic_url')
     if generic_url is not None and generic_url != '':
         gudesc = db.config.ext['MATHOLYMP_GENERIC_URL_DESC_PLURAL']
         gudesc_sing = db.config.ext['MATHOLYMP_GENERIC_URL_DESC']
@@ -86,9 +87,17 @@ def audit_country_fields(db, cl, nodeid, newvalues):
                 guok = True
                 sdata = static_site_event_group(db)
                 if sdata:
-                    if int(m.group(1)) not in sdata.country_map:
+                    cno = int(m.group(1))
+                    if cno not in sdata.country_map:
                         raise ValueError(gudesc_sing + ' for previous'
                                          ' participation not valid')
+                    if (get_new_value(db, cl, nodeid, newvalues,
+                                      'reuse_flag') and
+                        not get_new_value(db, cl, nodeid, newvalues, 'files')):
+                        flag_url = sdata.country_map[cno].flag_url
+                        flag_data = static_site_file_data(db, flag_url)
+                        if flag_data:
+                            newvalues['files'] = db.file.create(**flag_data)
         if not guok:
             raise ValueError(gudesc + ' for previous participation must'
                              ' be in the form ' + gubase + 'N/')

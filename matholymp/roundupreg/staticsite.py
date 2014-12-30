@@ -33,10 +33,11 @@ registration system.
 """
 
 import os.path
+import re
 
 from matholymp.sitegen import read_sitegen_config, sitegen_event_group
 
-__all__ = ['static_site_event_group']
+__all__ = ['static_site_event_group', 'static_site_file_data']
 
 def static_site_event_group(db):
     """
@@ -49,3 +50,31 @@ def static_site_event_group(db):
     static_site_path = os.path.join(db.config.TRACKER_HOME, static_site_path)
     cfg_data = read_sitegen_config(static_site_path)
     return sitegen_event_group(static_site_path, cfg_data)
+
+def static_site_file_data(db, url):
+    """
+    Return file name, content and MIME type for a file from the static
+    site, or None if not available.
+    """
+    if not url:
+        return None
+    gubase = db.config.ext['MATHOLYMP_GENERIC_URL_BASE']
+    if not url.startswith(gubase):
+        return None
+    url_path = url[len(gubase):]
+    url_dirs = url_path.split('/')
+    static_site_path = db.config.ext['MATHOLYMP_STATIC_SITE_DIRECTORY']
+    if not static_site_path:
+        return None
+    static_site_path = os.path.join(db.config.TRACKER_HOME, static_site_path)
+    file_path = os.path.join(static_site_path, *url_dirs)
+    # Static site import ensures lowercase suffixes and .jpg not .jpeg.
+    mime_type_map = {'png': 'image/png', 'jpg': 'image/jpeg'}
+    file_ext = re.sub('^.*\\.', '', file_path)
+    if file_ext not in mime_type_map:
+        return None
+    with open(file_path, 'rb') as in_file:
+        content = in_file.read()
+    return {'name': url_dirs[-1],
+            'type': mime_type_map[file_ext],
+            'content': content}

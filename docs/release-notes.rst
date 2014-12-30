@@ -27,7 +27,15 @@ Next version (unreleased)
   not be writable.  This is used by the registration system to access
   information from the static site (specifically, to check whether
   URLs for previous participation specified at registration time do
-  relate to some country or person that previously participated).
+  relate to some country or person that previously participated, and
+  to support automatic reuse of flags from previous years).
+
+* When registering a country, you can specify to reuse a flag from a
+  previous year (without needing to download and reupload it
+  manually); this reuse is the default option.  This depends on
+  ``matholymp_static_site_directory`` pointing to the static site
+  data.  The HTML site template :file:`country.item.html` also needs
+  updating from the provided examples to make use of this feature.
 
 Version 2014.09.0 (28 September 2014)
 -------------------------------------
