@@ -44,6 +44,9 @@ Next version (unreleased)
 * The registration system makes further sanity checks on things done
   by administrative users.
 
+* A bug has been fixed that produced errors when downloading a CSV
+  file of scores from the registration system.
+
 Version 2014.09.0 (28 September 2014)
 -------------------------------------
 

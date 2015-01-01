@@ -1842,7 +1842,7 @@ class SiteGenerator(object):
             csv_out['Award'] = ''
             if not reg_system:
                 csv_out['Rank'] = ''
-        if reg_system:
+        if reg_system and not scores_only:
             if p.generic_id is None:
                 csv_out['Generic Number'] = ''
             else:
