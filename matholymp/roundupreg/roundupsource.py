@@ -36,7 +36,8 @@ countries involved in them from which other data is derived.
 from matholymp.datasource import DataSource
 from matholymp.fileutil import boolean_states
 from matholymp.roundupreg.rounduputil import distinguish_official, \
-    scores_from_str, contestant_age, get_none_country
+    get_num_problems, get_marks_per_problem, scores_from_str, contestant_age, \
+    get_none_country
 from matholymp.urlutil import url_quote
 
 __all__ = ['RoundupDataSource']
@@ -109,12 +110,9 @@ class RoundupDataSource(DataSource):
 
     def event_get_attr(self, id, name):
         if name == 'num_problems':
-            return int(self._db.config.ext['MATHOLYMP_NUM_PROBLEMS'])
+            return get_num_problems(self._db)
         elif name == 'marks_per_problem':
-            marks_per_problem = \
-                self._db.config.ext['MATHOLYMP_MARKS_PER_PROBLEM']
-            marks_per_problem = marks_per_problem.split()
-            return [int(m) for m in marks_per_problem]
+            return get_marks_per_problem(self._db)
         elif name == 'gold_boundary':
             gold = self._db.event.get('1', 'gold')
             if gold is None or gold == '':

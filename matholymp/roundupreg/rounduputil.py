@@ -40,24 +40,35 @@ from roundup.date import Date
 
 from matholymp.fileutil import boolean_states
 
-__all__ = ['distinguish_official', 'scores_from_str', 'contestant_age',
-           'get_none_country_name', 'get_none_country',
-           'get_staff_country_name', 'get_staff_country',
+__all__ = ['distinguish_official', 'get_num_problems', 'get_marks_per_problem',
+           'scores_from_str', 'contestant_age', 'get_none_country_name',
+           'get_none_country', 'get_staff_country_name', 'get_staff_country',
            'normal_country_person', 'person_is_contestant', 'contestant_code',
            'pn_score', 'scores_final', 'any_scores_missing',
-           'country_has_contestants', 'valid_country_problem', 'create_rss']
+           'country_has_contestants', 'valid_country_problem', 'valid_score',
+           'create_rss']
 
 def distinguish_official(db):
     """Return whether this event distinguishes official countries."""
     dist_off = db.config.ext['MATHOLYMP_DISTINGUISH_OFFICIAL']
     return boolean_states[dist_off.lower()]
 
+def get_num_problems(db):
+    """Return the number of problems at this event."""
+    return int(db.config.ext['MATHOLYMP_NUM_PROBLEMS'])
+
+def get_marks_per_problem(db):
+    """Return the number of marks for each problem at this event."""
+    marks_per_problem = db.config.ext['MATHOLYMP_MARKS_PER_PROBLEM']
+    marks_per_problem = marks_per_problem.split()
+    return [int(m) for m in marks_per_problem]
+
 def scores_from_str(db, score_str):
     """
     Return a list of the scores (strings) for a contestant, given the
     string for their scores stored in the database.
     """
-    num_problems = int(db.config.ext['MATHOLYMP_NUM_PROBLEMS'])
+    num_problems = get_num_problems(db)
     scores = score_str.split(',')
     # Allow for the number of problems changing after registration started.
     if len(scores) < num_problems:
@@ -135,7 +146,7 @@ def scores_final(db):
 def any_scores_missing(db):
     """Determine whether any scores have yet to be entered."""
     person_list = db.person.list()
-    num_problems = int(db.config.ext['MATHOLYMP_NUM_PROBLEMS'])
+    num_problems = get_num_problems(db)
     for person in person_list:
         if person_is_contestant(db, person):
             score_str = db.person.get(person, 'scores')
@@ -157,7 +168,7 @@ def valid_country_problem(db, form):
     """Determine whether the country and problem are valid to enter scores."""
     if 'country' not in form or 'problem' not in form:
         return False
-    num_problems = int(db.config.ext['MATHOLYMP_NUM_PROBLEMS'])
+    num_problems = get_num_problems(db)
     country = form['country'].value
     problem = form['problem'].value
     if not re.match('^[1-9][0-9]*\\Z', problem):
@@ -165,6 +176,20 @@ def valid_country_problem(db, form):
     if int(problem) > num_problems:
         return False
     return country_has_contestants(db, country)
+
+def valid_score(score_str, max_score):
+    """
+    Determine whether the score string (for an individual problem or a
+    medal boundary) is an integer in the range from 0 to max_score
+    inclusive.
+    """
+    if score_str != '0' and not re.match('^[1-9][0-9]*\\Z', score_str):
+        return False
+    if len(score_str) > len(str(max_score)):
+        return False
+    if int(score_str) > max_score:
+        return False
+    return True
 
 def create_rss(db, title, description, **args):
     """Create an RSS item."""

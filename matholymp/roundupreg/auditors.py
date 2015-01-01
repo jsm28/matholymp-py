@@ -38,26 +38,40 @@ from roundup.date import Date
 
 from matholymp.fileutil import boolean_states
 from matholymp.roundupreg.auditorutil import get_new_value, require_value
-from matholymp.roundupreg.rounduputil import get_none_country, \
-    get_staff_country, any_scores_missing, create_rss
+from matholymp.roundupreg.rounduputil import get_num_problems, \
+    get_marks_per_problem, get_none_country, get_staff_country, \
+    any_scores_missing, valid_score, create_rss
 from matholymp.roundupreg.staticsite import static_site_event_group, \
     static_site_file_data
 from matholymp.roundupreg.userauditor import audit_user_fields
 
 def audit_event_fields(db, cl, nodeid, newvalues):
     """Verify medal boundaries can be set and create RSS item for them."""
-    gold = newvalues.get('gold', None)
-    silver = newvalues.get('silver', None)
-    bronze = newvalues.get('bronze', None)
+    gold = get_new_value(db, cl, nodeid, newvalues, 'gold')
+    silver = get_new_value(db, cl, nodeid, newvalues, 'silver')
+    bronze = get_new_value(db, cl, nodeid, newvalues, 'bronze')
     if gold or silver or bronze:
         if any_scores_missing(db):
             raise ValueError('Scores not all entered')
+        if not gold or not silver or not bronze:
+            raise ValueError('Must set all medal boundaries at once')
+        marks_per_problem = get_marks_per_problem(db)
+        # A gold medal boundary of max + 1 means no gold medals.
+        max_medal_boundary = sum(marks_per_problem) + 1
+        if not valid_score(gold, max_medal_boundary):
+            raise ValueError('Invalid gold medal boundary')
+        if not valid_score(silver, max_medal_boundary):
+            raise ValueError('Invalid silver medal boundary')
+        if not valid_score(bronze, max_medal_boundary):
+            raise ValueError('Invalid bronze medal boundary')
+        if int(silver) > int(gold) or int(bronze) > int(silver):
+            raise ValueError('Medal boundaries in wrong order')
     medal_items = []
-    if gold is not None:
+    if newvalues.get('gold', None) is not None:
         medal_items.append('Gold ' + gold)
-    if silver is not None:
+    if newvalues.get('silver', None) is not None:
         medal_items.append('Silver ' + silver)
-    if bronze is not None:
+    if newvalues.get('bronze', None) is not None:
         medal_items.append('Bronze ' + bronze)
     if medal_items:
         medal_text = 'Medal boundaries: ' + ', '.join(medal_items)
@@ -199,7 +213,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     # in case someone is first registered with another role then
     # changed to a contestant.
     if nodeid is None:
-        num_problems = int(db.config.ext['MATHOLYMP_NUM_PROBLEMS'])
+        num_problems = get_num_problems(db)
         scores_list = ['' for i in range(num_problems)]
         newvalues['scores'] = ','.join(scores_list)
 

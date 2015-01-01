@@ -43,9 +43,10 @@ from roundup.cgi.actions import Action
 from roundup.cgi.exceptions import Unauthorised
 
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
-from matholymp.roundupreg.rounduputil import scores_from_str, \
-    get_none_country, get_staff_country, person_is_contestant, \
-    contestant_code, scores_final, valid_country_problem, create_rss
+from matholymp.roundupreg.rounduputil import get_marks_per_problem, \
+    scores_from_str, get_none_country, get_staff_country, \
+    person_is_contestant, contestant_code, scores_final, \
+    valid_country_problem, valid_score, create_rss
 
 class ScoreAction(Action):
 
@@ -68,10 +69,8 @@ class ScoreAction(Action):
         problem = self.form['problem'].value
         country_node = self.db.country.getnode(country)
         problem_number = int(problem)
-        marks_per_problem = self.db.config.ext['MATHOLYMP_MARKS_PER_PROBLEM']
-        marks_per_problem = marks_per_problem.split()
-        max_this_problem_str = marks_per_problem[problem_number-1]
-        max_this_problem = int(max_this_problem_str)
+        marks_per_problem = get_marks_per_problem(self.db)
+        max_this_problem = marks_per_problem[problem_number-1]
         results_list = []
         people = self.db.person.filter(None, {'country': country})
         for person in people:
@@ -80,12 +79,7 @@ class ScoreAction(Action):
                 if code not in self.form:
                     raise ValueError('No score specified for ' + code)
                 score = self.form[code].value
-                if (score != '' and score != '0' and
-                    not re.match('^[1-9][0-9]*\\Z', score)):
-                    raise ValueError('Invalid score specified for ' + code)
-                if len(score) > len(max_this_problem_str):
-                    raise ValueError('Invalid score specified for ' + code)
-                if score != '' and int(score) > max_this_problem:
+                if score != '' and not valid_score(score, max_this_problem):
                     raise ValueError('Invalid score specified for ' + code)
                 score_str = self.db.person.get(person, 'scores')
                 scores = scores_from_str(self.db, score_str)
