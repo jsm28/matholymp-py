@@ -41,6 +41,9 @@ Next version (unreleased)
   specified), with the same configuration requirement;
   :file:`person.item.html` needs updating to make use of this feature.
 
+* The registration system makes further sanity checks on things done
+  by administrative users.
+
 Version 2014.09.0 (28 September 2014)
 -------------------------------------
 

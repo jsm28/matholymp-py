@@ -69,6 +69,10 @@ def audit_country_fields(db, cl, nodeid, newvalues):
                          'No country code specified')
     if not re.match('^[A-Z]+\\Z', code):
         raise ValueError('Country codes must be all capital letters')
+    countries_with_code = db.country.filter(None, {'code': code})
+    for c in countries_with_code:
+        if c != nodeid:
+            raise ValueError('A country with code %s already exists' % code)
 
     require_value(db, cl, nodeid, newvalues, 'name',
                   'No country name specified')
