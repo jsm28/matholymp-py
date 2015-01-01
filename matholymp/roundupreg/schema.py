@@ -54,7 +54,8 @@
 
 """This module provides the Roundup registration schema."""
 
-from matholymp.roundupreg.rounduputil import distinguish_official
+from matholymp.roundupreg.rounduputil import distinguish_official, \
+    get_none_country
 
 __all__ = ['init_schema']
 
@@ -208,7 +209,7 @@ def init_schema(env):
     # Users can view any normal or admin country, but not 'None'.
     def non_none_country(db, userid, itemid):
         """Determine whether the country is not the special 'None' country."""
-        return itemid != db.country.lookup('None')
+        return itemid != get_none_country(db)
     p = db.security.addPermission(
         name='View', klass='country',
         check=non_none_country,

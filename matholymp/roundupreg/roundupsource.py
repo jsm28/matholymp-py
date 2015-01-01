@@ -36,7 +36,7 @@ countries involved in them from which other data is derived.
 from matholymp.datasource import DataSource
 from matholymp.fileutil import boolean_states
 from matholymp.roundupreg.rounduputil import distinguish_official, \
-    scores_from_str, contestant_age
+    scores_from_str, contestant_age, get_none_country
 from matholymp.urlutil import url_quote
 
 __all__ = ['RoundupDataSource']
@@ -59,7 +59,7 @@ class RoundupDataSource(DataSource):
 
     def _get_none_country(self):
         if self._none_country is None:
-            self._none_country = self._db.country.lookup('None')
+            self._none_country = get_none_country(self._db)
 
     def event_group_get_attr(self, name):
         if name == 'short_name':

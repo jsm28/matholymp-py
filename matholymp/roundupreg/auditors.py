@@ -289,9 +289,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     for c in guide_for:
         if primary_role != guide:
             raise ValueError('Only normal Guides may guide a country')
-        if c == staff_country:
-            raise ValueError('May only guide normal countries')
-        if c == db.country.lookup('None'):
+        if c == staff_country or c == none_country:
             raise ValueError('May only guide normal countries')
 
     # Likewise phone_number.

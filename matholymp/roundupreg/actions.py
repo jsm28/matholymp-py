@@ -189,8 +189,9 @@ class FlagsZIPAction(Action):
                      'individual countries.\n')
 
         country_list = self.db.country.list()
+        none_country = get_none_country(self.db)
         for country in country_list:
-            if self.db.country.get(country, 'name') != 'None':
+            if country != none_country:
                 flag_id = self.db.country.get(country, 'files')
                 if flag_id is not None:
                     filename = self.db.filename('file', flag_id)

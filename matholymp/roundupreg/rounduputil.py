@@ -41,10 +41,11 @@ from roundup.date import Date
 from matholymp.fileutil import boolean_states
 
 __all__ = ['distinguish_official', 'scores_from_str', 'contestant_age',
-           'get_none_country', 'get_staff_country', 'normal_country_person',
-           'person_is_contestant', 'contestant_code', 'pn_score',
-           'scores_final', 'any_scores_missing', 'country_has_contestants',
-           'valid_country_problem', 'create_rss']
+           'get_none_country_name', 'get_none_country',
+           'get_staff_country_name', 'get_staff_country',
+           'normal_country_person', 'person_is_contestant', 'contestant_code',
+           'pn_score', 'scores_final', 'any_scores_missing',
+           'country_has_contestants', 'valid_country_problem', 'create_rss']
 
 def distinguish_official(db):
     """Return whether this event distinguishes official countries."""
@@ -81,16 +82,23 @@ def contestant_age(db, person):
         diff -= 1
     return diff
 
+def get_none_country_name(db):
+    """Return the name of the special 'None' country."""
+    return 'None'
+
 def get_none_country(db):
     """Return the id of the special 'None' country."""
-    return db.country.lookup('None')
+    return db.country.lookup(get_none_country_name(db))
+
+def get_staff_country_name(db):
+    """Return the name of the special staff country."""
+    short_name = db.config.ext['MATHOLYMP_SHORT_NAME']
+    year = db.config.ext['MATHOLYMP_YEAR']
+    return short_name + ' ' + year + ' Staff'
 
 def get_staff_country(db):
     """Return the id of the special staff country."""
-    short_name = db.config.ext['MATHOLYMP_SHORT_NAME']
-    year = db.config.ext['MATHOLYMP_YEAR']
-    staff_country_name = short_name + ' ' + year + ' Staff'
-    return db.country.lookup(staff_country_name)
+    return db.country.lookup(get_staff_country_name(db))
 
 def normal_country_person(db, userid):
     """Determine whether the user is from a normal country."""
