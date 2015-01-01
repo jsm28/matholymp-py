@@ -47,6 +47,17 @@ Next version (unreleased)
 * A bug has been fixed that produced errors when downloading a CSV
   file of scores from the registration system.
 
+* Previously, when a person or country was removed from the
+  registration system, although they no longer appeared in the lists
+  of registered people or countries, accessing the page for that
+  person or country directly via its URL (e.g., if it had been indexed
+  by a search engine before the removal) would still show their
+  details, with no indication (unless logged in with edit access) that
+  the person or country was no longer registered.  Now, accessing the
+  page for a removed person or country will give an error instead of
+  showing any details for that person or country, unless logged in
+  with access to edit that person or country's details.
+
 Version 2014.09.0 (28 September 2014)
 -------------------------------------
 

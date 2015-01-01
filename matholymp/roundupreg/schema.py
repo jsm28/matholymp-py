@@ -206,13 +206,15 @@ def init_schema(env):
         description='User is allowed to edit their own user details')
     db.security.addPermissionToRole('User', p)
 
-    # Users can view any normal or admin country, but not 'None'.
-    def non_none_country(db, userid, itemid):
-        """Determine whether the country is not the special 'None' country."""
-        return itemid != get_none_country(db)
+    # Users can view any normal or admin country, but not 'None' or
+    # retired countries.
+    def can_view_country(db, userid, itemid):
+        """Determine whether a normal user can view this country."""
+        return (itemid != get_none_country(db) and
+                not db.country.is_retired(itemid))
     p = db.security.addPermission(
         name='View', klass='country',
-        check=non_none_country,
+        check=can_view_country,
         description='User is allowed to view most country details')
     db.security.addPermissionToRole('User', p)
     db.security.addPermissionToRole('Anonymous', p)
@@ -225,7 +227,7 @@ def init_schema(env):
     # Registering users can view and edit person records if the person is
     # from their own country.  Staff records are expected to be edited by
     # adminstrative users so not all relevant fields are accessible here.
-    # All users can view certain person details.
+    # All users can view certain person details, but not for retired people.
     db.security.addRole(name='Register', description='Registering people')
     def own_country_person(db, userid, itemid):
         """Determine whether the userid matches the country of the person
@@ -264,7 +266,11 @@ def init_schema(env):
                                               'generic_url',
                                               'files'))
     db.security.addPermissionToRole('Register', p)
+    def normal_can_view_person(db, userid, itemid):
+        """Determine whether a normal user can view this person."""
+        return not db.person.is_retired(itemid)
     p = db.security.addPermission(name='View', klass='person',
+                                  check=normal_can_view_person,
                                   properties=('country', 'given_name',
                                               'family_name', 'primary_role',
                                               'other_roles', 'guide_for',
