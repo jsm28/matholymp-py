@@ -74,8 +74,12 @@ def audit_country_fields(db, cl, nodeid, newvalues):
         if c != nodeid:
             raise ValueError('A country with code %s already exists' % code)
 
-    require_value(db, cl, nodeid, newvalues, 'name',
-                  'No country name specified')
+    name = require_value(db, cl, nodeid, newvalues, 'name',
+                         'No country name specified')
+    if nodeid is not None:
+        if nodeid == get_staff_country(db) or nodeid == get_none_country(db):
+            if name != db.country.get(nodeid, 'name'):
+                raise ValueError('Cannot rename special countries')
 
     generic_url = get_new_value(db, cl, nodeid, newvalues, 'generic_url')
     if generic_url is not None and generic_url != '':
