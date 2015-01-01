@@ -98,13 +98,13 @@ define="edit_ok context/is_edit_ok"
 
 <tal:block tal:condition="context/is_edit_ok">
 <tal:block tal:condition="context/id">
- <tr tal:condition="not:context/files" tal:define="name string:reuse_flag; label string:Reuse flag; value context/reuse_flag; edit_ok edit_ok">
+ <tr tal:condition="not:context/files" tal:define="name string:reuse_flag; label string:Reuse previous flag (if available); value context/reuse_flag; edit_ok edit_ok">
   <th metal:use-macro="th_label">Reuse previous flag (if available)</th>
   <td tal:content="structure context/reuse_flag/field">reuse_flag</td>
  </tr>
 </tal:block>
 <tal:block tal:condition="not:context/id">
- <tr tal:define="name string:reuse_flag; label string:Reuse flag; value context/reuse_flag; edit_ok edit_ok">
+ <tr tal:define="name string:reuse_flag; label string:Reuse previous flag (if available); value context/reuse_flag; edit_ok edit_ok">
   <th metal:use-macro="th_label">Reuse previous flag (if available)</th>
   <td><input type="radio" checked="checked" name="reuse_flag" value="yes">Yes<input type="radio" name="reuse_flag" value="no">No</td>
  </tr>

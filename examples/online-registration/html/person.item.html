@@ -239,7 +239,7 @@ define="edit_ok context/is_edit_ok"
   person participated will be reused unless you select
   &lsquo;No&rsquo; here or upload a new photo.</td>
  </tr>
- <tr tal:condition="not:context/files" tal:define="name string:reuse_photo; label string:Reuse photo; value context/reuse_photo; edit_ok edit_ok">
+ <tr tal:condition="not:context/files" tal:define="name string:reuse_photo; label string:Reuse previous photo (if available); value context/reuse_photo; edit_ok edit_ok">
   <th metal:use-macro="th_label">Reuse previous photo (if available)</th>
   <td tal:content="structure context/reuse_photo/field">reuse_photo</td>
  </tr>
@@ -251,7 +251,7 @@ define="edit_ok context/is_edit_ok"
   person participated will be reused unless you select
   &lsquo;No&rsquo; here or upload a new photo.</td>
  </tr>
- <tr tal:define="name string:reuse_photo; label string:Reuse photo; value context/reuse_photo; edit_ok edit_ok">
+ <tr tal:define="name string:reuse_photo; label string:Reuse previous photo (if available); value context/reuse_photo; edit_ok edit_ok">
   <th metal:use-macro="th_label">Reuse previous photo (if available)</th>
   <td><input type="radio" checked="checked" name="reuse_photo" value="yes">Yes<input type="radio" name="reuse_photo" value="no">No</td>
  </tr>
