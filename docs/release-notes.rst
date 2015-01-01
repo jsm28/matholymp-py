@@ -36,6 +36,10 @@ Next version (unreleased)
   ``matholymp_static_site_directory`` pointing to the static site
   data.  The HTML site template :file:`country.item.html` also needs
   updating from the provided examples to make use of this feature.
+  Similarly, photos from previous years are reused by default when a
+  person is registered (if a URL for previous participation is
+  specified), with the same configuration requirement;
+  :file:`person.item.html` needs updating to make use of this feature.
 
 Version 2014.09.0 (28 September 2014)
 -------------------------------------

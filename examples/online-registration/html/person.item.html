@@ -231,6 +231,33 @@ define="edit_ok context/is_edit_ok"
   <td><input name="generic_url" metal:use-macro="normal_input"></td>
  </tr>
 
+<tal:block tal:condition="context/is_edit_ok">
+<tal:block tal:condition="context/id">
+ <tr tal:condition="not:context/files">
+  <td colspan="2">If a URL for previous participation is given, any
+  photo provided for the most recent previous event at which this
+  person participated will be reused unless you select
+  &lsquo;No&rsquo; here or upload a new photo.</td>
+ </tr>
+ <tr tal:condition="not:context/files" tal:define="name string:reuse_photo; label string:Reuse photo; value context/reuse_photo; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Reuse previous photo (if available)</th>
+  <td tal:content="structure context/reuse_photo/field">reuse_photo</td>
+ </tr>
+</tal:block>
+<tal:block tal:condition="not:context/id">
+ <tr>
+  <td colspan="2">If a URL for previous participation is given, any
+  photo provided for the most recent previous event at which this
+  person participated will be reused unless you select
+  &lsquo;No&rsquo; here or upload a new photo.</td>
+ </tr>
+ <tr tal:define="name string:reuse_photo; label string:Reuse photo; value context/reuse_photo; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Reuse previous photo (if available)</th>
+  <td><input type="radio" checked="checked" name="reuse_photo" value="yes">Yes<input type="radio" name="reuse_photo" value="no">No</td>
+ </tr>
+</tal:block>
+</tal:block>
+
  <tr tal:condition="context/is_edit_ok">
   <th i18n:translate="">Upload photo</th>
   <td colspan=3><input type="file" name="@file" size="20"></td>

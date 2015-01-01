@@ -147,6 +147,7 @@ def init_schema(env):
                  room_number=String(),
                  phone_number=String(),
                  generic_url=String(),
+                 reuse_photo=Boolean(),
                  files=Link('file'),
                  scores=String() # comma-separated scores on each problem
     )

@@ -213,7 +213,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         if departure_time > latest_dep:
             raise ValueError('Departure date too late')
 
-    generic_url = newvalues.get('generic_url', None)
+    generic_url = get_new_value(db, cl, nodeid, newvalues, 'generic_url')
     if generic_url is not None and generic_url != '':
         gudesc = db.config.ext['MATHOLYMP_GENERIC_URL_DESC_PLURAL']
         gudesc_sing = db.config.ext['MATHOLYMP_GENERIC_URL_DESC']
@@ -227,9 +227,17 @@ def audit_person_fields(db, cl, nodeid, newvalues):
                 guok = True
                 sdata = static_site_event_group(db)
                 if sdata:
-                    if int(m.group(1)) not in sdata.person_map:
+                    pno = int(m.group(1))
+                    if pno not in sdata.person_map:
                         raise ValueError(gudesc_sing + ' for previous'
                                          ' participation not valid')
+                    if (get_new_value(db, cl, nodeid, newvalues,
+                                      'reuse_photo') and
+                        not get_new_value(db, cl, nodeid, newvalues, 'files')):
+                        photo_url = sdata.person_map[pno].photo_url
+                        photo_data = static_site_file_data(db, photo_url)
+                        if photo_data:
+                            newvalues['files'] = db.file.create(**photo_data)
         if not guok:
             raise ValueError(gudesc + ' for previous participation'
                              ' must be in the form ' + gubase + 'N/')

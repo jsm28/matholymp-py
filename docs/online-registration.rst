@@ -217,11 +217,6 @@ you should check manually from time to time.
   that person did in fact participate previously (checking with the
   relevant country if necessary).
 
-* If a person is registered without a photo, but the static site has a
-  photo for them from a previous year, upload that photo to the
-  registration system.  (Future versions of matholymp may add more
-  automation in this area.)
-
 Closing registration
 ^^^^^^^^^^^^^^^^^^^^
 

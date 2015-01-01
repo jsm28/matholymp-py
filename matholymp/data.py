@@ -914,6 +914,13 @@ class Person(object):
         'name', _get_name,
         """The name of this person.""")
 
+    def _get_photo_url(self):
+        return self.participation_list[-1].photo_url
+
+    photo_url = _PropertyCached(
+        'photo_url', _get_photo_url,
+        """The photo URL of this person at their last participation.""")
+
     def _get_sort_key_alpha(self):
         return (coll_get_sort_key(self.family_name),
                 coll_get_sort_key(self.given_name),
