@@ -67,6 +67,12 @@ Next version (unreleased)
   access to the contact email address through the XML-RPC interface as
   well as the main web interface.
 
+* The same contact email address can now be specified for multiple
+  user accounts (this can be useful, for example, if the person
+  registering participants from the host country also has an
+  administrative account, or the same person registers participants
+  for both a country's main team and its B team).
+
 Version 2014.09.0 (28 September 2014)
 -------------------------------------
 

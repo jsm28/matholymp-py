@@ -46,8 +46,6 @@ def country_react(db, cl, nodeid, oldvalues):
     email_addr = db.country.get(nodeid, 'contact_email')
     if not email_addr:
         return
-    if db.user.stringFind(address=email_addr):
-        return
     country_code = db.country.get(nodeid, 'code')
     username = country_code + '_reg'
     if db.user.stringFind(username=username):

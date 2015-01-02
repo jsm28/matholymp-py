@@ -72,7 +72,6 @@ def audit_user_fields(db, cl, nodeid, newvalues):
     """ Make sure user properties are valid.
 
         - email address is syntactically valid
-        - email address is unique
         - roles specified exist
         - country is specified
     """
@@ -81,9 +80,6 @@ def audit_user_fields(db, cl, nodeid, newvalues):
         address = newvalues['address']
         if not _valid_address(address):
             raise ValueError('Email address syntax is invalid')
-
-        if db.user.stringFind(address=address):
-            raise ValueError('Email address %s already in use' % address)
 
     for rolename in [r.lower().strip()
                      for r in newvalues.get('roles', '').split(',')]:
