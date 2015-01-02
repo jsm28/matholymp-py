@@ -254,7 +254,7 @@ def init_schema(env):
                                               'departure_time',
                                               'departure_flight',
                                               'generic_url',
-                                              'files'))
+                                              'reuse_photo', 'files'))
     db.security.addPermissionToRole('Register', p)
     p = db.security.addPermission(name='Create', klass='person',
                                   properties=('country', 'given_name',
@@ -268,7 +268,7 @@ def init_schema(env):
                                               'departure_time',
                                               'departure_flight',
                                               'generic_url',
-                                              'files'))
+                                              'reuse_photo', 'files'))
     db.security.addPermissionToRole('Register', p)
     def normal_can_view_person(db, userid, itemid):
         """Determine whether a normal user can view this person."""
