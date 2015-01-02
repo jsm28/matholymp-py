@@ -212,14 +212,18 @@ def init_schema(env):
         """Determine whether a normal user can view this country."""
         return (itemid != get_none_country(db) and
                 not db.country.is_retired(itemid))
+    country_public_props = ['code', 'name', 'generic_url', 'files']
+    if distinguish_official(db):
+        country_public_props.append('official')
     p = db.security.addPermission(
         name='View', klass='country',
         check=can_view_country,
+        properties=country_public_props,
         description='User is allowed to view most country details')
     db.security.addPermissionToRole('User', p)
     db.security.addPermissionToRole('Anonymous', p)
     p = db.security.addPermission(
-        name='Search', klass='country',
+        name='Search', klass='country', properties=country_public_props,
         description='User is allowed to search country details')
     db.security.addPermissionToRole('User', p)
     db.security.addPermissionToRole('Anonymous', p)

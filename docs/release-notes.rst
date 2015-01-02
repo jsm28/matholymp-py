@@ -58,6 +58,15 @@ Next version (unreleased)
   showing any details for that person or country, unless logged in
   with access to edit that person or country's details.
 
+* When a contact email address was given for a country at registration
+  time so that a registration system account could be created
+  automatically, that address did not appear in public on the
+  registration system page for that country but was unintentionally
+  available to the public through the XML-RPC interface to the
+  registration system.  Now the registration system properly denies
+  access to the contact email address through the XML-RPC interface as
+  well as the main web interface.
+
 Version 2014.09.0 (28 September 2014)
 -------------------------------------
 
