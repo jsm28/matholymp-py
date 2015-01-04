@@ -28,7 +28,7 @@ Next version (unreleased)
   information from the static site (specifically, to check whether
   URLs for previous participation specified at registration time do
   relate to some country or person that previously participated, and
-  to support automatic reuse of flags from previous years).
+  to support automatic reuse of flags and photos from previous years).
 
 * When registering a country, you can specify to reuse a flag from a
   previous year (without needing to download and reupload it
