@@ -10,8 +10,8 @@ matholymp APIs not in the provided examples), you should examine the
 source code changes to determine if any API changes require changes to
 your code.
 
-Next version (unreleased)
--------------------------
+Version 2015.01.0 (4 January 2015)
+----------------------------------
 
 * The registration system can detect some more cases of invalid URLs
   specified for previous participation.
