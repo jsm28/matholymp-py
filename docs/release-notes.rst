@@ -71,7 +71,9 @@ Version 2015.01.0 (4 January 2015)
   user accounts (this can be useful, for example, if the person
   registering participants from the host country also has an
   administrative account, or the same person registers participants
-  for both a country's main team and its B team).
+  for both a country's main team and its B team).  You may wish to
+  update :file:`user.forgotten.html` from the provided examples as the
+  example file has been updated to reflect this change.
 
 * Scoreboards now show additional statistical information about
   scores.
