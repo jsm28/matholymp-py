@@ -1187,6 +1187,11 @@ class SiteGenerator(object):
         text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
         text += '\n'
 
+        total_mean_std_dev = e.total_mean_std_dev
+        if total_mean_std_dev is not None:
+            text += ('<p>Mean score = %.3f; standard deviation = %.3f.</p>\n' %
+                     total_mean_std_dev)
+
         text += '<h2>Statistics by problem</h2>\n'
         row_list = []
         row = ['']
@@ -1199,6 +1204,53 @@ class SiteGenerator(object):
                     s = str(e.problem_stats[j][i])
                 else:
                     s = ''
+                row.append(self.html_td_scores(s))
+            row_list.append(self.html_tr_list(row))
+        row = [self.html_th_scores('Mean(Score)')]
+        for j in range(num_problems):
+            if e.problem_mean[j] is None:
+                s = ''
+            else:
+                s = '%.3f' % e.problem_mean[j]
+            row.append(self.html_td_scores(s))
+        row_list.append(self.html_tr_list(row))
+        row = [self.html_th_scores('&sigma;(Score)')]
+        for j in range(num_problems):
+            if e.problem_std_dev[j] is None:
+                s = ''
+            else:
+                s = '%.3f' % e.problem_std_dev[j]
+            row.append(self.html_td_scores(s))
+        row_list.append(self.html_tr_list(row))
+        row = [self.html_th_scores('Corr(Score, Total)')]
+        for j in range(num_problems):
+            corr = e.problem_corr_with_total[j]
+            if corr is None:
+                s = ''
+            elif corr < 0:
+                s = '&minus;%.3f' % -corr
+            else:
+                s = '%.3f' % corr
+            row.append(self.html_td_scores(s))
+        row_list.append(self.html_tr_list(row))
+        text += self.html_table_list(row_list)
+        text += '\n'
+
+        text += '<h2>Correlation coefficients between problems</h2>\n'
+        row_list = []
+        row = ['']
+        row.extend(['P%d' % (i + 1) for i in range(num_problems)])
+        row_list.append(self.html_tr_th_scores_list(row))
+        for i in range(num_problems):
+            row = [self.html_th_scores('P%d' % (i + 1))]
+            for j in range(num_problems):
+                corr = e.problem_corr[i][j]
+                if corr is None or i == j:
+                    s = ''
+                elif corr < 0:
+                    s = '&minus;%.3f' % -corr
+                else:
+                    s = '%.3f' % corr
                 row.append(self.html_td_scores(s))
             row_list.append(self.html_tr_list(row))
         text += self.html_table_list(row_list)
@@ -1222,7 +1274,9 @@ class SiteGenerator(object):
 
         if not e.scores_final:
             text += ('<p>The statistics by problem only include the'
-                     ' scores shown on the scoreboard.  Other statistics'
+                     ' scores shown on the scoreboard; correlation'
+                     ' coefficients between problems only include contestants'
+                     ' with scores shown for both problems.  Other statistics'
                      ' treat such blanks as 0.</p>\n')
 
         return text

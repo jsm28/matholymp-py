@@ -73,6 +73,9 @@ Next version (unreleased)
   administrative account, or the same person registers participants
   for both a country's main team and its B team).
 
+* Scoreboards now show additional statistical information about
+  scores.
+
 Version 2014.09.0 (28 September 2014)
 -------------------------------------
 

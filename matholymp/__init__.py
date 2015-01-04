@@ -36,4 +36,4 @@ participants and associated administration.
 __version__ = '2015.01.0.dev0'
 
 __all__ = ['collate', 'csvsource', 'data', 'datasource', 'docgen',
-           'fileutil', 'regdata', 'sitegen', 'urlutil']
+           'fileutil', 'regdata', 'sitegen', 'stats', 'urlutil']

@@ -36,6 +36,7 @@ DataSource.
 import collections
 
 from matholymp.collate import coll_get_sort_key
+from matholymp.stats import mean_std_dev, corr_coeff
 
 __all__ = ['EventGroup', 'Event', 'Paper', 'Person', 'PersonEvent',
            'Country', 'CountryEvent']
@@ -491,6 +492,71 @@ class Event(object):
         problem n, score s.
         """)
 
+    def _get_problem_mean_std_dev(self):
+        return [mean_std_dev([p.problem_scores[n]
+                              for p in self.contestant_list])
+                for n in range(self.num_problems)]
+
+    problem_mean_std_dev = _PropertyCached(
+        'problem_mean_std_dev', _get_problem_mean_std_dev,
+        """
+        A list giving, for each problem, the mean and standard
+        deviation of known scores on that problem.
+        """)
+
+    def _get_problem_mean(self):
+        return [(None
+                 if self.problem_mean_std_dev[n] is None
+                 else self.problem_mean_std_dev[n][0])
+                for n in range(self.num_problems)]
+
+    problem_mean = _PropertyCached(
+        'problem_mean', _get_problem_mean,
+        """
+        A list giving, for each problem, the mean of known scores on
+        that problem.
+        """)
+
+    def _get_problem_std_dev(self):
+        return [(None
+                 if self.problem_mean_std_dev[n] is None
+                 else self.problem_mean_std_dev[n][1])
+                for n in range(self.num_problems)]
+
+    problem_std_dev = _PropertyCached(
+        'problem_std_dev', _get_problem_std_dev,
+        """
+        A list giving, for each problem, the standard deviation of
+        known scores on that problem.
+        """)
+
+    def _get_problem_corr_with_total(self):
+        return [corr_coeff([(p.problem_scores[n], p.total_score)
+                            for p in self.contestant_list])
+                for n in range(self.num_problems)]
+
+    problem_corr_with_total = _PropertyCached(
+        'problem_corr_with_total', _get_problem_corr_with_total,
+        """
+        A list giving, for each problem, the correlation coefficient
+        of a contestant's score on that problem (for contestants with
+        known score on that problem) with their total score.
+        """)
+
+    def _get_problem_corr(self):
+        return [[corr_coeff([(p.problem_scores[n1], p.problem_scores[n2])
+                             for p in self.contestant_list])
+                 for n2 in range(self.num_problems)]
+                for n1 in range(self.num_problems)]
+
+    problem_corr = _PropertyCached(
+        'problem_corr', _get_problem_corr,
+        """
+        A list of lists giving, for each pair of problems, the
+        correlation coefficient of contestants' scores on those two
+        problems (for contestants with known scores on both problems).
+        """)
+
     def _get_total_stats_cond(self, cond):
         r = [0 for s in range(self.marks_total + 1)]
         for p in self.contestant_list:
@@ -518,6 +584,35 @@ class Event(object):
         contestants from official countries receiving that total
         score.
         """)
+
+    def _get_total_mean_std_dev(self):
+        return mean_std_dev([p.total_score for p in self.contestant_list])
+
+    total_mean_std_dev = _PropertyCached(
+        'total_mean_std_dev', _get_total_mean_std_dev,
+        """The mean and standard deviation of total scores of contestants.""")
+
+    def _get_total_mean(self):
+        ms = self.total_mean_std_dev
+        if ms is None:
+            return None
+        else:
+            return ms[0]
+
+    total_mean = _PropertyCached(
+        'total_mean', _get_total_mean,
+        """The mean of total scores of contestants.""")
+
+    def _get_total_std_dev(self):
+        ms = self.total_mean_std_dev
+        if ms is None:
+            return None
+        else:
+            return ms[1]
+
+    total_std_dev = _PropertyCached(
+        'total_std_dev', _get_total_std_dev,
+        """The standard deviation of total scores of contestants.""")
 
     registration_active = _EventPropertyDS(
         'registration_active',
