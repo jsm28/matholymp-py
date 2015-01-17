@@ -94,6 +94,9 @@ The current development sources of matholymp are available using `Git
 
    git clone git://git.ukmt.org.uk/git/matholymp-py.git
 
+There is also a `mirror on GitHub
+<https://github.com/jsm28/matholymp-py>`_.
+
 The matholymp code can be used directly from its source directory; no
 installation is required.  If you run the provided scripts from the
 source directory, they will automatically find the Python modules in
