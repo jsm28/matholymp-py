@@ -35,7 +35,7 @@ involved in them from which other data is derived.
 
 from matholymp.data import Paper
 from matholymp.datasource import DataSource
-from matholymp.fileutil import boolean_states
+from matholymp.fileutil import comma_split, boolean_states
 
 __all__ = ['CSVDataSource']
 
@@ -232,14 +232,10 @@ class CSVDataSource(DataSource):
                 return int(s)
         if name == 'other_roles':
             s = self._people[event_id][person_id]['Other Roles']
-            if s == '':
-                return []
-            return s.split(',')
+            return comma_split(s)
         if name == '_guide_for_ids':
             s = self._people[event_id][person_id]['Guide For']
-            if s == '':
-                return []
-            cnames = s.split(',')
+            cnames = comma_split(s)
             r = []
             ce = self._countries[event_id].values()
             for cn in cnames:

@@ -10,6 +10,15 @@ matholymp APIs not in the provided examples), you should examine the
 source code changes to determine if any API changes require changes to
 your code.
 
+Next version (unreleased)
+-------------------------
+
+* Country and role names can now contain commas without this causing
+  ambiguity in interpretation of the CSV fields ``Other Roles`` and
+  ``Guide For``.  Those fields now contain values interpreted as if
+  they were the single row of a CSV file, instead of as simple
+  comma-separated strings.
+
 Version 2015.01.0 (4 January 2015)
 ----------------------------------
 

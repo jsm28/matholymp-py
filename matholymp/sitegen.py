@@ -41,7 +41,7 @@ from matholymp.collate import coll_get_sort_key
 from matholymp.csvsource import CSVDataSource
 from matholymp.data import EventGroup
 from matholymp.fileutil import read_utf8_csv, write_utf8_csv, \
-    write_text_to_file, read_text_from_file, read_config
+    comma_join, write_text_to_file, read_text_from_file, read_config
 
 __all__ = ['read_sitegen_config', 'sitegen_events_csv', 'sitegen_papers_csv',
            'sitegen_countries_csv', 'sitegen_people_csv',
@@ -1856,11 +1856,11 @@ class SiteGenerator(object):
         csv_out['Country Code'] = p.country.code
         if not scores_only:
             csv_out['Primary Role'] = p.primary_role
-            csv_out['Other Roles'] = ','.join(sorted(p.other_roles,
-                                                     key=coll_get_sort_key))
+            csv_out['Other Roles'] = comma_join(sorted(p.other_roles,
+                                                       key=coll_get_sort_key))
             guide_for = sorted(p.guide_for, key=lambda x:x.sort_key)
             guide_for = [c.name for c in guide_for]
-            csv_out['Guide For'] = ','.join(guide_for)
+            csv_out['Guide For'] = comma_join(guide_for)
         csv_out['Given Name'] = p.given_name
         csv_out['Family Name'] = p.family_name
         if not scores_only:

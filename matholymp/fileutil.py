@@ -44,8 +44,9 @@ import os
 import os.path
 
 __all__ = ['read_utf8_csv', 'write_utf8_csv_bytes', 'write_utf8_csv',
-           'make_dirs_for_file', 'write_text_to_file', 'read_text_from_file',
-           'read_config', 'boolean_states', 'remove_if_exists']
+           'comma_join', 'comma_split', 'make_dirs_for_file',
+           'write_text_to_file', 'read_text_from_file', 'read_config',
+           'boolean_states', 'remove_if_exists']
 
 if _py3:
     _text_open_args = { 'encoding': 'utf-8' }
@@ -99,6 +100,51 @@ def write_utf8_csv(csv_file_name, rows, keys):
     """Write a UTF-8 CSV file (with BOM) from an array of dictionaries."""
     with open(csv_file_name, 'wb') as csv_file:
         csv_file.write(write_utf8_csv_bytes(rows, keys))
+
+def comma_join(val_list):
+    """
+    Join the given strings together, quoted as needed, in an
+    unambiguous way, as if they formed the row of a single-row CSV
+    file."""
+    if len(val_list) == 0:
+        return ''
+    if len(val_list) == 1 and val_list[0] == '':
+        return '""'
+    if _py3:
+        csv_text_file = io.StringIO(newline='')
+    else:
+        csv_text_file = io.BytesIO()
+    csv_file_writer = csv.writer(csv_text_file, dialect='excel')
+    csv_file_writer.writerow(val_list)
+    csv_text = csv_text_file.getvalue()
+    csv_text_file.close()
+    if csv_text[-1] == '\n':
+        csv_text = csv_text[:-1]
+    if csv_text[-1] == '\r':
+        csv_text = csv_text[:-1]
+    return csv_text
+
+def comma_split(val_text):
+    """
+    Split the given comma-separated string as if it formed the row of
+    a single-row CSV file.
+    """
+    if val_text == '':
+        return []
+    if _py3:
+        csv_text_file = io.StringIO(initial_value=val_text, newline='')
+    else:
+        csv_text_file = io.BytesIO(val_text)
+    csv_file_reader = csv.reader(csv_text_file, dialect='excel')
+    val_row = None
+    for row in csv_file_reader:
+        if val_row is not None:
+            raise ValueError('Multiple rows in comma-separated string')
+        val_row = row
+    if val_row is None:
+        raise ValueError('No rows in comma-separated string')
+    csv_text_file.close()
+    return val_row
 
 def make_dirs_for_file(file_name):
     """Create directories needed to create a file."""
