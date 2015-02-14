@@ -106,6 +106,13 @@ define="edit_ok context/is_edit_ok"
   <td><input name="family_name" metal:use-macro="normal_input"></td>
  </tr>
 
+ <tr tal:condition="context/is_edit_ok">
+  <td colspan="2"><span tal:condition="python:context.id and edit_ok"
+  tal:replace="structure python:utils.person_case_warning(db._db, context.id)"/>
+  Please enter names in mixed case (e.g. &lsquo;Jane
+  Doe&rsquo;, not &lsquo;JANE DOE&rsquo; or &lsquo;Jane DOE&rsquo;).</td>
+ </tr>
+
  <tr tal:define="name string:gender; label string:Gender; value context/gender; edit_ok edit_ok" tal:condition="context/is_edit_ok">
   <th metal:use-macro="th_label">Gender</th>
   <td tal:content="structure python:context.gender.menu(html_kwargs =

@@ -209,8 +209,10 @@ you should check manually from time to time.
   formats may not work for name badge generation.  (Future versions of
   matholymp may add more automation in this area.)
 
-* If some names are entered with all-uppercase surnames, convert them
-  to mixed case for consistency.
+* If some names are entered with all-uppercase surnames (or entirely
+  in uppercase), convert them to mixed case for consistency.  (The
+  registration system will show a warning when editing details for a
+  person either of whose names is entirely in uppercase.)
 
 * If a person is registered without a link for previous participation,
   check the list of previous participants and add a link if it seems

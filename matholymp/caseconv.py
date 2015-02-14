@@ -1,6 +1,6 @@
-# Initialise matholymp package.
+# Case conversion support for matholymp package.
 
-# Copyright 2014-2015 Joseph Samuel Myers.
+# Copyright 2015 Joseph Samuel Myers.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,12 +28,21 @@
 # used as well as that of the covered work.
 
 """
-The matholymp package provides a range of functionality for
-maintaining websites for mathematical olympiads, registration of
-participants and associated administration.
+This module provides case conversion support for matholymp use.
 """
 
-__version__ = '2015.02.0.dev0'
+import sys
+_py3 = sys.version_info.major >= 3
+import codecs
 
-__all__ = ['caseconv', 'collate', 'csvsource', 'data', 'datasource', 'docgen',
-           'fileutil', 'regdata', 'sitegen', 'stats', 'urlutil']
+import icu
+
+__all__ = ['toupper']
+
+def toupper(text):
+    """Return the argument string converted to uppercase."""
+    usret = icu.UnicodeString(text).toUpper(icu.Locale('en_GB'))
+    if _py3:
+        return str(usret)
+    else:
+        return codecs.encode(unicode(usret), 'utf-8')

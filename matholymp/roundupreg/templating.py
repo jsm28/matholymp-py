@@ -35,8 +35,9 @@ system.
 __all__ = ['people_from_country_internal', 'people_from_country',
            'country_people_table', 'all_people_table', 'person_scores_table',
            'country_scores_table', 'scoreboard', 'has_nonempty_travel',
-           'country_travel_copy_options', 'missing_person_details',
-           'registration_status', 'register_templating_utils']
+           'country_travel_copy_options', 'person_case_warning',
+           'missing_person_details', 'registration_status',
+           'register_templating_utils']
 
 import cgi
 import json
@@ -44,6 +45,7 @@ import re
 
 from roundup.cgi.templating import HTMLItem
 
+from matholymp.caseconv import toupper
 from matholymp.collate import coll_get_sort_key
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import distinguish_official, \
@@ -158,6 +160,23 @@ def country_travel_copy_options(db, country, person):
                                       quote=True), prop_js_esc))
         travel_list.append(prop_js_submit)
     return '\n'.join(travel_list)
+
+def person_case_warning(db, person):
+    """Return an HTML warning about all-upper-case parts of a person's name."""
+    given_name = db.person.get(person, 'given_name')
+    family_name = db.person.get(person, 'family_name')
+    given_all_uc = given_name == toupper(given_name)
+    family_all_uc = family_name == toupper(family_name)
+    warn_text = ''
+    if given_all_uc and family_all_uc:
+        warn_text = 'Warning: name has been entered in all upper case.'
+    elif family_all_uc:
+        warn_text = 'Warning: family name has been entered in all upper case.'
+    elif given_all_uc:
+        warn_text = 'Warning: given name has been entered in all upper case.'
+    if warn_text:
+        warn_text = '<strong>%s</strong>' % warn_text
+    return warn_text
 
 def missing_person_details(db, person):
     """Return a description of missing details for a person."""
@@ -344,4 +363,5 @@ def register_templating_utils(instance):
     instance.registerUtil('valid_country_problem', valid_country_problem)
     instance.registerUtil('country_travel_copy_options',
                           country_travel_copy_options)
+    instance.registerUtil('person_case_warning', person_case_warning)
     instance.registerUtil('registration_status', registration_status)

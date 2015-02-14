@@ -19,6 +19,13 @@ Next version (unreleased)
   they were the single row of a CSV file, instead of as simple
   comma-separated strings.
 
+* The registration system now detects and warns users if given or
+  family names are entered all in uppercase.  (This is a warning
+  rather than a hard error because of the possibility that in some
+  cases the correct orthography is all-uppercase; for example, for a
+  single-character name.)  :file:`person.item.html` needs updating to
+  make use of this feature.
+
 Version 2015.01.0 (4 January 2015)
 ----------------------------------
 
