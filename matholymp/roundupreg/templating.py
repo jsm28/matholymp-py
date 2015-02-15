@@ -45,7 +45,7 @@ import re
 
 from roundup.cgi.templating import HTMLItem
 
-from matholymp.caseconv import toupper
+from matholymp.caseconv import all_uppercase
 from matholymp.collate import coll_get_sort_key
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import distinguish_official, \
@@ -165,8 +165,8 @@ def person_case_warning(db, person):
     """Return an HTML warning about all-upper-case parts of a person's name."""
     given_name = db.person.get(person, 'given_name')
     family_name = db.person.get(person, 'family_name')
-    given_all_uc = given_name == toupper(given_name)
-    family_all_uc = family_name == toupper(family_name)
+    given_all_uc = all_uppercase(given_name)
+    family_all_uc = all_uppercase(family_name)
     warn_text = ''
     if given_all_uc and family_all_uc:
         warn_text = 'Warning: name has been entered in all upper case.'

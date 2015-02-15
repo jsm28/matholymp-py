@@ -37,7 +37,15 @@ import codecs
 
 import icu
 
-__all__ = ['toupper']
+__all__ = ['tolower', 'toupper', 'all_uppercase']
+
+def tolower(text):
+    """Return the argument string converted to lowercase."""
+    usret = icu.UnicodeString(text).toLower(icu.Locale('en_GB'))
+    if _py3:
+        return str(usret)
+    else:
+        return codecs.encode(unicode(usret), 'utf-8')
 
 def toupper(text):
     """Return the argument string converted to uppercase."""
@@ -46,3 +54,7 @@ def toupper(text):
         return str(usret)
     else:
         return codecs.encode(unicode(usret), 'utf-8')
+
+def all_uppercase(text):
+    """Return whether the argument string is all uppercase."""
+    return text == toupper(text) and text != tolower(text)
