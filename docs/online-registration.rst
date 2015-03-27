@@ -222,6 +222,11 @@ you should check manually from time to time.
   that person did in fact participate previously (checking with the
   relevant country if necessary).
 
+* If languages chosen seem unlikely for contestants from a given
+  country (for example, all contestants from a non-English-speaking
+  country requesting only English papers), check the correctness of
+  the requested languages with the country in question.
+
 Closing registration
 ^^^^^^^^^^^^^^^^^^^^
 
