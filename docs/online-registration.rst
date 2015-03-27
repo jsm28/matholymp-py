@@ -222,6 +222,13 @@ you should check manually from time to time.
   that person did in fact participate previously (checking with the
   relevant country if necessary).
 
+* Sometimes a registration for one person may have most of the
+  registration details changed so it now refers to another person
+  (whether in the same role or a different role).  In such cases, the
+  link for previous participation, or its absence, should be checked,
+  since it may have been correct for the person previously registered
+  but not for the new details.
+
 * If languages chosen seem unlikely for contestants from a given
   country (for example, all contestants from a non-English-speaking
   country requesting only English papers), check the correctness of
