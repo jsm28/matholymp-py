@@ -18,7 +18,19 @@
 \hfil%
 \vspace*{2mm}%
 \end{minipage}%
-}
+}%
+\newcommand{\onelinetextnobox}[6]{%
+\settowidth{\matholymptmplength}{\hbox{\raggedright#2#6}}%
+\ifthenelse{\lengthtest{\matholymptmplength>#1}}{%
+\settowidth{\matholymptmplength}{\hbox{\raggedright#3#6}}%
+\ifthenelse{\lengthtest{\matholymptmplength>#1}}{%
+\settowidth{\matholymptmplength}{\hbox{\raggedright#4#6}}%
+\ifthenelse{\lengthtest{\matholymptmplength>#1}}{%
+#5#6%
+}{#4#6}%
+}{#3#6}%
+}{#2#6}%
+}%
 \newcommand{\formrow}[1]{%
 \textsf{#1} & \\ \hline%
 }%
@@ -31,7 +43,7 @@
 \put(146,231){\small\textsf{@@long_name@@}}%
 }%
 \begin{picture}(204,297)%
-\put(3,278){\frame{\spacebox{\Huge\textsf{Country: \textbf{#1}}}}}%
+\put(3,278){\frame{\spacebox{\onelinetextnobox{142mm}{\Huge}{\huge}{\LARGE}{\Large}{\textsf{Country: \textbf{#1}}}}}}%
 \put(3,258){\frame{\spacebox{\Huge\textsf{Problem: \textbf{#2}}}}}%
 \put(20,170){%
 \Huge%

@@ -26,6 +26,9 @@ Next version (unreleased)
   single-character name.)  :file:`person.item.html` needs updating to
   make use of this feature.
 
+* The example document-generation template
+  :file:`coord-form-template.tex` now handles longer country names.
+
 Version 2015.01.0 (4 January 2015)
 ----------------------------------
 
