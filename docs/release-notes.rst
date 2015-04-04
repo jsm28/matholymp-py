@@ -41,6 +41,10 @@ Next version (unreleased)
   coordination forms; again, the example template has been updated for
   this.
 
+* :file:`person.item.html` has had clarification added that the
+  languages to enter for contestants are those in which papers are
+  requested.
+
 Version 2015.01.0 (4 January 2015)
 ----------------------------------
 
