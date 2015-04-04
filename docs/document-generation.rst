@@ -181,6 +181,9 @@ adapting if you have more than four contestants per team)::
 
    mo-document-generate coord-form all
 
+Add ``--background`` if a background design is to be used in the
+forms, but they are not printed on paper with that design pre-printed.
+
 Certificates
 ^^^^^^^^^^^^
 
