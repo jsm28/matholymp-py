@@ -114,7 +114,7 @@ def main():
     elif cmdline_data['type'] == 'language-list':
         docgen.generate_language_list()
     elif cmdline_data['type'] == 'coord-form':
-        docgen.generate_coord_forms()
+        docgen.generate_coord_forms(bg)
     elif cmdline_data['type'] == 'scores-commands':
         docgen.generate_scores_commands()
     else:

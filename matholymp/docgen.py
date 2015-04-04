@@ -62,6 +62,7 @@ def read_docgen_config(top_directory):
     cfg_int_none_keys = ['gold_boundary', 'silver_boundary', 'bronze_boundary']
     cfg_bool_keys = ['show_countries_for_guides', 'show_rooms_for_guides',
                      'paper_print_logo', 'paper_text_left',
+                     'coord_form_print_logo', 'coord_form_text_left',
                      'honourable_mentions_available']
     config_data = read_config(config_file_name, 'matholymp.documentgen',
                               cfg_str_keys, cfg_int_keys,
@@ -674,7 +675,7 @@ class DocumentGenerator(object):
         write_text_to_file(out_text, os.path.join(self._out_dir,
                                                   'language-list.txt'))
 
-    def generate_coord_forms(self):
+    def generate_coord_forms(self, use_background):
         """Generate all coordination forms requested by the command line."""
         template_file_base = 'coord-form-template'
         form_list = []
@@ -704,6 +705,18 @@ class DocumentGenerator(object):
         template_fields['year'] = self._event.year
         template_fields['short_name'] = self._event.short_name
         template_fields['long_name'] = self._event.long_name
+        if use_background:
+            template_fields['use_background'] = 'true'
+        else:
+            template_fields['use_background'] = 'false'
+        if self._cfg['coord_form_print_logo']:
+            template_fields['print_logo'] = 'true'
+        else:
+            template_fields['print_logo'] = 'false'
+        if self._cfg['coord_form_text_left']:
+            template_fields['text_left'] = 'true'
+        else:
+            template_fields['text_left'] = 'false'
         raw_fields = ['coord_forms']
         self.subst_and_pdflatex(template_file_base, output_file_base,
                            template_fields, raw_fields)

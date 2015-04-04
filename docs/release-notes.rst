@@ -29,6 +29,18 @@ Next version (unreleased)
 * The example document-generation template
   :file:`coord-form-template.tex` now handles longer country names.
 
+* New configuration variables ``coord_form_print_logo`` and
+  ``coord_form_text_left`` must be specified in
+  :file:`documentgen.cfg`.  These can be used to configure the
+  template for coordination forms; the example
+  :file:`coord-form-template.tex` has been updated to use them
+  (settings of ``Yes`` make the template behave the same as in
+  previous versions).  In addition, the ``--background`` option to
+  :command:`mo-document-generate` can be used to include a background
+  design from :file:`coord-form-background.pdf` when generating
+  coordination forms; again, the example template has been updated for
+  this.
+
 Version 2015.01.0 (4 January 2015)
 ----------------------------------
 

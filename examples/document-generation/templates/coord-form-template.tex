@@ -5,6 +5,7 @@
 \usepackage{ifthen}
 \usepackage{graphicx}
 \usepackage{eso-pic}
+\usepackage{wallpaper}
 \setlength{\unitlength}{1mm}
 \newlength{\matholymptmplength}
 \renewcommand{\arraystretch}{2.0}%
@@ -19,6 +20,11 @@
 \vspace*{2mm}%
 \end{minipage}%
 }%
+\newcommand{\leftbox}[1]{%
+\settowidth{\matholymptmplength}{#1}%
+\hspace*{-\matholymptmplength}%
+#1%
+}%
 \newcommand{\onelinetextnobox}[6]{%
 \settowidth{\matholymptmplength}{\hbox{\raggedright#2#6}}%
 \ifthenelse{\lengthtest{\matholymptmplength>#1}}{%
@@ -31,20 +37,33 @@
 }{#3#6}%
 }{#2#6}%
 }%
+\newboolean{matholympprintlogo}
+\setboolean{matholympprintlogo}{@@print_logo@@}
+\newboolean{matholymptextleft}
+\setboolean{matholymptextleft}{@@text_left@@}
+\newboolean{matholympusebackground}
+\setboolean{matholympusebackground}{@@use_background@@}
 \newcommand{\formrow}[1]{%
 \textsf{#1} & \\ \hline%
 }%
 \newcommand{\oneform}[3]{%
 \ClearShipoutPicture%
+\ifthenelse{\boolean{matholympusebackground}}{\ThisURCornerWallPaper{1}{coord-form-background.pdf}}{}%
+\ifthenelse{\boolean{matholympprintlogo}}{%
 \AddToShipoutPicture{%
 \setlength{\unitlength}{1mm}%
 \put(149,242){\includegraphics[width=50mm,trim=0mm 7mm 0mm 0mm,clip]{logo.pdf}}%
 \put(151,236){\huge\textsf{\textbf{@@short_name@@ @@year@@}}}%
 \put(146,231){\small\textsf{@@long_name@@}}%
-}%
+}}{}%
 \begin{picture}(204,297)%
+\ifthenelse{\boolean{matholymptextleft}}{%
 \put(3,278){\frame{\spacebox{\onelinetextnobox{142mm}{\Huge}{\huge}{\LARGE}{\Large}{\textsf{Country: \textbf{#1}}}}}}%
 \put(3,258){\frame{\spacebox{\Huge\textsf{Problem: \textbf{#2}}}}}%
+}{%
+\put(198,278){\leftbox{\frame{\spacebox{\onelinetextnobox{142mm}{\Huge}{\huge}{\LARGE}{\Large}{\textsf{Country: \textbf{#1}}}}}}}%
+\put(198,258){\leftbox{\frame{\spacebox{\Huge\textsf{Problem: \textbf{#2}}}}}}%
+}%
 \put(20,170){%
 \Huge%
 \begin{tabular}{|c|c|}%
