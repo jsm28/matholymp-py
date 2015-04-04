@@ -45,6 +45,10 @@ Next version (unreleased)
   languages to enter for contestants are those in which papers are
   requested.
 
+* Scoreboards now properly use singular rather than plural when
+  referring to a single contestant having received a particular award,
+  or to a single contestant being registered.
+
 Version 2015.01.0 (4 January 2015)
 ----------------------------------
 

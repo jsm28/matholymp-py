@@ -1105,6 +1105,41 @@ class SiteGenerator(object):
             row.extend([hm_text])
         return self.html_tr_td_scores_list(row)
 
+    def num_text_contestants(self, n):
+        """Return text describing a number of contestants."""
+        if n == 1:
+            return '1 contestant'
+        else:
+            return '%d contestants' % n
+
+    def num_text_gold(self, n):
+        """Return text describing a number of gold medals."""
+        if n == 1:
+            return '1 gold medal'
+        else:
+            return '%d gold medals' % n
+
+    def num_text_silver(self, n):
+        """Return text describing a number of silver medals."""
+        if n == 1:
+            return '1 silver medal'
+        else:
+            return '%d silver medals' % n
+
+    def num_text_bronze(self, n):
+        """Return text describing a number of bronze medals."""
+        if n == 1:
+            return '1 bronze medal'
+        else:
+            return '%d bronze medals' % n
+
+    def num_text_hm(self, n):
+        """Return text describing a number of honourable mentions."""
+        if n == 1:
+            return '1 honourable mention'
+        else:
+            return '%d honourable mentions' % n
+
     def scoreboard_text(self, e):
         """Return the main text of the scoreboard for one event."""
         text = ''
@@ -1132,31 +1167,38 @@ class SiteGenerator(object):
         if e.scores_final:
             hm_text = ''
             if e.honourable_mentions_available:
-                hm_text = (', %d honourable mentions' %
-                           e.num_awards['Honourable Mention'])
-            text += ('<p>%d gold medals (scores &ge; %d),'
-                     ' %d silver medals (scores &ge; %d),'
-                     ' %d bronze medals (scores &ge; %d)%s'
-                     ' from %d contestants'
+                hm_text = ', ' + self.num_text_hm(
+                    e.num_awards['Honourable Mention'])
+            text += ('<p>%s (scores &ge; %d),'
+                     ' %s (scores &ge; %d),'
+                     ' %s (scores &ge; %d)%s'
+                     ' from %s'
                      ' total.</p>\n' %
-                     (e.num_awards['Gold Medal'], e.gold_boundary,
-                      e.num_awards['Silver Medal'], e.silver_boundary,
-                      e.num_awards['Bronze Medal'], e.bronze_boundary,
-                      hm_text, e.num_contestants))
+                     (self.num_text_gold(e.num_awards['Gold Medal']),
+                      e.gold_boundary,
+                      self.num_text_silver(e.num_awards['Silver Medal']),
+                      e.silver_boundary,
+                      self.num_text_bronze(e.num_awards['Bronze Medal']),
+                      e.bronze_boundary,
+                      hm_text, self.num_text_contestants(e.num_contestants)))
             if e.distinguish_official:
                 hm_text = ''
                 if e.honourable_mentions_available:
-                    hm_text = (', %d honourable mentions' %
-                               e.num_awards_official['Honourable Mention'])
-                text += ('<p>From %s teams: %d gold medals, %d silver medals,'
-                         ' %d bronze medals%s'
-                         ' from %d contestants total.</p>\n' %
+                    hm_text = ', ' + self.num_text_hm(
+                        e.num_awards_official['Honourable Mention'])
+                text += ('<p>From %s teams: %s, %s,'
+                         ' %s%s'
+                         ' from %s total.</p>\n' %
                          (cgi.escape(self._cfg['official_desc_lc']),
-                          e.num_awards_official['Gold Medal'],
-                          e.num_awards_official['Silver Medal'],
-                          e.num_awards_official['Bronze Medal'],
+                          self.num_text_gold(
+                              e.num_awards_official['Gold Medal']),
+                          self.num_text_silver(
+                              e.num_awards_official['Silver Medal']),
+                          self.num_text_bronze(
+                              e.num_awards_official['Bronze Medal']),
                           hm_text,
-                          e.num_contestants_official))
+                          self.num_text_contestants(
+                              e.num_contestants_official)))
         else:
             if e.distinguish_official:
                 off_text = (' (%d from %s teams)' %
@@ -1164,8 +1206,8 @@ class SiteGenerator(object):
                              cgi.escape(self._cfg['official_desc_lc'])))
             else:
                 off_text = ''
-            text += ('<p>%d contestants%s.</p>\n' %
-                     (e.num_contestants, off_text))
+            text += ('<p>%s%s.</p>\n' %
+                     (self.num_text_contestants(e.num_contestants), off_text))
         head_row = ['Total score',
                     'Candidates',
                     'Cumulative']
@@ -1269,8 +1311,8 @@ class SiteGenerator(object):
 
         if e.rank_top_n_matters:
             text += ('<p>Country ranks are determined by the total score of'
-                     ' the top %d contestants from each country.</p>\n' %
-                     e.rank_top_n)
+                     ' the top %s from each country.</p>\n' %
+                     self.num_text_contestants(e.rank_top_n))
 
         if not e.scores_final:
             text += ('<p>The statistics by problem only include the'
