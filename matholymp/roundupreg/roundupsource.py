@@ -34,7 +34,7 @@ countries involved in them from which other data is derived.
 """
 
 from matholymp.datasource import DataSource
-from matholymp.fileutil import boolean_states
+from matholymp.fileutil import comma_split, boolean_states
 from matholymp.roundupreg.rounduputil import distinguish_official, \
     get_num_problems, get_marks_per_problem, scores_from_str, contestant_age, \
     get_none_country
@@ -172,6 +172,11 @@ class RoundupDataSource(DataSource):
                     s = int(s)
                 r.append(s)
             return r
+        elif name == 'extra_awards':
+            extra_awards_str = self._db.person.get(id, 'extra_awards')
+            if extra_awards_str is None:
+                return []
+            return comma_split(extra_awards_str)
         elif name == 'photo_url':
             photo_id = self._db.person.get(id, 'files')
             if photo_id is None:

@@ -1,0 +1,8 @@
+﻿XMO Number,Country Number,Person Number,Annual URL,Country Name,Country Code,Primary Role,Other Roles,Guide For,Contestant Code,Contestant Age,Given Name,Family Name,P1,P2,P3,P4,P5,P6,Total,Award,Extra Awards,Photo URL
+1,1,1,https://www.example.org/registration/2014/person2,One Country,DEF,Contestant 1,,,DEF1,18,One,Two,7,4,0,7,2,1,21,Silver Medal,,https://www.example.org/people/person1/photo1.jpg
+1,1,2,https://www.example.org/registration/2014/person1,One Country,DEF,Contestant 2,,,DEF2,17,Three,Four,6,0,0,0,2,0,8,,"""Prize for A, B and C""",https://www.example.org/people/person2/photo1.jpg
+1,1,3,https://www.example.org/registration/2014/person3,One Country,DEF,Deputy Leader,,,,,Five,Six,,,,,,,,,,
+1,1,4,https://www.example.org/registration/2014/person4,One Country,DEF,Leader,,,,,Seven,Eight,,,,,,,,,,https://www.example.org/people/person4/photo1.jpg
+1,2,5,https://www.example.org/registration/2014/person6,Two Three,ABC,Contestant 1,,,ABC1,16,Nine,Ten,7,7,0,7,7,1,29,Gold Medal,"Special Prize A,Special Prize B",https://www.example.org/people/person5/photo1.jpg
+1,2,6,https://www.example.org/registration/2014/person7,Two Three,ABC,Contestant 2,,,ABC2,,Eleven,Twelve,7,0,0,7,0,1,15,Bronze Medal,,https://www.example.org/people/person6/photo1.jpg
+1,3,7,https://www.example.org/registration/2014/person9,Four Five,ZYX,Contestant 1,,,ZYX1,13,Thirteen,Fourteen,7,7,0,7,2,7,30,Gold Medal,Special Prize,https://www.example.org/people/person7/photo1.jpg

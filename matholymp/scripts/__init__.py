@@ -33,4 +33,5 @@ the user interface to command-line scripts.
 """
 
 __all__ = ['mo_document_generate', 'mo_run_tests', 'mo_sphinx_build',
-           'mo_static_generate', 'mo_static_import', 'mo_static_papers_import']
+           'mo_static_generate', 'mo_static_import', 'mo_static_papers_import',
+           'mo_static_upgrade']

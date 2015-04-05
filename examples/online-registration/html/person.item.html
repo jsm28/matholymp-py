@@ -276,6 +276,26 @@ define="edit_ok context/is_edit_ok"
   <td colspan=3><input type="file" name="@file" size="20"></td>
  </tr>
 
+<tal:block tal:condition="context/id">
+<tal:block tal:condition="python:not db._db.person.is_retired(context.id)">
+<tal:block tal:condition="python:utils.person_is_contestant(db._db, context.id)">
+<tal:block tal:condition="context/extra_awards/is_edit_ok">
+ <tr tal:define="name string:extra_awards; label string:Extra awards; value context/extra_awards; edit_ok context/extra_awards/is_edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label">Extra awards</th>
+  <td><input name="extra_awards" metal:use-macro="normal_input"></td>
+ </tr>
+ <tr>
+  <td colspan="2">Enter &lsquo;Special Prize&rsquo; under
+  &lsquo;Extra awards&rsquo; for a contestant awarded a special
+  prize.  For a contestant awarded multiple special prizes, or
+  special prizes with more specific descriptions, a comma-separated
+  list can be entered here, formatted as a row of a CSV file.</td>
+ </tr>
+</tal:block>
+</tal:block>
+</tal:block>
+</tal:block>
+
  <tr tal:condition="edit_ok">
   <td>
    &nbsp;

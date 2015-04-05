@@ -150,7 +150,8 @@ def init_schema(env):
                  generic_url=String(),
                  reuse_photo=Boolean(),
                  files=Link('file'),
-                 scores=String() # comma-separated scores on each problem
+                 scores=String(), # comma-separated scores on each problem
+                 extra_awards=String()
     )
     person.setorderprop('primary_role')
 
@@ -279,7 +280,7 @@ def init_schema(env):
                                               'family_name', 'primary_role',
                                               'other_roles', 'guide_for',
                                               'files', 'scores',
-                                              'generic_url'))
+                                              'extra_awards', 'generic_url'))
     db.security.addPermissionToRole('User', p)
     db.security.addPermissionToRole('Anonymous', p)
 

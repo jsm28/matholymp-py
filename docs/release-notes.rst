@@ -10,8 +10,18 @@ matholymp APIs not in the provided examples), you should examine the
 source code changes to determine if any API changes require changes to
 your code.
 
+When upgrading matholymp, you should run the
+:command:`mo-static-upgrade` script from the directory containing the
+static site, to update the CSV data files with details of past events
+for any format changes in the new version of matholymp.  After doing
+so, run :command:`mo-static-generate`.
+
 Next version (unreleased)
 -------------------------
+
+* There is a new script :command:`mo-static-upgrade` that should be
+  run from the directory containing the static site when upgrading
+  matholymp.
 
 * Country and role names can now contain commas without this causing
   ambiguity in interpretation of the CSV fields ``Other Roles`` and
@@ -48,6 +58,8 @@ Next version (unreleased)
 * Scoreboards now properly use singular rather than plural when
   referring to a single contestant having received a particular award,
   or to a single contestant being registered.
+
+* Special prizes are now supported.
 
 Version 2015.01.0 (4 January 2015)
 ----------------------------------

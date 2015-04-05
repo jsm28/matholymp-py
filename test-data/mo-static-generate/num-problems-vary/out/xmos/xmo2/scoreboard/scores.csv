@@ -1,4 +1,4 @@
-﻿Country Name,Country Code,Contestant Code,Given Name,Family Name,P1,P2,P3,P4,P5,Total,Award,Rank
-Two and Three,ABC,ABC1,Nine,Ten,7,7,7,7,7,35,Gold Medal,1
-One Country,DEF,DEF1,Three Middle,Four,7,7,0,7,5,26,Silver Medal,2
-New Country,GHI,GHI1,Eleven,Twelve,7,4,2,1,7,21,Bronze Medal,3
+﻿Country Name,Country Code,Contestant Code,Given Name,Family Name,P1,P2,P3,P4,P5,Total,Award,Extra Awards,Rank
+Two and Three,ABC,ABC1,Nine,Ten,7,7,7,7,7,35,Gold Medal,,1
+One Country,DEF,DEF1,Three Middle,Four,7,7,0,7,5,26,Silver Medal,,2
+New Country,GHI,GHI1,Eleven,Twelve,7,4,2,1,7,21,Bronze Medal,,3

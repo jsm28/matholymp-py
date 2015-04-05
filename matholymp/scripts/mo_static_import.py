@@ -195,5 +195,5 @@ def main():
                      'Contestant Code', 'Contestant Age', 'Given Name',
                      'Family Name']
     people_header.extend([('P%d' % (i + 1)) for i in range(max_num_problems)])
-    people_header.extend(['Total', 'Award', 'Photo URL'])
+    people_header.extend(['Total', 'Award', 'Extra Awards', 'Photo URL'])
     write_utf8_csv(people_csv, people_data, people_header)

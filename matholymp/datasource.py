@@ -108,11 +108,11 @@ class DataSource(object):
         Return the value of an attribute for a PersonEvent.  Possible
         names are: _country_id, annual_url, primary_role, other_roles,
         _guide_for_ids, contestant_age, given_name, family_name,
-        problem_scores, total_score, award, photo_url, first_language,
-        second_language, diet, room_number, phone_number, generic_id,
-        gender, date_of_birth, tshirt, arrival_place, arrival_time,
-        arrival_flight, departure_place, departure_time,
-        departure_flight.
+        problem_scores, total_score, award, extra_awards, photo_url,
+        first_language, second_language, diet, room_number,
+        phone_number, generic_id, gender, date_of_birth, tshirt,
+        arrival_place, arrival_time, arrival_flight, departure_place,
+        departure_time, departure_flight.
         """
         raise NotImplementedError
 

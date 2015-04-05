@@ -1202,6 +1202,26 @@ class PersonEvent(object):
         'award', _get_award,
         """The award given to this contestant at this event.""")
 
+    extra_awards = _PersonEventPropertyDS(
+        'extra_awards',
+        """A list of extra awards for this person at this event.""")
+
+    def _get_awards_str(self):
+        assert self.is_contestant
+        if not self.event.scores_final:
+            return ''
+        base_award = self.award
+        if base_award is not None:
+            award_list = [base_award]
+        else:
+            award_list = []
+        award_list.extend(self.extra_awards)
+        return ', '.join(award_list)
+
+    awards_str = _PropertyCached(
+        'awards_str', _get_awards_str,
+        """A string listing awards for this person at this event.""")
+
     def _get_rank(self):
         assert self.is_contestant
         rank = 0

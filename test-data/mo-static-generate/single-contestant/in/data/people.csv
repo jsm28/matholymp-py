@@ -1,4 +1,4 @@
-﻿XMO Number,Country Number,Person Number,Annual URL,Country Name,Country Code,Primary Role,Other Roles,Guide For,Contestant Code,Contestant Age,Given Name,Family Name,P1,P2,P3,P4,P5,P6,Total,Award,Photo URL
-1,1,1,https://www.example.org/registration/2014/person2,One Country,DEF,Contestant 1,,,DEF1,18,One,Two,7,4,0,7,2,1,21,Silver Medal,https://www.example.org/people/person1/photo1.jpg
-1,1,3,https://www.example.org/registration/2014/person3,One Country,DEF,Deputy Leader,,,,,Five,Six,,,,,,,,,
-1,1,4,https://www.example.org/registration/2014/person4,One Country,DEF,Leader,,,,,Seven,Eight,,,,,,,,,https://www.example.org/people/person4/photo1.jpg
+﻿XMO Number,Country Number,Person Number,Annual URL,Country Name,Country Code,Primary Role,Other Roles,Guide For,Contestant Code,Contestant Age,Given Name,Family Name,P1,P2,P3,P4,P5,P6,Total,Award,Extra Awards,Photo URL
+1,1,1,https://www.example.org/registration/2014/person2,One Country,DEF,Contestant 1,,,DEF1,18,One,Two,7,4,0,7,2,1,21,Silver Medal,,https://www.example.org/people/person1/photo1.jpg
+1,1,3,https://www.example.org/registration/2014/person3,One Country,DEF,Deputy Leader,,,,,Five,Six,,,,,,,,,,
+1,1,4,https://www.example.org/registration/2014/person4,One Country,DEF,Leader,,,,,Seven,Eight,,,,,,,,,,https://www.example.org/people/person4/photo1.jpg

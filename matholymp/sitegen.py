@@ -738,8 +738,8 @@ class SiteGenerator(object):
                                                     cgi.escape(p.country.name))
                 year_text += '%s ' % cl
                 role_text = cgi.escape(p.primary_role)
-                if p.is_contestant and p.award is not None:
-                    role_text += ': %s' % cgi.escape(p.award)
+                if p.is_contestant and p.awards_str:
+                    role_text += ': %s' % cgi.escape(p.awards_str)
                 if p.guide_for:
                     glist = sorted(p.guide_for, key=lambda x:x.sort_key)
                     gtlist = []
@@ -1023,7 +1023,7 @@ class SiteGenerator(object):
         row.extend(scores_row)
         row.extend([str(p.total_score)])
         if show_award:
-            row.extend([cgi.escape(p.award or '')])
+            row.extend([cgi.escape(p.awards_str)])
         return self.html_tr_td_scores_list(row)
 
     def country_scoreboard_header(self, event, country):
@@ -1869,7 +1869,7 @@ class SiteGenerator(object):
                 'Contestant Code',
                 'Contestant Age', 'Given Name', 'Family Name']
         cols.extend(self.pn_csv_header(num_problems))
-        cols.extend(['Total', 'Award', 'Photo URL'])
+        cols.extend(['Total', 'Award', 'Extra Awards', 'Photo URL'])
         if reg_system:
             cols.extend(['Generic Number'])
         if not reg_system:
@@ -1926,6 +1926,7 @@ class SiteGenerator(object):
                     csv_out['P%d' % (i + 1)] = ''
             csv_out['Total'] = str(p.total_score)
             csv_out['Award'] = p.award or ''
+            csv_out['Extra Awards'] = comma_join(p.extra_awards)
             if not reg_system:
                 csv_out['Rank'] = str(p.rank)
         else:
@@ -1936,6 +1937,7 @@ class SiteGenerator(object):
                 csv_out['P%d' % (i + 1)] = ''
             csv_out['Total'] = ''
             csv_out['Award'] = ''
+            csv_out['Extra Awards'] = ''
             if not reg_system:
                 csv_out['Rank'] = ''
         if reg_system and not scores_only:
@@ -1998,7 +2000,7 @@ class SiteGenerator(object):
         cols = ['Country Name', 'Country Code',
                 'Contestant Code', 'Given Name', 'Family Name']
         cols.extend(self.pn_csv_header(num_problems))
-        cols.extend(['Total', 'Award'])
+        cols.extend(['Total', 'Award', 'Extra Awards'])
         if not reg_system:
             cols.extend(['Rank'])
         return cols

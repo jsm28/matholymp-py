@@ -233,6 +233,9 @@ class CSVDataSource(DataSource):
         if name == 'other_roles':
             s = self._people[event_id][person_id]['Other Roles']
             return comma_split(s)
+        if name == 'extra_awards':
+            s = self._people[event_id][person_id]['Extra Awards']
+            return comma_split(s)
         if name == '_guide_for_ids':
             s = self._people[event_id][person_id]['Guide For']
             cnames = comma_split(s)

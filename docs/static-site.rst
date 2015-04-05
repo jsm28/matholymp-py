@@ -176,6 +176,12 @@ the script (:download:`matholymp/scripts/mo_static_import.py
 the details of how the formats differ (in particular, the different
 meanings of Person Number and Country Number in the input files).
 
+Special prizes are represented in :file:`people.csv` by putting
+``Special Prize`` in the ``Extra Awards`` column.  If different types
+of special prizes are distinguished, this column may give a name or
+description of the prize (in general, it can contain a comma-separated
+list of extra awards, formatted as if the single row of a CSV file).
+
 .. note::
 
    Matholymp does not currently support results of past events with
