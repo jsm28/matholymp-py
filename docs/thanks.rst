@@ -40,6 +40,8 @@ limited to:
 
 * Şükrü Torun
 
+* Kasia Warburton
+
 * Pascal Zeihen
 
 * Alison Zhu
