@@ -59,7 +59,8 @@ Next version (unreleased)
   referring to a single contestant having received a particular award,
   or to a single contestant being registered.
 
-* Special prizes are now supported.
+* Special prizes are now supported.  :file:`person.item.html` needs
+  updating to make use of this feature in the registration system.
 
 Version 2015.01.0 (4 January 2015)
 ----------------------------------
