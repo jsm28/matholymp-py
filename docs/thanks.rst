@@ -12,6 +12,8 @@ limited to:
 
 * James Cranch
 
+* Birgit van Dalen
+
 * Beverley Detoeuf
 
 * Mike Dostert
@@ -29,6 +31,8 @@ limited to:
 * Mikita Lappo
 
 * Charles Leytem
+
+* Sergei Mazanik
 
 * Vicky Neale
 
