@@ -914,7 +914,7 @@ class Paper(object):
 class Person(object):
 
     """
-    A Person represents an individual involved in one of more Events
+    A Person represents an individual involved in one or more Events
     within an EventGroup.
     """
 
@@ -1333,7 +1333,7 @@ class PersonEvent(object):
 class Country(object):
 
     """
-    A Country represents a group of people involved together in one of
+    A Country represents a group of people involved together in one or
     more Events within an EventGroup (possibly a conventional national
     team for a country or territory, possibly a B team, possibly a
     container for staff at an event instead of a normal country at
