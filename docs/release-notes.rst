@@ -16,6 +16,19 @@ static site, to update the CSV data files with details of past events
 for any format changes in the new version of matholymp.  After doing
 so, run :command:`mo-static-generate`.
 
+Next version (unreleased)
+-------------------------
+
+* Generated statistics now refer to the number of participating teams,
+  not countries, at an event, reflecting that what is counted is not
+  countries in the matholymp sense (including the special staff
+  country and any countries sending only observers), nor in the sense
+  of common usage (B teams are included, but countries sending only
+  observers are excluded), but those sending nonempty teams.  This
+  includes changes to the CSV column headers in generated CSV files
+  (though not in those that serve as inputs to
+  :command:`mo-static-generate`).
+
 Version 2015.04.0 (5 April 2015)
 --------------------------------
 

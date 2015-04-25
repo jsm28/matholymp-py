@@ -578,7 +578,7 @@ class SiteGenerator(object):
                       self.html_th_scores('Country', rowspan='2'),
                       self.html_th_scores('City', rowspan='2'),
                       self.html_th_scores('Dates', rowspan='2'),
-                      self.html_th_scores('Countries', rowspan='2'),
+                      self.html_th_scores('Teams', rowspan='2'),
                       self.html_th_scores('Contestants',
                                           colspan=awards_colspan)]
         head_row_2 = [self.html_th_scores('All'),
@@ -846,7 +846,7 @@ class SiteGenerator(object):
                 silver_off = ''
                 bronze_off = ''
                 hm_off = ''
-            more_rows = [['Participating countries',
+            more_rows = [['Participating teams',
                           ('%d%s (%s)' %
                            (e.num_countries, part_c_off,
                             self.link_for_event_countries(e, 'list')))],
@@ -1674,7 +1674,7 @@ class SiteGenerator(object):
                             str(e.num_awards['Honourable Mention'])
                     else:
                         csv_out['Honourable Mentions'] = ''
-                csv_out['Number of Countries'] = str(e.num_countries)
+                csv_out['Number of Teams'] = str(e.num_countries)
                 if e.distinguish_official:
                     csv_out[self._cfg['official_adj'] + ' Contestants'] = \
                         str(e.num_contestants_official)
@@ -1688,7 +1688,7 @@ class SiteGenerator(object):
                             ' Honourable Mentions'] = \
                         str(e.num_awards_official['Honourable Mention'])
                     csv_out['Number of ' + self._cfg['official_adj'] +
-                            ' Countries'] = str(e.num_countries_official)
+                            ' Teams'] = str(e.num_countries_official)
             else:
                 csv_out['Contestants'] = ''
                 csv_out['Gold Medals'] = ''
@@ -1696,7 +1696,7 @@ class SiteGenerator(object):
                 csv_out['Bronze Medals'] = ''
                 if self._data.honourable_mentions_available:
                     csv_out['Honourable Mentions'] = ''
-                csv_out['Number of Countries'] = ''
+                csv_out['Number of Teams'] = ''
             if (self._data.distinguish_official and
                 (not e.distinguish_official or not e.num_contestants)):
                 csv_out[self._cfg['official_adj'] + ' Contestants'] = ''
@@ -1706,7 +1706,7 @@ class SiteGenerator(object):
                 csv_out[self._cfg['official_adj'] + ' Honourable Mentions'] = \
                     ''
                 csv_out['Number of ' + self._cfg['official_adj'] +
-                        ' Countries'] = ''
+                        ' Teams'] = ''
             events_data_output.append(csv_out)
         events_columns = ['Number', 'Year', 'Country Number', 'Country',
                           'City', 'Start Date', 'End Date',
@@ -1725,7 +1725,7 @@ class SiteGenerator(object):
                                'Bronze Medals'])
         if self._data.honourable_mentions_available:
             events_columns.extend(['Honourable Mentions'])
-        events_columns.extend(['Number of Countries'])
+        events_columns.extend(['Number of Teams'])
         if self._data.distinguish_official:
             events_columns.extend([self._cfg['official_adj'] + ' Contestants',
                                    self._cfg['official_adj'] + ' Gold Medals',
@@ -1737,7 +1737,7 @@ class SiteGenerator(object):
                 events_columns.extend([self._cfg['official_adj'] +
                                        ' Honourable Mentions'])
             events_columns.extend(['Number of ' + self._cfg['official_adj'] +
-                                   ' Countries'])
+                                   ' Teams'])
         self.write_csv_to_file(self.path_for_data_events(), events_data_output,
                                events_columns)
 
