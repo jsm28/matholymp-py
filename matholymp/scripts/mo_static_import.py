@@ -126,6 +126,9 @@ def main():
             shutil.copyfile(flag_src_filename, flag_dst_filename)
     if event_number is None:
         raise ValueError('no countries in imported data')
+    for c in countries_data:
+        if c[cfg_data['num_key']] == event_number:
+            raise ValueError('data for this event already present')
 
     countries_data.extend(new_countries_data)
     countries_header = [cfg_data['num_key'], 'Country Number', 'Annual URL',
@@ -177,6 +180,9 @@ def main():
             photo_dst_filename = os.path.join(top_directory, *photo_dst_list)
             make_dirs_for_file(photo_dst_filename)
             shutil.copyfile(photo_src_filename, photo_dst_filename)
+    for p in people_data:
+        if p[cfg_data['num_key']] == event_number:
+            raise ValueError('data for this event already present')
 
     people_data.extend(new_people_data)
     for p in people_data:

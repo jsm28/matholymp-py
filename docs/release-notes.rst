@@ -33,6 +33,10 @@ Next version (unreleased)
   specifying the number of the event for which data is to be imported;
   instead, this is determined automatically from the data imported.
 
+* :command:`mo-static-import` has an additional sanity check that data
+  is not already present in the static site for countries or people at
+  the event for which data is being imported.
+
 Version 2015.04.0 (5 April 2015)
 --------------------------------
 
