@@ -29,6 +29,10 @@ Next version (unreleased)
   (though not in those that serve as inputs to
   :command:`mo-static-generate`).
 
+* The :command:`mo-static-import` script no longer takes an argument
+  specifying the number of the event for which data is to be imported;
+  instead, this is determined automatically from the data imported.
+
 Version 2015.04.0 (5 April 2015)
 --------------------------------
 

@@ -30,12 +30,11 @@
 """
 The mo-static-import script imports CSV files and images from the
 registration system to the static site, after an event has finished.
-The first argument is the number of the event for which files are
-being imported; the second argument is the directory with the files to
-import.  This directory should contain files countries.csv, people.csv
-(the file downloaded when not logged in, so only including public
-information) and scores-rss.xml (the final RSS feed of all scores),
-and subdirectories flags and photos from unpacking files flags.zip and
+The argument is the directory with the files to import.  This
+directory should contain files countries.csv, people.csv (the file
+downloaded when not logged in, so only including public information)
+and scores-rss.xml (the final RSS feed of all scores), and
+subdirectories flags and photos from unpacking files flags.zip and
 photos.zip from the registration system.  The data/<event>s.csv file
 needs updating manually to include all relevant data (in particular,
 the number of problems, the maximum marks for each problem and the
@@ -69,12 +68,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--version', action='version',
                         version='%(prog)s '+matholymp.__version__)
-    parser.add_argument('event_number', help='number of event', type=int)
     parser.add_argument('input_directory', help='directory with input data')
     args = vars(parser.parse_args())
 
     top_directory = os.getcwd()
-    event_number = str(args['event_number'])
     input_directory = args['input_directory']
 
     input_countries_csv = os.path.join(input_directory, 'countries.csv')
@@ -88,13 +85,7 @@ def main():
     people_csv = sitegen_people_csv(top_directory, cfg_data)
 
     max_num_problems = 0
-
-    rss_dst_filename = os.path.join(top_directory,
-                                    cfg_data['short_name_url_plural'],
-                                    cfg_data['short_name_url'] + event_number,
-                                    'scoreboard', 'rss.xml')
-    make_dirs_for_file(rss_dst_filename)
-    shutil.copyfile(input_scores_rss, rss_dst_filename)
+    event_number = None
 
     countries_data = read_utf8_csv(countries_csv)
     max_country_index = 0
@@ -106,6 +97,8 @@ def main():
     new_countries_data = read_utf8_csv(input_countries_csv)
     country_index = {}
     for c in new_countries_data:
+        if event_number is None:
+            event_number = c[cfg_data['num_key']]
         if c[cfg_data['num_key']] != event_number:
             raise ValueError('country from wrong event')
         annual_id = c['Country Number']
@@ -131,6 +124,8 @@ def main():
             flag_dst_filename = os.path.join(top_directory, *flag_dst_list)
             make_dirs_for_file(flag_dst_filename)
             shutil.copyfile(flag_src_filename, flag_dst_filename)
+    if event_number is None:
+        raise ValueError('no countries in imported data')
 
     countries_data.extend(new_countries_data)
     countries_header = [cfg_data['num_key'], 'Country Number', 'Annual URL',
@@ -197,3 +192,10 @@ def main():
     people_header.extend([('P%d' % (i + 1)) for i in range(max_num_problems)])
     people_header.extend(['Total', 'Award', 'Extra Awards', 'Photo URL'])
     write_utf8_csv(people_csv, people_data, people_header)
+
+    rss_dst_filename = os.path.join(top_directory,
+                                    cfg_data['short_name_url_plural'],
+                                    cfg_data['short_name_url'] + event_number,
+                                    'scoreboard', 'rss.xml')
+    make_dirs_for_file(rss_dst_filename)
+    shutil.copyfile(input_scores_rss, rss_dst_filename)

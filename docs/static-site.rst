@@ -274,7 +274,7 @@ it as :file:`scores-rss.xml`).  Then:
 
 .. parsed-literal::
 
-   mo-static-import *event-number* *input-directory*
+   mo-static-import *input-directory*
 
 If this is the first event, at this point you should fill in Country
 Number for the host country in :file:`{event}s.csv` before
