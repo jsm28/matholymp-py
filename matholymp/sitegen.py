@@ -1140,6 +1140,13 @@ class SiteGenerator(object):
         else:
             return '%d honourable mentions' % n
 
+    def cum_stat_text(self, nmin, nmax):
+        """Return text for an entry in the cumulative statistics table."""
+        if nmin == nmax:
+            return str(nmin)
+        else:
+            return '%d (max %d)' % (nmin, nmax)
+
     def scoreboard_text(self, e):
         """Return the main text of the scoreboard for one event."""
         text = ''
@@ -1217,14 +1224,19 @@ class SiteGenerator(object):
         head_row_list = [self.html_tr_th_scores_list(head_row)]
         body_row_list = []
         ctot = 0
+        ctot_max = 0
         ctot_official = 0
+        ctot_max_official = 0
         for i in range(e.marks_total, -1, -1):
             this_tot = e.total_stats[i]
             ctot += this_tot
-            row = [str(i), str(this_tot), str(ctot)]
+            ctot_max += e.max_total_stats[i]
+            row = [str(i), str(this_tot), self.cum_stat_text(ctot, ctot_max)]
             if e.distinguish_official:
                 ctot_official += e.total_stats_official[i]
-                row.extend([str(ctot_official)])
+                ctot_max_official += e.max_total_stats_official[i]
+                row.extend([self.cum_stat_text(ctot_official,
+                                               ctot_max_official)])
             body_row_list.append(self.html_tr_td_scores_list(row))
         text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
         text += '\n'

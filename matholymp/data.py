@@ -585,6 +585,36 @@ class Event(object):
         score.
         """)
 
+    def _get_max_total_stats_cond(self, cond):
+        r = [0 for s in range(self.marks_total + 1)]
+        for p in self.contestant_list:
+            if cond(p):
+                r[p.max_total_score] += 1
+        return r
+
+    def _get_max_total_stats(self):
+        return self._get_max_total_stats_cond(lambda p:True)
+
+    max_total_stats = _PropertyCached(
+        'max_total_stats', _get_max_total_stats,
+        """
+        A list giving, for each possible total score, the number of
+        contestants that would receive that total score given the
+        maximum score on each problem without a score entered.
+        """)
+
+    def _get_max_total_stats_official(self):
+        return self._get_max_total_stats_cond(lambda p:p.country.is_official)
+
+    max_total_stats_official = _PropertyCached(
+        'max_total_stats_official', _get_max_total_stats_official,
+        """
+        A list giving, for each possible total score, the number of
+        contestants from official countries that would receive that
+        total score given the maximum score on each problem without a
+        score entered.
+        """)
+
     def _get_total_mean_std_dev(self):
         return mean_std_dev([p.total_score for p in self.contestant_list])
 
@@ -1172,6 +1202,23 @@ class PersonEvent(object):
     total_score = _PropertyCached(
         'total_score', _get_total_score,
         """The total score of this contestant at this event.""")
+
+    def _get_max_total_score(self):
+        assert self.is_contestant
+        t = 0
+        for n in range(self.event.num_problems):
+            if self.problem_scores[n] is None:
+                t += self.event.marks_per_problem[n]
+            else:
+                t += self.problem_scores[n]
+        return t
+
+    max_total_score = _PropertyCached(
+        'max_total_score', _get_max_total_score,
+        """
+        The maximum possible total score of this contestant at this
+        event.
+        """)
 
     def _get_award(self):
         assert self.is_contestant

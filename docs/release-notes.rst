@@ -37,6 +37,12 @@ Next version (unreleased)
   is not already present in the static site for countries or people at
   the event for which data is being imported.
 
+* When scores are incomplete, the live scoreboard's cumulative
+  statistics on scores show the maximum number of contestants who
+  might have at least a given score after their scores are complete,
+  as well as the number who have at least that score based on the
+  scores entered so far.
+
 Version 2015.04.0 (5 April 2015)
 --------------------------------
 
