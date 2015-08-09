@@ -137,10 +137,11 @@ def init_data(env):
     for r in extra_admin_roles_secondaryok:
         matholymprole.create(name=r, isadmin=True, secondaryok=True)
 
-    # Create two genders.
+    # Create three genders.
     gender = db.getclass('gender')
     gender.create(name='Female')
     gender.create(name='Male')
+    gender.create(name='Other')
 
     # Create T-shirt sizes.
     tshirt = db.getclass('tshirt')

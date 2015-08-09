@@ -43,6 +43,9 @@ Next version (unreleased)
   as well as the number who have at least that score based on the
   scores entered so far.
 
+* The default set of choices for gender in the registration system now
+  includes "Other".
+
 Version 2015.04.0 (5 April 2015)
 --------------------------------
 
