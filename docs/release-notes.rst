@@ -46,6 +46,10 @@ Next version (unreleased)
 * The default set of choices for gender in the registration system now
   includes "Other".
 
+* :file:`country.item.html` no longer refers to accounts being created
+  automatically only if the specified email address is not used by any
+  other country.  (That restriction was removed in version 2015.01.0.)
+
 Version 2015.04.0 (5 April 2015)
 --------------------------------
 
