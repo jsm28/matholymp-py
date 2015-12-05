@@ -10,7 +10,7 @@ Matholymp is free software, written in `Python
 Public License, version 3 <https://www.gnu.org/licenses/gpl.html>`_.
 
 Matholymp is written and maintained by `Joseph Myers
-<http://www.polyomino.org.uk/>`_.  It was originally developed for the
+<https://www.polyomino.org.uk/>`_.  It was originally developed for the
 `European Girls' Mathematical Olympiad <https://www.egmo.org/>`_.  The
 following events are known to use matholymp; please let me know if
 you're using it for your event and I'll add it to the list.
