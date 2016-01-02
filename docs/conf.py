@@ -49,7 +49,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'matholymp'
-copyright = u'2014-2015, Joseph Samuel Myers'
+copyright = u'2014-2016, Joseph Samuel Myers'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
