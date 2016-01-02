@@ -57,6 +57,7 @@
 from matholymp.roundupreg.rounduputil import distinguish_official, \
     get_none_country_name, get_none_country, get_staff_country_name, \
     get_staff_country
+from matholymp.roundupreg.staticsite import static_site_event_group
 
 __all__ = ['init_data']
 
@@ -154,10 +155,25 @@ def init_data(env):
 
     # Create languages previously used.
     initial_languages = db.config.ext['MATHOLYMP_INITIAL_LANGUAGES'].split(',')
-    initial_languages = [lang.strip() for lang in initial_languages]
-    initial_languages = [lang for lang in initial_languages if lang != '']
-    language = db.getclass('language')
+    lang_set = set()
     for lang in initial_languages:
+        lang = lang.strip()
+        if lang == '':
+            pass
+        elif lang.startswith('-'):
+            lang_set.remove(lang[1:])
+        elif lang == 'PREVIOUS':
+            sdata = static_site_event_group(db)
+            if not sdata:
+                raise ValueError('PREVIOUS languages specified without'
+                                 ' static site data')
+            for e in sdata.event_list:
+                for p in e.paper_list:
+                    lang_set.add(p.language)
+        else:
+            lang_set.add(lang)
+    language = db.getclass('language')
+    for lang in sorted(lang_set):
         language.create(name=lang)
 
     # Arrival/departure points must be created using the web interface.

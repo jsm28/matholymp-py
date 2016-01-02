@@ -50,6 +50,16 @@ Next version (unreleased)
   automatically only if the specified email address is not used by any
   other country.  (That restriction was removed in version 2015.01.0.)
 
+* When the registration system is initialised, if
+  ``matholymp_initial_languages`` in :file:`extensions/config.ini`
+  includes the special language name ``PREVIOUS``, then all languages
+  of papers at previous events will automatically be added to the
+  registration system; this requires
+  ``matholymp_static_site_directory`` to point to the static site data
+  for previous events.  To exclude some previous languages while
+  including others automatically, languages starting with ``-`` may be
+  listed after ``PREVIOUS`` (for example, ``PREVIOUS, -Latin``).
+
 Version 2015.04.0 (5 April 2015)
 --------------------------------
 
