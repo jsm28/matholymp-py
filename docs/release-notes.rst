@@ -16,6 +16,22 @@ static site, to update the CSV data files with details of past events
 for any format changes in the new version of matholymp.  After doing
 so, run :command:`mo-static-generate`.
 
+Next version (unreleased)
+-------------------------
+
+* Static site generation now supports a person with roles for more
+  than one country at an event.  (This is only intended for cases
+  where someone has a role, such as Leader or Deputy Leader, for more
+  than one non-staff country, such as A and B teams for the host
+  country.  If someone has both non-staff and staff roles, such as
+  being both a Leader and on the organising committee, this should be
+  represented by listing other roles under the non-staff
+  participation.)  In the registration system, this should be
+  represented by separately registered entries for each country, with
+  the same URL for past participation listed; it is not currently
+  possible to register a new participant this way without multiple
+  records being created for them by :command:`mo-static-import`.
+
 Version 2016.01.0 (2 January 2016)
 ----------------------------------
 

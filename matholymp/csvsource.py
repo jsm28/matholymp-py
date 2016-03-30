@@ -99,10 +99,14 @@ class CSVDataSource(DataSource):
         for p in people:
             eid = int(p[cfg['num_key']])
             pid = int(p['Person Number'])
+            cid = int(p['Country Number'])
             self._person_ids.add(pid)
-            if pid in self._people[eid]:
-                raise ValueError('duplicate event %d person %d' % (eid, pid))
-            self._people[eid][pid] = p
+            if pid not in self._people[eid]:
+                self._people[eid][pid] = {}
+            if cid in self._people[eid][pid]:
+                raise ValueError('duplicate event %d country %d person %d' %
+                                 (eid, cid, pid))
+            self._people[eid][pid][cid] = p
 
     def event_group_get_attr(self, name):
         if name in ('short_name', 'short_name_plural', 'long_name',
@@ -211,33 +215,36 @@ class CSVDataSource(DataSource):
                                    'departure_time': 'Departure Time',
                                    'departure_flight': 'Departure FLight' }
 
-    _person_event_attr_map_int = { '_country_id': 'Country Number',
-                                   'contestant_age': 'Contestant Age',
+    _person_event_attr_map_int = { 'contestant_age': 'Contestant Age',
                                    'total_score': 'Total',
                                    'generic_id': 'Generic Number' }
 
-    def person_event_get_attr(self, person_id, event_id, name):
+    def person_event_get_attr(self, person_id, country_id, event_id, name):
+        if name == '_country_ids':
+            assert country_id is None
+            return list(self._people[event_id][person_id].keys())
+        assert country_id is not None
         if name in CSVDataSource._person_event_attr_map_str:
             k = CSVDataSource._person_event_attr_map_str[name]
-            s = self._people[event_id][person_id][k]
+            s = self._people[event_id][person_id][country_id][k]
             if s == '':
                 s = None
             return s
         if name in CSVDataSource._person_event_attr_map_int:
             k = CSVDataSource._person_event_attr_map_int[name]
-            s = self._people[event_id][person_id][k]
+            s = self._people[event_id][person_id][country_id][k]
             if s == '':
                 return None
             else:
                 return int(s)
         if name == 'other_roles':
-            s = self._people[event_id][person_id]['Other Roles']
+            s = self._people[event_id][person_id][country_id]['Other Roles']
             return comma_split(s)
         if name == 'extra_awards':
-            s = self._people[event_id][person_id]['Extra Awards']
+            s = self._people[event_id][person_id][country_id]['Extra Awards']
             return comma_split(s)
         if name == '_guide_for_ids':
-            s = self._people[event_id][person_id]['Guide For']
+            s = self._people[event_id][person_id][country_id]['Guide For']
             cnames = comma_split(s)
             r = []
             ce = self._countries[event_id].values()
@@ -250,7 +257,7 @@ class CSVDataSource(DataSource):
         if name == 'problem_scores':
             r = []
             for n in range(int(self._events[event_id]['Number of Problems'])):
-                s = self._people[event_id][person_id]['P%d' % (n+1)]
+                s = self._people[event_id][person_id][country_id]['P%d' % (n+1)]
                 if s == '':
                     s = None
                 else:
@@ -259,7 +266,7 @@ class CSVDataSource(DataSource):
             return r
         raise KeyError(name)
 
-    def person_event_have_attr(self, person_id, event_id, name):
+    def person_event_have_attr(self, person_id, country_id, event_id, name):
         return True
 
     _country_event_attr_map_str = { 'annual_url': 'Annual URL',

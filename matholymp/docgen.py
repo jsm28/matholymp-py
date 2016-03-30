@@ -181,7 +181,10 @@ class DocumentGenerator(object):
         elif id in self._event.contestant_map:
             return self._event.contestant_map[id]
         elif id_numeric and int(id) in self._event.person_map:
-            return self._event.person_map[int(id)]
+            p = self._event.person_map[int(id)]
+            if len(p) != 1:
+                raise ValueError('Person %s present more than once')
+            return p[0]
         else:
             raise ValueError('Person %s not found' % id)
 

@@ -103,20 +103,23 @@ class DataSource(object):
         """
         return False
 
-    def person_event_get_attr(self, person_id, event_id, name):
+    def person_event_get_attr(self, person_id, country_id, event_id, name):
         """
-        Return the value of an attribute for a PersonEvent.  Possible
-        names are: _country_id, annual_url, primary_role, other_roles,
-        _guide_for_ids, contestant_age, given_name, family_name,
-        problem_scores, total_score, award, extra_awards, photo_url,
-        first_language, second_language, diet, room_number,
-        phone_number, generic_id, gender, date_of_birth, tshirt,
-        arrival_place, arrival_time, arrival_flight, departure_place,
-        departure_time, departure_flight.
+        Return the value of an attribute for a PersonEvent (when
+        country_id is not None), or a list of ids for countries with
+        PersonEvents for that Person at that Event (when country_id is
+        None).  Possible names are: _country_ids, annual_url,
+        primary_role, other_roles, _guide_for_ids, contestant_age,
+        given_name, family_name, problem_scores, total_score, award,
+        extra_awards, photo_url, first_language, second_language,
+        diet, room_number, phone_number, generic_id, gender,
+        date_of_birth, tshirt, arrival_place, arrival_time,
+        arrival_flight, departure_place, departure_time,
+        departure_flight.
         """
         raise NotImplementedError
 
-    def person_event_have_attr(self, person_id, event_id, name):
+    def person_event_have_attr(self, person_id, country_id, event_id, name):
         """
         Return whether this DataSource provides a value of an
         attribute for a PersonEvent, or whether it should be computed

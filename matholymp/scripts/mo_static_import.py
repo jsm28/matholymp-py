@@ -152,6 +152,7 @@ def main():
             i += 1
 
     new_people_data = read_utf8_csv(input_people_csv)
+    people_num_photos = {}
     for p in new_people_data:
         if p[cfg_data['num_key']] != event_number:
             raise ValueError('person from wrong event')
@@ -173,7 +174,13 @@ def main():
             photo_ext = photo_ext.lower()
             if photo_ext == 'jpeg':
                 photo_ext = 'jpg'
-            photo_dst = 'photo' + event_number + '.' + photo_ext
+            photo_extra = ''
+            if person_number in people_num_photos:
+                people_num_photos[person_number] += 1
+                photo_extra = '-%d' % people_num_photos[person_number]
+            else:
+                people_num_photos[person_number] = 1
+            photo_dst = 'photo' + event_number + photo_extra + '.' + photo_ext
             photo_dst_list = ['people', 'person' + person_number,
                               photo_dst]
             p['Photo URL'] = cfg_data['url_base'] + '/'.join(photo_dst_list)

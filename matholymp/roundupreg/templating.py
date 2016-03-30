@@ -96,6 +96,8 @@ def person_scores_table(db, person):
     """Show the table of scores for a person on that person's page."""
     sitegen = RoundupSiteGenerator(db)
     p = sitegen.event.person_map[int(person)]
+    assert len(p) == 1
+    p = p[0]
     return sitegen.person_event_scores_table(p, show_rank=False,
                                              show_code=False, show_name=False)
 

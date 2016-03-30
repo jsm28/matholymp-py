@@ -339,7 +339,9 @@ class Event(object):
         self._cache = {}
         self.person_map = _LazyMap(self._person_id_test,
                                    self._person_id_get, self._person_id_list)
-        """A mapping from the id of a person to the PersonEvent object."""
+        """
+        A mapping from the id of a person to a list of PersonEvent objects.
+        """
         self.country_map = _LazyMap(self._country_id_test,
                                     self._country_id_get,
                                     self._country_id_list)
@@ -676,7 +678,7 @@ class Event(object):
         """A list of ids for all people at this event.""")
 
     def _get_person_list(self):
-        return list(self.person_map.values())
+        return [pe for pl in self.person_map.values() for pe in pl]
 
     person_list = _PropertyCached(
         'person_list', _get_person_list,
@@ -686,7 +688,11 @@ class Event(object):
         return self.event_group._ds.person_event_exists(id, self.id)
 
     def _person_id_get(self, id):
-        return PersonEvent(self.event_group.person_map[id], self)
+        ds = self.event_group._ds
+        return [PersonEvent(self.event_group.person_map[id],
+                            self.country_map[cid], self)
+                for cid in ds.person_event_get_attr(id, None, self.id,
+                                                    '_country_ids')]
 
     def _person_id_list(self):
         return self._person_ids
@@ -962,13 +968,18 @@ class Person(object):
         self._cache = {}
 
     def _get_participation_list(self):
-        return [e.person_map[self.id] for e in self.event_group.event_list
-                if self.id in e.person_map]
+        l = [e.person_map[self.id] for e in self.event_group.event_list
+             if self.id in e.person_map]
+        l = [p for pl in l for p in pl]
+        l = sorted(l, key=lambda p:p.sort_key)
+        return l
 
     participation_list = _PropertyCached(
         'participation_list', _get_participation_list,
         """
-        A list of PersonEvent objects for this person, in chronological order.
+        A list of PersonEvent objects for this person, in
+        chronological order; sorted by the sort key for the
+        PersonEvent, for multiple objects at the same Event.
         """)
 
     def _get_contestant_list(self):
@@ -1079,7 +1090,9 @@ class _PersonEventPropertyDS(_PropertyCached):
     def __init__(self, name, doc):
         def ds_get(obj):
             ds = obj.person.event_group._ds
-            return ds.person_event_get_attr(obj.person.id, obj.event.id,
+            return ds.person_event_get_attr(obj.person.id,
+                                            obj.country.country.id,
+                                            obj.event.id,
                                             name)
         super(_PersonEventPropertyDS, self).__init__(name, ds_get, doc)
 
@@ -1087,33 +1100,31 @@ class PersonEvent(object):
 
     """
     A PersonEvent represents the participation of a Person in a
-    particular Event.
+    particular Event for a particular Country.  Normally, a Person
+    participates in an Event for only one Country; if they have staff
+    and non-staff roles (e.g. being a Leader and also being on the
+    organising committee), the staff roles are listed as other roles
+    for the person under the non-staff country.  However, if someone
+    has no staff roles but non-staff roles (Leader, Deputy Leader or
+    Observer) for more than one Country (e.g., A and B teams from the
+    same country), they have multiple PersonEvents at the same Event.
     """
 
-    def __init__(self, person, event):
+    def __init__(self, person, country, event):
         """
-        Initialise a PersonEvent from the given Person and Event.
-        Normally users should access attributes that implicitly create
-        PersonEvent objects rather than constructing PersonEvent
-        objects directly.
+        Initialise a PersonEvent from the given Person, CountryEvent
+        and Event.  Normally users should access attributes that
+        implicitly create PersonEvent objects rather than constructing
+        PersonEvent objects directly.
         """
         self.person = person
         """The Person object for this PersonEvent."""
+        self.country = country
+        """The CountryEvent object for this PersonEvent."""
         self.event = event
         """The Event object for this PersonEvent."""
         assert person.event_group is event.event_group
         self._cache = {}
-
-    _country_id = _PersonEventPropertyDS(
-        '_country_id',
-        """The id of this person's country.""")
-
-    def _get_country(self):
-        return self.event.country_map[self._country_id]
-
-    country = _PropertyCached(
-        'country', _get_country,
-        """The country (CountryEvent object) of this person.""")
 
     annual_url = _PersonEventPropertyDS(
         'annual_url',
@@ -1191,9 +1202,11 @@ class PersonEvent(object):
         assert self.is_contestant
         t = sum([s for s in self.problem_scores if s is not None])
         ds = self.person.event_group._ds
-        if ds.person_event_have_attr(self.person.id, self.event.id,
-                                     'total_score'):
-            expt = ds.person_event_get_attr(self.person.id, self.event.id,
+        if ds.person_event_have_attr(self.person.id, self.country.country.id,
+                                     self.event.id, 'total_score'):
+            expt = ds.person_event_get_attr(self.person.id,
+                                            self.country.country.id,
+                                            self.event.id,
                                             'total_score')
             if t != expt:
                 raise ValueError('total score not as expected')
@@ -1238,8 +1251,11 @@ class PersonEvent(object):
         else:
             a = None
         ds = self.person.event_group._ds
-        if ds.person_event_have_attr(self.person.id, self.event.id, 'award'):
-            expa = ds.person_event_get_attr(self.person.id, self.event.id,
+        if ds.person_event_have_attr(self.person.id, self.country.country.id,
+                                     self.event.id, 'award'):
+            expa = ds.person_event_get_attr(self.person.id,
+                                            self.country.country.id,
+                                            self.event.id,
                                             'award')
             if a != expa:
                 raise ValueError('award not as expected')
@@ -1361,6 +1377,7 @@ class PersonEvent(object):
                 coll_get_sort_key(self.primary_role),
                 coll_get_sort_key(self.family_name),
                 coll_get_sort_key(self.given_name),
+                self.country.country.id,
                 self.person.id)
 
     sort_key = _PropertyCached(
@@ -1566,7 +1583,8 @@ class CountryEvent(object):
                                       '_person_ids'):
             ids = ds.country_event_get_attr(self.country.id, self.event.id,
                                             '_person_ids')
-            return [self.event.person_map[id] for id in ids]
+            return [p for id in ids for p in self.event.person_map[id]
+                    if p.country.country.id == self.country.id]
         else:
             return [p for p in self.event.person_list if self is p.country]
 
@@ -1600,7 +1618,11 @@ class CountryEvent(object):
                                       '_guide_ids'):
             ids = ds.country_event_get_attr(self.country.id, self.event.id,
                                             '_guide_ids')
-            return [self.event.person_map[id] for id in ids]
+            l = [self.event.person_map[id] for id in ids]
+            for pl in l:
+                if len(pl) != 1:
+                    raise ValueError('Guide present more than once at Event')
+            return [p for pl in l for p in pl]
         else:
             return [p for p in self.event.person_list if self in p.guide_for]
 

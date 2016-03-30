@@ -136,11 +136,13 @@ class RoundupDataSource(DataSource):
                     if c != self._none_country]
         raise KeyError(name)
 
-    def person_event_get_attr(self, person_id, event_id, name):
+    def person_event_get_attr(self, person_id, country_id, event_id, name):
         id = str(person_id)
-        if name == '_country_id':
-            return int(self._db.person.get(id, 'country'))
-        elif name == 'annual_url':
+        if name == '_country_ids':
+            assert country_id is None
+            return [int(self._db.person.get(id, 'country'))]
+        assert country_id is not None
+        if name == 'annual_url':
             return self._db.config.TRACKER_WEB + 'person' + id
         elif name == 'primary_role':
             primary_role = self._db.person.get(id, 'primary_role')
