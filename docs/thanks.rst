@@ -26,6 +26,8 @@ limited to:
 
 * Vesna Kadelburg
 
+* Viviane Kehl
+
 * Azer Kerimov
 
 * Mikita Lappo
