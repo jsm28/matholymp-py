@@ -39,6 +39,12 @@ Next version (unreleased)
   :command:`pdflatex`.  (If both PDF and LaTeX versions are present,
   the PDF version will be used, as before.)
 
+* :command:`mo-document-generate` can now be used with arguments
+  ``paper new-drafts`` to generate draft papers to display only for
+  translations that are new or modified since the previous call with
+  those arguments.  Previously the user needed to keep track of which
+  new or revised papers needed drafts generating.
+
 Version 2016.01.0 (2 January 2016)
 ----------------------------------
 

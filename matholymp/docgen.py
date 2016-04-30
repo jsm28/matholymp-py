@@ -95,6 +95,8 @@ class DocumentGenerator(object):
         self._cache_dir = os.path.join(out_dir, 'cache')
         self._cache_papers_tex_dir = os.path.join(self._cache_dir,
                                                   'papers-tex')
+        self._cache_drafts_src_dir = os.path.join(self._cache_dir,
+                                                  'drafts-src')
         self._langs_num_pages = {}
 
     def text_to_latex(self, text):
@@ -507,6 +509,28 @@ class DocumentGenerator(object):
         shutil.copyfile(papers_dir_tex_name, cache_tex_name)
         return cache_pdf_name
 
+    def new_paper(self, lang_filename_day):
+        """
+        If a version of the paper for the given language and day is
+        available, and has not yet had a draft generated for it,
+        return a tuple of the source filename and the filename to use
+        for a cached copy; otherwise, return (None, None).
+        """
+        pdf_file_name = lang_filename_day + '.pdf'
+        tex_file_name = lang_filename_day + '.tex'
+        src_pdf_name = os.path.join(self._problems_dir, pdf_file_name)
+        src_tex_name = os.path.join(self._problems_dir, tex_file_name)
+        dst_name = os.path.join(self._cache_drafts_src_dir, lang_filename_day)
+        if os.access(src_pdf_name, os.F_OK):
+            src_name = src_pdf_name
+        elif os.access(src_tex_name, os.F_OK):
+            src_name = src_tex_name
+        else:
+            return (None, None)
+        if os.access(dst_name, os.F_OK) and filecmp.cmp(src_name, dst_name):
+            return (None, None)
+        return (src_name, dst_name)
+
     def one_paper_latex(self, lang_filename, lang, day, desc, code):
         """Generate the LaTeX fragment for a single paper."""
         if day:
@@ -571,6 +595,7 @@ class DocumentGenerator(object):
         for lang in all_languages:
             lang_filenames[lang_to_filename(lang)] = lang
 
+        new_drafts_only = False
         if id == 'all':
             contestants = self._event.contestant_list
             contestants = sorted(contestants, key=lambda x:x.sort_key_exams)
@@ -581,6 +606,12 @@ class DocumentGenerator(object):
             languages = all_languages
             paper_draft = ''
             draft_text = ''
+        elif id == 'new-drafts':
+            contestants = []
+            languages = all_languages
+            new_drafts_only = True
+            paper_draft = 'Draft'
+            draft_text = '-draft'
         elif id in lang_filenames:
             contestants = []
             languages = [lang_filenames[id]]
@@ -605,15 +636,28 @@ class DocumentGenerator(object):
                     bg_text = ''
                 for lang in languages:
                     lang_filename = lang_to_filename(lang)
-                    output_file_base = ('paper' + day_text + draft_text +
-                                        bg_text + '-' + lang_filename)
-                    paper_text = self.one_paper_latex(lang_filename, lang, d,
-                                                      paper_draft, '')
-                    paper_list.append(paper_text)
-                    template_fields['papers'] = paper_text
-                    self.subst_and_pdflatex(template_file_base,
-                                       output_file_base, template_fields,
-                                       raw_fields)
+                    do_this_paper = True
+                    new_paper_src = None
+                    new_paper_dst = None
+                    if new_drafts_only:
+                        new_paper = self.new_paper(lang_filename + day_text)
+                        new_paper_src = new_paper[0]
+                        new_paper_dst = new_paper[1]
+                        if new_paper_src is None:
+                            do_this_paper = False
+                    if do_this_paper:
+                        output_file_base = ('paper' + day_text + draft_text +
+                                            bg_text + '-' + lang_filename)
+                        paper_text = self.one_paper_latex(lang_filename, lang,
+                                                          d, paper_draft, '')
+                        paper_list.append(paper_text)
+                        template_fields['papers'] = paper_text
+                        self.subst_and_pdflatex(template_file_base,
+                                                output_file_base,
+                                                template_fields, raw_fields)
+                        if new_paper_src is not None:
+                            make_dirs_for_file(new_paper_dst)
+                            shutil.copyfile(new_paper_src, new_paper_dst)
                 if id == 'all-languages':
                     output_file_base = ('paper' + day_text + draft_text +
                                         bg_text + '-All')

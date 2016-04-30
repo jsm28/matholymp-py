@@ -125,8 +125,15 @@ margins are correct and again get a matching PDF file.  Given the
 appropriately-named LaTeX sources or PDFs of papers from leaders,
 there are then several documents that can be generated.
 
-For draft papers to display (add :samp:`--day {day}` to generate these
-only for a particular day; the language name is as used in filenames):
+For draft papers to display::
+
+   mo-document-generate paper new-drafts
+
+That will generate draft papers for all translations that are new or
+modified since the previous run (if any) of that command.  To generate
+drafts instead for a specific language (add :samp:`--day {day}` to
+generate these only for a particular day; the language name is as used
+in filenames):
 
 .. parsed-literal::
 

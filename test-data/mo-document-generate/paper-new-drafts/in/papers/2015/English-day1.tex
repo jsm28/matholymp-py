@@ -1,0 +1,69 @@
+% XMO 2015, Day 1 (1 April 2015).
+%
+% Change the parts of this document marked CHANGE or TRANSLATE and
+% convert it to PDF using pdflatex.  Do not change the paper size, the
+% margins, the header or the footer.  Ensure the output paper size is
+% A4 (not letter) and that all fonts are embedded in the PDF file.
+%
+\documentclass[a4paper,11pt]{article}
+\usepackage[a4paper,left=2cm,right=2cm,bottom=1.5cm,top=7.5cm]{geometry}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{enumerate}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+%
+% CHANGE this if you are unable to use UTF-8 input encoding.
+\usepackage[utf8]{inputenc}
+%
+% CHANGE the options here as needed for your language, and add any
+% other packages needed.
+\usepackage[english]{babel}
+%
+% TRANSLATE the word ``Problem'' into your own language.
+\newcommand{\xmoproblemword}{Problem}
+%
+% CHANGE ``English'' to the English name of your own language.
+\newcommand{\xmolanguagename}{English}
+%
+% TRANSLATE this instruction into your own language.
+\newcommand{\xmotime}{Time: 4 hours and 30 minutes}
+%
+% TRANSLATE this information into your own language.
+\newcommand{\xmomarks}{Each problem is worth 7 points}
+%
+% TRANSLATE this date into your own language.
+\newcommand{\xmodate}{Wednesday, April 1, 2015}
+%
+\pagestyle{empty}
+\newenvironment{xmoproblem}[1]{\paragraph*{\xmoproblemword{} #1.}}{}
+\newenvironment{xmopaper}{
+\begin{flushright}
+\textit{\xmodate}
+\end{flushright}
+}{
+\vfill
+\begin{flushright}
+Language: \xmolanguagename\hfill\xmotime \\
+\xmomarks
+\end{flushright}
+}
+\begin{document}
+\begin{xmopaper}
+%
+% TRANSLATE the three problems into your own language.
+%
+\begin{xmoproblem}{1}
+Prove Fermat's Last Theorem.
+\end{xmoproblem}
+
+\begin{xmoproblem}{2}
+Prove the Riemann Hypothesis.
+\end{xmoproblem}
+
+\begin{xmoproblem}{3}
+Prove the Goldbach Conjecture.
+\end{xmoproblem}
+
+\end{xmopaper}
+\end{document} 
