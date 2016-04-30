@@ -32,6 +32,13 @@ Next version (unreleased)
   possible to register a new participant this way without multiple
   records being created for them by :command:`mo-static-import`.
 
+* When papers are generated with :command:`mo-document-generate`, the
+  directory with papers received from leaders may contain only the
+  LaTeX sources of a paper without a corresponding PDF version, in
+  which case the PDF version is generated automatically with
+  :command:`pdflatex`.  (If both PDF and LaTeX versions are present,
+  the PDF version will be used, as before.)
+
 Version 2016.01.0 (2 January 2016)
 ----------------------------------
 

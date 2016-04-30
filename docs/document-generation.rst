@@ -18,9 +18,9 @@ containing:
 * A subdirectory :file:`templates/` with various LaTeX templates for
   documents and PDF backgrounds and logos.
 
-* A subdirectory :file:`papers/{year}/` containing PDFs of exam papers
-  (from leaders, before headings and backgrounds are added by the
-  script).
+* A subdirectory :file:`papers/{year}/` containing LaTeX sources or
+  PDFs of exam papers (from leaders, before headings and backgrounds
+  are added by the script).
 
 * A subdirectory :file:`data/` containing data from the registration
   system: :file:`countries.csv`, :file:`people.csv` (the full CSV file
@@ -112,13 +112,18 @@ margins.  Collect translations and put them in the
 :file:`English-day1.pdf` (or just :file:`English.pdf` for a single-day
 competition); in the filename, all characters that are not ASCII
 letters are omitted from the language name (so a paper for "French
-(Swiss)" would be :file:`FrenchSwiss-day1.pdf`, for example).  If a
-LaTeX file is provided, ensure that you generate a matching PDF or get
-one from the leader (watch out for a PDF being out of date with
-respect to the LaTeX file).  If a leader wishes to use Word, make sure
-that the page margins are correct and again get a matching PDF file.
-Given the appropriately-named PDFs of papers from leaders, there are
-then several documents that can be generated.
+(Swiss)" would be :file:`FrenchSwiss-day1.pdf`, for example).  If the
+paper is produced using LaTeX, only the file with a name such as
+:file:`English-day1.tex` needs to go in that directory;
+:command:`mo-document-generate` will run :command:`pdflatex` on such a
+file automatically (the generated PDF will go in the :file:`out/`
+directory, and be updated automatically if the LaTeX source changes).
+If both the PDF and LaTeX source are present, only the PDF will be
+used, so watch out for a PDF being out of date with respect to the
+LaTeX file.  If a leader wishes to use Word, make sure that the page
+margins are correct and again get a matching PDF file.  Given the
+appropriately-named LaTeX sources or PDFs of papers from leaders,
+there are then several documents that can be generated.
 
 For draft papers to display (add :samp:`--day {day}` to generate these
 only for a particular day; the language name is as used in filenames):

@@ -32,9 +32,11 @@ This module provides the DocumentGenerator class that can be used to
 generate various documents from registration system data.
 """
 
+import filecmp
 import os
 import os.path
 import re
+import shutil
 import subprocess
 
 try:
@@ -43,8 +45,8 @@ except ImportError:
     from pyPdf import PdfFileReader
 
 from matholymp.collate import coll_get_sort_key
-from matholymp.fileutil import read_utf8_csv, write_text_to_file, \
-    read_text_from_file, read_config, remove_if_exists
+from matholymp.fileutil import read_utf8_csv, make_dirs_for_file, \
+    write_text_to_file, read_text_from_file, read_config, remove_if_exists
 from matholymp.regdata import file_url_to_local, lang_to_filename
 
 __all__ = ['read_docgen_config', 'DocumentGenerator']
@@ -90,6 +92,9 @@ class DocumentGenerator(object):
         self._problems_dir = problems_dir
         self._data_dir = data_dir
         self._out_dir = out_dir
+        self._cache_dir = os.path.join(out_dir, 'cache')
+        self._cache_papers_tex_dir = os.path.join(self._cache_dir,
+                                                  'papers-tex')
         self._langs_num_pages = {}
 
     def text_to_latex(self, text):
@@ -471,6 +476,37 @@ class DocumentGenerator(object):
         self.subst_and_pdflatex(template_file_base, output_file_base,
                                 template_fields, raw_fields)
 
+    def get_paper_pdf(self, lang_filename_day):
+        """
+        Return the filename for the PDF version of a paper, generating
+        it first if necessary.
+        """
+        pdf_file_name = lang_filename_day + '.pdf'
+        tex_file_name = lang_filename_day + '.tex'
+        papers_dir_pdf_name = os.path.join(self._problems_dir, pdf_file_name)
+        papers_dir_tex_name = os.path.join(self._problems_dir, tex_file_name)
+        cache_pdf_name = os.path.join(self._out_dir, pdf_file_name)
+        cache_tex_name = os.path.join(self._cache_papers_tex_dir,
+                                      tex_file_name)
+        if os.access(papers_dir_pdf_name, os.F_OK):
+            remove_if_exists(cache_pdf_name)
+            remove_if_exists(cache_tex_name)
+            return papers_dir_pdf_name
+        if not os.access(papers_dir_tex_name, os.F_OK):
+            raise IOError('PDF or TeX for %s not found' % lang_filename_day)
+        if (os.access(cache_tex_name, os.F_OK) and
+            os.access(cache_pdf_name, os.F_OK) and
+            filecmp.cmp(papers_dir_tex_name, cache_tex_name)):
+            return cache_pdf_name
+        remove_if_exists(cache_pdf_name)
+        remove_if_exists(cache_tex_name)
+        make_dirs_for_file(cache_pdf_name)
+        self.pdflatex_file(tex_file_name)
+        self.pdflatex_cleanup(os.path.join(self._out_dir, lang_filename_day))
+        make_dirs_for_file(cache_tex_name)
+        shutil.copyfile(papers_dir_tex_name, cache_tex_name)
+        return cache_pdf_name
+
     def one_paper_latex(self, lang_filename, lang, day, desc, code):
         """Generate the LaTeX fragment for a single paper."""
         if day:
@@ -478,9 +514,7 @@ class DocumentGenerator(object):
         else:
             lang_filename_day = lang_filename
         if lang_filename_day not in self._langs_num_pages:
-            pdf_file = open(os.path.join(self._problems_dir,
-                                         lang_filename_day + '.pdf'),
-                            'rb')
+            pdf_file = open(self.get_paper_pdf(lang_filename_day), 'rb')
             r = PdfFileReader(pdf_file)
             self._langs_num_pages[lang_filename_day] = r.getNumPages()
             pdf_file.close()

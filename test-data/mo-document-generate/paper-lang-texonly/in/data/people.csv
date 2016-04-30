@@ -1,0 +1,11 @@
+﻿XMO Number,Country Number,Person Number,Annual URL,Country Name,Country Code,Primary Role,Other Roles,Guide For,Contestant Code,Contestant Age,Given Name,Family Name,P1,P2,P3,P4,P5,P6,Total,Award,Extra Awards,Photo URL,Generic Number,Gender,Date of Birth,First Language,Second Language,Dietary Requirements,T-Shirt Size,Arrival Place,Arrival Time,Arrival Flight,Departure Place,Departure Time,Departure Flight,Room Number,Phone Number
+2,3,3,https://www.example.org/registration/2015/person3,Test Country One,BCD,Contestant 1,,,BCD1,15,A,Contestant,,,,,,,0,,,,,Female,2000-01-01,English,German,,M,,,,,,,,
+2,3,4,https://www.example.org/registration/2015/person4,Test Country One,BCD,Contestant 2,,,BCD2,14,Next,Contestant,,,,,,,0,,,,,Female,2001-01-01,French,,,M,,,,,,,,
+2,3,5,https://www.example.org/registration/2015/person5,Test Country One,BCD,Leader,,,,,The,Leader,,,,,,,,,,,,Female,,English,,,M,,,,,,,,
+2,4,6,https://www.example.org/registration/2015/person6,Next Test Country,CDE,Contestant 1,,,CDE1,16,Further,Contestant,,,,,,,0,,,,,Female,1999-01-01,Russian,,,M,,,,,,,,
+2,4,7,https://www.example.org/registration/2015/person7,Next Test Country,CDE,Leader,,,,,Further,Leader,,,,,,,,,,,,Female,,German,,,M,,,,,,,,
+2,6,10,https://www.example.org/registration/2015/person10,Fourth Country,FOU,Contestant 1,,,FOU1,18,Fourth,Contestant,,,,,,,0,,,,,Female,1997-01-01,English,,,M,,,,,,,,
+2,5,9,https://www.example.org/registration/2015/person9,Unguided Country,UNG,Contestant 1,,,UNG1,17,Latest,Contestant,,,,,,,0,,,,,Female,1998-01-01,English,,,M,,,,,,,,
+2,5,8,https://www.example.org/registration/2015/person8,Unguided Country,UNG,Observer with Leader,,,,,New,Observer,,,,,,,,,,,,Female,,English,,,M,,,,,,,,
+2,1,2,https://www.example.org/registration/2015/person2,XMO 2015 Staff,ZZA,Guide,,"Test Country One,Next Test Country,Fourth Country",,,Second,Guide,,,,,,,,,,,,Female,,English,,,M,,,,,,,,
+2,1,1,https://www.example.org/registration/2015/person1,XMO 2015 Staff,ZZA,Guide,,Test Country One,,,Some,Guide,,,,,,,,,,,,Female,,English,,,M,,,,,,,,
