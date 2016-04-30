@@ -234,6 +234,15 @@ you should check manually from time to time.
   country requesting only English papers), check the correctness of
   the requested languages with the country in question.
 
+* If there are multiple registrations for the same person in different
+  roles for the staff country, add the additional roles to "Other
+  roles" for one of those registrations, and remove the other
+  registrations.  Likewise, if a person has both staff and non-staff
+  roles, all their staff roles should be listed in "Other roles" for
+  their non-staff registration; "OK as secondary role for non-staff?"
+  needs setting for such roles (which can be edited after finding them
+  through :guilabel:`Role List`) if not already set for them.
+  
 Closing registration
 ^^^^^^^^^^^^^^^^^^^^
 
