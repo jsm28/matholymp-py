@@ -105,10 +105,10 @@ generated in the :file:`{event}/auto/` directory.
   registration system pages continue to work after the registration
   system is shut down.  These rules are in the format used by `Apache
   mod_rewrite
-  <http://httpd.apache.org/docs/current/mod/mod_rewrite.html>`_, which
-  must thus be enabled in your Apache configuration if you wish to use
-  such redirects.  You will also need to set up Apache to use these
-  rules.
+  <https://httpd.apache.org/docs/current/mod/mod_rewrite.html>`_,
+  which must thus be enabled in your Apache configuration if you wish
+  to use such redirects.  You will also need to set up Apache to use
+  these rules.
 
 Data files
 ----------

@@ -41,12 +41,12 @@ matholymp:
   source distribution before installing Roundup.  See
   :ref:`roundup-patches` for more details of those patches.
 
-* `PyPDF2 <http://mstamy2.github.io/PyPDF2/>`_ or the older `pyPdf
+* `PyPDF2 <https://mstamy2.github.io/PyPDF2/>`_ or the older `pyPdf
   <http://pybrary.net/pyPdf/>`_ (used in generating PDF documents from
   registration system data; not needed if that part of matholymp is
   not used).
 
-* `LaTeX <http://latex-project.org/>`_; specifically, the
+* `LaTeX <https://latex-project.org/>`_; specifically, the
   :command:`pdflatex` command (used in generating PDF documents from
   registration system data; not needed if that part of matholymp is
   not used).
@@ -98,7 +98,7 @@ Releases of matholymp are available for download:
   `GPG signature <https://www.polyomino.org.uk/mathematics/olympiad-software/matholymp-2014.09.0.tar.gz.sig>`_).
 
 The current development sources of matholymp are available using `Git
-<http://git-scm.com/>`_::
+<https://git-scm.com/>`_::
 
    git clone git://git.ukmt.org.uk/git/matholymp-py.git
 
