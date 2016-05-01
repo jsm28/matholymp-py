@@ -33,13 +33,13 @@ matholymp:
   not used; Roundup is not needed if the online registration system is
   not used).  (Roundup does not yet support Python 3, which is why
   Python 3 is not supported for online registration.)  Use of the
-  current version of Roundup, 1.5.0 as of this writing, is
-  recommended.  Versions before 1.4.20 have known bugs, fixed in
-  1.4.20, that are relevant to some uses of matholymp.  Some such bugs
-  are still present in 1.5.0, so you should consider applying the
-  patches in the :file:`roundup-patches/` directory in the matholymp
-  source distribution before installing Roundup.  See
-  :ref:`roundup-patches` for more details of those patches.
+  current version of Roundup, 1.5.1 as of this writing, is
+  recommended; older versions will not work because of Roundup API
+  changes.  Some bugs relevant to some uses of matholymp are still
+  present in 1.5.1, so you should consider applying the patches in the
+  :file:`roundup-patches/` directory in the matholymp source
+  distribution before installing Roundup.  See :ref:`roundup-patches`
+  for more details of those patches.
 
 * `PyPDF2 <https://mstamy2.github.io/PyPDF2/>`_ or the older `pyPdf
   <http://pybrary.net/pyPdf/>`_ (used in generating PDF documents from

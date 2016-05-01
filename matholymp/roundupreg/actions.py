@@ -94,8 +94,8 @@ class ScoreAction(Action):
         title_text = country_node.code + ' P' + problem
         full_results_text = title_text + ': ' + ', '.join(results_list)
         create_rss(self.db, title_text, full_results_text, country=country)
-        self.client.ok_message.append('Scores entered for %s problem %s'
-                                      % (country_node.name, problem))
+        self.client.add_ok_message('Scores entered for %s problem %s'
+                                   % (country_node.name, problem))
         self.db.commit()
 
 class RetireCountryAction(Action):

@@ -1,27 +1,7 @@
-diff -rupN roundup-1.5.0.orig/roundup/backends/back_postgresql.py roundup-1.5.0/roundup/backends/back_postgresql.py
---- roundup-1.5.0.orig/roundup/backends/back_postgresql.py	2013-06-17 13:52:53.000000000 +0000
-+++ roundup-1.5.0/roundup/backends/back_postgresql.py	2014-09-06 23:44:45.721710334 +0000
-@@ -9,13 +9,13 @@ __docformat__ = 'restructuredtext'
- 
- import os, shutil, time
- try:
--    import psycopg
--    from psycopg import QuotedString
--    from psycopg import ProgrammingError
--except:
--    from psycopg2 import psycopg1 as psycopg
-+    from psycopg2            import psycopg1 as psycopg
-     from psycopg2.extensions import QuotedString
--    from psycopg2.psycopg1 import ProgrammingError
-+    from psycopg2.psycopg1   import ProgrammingError
-+except ImportError:
-+    import psycopg
-+    from psycopg             import QuotedString
-+    from psycopg             import ProgrammingError
- import logging
- 
- from roundup import hyperdb, date
-@@ -84,23 +84,18 @@ def pg_command(cursor, command):
+diff -rupN roundup-1.5.1.orig/roundup/backends/back_postgresql.py roundup-1.5.1/roundup/backends/back_postgresql.py
+--- roundup-1.5.1.orig/roundup/backends/back_postgresql.py	2016-01-11 14:53:59.000000000 +0000
++++ roundup-1.5.1/roundup/backends/back_postgresql.py	2016-05-01 11:05:00.552929864 +0000
+@@ -108,23 +108,18 @@ def pg_command(cursor, command):
      '''
      try:
          cursor.execute(command)
@@ -55,21 +35,3 @@ diff -rupN roundup-1.5.0.orig/roundup/backends/back_postgresql.py roundup-1.5.0/
      return 1
  
  def db_exists(config):
-@@ -156,7 +151,7 @@ class Database(rdbms_common.Database):
- 
-         try:
-             self.load_dbschema()
--        except psycopg.ProgrammingError, message:
-+        except ProgrammingError, message:
-             if str(message).find('schema') == -1:
-                 raise
-             self.rollback()
-@@ -229,7 +224,7 @@ class Database(rdbms_common.Database):
- 
-         try:
-             self.conn.commit()
--        except psycopg.ProgrammingError, message:
-+        except ProgrammingError, message:
-             # we've been instructed that this commit is allowed to fail
-             if fail_ok and str(message).endswith('could not serialize '
-                     'access due to concurrent update'):

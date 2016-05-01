@@ -45,6 +45,10 @@ Next version (unreleased)
   those arguments.  Previously the user needed to keep track of which
   new or revised papers needed drafts generating.
 
+* The registration system code and associated Roundup patches have
+  been updated for Roundup 1.5.1.  Because of Roundup API changes, the
+  code will no longer work with older Roundup versions.
+
 Version 2016.01.0 (2 January 2016)
 ----------------------------------
 

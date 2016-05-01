@@ -1,7 +1,7 @@
-diff -rupN roundup-1.5.0.orig/roundup/backends/back_postgresql.py roundup-1.5.0/roundup/backends/back_postgresql.py
---- roundup-1.5.0.orig/roundup/backends/back_postgresql.py	2013-06-17 13:52:53.000000000 +0000
-+++ roundup-1.5.0/roundup/backends/back_postgresql.py	2014-09-06 23:48:00.809084295 +0000
-@@ -69,12 +69,12 @@ def db_command(config, command, database
+diff -rupN roundup-1.5.1.orig/roundup/backends/back_postgresql.py roundup-1.5.1/roundup/backends/back_postgresql.py
+--- roundup-1.5.1.orig/roundup/backends/back_postgresql.py	2016-01-11 14:53:59.000000000 +0000
++++ roundup-1.5.1/roundup/backends/back_postgresql.py	2016-05-01 10:51:06.786627564 +0000
+@@ -93,12 +93,12 @@ def db_command(config, command, database
      conn.set_isolation_level(0)
      cursor = conn.cursor()
      try:
