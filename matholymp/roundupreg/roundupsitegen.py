@@ -62,7 +62,11 @@ class RoundupSiteGenerator(RegSiteGenerator):
                     db.config.ext['MATHOLYMP_OFFICIAL_DESC_LC'],
                 'url_base': db.config.ext['MATHOLYMP_GENERIC_URL_BASE'],
                 'outer_scores_css':
-                    db.config.ext['MATHOLYMP_OUTER_SCORES_CLASS'] }
+                    db.config.ext['MATHOLYMP_OUTER_SCORES_CLASS'],
+                'display_scoreboard_rows':
+                    int(db.config.ext['MATHOLYMP_DISPLAY_SCOREBOARD_ROWS']),
+                'display_scoreboard_columns':
+                    int(db.config.ext['MATHOLYMP_DISPLAY_SCOREBOARD_COLUMNS']) }
         event_group = EventGroup(RoundupDataSource(db))
         super(RoundupSiteGenerator, self).__init__(cfg, event_group)
 

@@ -57,6 +57,13 @@ Next version (unreleased)
   (These checks are not applied to flags or photos automatically
   reused from previous years.)
 
+* The numbers of rows and columns on each page of the display
+  scoreboard are now configurable instead of being hardcoded as 2.
+  The new configuration variables
+  ``matholymp_display_scoreboard_rows`` and
+  ``matholymp_display_scoreboard_columns`` must be specified in
+  :file:`extensions/config.ini` for the registration system.
+
 Version 2016.01.0 (2 January 2016)
 ----------------------------------
 

@@ -79,9 +79,9 @@ class RegSiteGenerator(SiteGenerator):
         text = ''
         countries = sorted(e.country_with_contestants_list,
                            key=lambda x:x.sort_key)
-        rows = 2
-        cols = 2
-        cell_width = '50%'
+        rows = self._cfg['display_scoreboard_rows']
+        cols = self._cfg['display_scoreboard_columns']
+        cell_width = 'width:%d%%' % (100 // cols)
         per_screen = rows * cols
         num_screens = (len(countries) + per_screen - 1) // per_screen
         if num_screens < 1:
@@ -115,10 +115,10 @@ class RegSiteGenerator(SiteGenerator):
             for j in range(cols):
                 td_text = self.html_td(ctext_list[i * cols + j],
                                        class_=self._cfg['outer_scores_css'],
-                                       width=cell_width)
+                                       style=cell_width)
                 col_list.append(td_text)
             row_list.append(self.html_tr_list(col_list))
-        text += self.html_table('\n'.join(row_list), width='100%')
+        text += self.html_table('\n'.join(row_list), style='width:100%')
         if e.scores_final:
             text += ('<p>Medal boundaries: Gold %d, Silver %d,'
                      ' Bronze %d.</p>\n' %
