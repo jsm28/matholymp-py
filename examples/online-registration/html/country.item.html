@@ -115,6 +115,10 @@ define="edit_ok context/is_edit_ok"
   <td colspan=3><input type="file" name="@file" size="20"></td>
  </tr>
 
+ <tr tal:condition="context/is_edit_ok">
+  <td colspan="2">Flags should be uploaded as PNG files.</td>
+ </tr>
+
  <tr tal:condition="edit_ok">
   <td>
    &nbsp;

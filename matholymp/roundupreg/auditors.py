@@ -37,7 +37,8 @@ import re
 from roundup.date import Date
 
 from matholymp.fileutil import boolean_states
-from matholymp.roundupreg.auditorutil import get_new_value, require_value
+from matholymp.roundupreg.auditorutil import get_new_value, require_value, \
+    file_format_contents, file_format_ext
 from matholymp.roundupreg.rounduputil import get_num_problems, \
     get_marks_per_problem, get_none_country, get_staff_country, \
     any_scores_missing, valid_score, create_rss
@@ -94,6 +95,17 @@ def audit_country_fields(db, cl, nodeid, newvalues):
         if nodeid == get_staff_country(db) or nodeid == get_none_country(db):
             if name != db.country.get(nodeid, 'name'):
                 raise ValueError('Cannot rename special countries')
+
+    if 'files' in newvalues:
+        file_id = newvalues['files']
+        if file_id is not None:
+            format_contents = file_format_contents(db, file_id)
+            format_ext = file_format_ext(db, file_id)
+            if format_contents != 'png':
+                raise ValueError('Flags must be in PNG format')
+            if format_ext != format_contents:
+                raise ValueError('Filename extension for flag must match '
+                                 'contents (%s)' % format_contents)
 
     generic_url = get_new_value(db, cl, nodeid, newvalues, 'generic_url')
     if generic_url is not None and generic_url != '':
@@ -234,6 +246,17 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         latest_dep = Date(db.config.ext['MATHOLYMP_LATEST_DEPARTURE_DATE'])
         if departure_time > latest_dep:
             raise ValueError('Departure date too late')
+
+    if 'files' in newvalues:
+        file_id = newvalues['files']
+        if file_id is not None:
+            format_contents = file_format_contents(db, file_id)
+            format_ext = file_format_ext(db, file_id)
+            if format_contents not in ('jpeg', 'png'):
+                raise ValueError('Photos must be in JPEG or PNG format')
+            if format_ext != format_contents:
+                raise ValueError('Filename extension for photo must match '
+                                 'contents (%s)' % format_contents)
 
     generic_url = get_new_value(db, cl, nodeid, newvalues, 'generic_url')
     if generic_url is not None and generic_url != '':

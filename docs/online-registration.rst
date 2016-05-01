@@ -204,13 +204,11 @@ you should check manually from time to time.
   size is probably excessive), download them, scale them down and
   upload the smaller photo on that person's page; although not
   strictly required, this will make the site quicker for users and may
-  also speed up printing name badges.  If any photos are not in JPEG
-  or PNG format, convert them and upload the converted version; other
-  formats may not work for name badge generation.  If any photos are
-  in the wrong orientation, rotate them and upload the rotated
-  version; :command:`jpegtran` can be used to rotate JPEG images
-  without uncompressing and recompressing.  (Future versions of
-  matholymp may add more automation in this area.)
+  also speed up printing name badges.  If any photos are in the wrong
+  orientation, rotate them and upload the rotated version;
+  :command:`jpegtran` can be used to rotate JPEG images without
+  uncompressing and recompressing.  (Future versions of matholymp may
+  add more automation in this area.)
 
 * If some names are entered with all-uppercase surnames (or entirely
   in uppercase), convert them to mixed case for consistency.  (The

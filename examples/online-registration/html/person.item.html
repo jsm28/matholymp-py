@@ -276,6 +276,10 @@ define="edit_ok context/is_edit_ok"
   <td colspan=3><input type="file" name="@file" size="20"></td>
  </tr>
 
+ <tr tal:condition="context/is_edit_ok">
+  <td colspan="2">Photos should be uploaded as JPEG or PNG files.</td>
+ </tr>
+
 <tal:block tal:condition="context/id">
 <tal:block tal:condition="python:not db._db.person.is_retired(context.id)">
 <tal:block tal:condition="python:utils.person_is_contestant(db._db, context.id)">

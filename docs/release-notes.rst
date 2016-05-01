@@ -49,6 +49,14 @@ Next version (unreleased)
   been updated for Roundup 1.5.1.  Because of Roundup API changes, the
   code will no longer work with older Roundup versions.
 
+* The registration system now checks that flags are uploaded in PNG
+  format, and that photos are uploaded in PNG or JPEG format, and that
+  the filename extension for such uploaded files matches the format of
+  the contents of the files.  :file:`country.item.html` and
+  :file:`person.item.html` are updated to mention these requirements.
+  (These checks are not applied to flags or photos automatically
+  reused from previous years.)
+
 Version 2016.01.0 (2 January 2016)
 ----------------------------------
 
