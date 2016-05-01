@@ -29,21 +29,20 @@
 
 """
 This module provides the RoundupSiteGenerator class that generates web
-content from within the registration system.
+content from within the Roundup-based registration system.
 """
 
 __all__ = ['RoundupSiteGenerator']
 
 from matholymp.data import EventGroup
-from matholymp.fileutil import write_utf8_csv_bytes
 from matholymp.roundupreg.roundupsource import RoundupDataSource
-from matholymp.sitegen import SiteGenerator
+from matholymp.regsitegen import RegSiteGenerator
 
-class RoundupSiteGenerator(SiteGenerator):
+class RoundupSiteGenerator(RegSiteGenerator):
 
     """
     A RoundupSiteGenerator supports web content generation from within
-    the registration system.
+    the Roundup-based registration system.
     """
 
     def __init__(self, db):
@@ -65,90 +64,10 @@ class RoundupSiteGenerator(SiteGenerator):
                 'outer_scores_css':
                     db.config.ext['MATHOLYMP_OUTER_SCORES_CLASS'] }
         event_group = EventGroup(RoundupDataSource(db))
-        self.event = event_group.event_list[0]
-        """The unique event described by the Roundup instance."""
         super(RoundupSiteGenerator, self).__init__(cfg, event_group)
-
-    def countries_csv_bytes(self):
-        """Return the byte contents of the CSV of countries."""
-        data = self.one_event_countries_csv_content(self.event,
-                                                    reg_system=True)
-        return write_utf8_csv_bytes(data[0], data[1])
-
-    def scores_csv_bytes(self):
-        """Return the byte contents of the CSV of scores."""
-        data = self.one_event_scores_csv_content(self.event, reg_system=True)
-        return write_utf8_csv_bytes(data[0], data[1])
-
-    def people_csv_bytes(self, private_data):
-        """Return the byte contents of the CSV of people."""
-        data = self.one_event_people_csv_content(self.event, reg_system=True,
-                                                 private_data=private_data)
-        return write_utf8_csv_bytes(data[0], data[1])
 
     def link_for_country_at_event(self, country, link_body):
         return self.html_a(link_body, 'country' + str(country.country.id))
 
     def link_for_person(self, person, link_body):
         return self.html_a(link_body, 'person' + str(person.id))
-
-    def display_scoreboard_text(self, e, display_start):
-        """
-        Return the text of one page of the display scoreboard for one
-        event.
-        """
-        text = ''
-        countries = sorted(e.country_with_contestants_list,
-                           key=lambda x:x.sort_key)
-        rows = 2
-        cols = 2
-        cell_width = '50%'
-        per_screen = rows * cols
-        num_screens = (len(countries) + per_screen - 1) // per_screen
-        if num_screens < 1:
-            num_screens = 1
-        display_start = display_start % num_screens
-        start_idx = display_start * per_screen
-        end_idx = (display_start + 1) * per_screen
-        ctext_list = []
-        for i in range(start_idx, end_idx):
-            head_row_list = [self.person_scoreboard_header(e, show_rank=False,
-                                                           show_name=False,
-                                                           show_award=False)]
-            ctext = ''
-            if i < len(countries):
-                contestants = sorted(countries[i].contestant_list,
-                                     key=lambda x:x.sort_key)
-                body_row_list = []
-                for p in contestants:
-                    body_row_list.append(
-                        self.person_scoreboard_row(p,
-                                                   show_rank=False,
-                                                   show_name=False,
-                                                   show_award=False,
-                                                   link=False))
-                ctext += self.html_table_thead_tbody_list(head_row_list,
-                                                          body_row_list)
-            ctext_list.append(ctext)
-        row_list = []
-        for i in range(rows):
-            col_list = []
-            for j in range(cols):
-                td_text = self.html_td(ctext_list[i * cols + j],
-                                       class_=self._cfg['outer_scores_css'],
-                                       width=cell_width)
-                col_list.append(td_text)
-            row_list.append(self.html_tr_list(col_list))
-        text += self.html_table('\n'.join(row_list), width='100%')
-        if e.scores_final:
-            text += ('<p>Medal boundaries: Gold %d, Silver %d,'
-                     ' Bronze %d.</p>\n' %
-                     (e.gold_boundary, e.silver_boundary, e.bronze_boundary))
-        return text
-
-    def this_event_scoreboard_text(self, for_display, display_start):
-        """Return the text of the scoreboard for the present event."""
-        if for_display:
-            return self.display_scoreboard_text(self.event, display_start)
-        else:
-            return self.scoreboard_text(self.event)

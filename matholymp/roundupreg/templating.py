@@ -109,8 +109,11 @@ def country_scores_table(db, country):
 
 def scoreboard(db, for_display, display_start):
     """Produce scoreboard page contents."""
-    return RoundupSiteGenerator(db).this_event_scoreboard_text(for_display,
-                                                               display_start)
+    sitegen = RoundupSiteGenerator(db)
+    if for_display:
+        return sitegen.display_scoreboard_text(sitegen.event, display_start)
+    else:
+        return sitegen.scoreboard_text(sitegen.event)
 
 def has_nonempty_travel(db, person):
     """Return whether a person has nonempty travel details."""
