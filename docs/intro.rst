@@ -22,7 +22,8 @@ matholymp:
 
 * `Python <https://www.python.org/>`_, version 2.7.x (not Python 3).
   (The command-line parts of matholymp should also work with Python
-  3.2.x or later, although this has only been tested with 3.4.)
+  3.2.x or later, although this has only been tested with 3.4 and
+  later.)
 
 * `PyICU <https://pypi.python.org/pypi/PyICU>`_ (which in turn
   requires `ICU <http://site.icu-project.org/>`_).
