@@ -50,7 +50,7 @@ Next version (unreleased)
   code will no longer work with older Roundup versions.
 
 * The registration system now checks that flags are uploaded in PNG
-  format, and that photos are uploaded in PNG or JPEG format, and that
+  format, and that photos are uploaded in JPEG or PNG format, and that
   the filename extension for such uploaded files matches the format of
   the contents of the files.  :file:`country.item.html` and
   :file:`person.item.html` are updated to mention these requirements.
