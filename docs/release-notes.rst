@@ -64,6 +64,11 @@ Next version (unreleased)
   ``matholymp_display_scoreboard_columns`` must be specified in
   :file:`extensions/config.ini` for the registration system.
 
+* If a person is registered with "Other roles" including their main
+  role, that duplicate entry will be automatically excluded when
+  generating the CSV file of person details, and so when the final
+  registration data are transferred to the static site.
+
 Version 2016.01.0 (2 January 2016)
 ----------------------------------
 

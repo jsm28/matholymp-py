@@ -151,6 +151,8 @@ class RoundupDataSource(DataSource):
             other_roles = self._db.person.get(id, 'other_roles')
             if other_roles is None:
                 other_roles = []
+            primary_role = self._db.person.get(id, 'primary_role')
+            other_roles = [i for i in other_roles if i != primary_role]
             return [self._db.matholymprole.get(i, 'name') for i in other_roles]
         elif name == '_guide_for_ids':
             guide_for = self._db.person.get(id, 'guide_for')
