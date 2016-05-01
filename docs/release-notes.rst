@@ -16,8 +16,8 @@ static site, to update the CSV data files with details of past events
 for any format changes in the new version of matholymp.  After doing
 so, run :command:`mo-static-generate`.
 
-Next version (unreleased)
--------------------------
+Version 2016.05.0 (1 May 2016)
+------------------------------
 
 * Static site generation now supports a person with roles for more
   than one country at an event.  (This is only intended for cases
