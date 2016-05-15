@@ -38,16 +38,16 @@ from matholymp.fileutil import file_extension
 
 __all__ = ['file_url_to_local', 'lang_to_filename']
 
-def file_url_to_local(url, local_dir, type):
+_type_to_entity_type = { 'flag': 'country',
+                         'photo': 'person' }
+
+def file_url_to_local(url, local_dir, type, id):
     """
     Convert a registration system download URL for a file to a local path.
     """
-    url = re.sub('^.*?/file', '', url)
-    matches = re.match('^([0-9]+)/(.*)', url)
-    file_id = matches.group(1)
-    file_name = matches.group(2)
-    ext = file_extension(file_name)
-    return os.path.join(local_dir, type + file_id, type + '.' + ext)
+    ext = file_extension(url)
+    entity_type = _type_to_entity_type[type]
+    return os.path.join(local_dir, entity_type + str(id), type + '.' + ext)
 
 def lang_to_filename(lang):
     """Convert a language name to the form used in a filename."""

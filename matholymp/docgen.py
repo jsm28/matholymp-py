@@ -214,7 +214,8 @@ class DocumentGenerator(object):
         if flag_url is None:
             return ''
         return file_url_to_local(flag_url,
-                                 os.path.join(self._data_dir, 'flags'), 'flag')
+                                 os.path.join(self._data_dir, 'flags'), 'flag',
+                                 country.country.id)
 
     def room_list_text(self, person):
         """
@@ -301,7 +302,7 @@ class DocumentGenerator(object):
             template_fields['photo'] = ''
         else:
             template_fields['photo'] = file_url_to_local(
-                photo_url, os.path.join(self._data_dir, 'photos'), 'photo')
+                photo_url, os.path.join(self._data_dir, 'photos'), 'photo', id)
 
         template_fields['name'] = person.name
 

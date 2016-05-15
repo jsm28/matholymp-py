@@ -16,6 +16,14 @@ static site, to update the CSV data files with details of past events
 for any format changes in the new version of matholymp.  After doing
 so, run :command:`mo-static-generate`.
 
+Next version (unreleased)
+-------------------------
+
+* The ZIP files of flags and photos that can be downloaded from the
+  registration system now have their contents arranged by the
+  registration system identifier for the country or person, not by
+  that for the file itself.
+
 Version 2016.05.0 (1 May 2016)
 ------------------------------
 

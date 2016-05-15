@@ -111,7 +111,7 @@ def main():
         if c['Flag URL']:
             flag_src_filename = file_url_to_local(c['Flag URL'],
                                                   input_flags_dir,
-                                                  'flag')
+                                                  'flag', annual_id)
             flag_ext = file_extension(flag_src_filename)
             flag_dst = 'flag' + event_number + '.' + flag_ext
             flag_dst_list = ['countries', 'country' + country_number,
@@ -153,6 +153,7 @@ def main():
         if p[cfg_data['num_key']] != event_number:
             raise ValueError('person from wrong event')
         p['Country Number'] = country_index[p['Country Number']]
+        annual_id = p['Person Number']
         person_number = p['Generic Number']
         del p['Generic Number']
         if not person_number:
@@ -165,7 +166,8 @@ def main():
             i += 1
         if p['Photo URL']:
             photo_src_filename = file_url_to_local(p['Photo URL'],
-                                                   input_photos_dir, 'photo')
+                                                   input_photos_dir, 'photo',
+                                                   annual_id)
             photo_ext = file_extension(photo_src_filename)
             photo_extra = ''
             if person_number in people_num_photos:

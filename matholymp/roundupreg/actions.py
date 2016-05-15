@@ -177,9 +177,7 @@ class FlagsZIPAction(Action):
         zip = zipfile.ZipFile(output, 'w', zipfile.ZIP_STORED)
         zip.writestr('flags/README.txt',
                      'The flags in this file are arranged by internal'
-                     ' database identifier;\nsee the Flag URL column in'
-                     ' the CSV file of countries to match them to\n'
-                     'individual countries.\n')
+                     ' database identifier\nfor the country.\n')
 
         country_list = self.db.country.list()
         none_country = get_none_country(self.db)
@@ -190,7 +188,7 @@ class FlagsZIPAction(Action):
                     flag_ext = db_file_extension(self.db, flag_id)
                     if flag_ext is not None:
                         filename = self.db.filename('file', flag_id)
-                        zip_filename = ('flags/flag' + flag_id + '/flag.' +
+                        zip_filename = ('flags/country' + country + '/flag.' +
                                         flag_ext)
                         zip.write(filename, zip_filename)
 
@@ -212,9 +210,7 @@ class PhotosZIPAction(Action):
         zip = zipfile.ZipFile(output, 'w', zipfile.ZIP_STORED)
         zip.writestr('photos/README.txt',
                      'The photos in this file are arranged by internal'
-                     ' database identifier;\nsee the Photo URL column in'
-                     ' the CSV file of people to match them to\n'
-                     'individual participants.\n')
+                     ' database identifier\nfor the person.\n')
 
         person_list = self.db.person.list()
         for person in person_list:
@@ -223,7 +219,7 @@ class PhotosZIPAction(Action):
                 photo_ext = db_file_extension(self.db, photo_id)
                 if photo_ext is not None:
                     filename = self.db.filename('file', photo_id)
-                    zip_filename = ('photos/photo' + photo_id + '/photo.' +
+                    zip_filename = ('photos/person' + person + '/photo.' +
                                     photo_ext)
                     zip.write(filename, zip_filename)
 

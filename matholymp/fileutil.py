@@ -237,7 +237,7 @@ _file_ext_map = { 'jpg': 'jpg',
 
 def file_extension(name):
     """
-    Given a filename, return the canonical form of its filename
+    Given a filename or URL, return the canonical form of its filename
     extension, or None if not a known extension that might be valid
     for some matholymp uses.
     """
