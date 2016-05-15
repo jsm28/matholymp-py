@@ -38,7 +38,8 @@ import time
 
 from roundup.date import Date
 
-from matholymp.fileutil import boolean_states
+from matholymp.fileutil import boolean_states, file_format_contents, \
+    file_extension
 
 __all__ = ['distinguish_official', 'get_num_problems', 'get_marks_per_problem',
            'scores_from_str', 'contestant_age', 'get_none_country_name',
@@ -46,7 +47,7 @@ __all__ = ['distinguish_official', 'get_num_problems', 'get_marks_per_problem',
            'normal_country_person', 'person_is_contestant', 'contestant_code',
            'pn_score', 'scores_final', 'any_scores_missing',
            'country_has_contestants', 'valid_country_problem', 'valid_score',
-           'create_rss']
+           'create_rss', 'db_file_format_contents', 'db_file_extension']
 
 def distinguish_official(db):
     """Return whether this event distinguishes official countries."""
@@ -204,3 +205,21 @@ def create_rss(db, title, description, **args):
                 '</item>' % (cgi.escape(title), cgi.escape(description),
                              cgi.escape(date_text), cgi.escape(rss_url)))
     db.rss.set(rss_id, text=rss_text)
+
+def db_file_format_contents(db, id):
+    """
+    Return the format (canonical filename extension) of an uploaded
+    file based on its contents, or None if not a known format that
+    might be valid for some uploads.
+    """
+    filename = db.filename('file', id)
+    return file_format_contents(filename)
+
+def db_file_extension(db, id):
+    """
+    Return the format (canonical filename extension) of an uploaded
+    file based on its filename extension, or None if not a known
+    format that might be valid for some uploads.
+    """
+    name = db.file.get(id, 'name')
+    return file_extension(name)

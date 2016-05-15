@@ -34,7 +34,7 @@ This module handles input data downloaded from the registration system.
 import os.path
 import re
 
-from matholymp.urlutil import url_unquote
+from matholymp.fileutil import file_extension
 
 __all__ = ['file_url_to_local', 'lang_to_filename']
 
@@ -46,11 +46,8 @@ def file_url_to_local(url, local_dir, type):
     matches = re.match('^([0-9]+)/(.*)', url)
     file_id = matches.group(1)
     file_name = matches.group(2)
-    file_name = url_unquote(file_name)
-    file_name = re.sub('[^a-zA-Z0-9_.]', '_', file_name)
-    file_name = re.sub('^.*\\.', type + '.', file_name)
-    file_name = re.sub('^[^.]*$', type, file_name)
-    return os.path.join(local_dir, type + file_id, file_name)
+    ext = file_extension(file_name)
+    return os.path.join(local_dir, type + file_id, type + '.' + ext)
 
 def lang_to_filename(lang):
     """Convert a language name to the form used in a filename."""

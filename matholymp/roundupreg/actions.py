@@ -35,7 +35,6 @@ __all__ = ['ScoreAction', 'RetireCountryAction', 'CountryCSVAction',
 
 import cgi
 import io
-import re
 import time
 import zipfile
 
@@ -46,7 +45,7 @@ from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import get_marks_per_problem, \
     scores_from_str, get_none_country, get_staff_country, \
     person_is_contestant, contestant_code, scores_final, \
-    valid_country_problem, valid_score, create_rss
+    valid_country_problem, valid_score, create_rss, db_file_extension
 
 class ScoreAction(Action):
 
@@ -188,17 +187,12 @@ class FlagsZIPAction(Action):
             if country != none_country:
                 flag_id = self.db.country.get(country, 'files')
                 if flag_id is not None:
-                    filename = self.db.filename('file', flag_id)
-                    zip_filename_only = self.db.file.get(flag_id, 'name')
-                    zip_filename_only = re.sub('[^a-zA-Z0-9_.]', '_',
-                                               zip_filename_only)
-                    zip_filename_only = re.sub('^.*\\.', 'flag.',
-                                               zip_filename_only)
-                    zip_filename_only = re.sub('^[^.]*$', 'flag',
-                                               zip_filename_only)
-                    zip_filename = ('flags/flag' + flag_id + '/' +
-                                    zip_filename_only)
-                    zip.write(filename, zip_filename)
+                    flag_ext = db_file_extension(self.db, flag_id)
+                    if flag_ext is not None:
+                        filename = self.db.filename('file', flag_id)
+                        zip_filename = ('flags/flag' + flag_id + '/flag.' +
+                                        flag_ext)
+                        zip.write(filename, zip_filename)
 
         zip.close()
         zip_bytes = output.getvalue()
@@ -226,17 +220,12 @@ class PhotosZIPAction(Action):
         for person in person_list:
             photo_id = self.db.person.get(person, 'files')
             if photo_id is not None:
-                filename = self.db.filename('file', photo_id)
-                zip_filename_only = self.db.file.get(photo_id, 'name')
-                zip_filename_only = re.sub('[^a-zA-Z0-9_.]', '_',
-                                           zip_filename_only)
-                zip_filename_only = re.sub('^.*\\.', 'photo.',
-                                           zip_filename_only)
-                zip_filename_only = re.sub('^[^.]*$', 'photo',
-                                           zip_filename_only)
-                zip_filename = ('photos/photo' + photo_id + '/' +
-                                zip_filename_only)
-                zip.write(filename, zip_filename)
+                photo_ext = db_file_extension(self.db, photo_id)
+                if photo_ext is not None:
+                    filename = self.db.filename('file', photo_id)
+                    zip_filename = ('photos/photo' + photo_id + '/photo.' +
+                                    photo_ext)
+                    zip.write(filename, zip_filename)
 
         zip.close()
         zip_bytes = output.getvalue()

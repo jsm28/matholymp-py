@@ -50,12 +50,11 @@ working directory.
 import argparse
 import os
 import os.path
-import re
 import shutil
 
 import matholymp
 from matholymp.fileutil import read_utf8_csv, write_utf8_csv, \
-    make_dirs_for_file
+    make_dirs_for_file, file_extension
 from matholymp.regdata import file_url_to_local
 from matholymp.sitegen import read_sitegen_config, sitegen_countries_csv, \
     sitegen_people_csv
@@ -113,10 +112,7 @@ def main():
             flag_src_filename = file_url_to_local(c['Flag URL'],
                                                   input_flags_dir,
                                                   'flag')
-            flag_ext = re.sub('^.*\\.', '', flag_src_filename)
-            flag_ext = flag_ext.lower()
-            if flag_ext == 'jpeg':
-                flag_ext = 'jpg'
+            flag_ext = file_extension(flag_src_filename)
             flag_dst = 'flag' + event_number + '.' + flag_ext
             flag_dst_list = ['countries', 'country' + country_number,
                              flag_dst]
@@ -170,10 +166,7 @@ def main():
         if p['Photo URL']:
             photo_src_filename = file_url_to_local(p['Photo URL'],
                                                    input_photos_dir, 'photo')
-            photo_ext = re.sub('^.*\\.', '', photo_src_filename)
-            photo_ext = photo_ext.lower()
-            if photo_ext == 'jpeg':
-                photo_ext = 'jpg'
+            photo_ext = file_extension(photo_src_filename)
             photo_extra = ''
             if person_number in people_num_photos:
                 people_num_photos[person_number] += 1

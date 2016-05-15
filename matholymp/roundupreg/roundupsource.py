@@ -37,8 +37,7 @@ from matholymp.datasource import DataSource
 from matholymp.fileutil import comma_split, boolean_states
 from matholymp.roundupreg.rounduputil import distinguish_official, \
     get_num_problems, get_marks_per_problem, scores_from_str, contestant_age, \
-    get_none_country
-from matholymp.urlutil import url_quote
+    get_none_country, db_file_extension
 
 __all__ = ['RoundupDataSource']
 
@@ -183,12 +182,12 @@ class RoundupDataSource(DataSource):
             return comma_split(extra_awards_str)
         elif name == 'photo_url':
             photo_id = self._db.person.get(id, 'files')
-            if photo_id is None:
-                photo_url = None
-            else:
-                photo_name = self._db.file.get(photo_id, 'name')
-                photo_url = (self._db.config.TRACKER_WEB + 'file' + photo_id +
-                             '/' + url_quote(photo_name))
+            photo_url = None
+            if photo_id is not None:
+                photo_ext = db_file_extension(self._db, photo_id)
+                if photo_ext is not None:
+                    photo_url = (self._db.config.TRACKER_WEB + 'file' +
+                                 photo_id + '/photo.' + photo_ext)
             return photo_url
         elif name == 'first_language':
             first_language = self._db.person.get(id, 'first_language')
@@ -267,12 +266,12 @@ class RoundupDataSource(DataSource):
             return self._db.country.get(id, 'name')
         elif name == 'flag_url':
             flag_id = self._db.country.get(id, 'files')
-            if flag_id is None:
-                flag_url = None
-            else:
-                flag_name = self._db.file.get(flag_id, 'name')
-                flag_url = (self._db.config.TRACKER_WEB + 'file' + flag_id +
-                            '/' + url_quote(flag_name))
+            flag_url = None
+            if flag_id is not None:
+                flag_ext = db_file_extension(self._db, flag_id)
+                if flag_ext is not None:
+                    flag_url = (self._db.config.TRACKER_WEB + 'file' +
+                                flag_id + '/flag.' + flag_ext)
             return flag_url
         elif name == 'is_official':
             return self._db.country.get(id, 'official')

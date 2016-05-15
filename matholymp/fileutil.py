@@ -39,14 +39,18 @@ if _py3:
 else:
     import ConfigParser as configparser
 import csv
+import imghdr
 import io
 import os
 import os.path
+import re
+import string
 
 __all__ = ['read_utf8_csv', 'write_utf8_csv_bytes', 'write_utf8_csv',
            'comma_join', 'comma_split', 'make_dirs_for_file',
            'write_text_to_file', 'read_text_from_file', 'read_config',
-           'boolean_states', 'remove_if_exists']
+           'boolean_states', 'remove_if_exists', 'file_format_contents',
+           'file_extension']
 
 if _py3:
     _text_open_args = { 'encoding': 'utf-8' }
@@ -203,3 +207,46 @@ def remove_if_exists(file_name):
     """Remove a file if it exists."""
     if os.access(file_name, os.F_OK):
         os.remove(file_name)
+
+# Map file format names from imghdr to canonical extensions.
+_file_format_ext_map = { 'jpeg': 'jpg',
+                         'png': 'png' }
+
+def file_format_contents(filename):
+    """
+    Return the format of a file (in the form of a canonical filename
+    extension) based on its contents, or None if not a known format
+    that might be valid for some matholymp uses.
+    """
+    fmt = imghdr.what(filename)
+    if fmt in _file_format_ext_map:
+        return _file_format_ext_map[fmt]
+    else:
+        return None
+
+if _py3:
+    _maketrans = str.maketrans
+else:
+    _maketrans = string.maketrans
+_ascii_tolower = _maketrans(string.ascii_uppercase, string.ascii_lowercase)
+
+# Map extensions to their canonical forms.
+_file_ext_map = { 'jpg': 'jpg',
+                  'jpeg': 'jpg',
+                  'png': 'png' }
+
+def file_extension(name):
+    """
+    Given a filename, return the canonical form of its filename
+    extension, or None if not a known extension that might be valid
+    for some matholymp uses.
+    """
+    if '.' not in name:
+        return None
+    name = re.sub('[^a-zA-Z0-9_.]', '_', name)
+    name = re.sub('^.*\\.', '', name)
+    name = name.translate(_ascii_tolower)
+    if name in _file_ext_map:
+        return _file_ext_map[name]
+    else:
+        return None

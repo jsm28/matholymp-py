@@ -33,11 +33,7 @@ This module provides utility functions for writing auditors for the
 Roundup registration system.
 """
 
-__all__ = ['get_new_value', 'require_value', 'file_format_contents',
-           'file_format_ext']
-
-import imghdr
-import re
+__all__ = ['get_new_value', 'require_value']
 
 def get_new_value(db, cl, nodeid, newvalues, prop):
     """
@@ -67,31 +63,3 @@ def require_value(db, cl, nodeid, newvalues, prop, error):
         raise ValueError(error)
     newvalues[prop] = value
     return value
-
-def file_format_contents(db, id):
-    """
-    Return the format of an uploaded file based on its contents, or
-    None if not a known format that might be valid for some uploads.
-    """
-    filename = db.filename('file', id)
-    return imghdr.what(filename)
-
-_file_format_ext_map = { 'jpg': 'jpeg',
-                         'jpeg': 'jpeg',
-                         'png': 'png' }
-
-def file_format_ext(db, id):
-    """
-    Return the format of an uploaded file based on its filename
-    extension, or None if not a known format that might be valid for
-    some uploads.
-    """
-    name = db.file.get(id, 'name')
-    if '.' not in name:
-        return None
-    name = re.sub('[^a-zA-Z0-9_.]', '_', name)
-    name = re.sub('^.*\\.', '', name)
-    name = name.lower()
-    if name in _file_format_ext_map:
-        return _file_format_ext_map[name]
-    return None
