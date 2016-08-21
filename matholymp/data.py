@@ -1307,6 +1307,13 @@ class PersonEvent(object):
         'photo_url',
         """The URL of the registration photo of this person at this event.""")
 
+    photo_filename = _PersonEventPropertyDS(
+        'photo_filename',
+        """
+        The local filename of the registration photo of this person at
+        this event.
+        """)
+
     first_language = _PersonEventPropertyDS(
         'first_language',
         """The first language of this person at this event.""")
@@ -1564,6 +1571,10 @@ class CountryEvent(object):
     flag_url = _CountryEventPropertyDS(
         'flag_url',
         """The flag URL of this country at this event.""")
+
+    flag_filename = _CountryEventPropertyDS(
+        'flag_filename',
+        """The local filename for the flag of this country at this event.""")
 
     def _get_is_official(self):
         if self.event.distinguish_official:

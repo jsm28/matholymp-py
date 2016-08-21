@@ -33,9 +33,12 @@ provide the source data about events and the people and countries
 involved in them from which other data is derived.
 """
 
+import os.path
+
 from matholymp.data import Paper
 from matholymp.datasource import DataSource
 from matholymp.fileutil import comma_split, boolean_states
+from matholymp.regdata import file_url_to_local
 
 __all__ = ['CSVDataSource']
 
@@ -43,7 +46,7 @@ class CSVDataSource(DataSource):
 
     """Subclass of DataSource providing information from CSV files."""
 
-    def __init__(self, cfg, events, papers, countries, people):
+    def __init__(self, cfg, events, papers, countries, people, local_dir):
         """
         Initialise a CSVDataSource from the given configuration
         information and arrays of dicts from CSV files.
@@ -53,9 +56,11 @@ class CSVDataSource(DataSource):
         self._papers = {}
         self._countries = {}
         self._people = {}
+        self._local_dir = local_dir
         if events is None:
             # Data direct from registration system used for generating
             # documents; no CSV file of event data.
+            self._reg_system = True
             eid = cfg['event_number']
             e = {}
             e['Year'] = cfg['year']
@@ -75,6 +80,7 @@ class CSVDataSource(DataSource):
             self._countries[eid] = {}
             self._people[eid] = {}
         else:
+            self._reg_system = False
             for e in events:
                 eid = int(e['Number'])
                 if eid in self._events:
@@ -237,6 +243,18 @@ class CSVDataSource(DataSource):
                 return None
             else:
                 return int(s)
+        if name == 'photo_filename':
+            url = self._people[event_id][person_id][country_id]['Photo URL']
+            if url == '':
+                return None
+            if self._reg_system:
+                return file_url_to_local(url, os.path.join(self._local_dir,
+                                                           'photos'),
+                                         'photo', person_id)
+            else:
+                url_path = url[len(self._cfg['url_base']):]
+                url_dirs = url_path.split('/')
+                return os.path.join(self._local_dir, *url_dirs)
         if name == 'other_roles':
             s = self._people[event_id][person_id][country_id]['Other Roles']
             return comma_split(s)
@@ -290,6 +308,18 @@ class CSVDataSource(DataSource):
                 return None
             else:
                 return int(s)
+        if name == 'flag_filename':
+            url = self._countries[event_id][country_id]['Flag URL']
+            if url == '':
+                return None
+            if self._reg_system:
+                return file_url_to_local(url, os.path.join(self._local_dir,
+                                                           'flags'),
+                                         'flag', country_id)
+            else:
+                url_path = url[len(self._cfg['url_base']):]
+                url_dirs = url_path.split('/')
+                return os.path.join(self._local_dir, *url_dirs)
         if name == 'is_official':
             k = self._cfg['official_desc']
             s = self._countries[event_id][country_id][k]

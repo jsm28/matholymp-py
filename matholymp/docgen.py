@@ -47,7 +47,7 @@ except ImportError:
 from matholymp.collate import coll_get_sort_key
 from matholymp.fileutil import read_utf8_csv, make_dirs_for_file, \
     write_text_to_file, read_text_from_file, read_config, remove_if_exists
-from matholymp.regdata import file_url_to_local, lang_to_filename
+from matholymp.regdata import lang_to_filename
 
 __all__ = ['read_docgen_config', 'DocumentGenerator']
 
@@ -210,12 +210,10 @@ class DocumentGenerator(object):
         country given as None."""
         if country is None:
             return ''
-        flag_url = country.flag_url
-        if flag_url is None:
+        flag_filename = country.flag_filename
+        if flag_filename is None:
             return ''
-        return file_url_to_local(flag_url,
-                                 os.path.join(self._data_dir, 'flags'), 'flag',
-                                 country.country.id)
+        return flag_filename
 
     def room_list_text(self, person):
         """
@@ -297,12 +295,11 @@ class DocumentGenerator(object):
             background_type = 'organiser'
         template_fields['background_type'] = background_type
 
-        photo_url = person.photo_url
-        if photo_url is None:
+        photo_filename = person.photo_filename
+        if photo_filename is None:
             template_fields['photo'] = ''
         else:
-            template_fields['photo'] = file_url_to_local(
-                photo_url, os.path.join(self._data_dir, 'photos'), 'photo', id)
+            template_fields['photo'] = photo_filename
 
         template_fields['name'] = person.name
 

@@ -34,8 +34,11 @@ content from within the registration system.
 
 __all__ = ['RegSiteGenerator']
 
+import io
+import zipfile
+
 from matholymp.data import EventGroup
-from matholymp.fileutil import write_utf8_csv_bytes
+from matholymp.fileutil import write_utf8_csv_bytes, file_extension
 from matholymp.sitegen import SiteGenerator
 
 class RegSiteGenerator(SiteGenerator):
@@ -70,6 +73,52 @@ class RegSiteGenerator(SiteGenerator):
         data = self.one_event_people_csv_content(self.event, reg_system=True,
                                                  private_data=private_data)
         return write_utf8_csv_bytes(data[0], data[1])
+
+    def flags_zip_bytes(self):
+        """Return the byte contents of the ZIP of flags."""
+        output = io.BytesIO()
+        zip = zipfile.ZipFile(output, 'w', zipfile.ZIP_STORED)
+        zip.writestr('flags/README.txt',
+                     'The flags in this file are arranged by internal'
+                     ' database identifier\nfor the country.\n')
+
+        e = self.event
+        country_list = sorted(e.country_list, key=lambda x:x.sort_key)
+        for c in country_list:
+            url = c.flag_url
+            if url is not None:
+                ext = file_extension(url)
+                filename = c.flag_filename
+                zip_filename = 'flags/country%d/flag.%s' % (c.country.id, ext)
+                zip.write(filename, zip_filename)
+
+        zip.close()
+        zip_bytes = output.getvalue()
+        output.close()
+        return zip_bytes
+
+    def photos_zip_bytes(self):
+        """Return the byte contents of the ZIP of photos."""
+        output = io.BytesIO()
+        zip = zipfile.ZipFile(output, 'w', zipfile.ZIP_STORED)
+        zip.writestr('photos/README.txt',
+                     'The photos in this file are arranged by internal'
+                     ' database identifier\nfor the person.\n')
+
+        e = self.event
+        person_list = sorted(e.person_list, key=lambda x:x.sort_key)
+        for p in person_list:
+            url = p.photo_url
+            if url is not None:
+                ext = file_extension(url)
+                filename = p.photo_filename
+                zip_filename = 'photos/person%d/photo.%s' % (p.person.id, ext)
+                zip.write(filename, zip_filename)
+
+        zip.close()
+        zip_bytes = output.getvalue()
+        output.close()
+        return zip_bytes
 
     def display_scoreboard_text(self, e, display_start):
         """

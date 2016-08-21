@@ -34,9 +34,6 @@ __all__ = ['ScoreAction', 'RetireCountryAction', 'CountryCSVAction',
            'PhotosZIPAction', 'ScoresRSSAction', 'register_actions']
 
 import cgi
-import io
-import time
-import zipfile
 
 from roundup.cgi.actions import Action
 from roundup.cgi.exceptions import Unauthorised
@@ -173,29 +170,7 @@ class FlagsZIPAction(Action):
         self.client.setHeader('Content-Type', 'application/zip')
         self.client.setHeader('Content-Disposition',
                               'attachment; filename=flags.zip')
-        output = io.BytesIO()
-        zip = zipfile.ZipFile(output, 'w', zipfile.ZIP_STORED)
-        zip.writestr('flags/README.txt',
-                     'The flags in this file are arranged by internal'
-                     ' database identifier\nfor the country.\n')
-
-        country_list = self.db.country.list()
-        none_country = get_none_country(self.db)
-        for country in country_list:
-            if country != none_country:
-                flag_id = self.db.country.get(country, 'files')
-                if flag_id is not None:
-                    flag_ext = db_file_extension(self.db, flag_id)
-                    if flag_ext is not None:
-                        filename = self.db.filename('file', flag_id)
-                        zip_filename = ('flags/country' + country + '/flag.' +
-                                        flag_ext)
-                        zip.write(filename, zip_filename)
-
-        zip.close()
-        zip_bytes = output.getvalue()
-        output.close()
-        return zip_bytes
+        return RoundupSiteGenerator(self.db).flags_zip_bytes()
 
 class PhotosZIPAction(Action):
 
@@ -206,27 +181,7 @@ class PhotosZIPAction(Action):
         self.client.setHeader('Content-Type', 'application/zip')
         self.client.setHeader('Content-Disposition',
                               'attachment; filename=photos.zip')
-        output = io.BytesIO()
-        zip = zipfile.ZipFile(output, 'w', zipfile.ZIP_STORED)
-        zip.writestr('photos/README.txt',
-                     'The photos in this file are arranged by internal'
-                     ' database identifier\nfor the person.\n')
-
-        person_list = self.db.person.list()
-        for person in person_list:
-            photo_id = self.db.person.get(person, 'files')
-            if photo_id is not None:
-                photo_ext = db_file_extension(self.db, photo_id)
-                if photo_ext is not None:
-                    filename = self.db.filename('file', photo_id)
-                    zip_filename = ('photos/person' + person + '/photo.' +
-                                    photo_ext)
-                    zip.write(filename, zip_filename)
-
-        zip.close()
-        zip_bytes = output.getvalue()
-        output.close()
-        return zip_bytes
+        return RoundupSiteGenerator(self.db).photos_zip_bytes()
 
 class ScoresRSSAction(Action):
 

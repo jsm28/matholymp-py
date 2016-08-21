@@ -92,7 +92,8 @@ def main():
                                               'countries.csv'))
 
     all_data = EventGroup(CSVDataSource(config_data, None, [], country_data,
-                                        people_data))
+                                        people_data,
+                                        cmdline_data['input_directory']))
     event_data = all_data.event_map[config_data['event_number']]
     docgen = DocumentGenerator(config_data, event_data, templates_dir,
                                cmdline_data['problems_directory'],

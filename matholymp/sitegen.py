@@ -99,7 +99,8 @@ def sitegen_event_group(top_directory, cfg_data):
     papers_data = read_utf8_csv(papers_csv)
 
     return EventGroup(CSVDataSource(cfg_data, events_data, papers_data,
-                                    countries_data, people_data))
+                                    countries_data, people_data,
+                                    top_directory))
 
 class SiteGenerator(object):
 

@@ -114,7 +114,7 @@ def main():
     new_people_data = read_utf8_csv(input_people_csv)
     all_new_data = EventGroup(CSVDataSource(docgen_config_data, None, [],
                                             new_countries_data,
-                                            new_people_data))
+                                            new_people_data, input_directory))
     event_data = all_new_data.event_map[docgen_config_data['event_number']]
 
     if args['day']:

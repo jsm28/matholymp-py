@@ -189,6 +189,12 @@ class RoundupDataSource(DataSource):
                     photo_url = (self._db.config.TRACKER_WEB + 'file' +
                                  photo_id + '/photo.' + photo_ext)
             return photo_url
+        elif name == 'photo_filename':
+            photo_id = self._db.person.get(id, 'files')
+            photo_filename = None
+            if photo_id is not None:
+                photo_filename = self._db.filename('file', photo_id)
+            return photo_filename
         elif name == 'first_language':
             first_language = self._db.person.get(id, 'first_language')
             return self._db.language.get(first_language, 'name')
@@ -273,6 +279,12 @@ class RoundupDataSource(DataSource):
                     flag_url = (self._db.config.TRACKER_WEB + 'file' +
                                 flag_id + '/flag.' + flag_ext)
             return flag_url
+        elif name == 'flag_filename':
+            flag_id = self._db.country.get(id, 'files')
+            flag_filename = None
+            if flag_id is not None:
+                flag_filename = self._db.filename('file', flag_id)
+            return flag_filename
         elif name == 'is_official':
             return self._db.country.get(id, 'official')
         elif name == '_person_ids':
