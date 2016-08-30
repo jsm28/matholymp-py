@@ -216,10 +216,10 @@ class CSVDataSource(DataSource):
                                    'tshirt': 'T-Shirt Size',
                                    'arrival_place': 'Arrival Place',
                                    'arrival_time': 'Arrival Time',
-                                   'arrival_flight': 'Arrival FLight',
+                                   'arrival_flight': 'Arrival Flight',
                                    'departure_place': 'Departure Place',
                                    'departure_time': 'Departure Time',
-                                   'departure_flight': 'Departure FLight' }
+                                   'departure_flight': 'Departure Flight' }
 
     _person_event_attr_map_int = { 'contestant_age': 'Contestant Age',
                                    'total_score': 'Total',
