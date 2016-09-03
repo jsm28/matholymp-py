@@ -36,8 +36,9 @@ countries involved in them from which other data is derived.
 from matholymp.datasource import DataSource
 from matholymp.fileutil import comma_split, boolean_states
 from matholymp.roundupreg.rounduputil import distinguish_official, \
-    get_num_problems, get_marks_per_problem, scores_from_str, contestant_age, \
-    get_none_country, db_file_extension
+    have_consent_forms, get_num_problems, get_marks_per_problem, \
+    scores_from_str, contestant_age, get_none_country, db_file_extension, \
+    db_private_file_extension
 
 __all__ = ['RoundupDataSource']
 
@@ -195,6 +196,28 @@ class RoundupDataSource(DataSource):
             if photo_id is not None:
                 photo_filename = self._db.filename('file', photo_id)
             return photo_filename
+        elif name == 'consent_form_url':
+            if not have_consent_forms(self._db):
+                return None
+            consent_form_id = self._db.person.get(id, 'consent_form')
+            consent_form_url = None
+            if consent_form_id is not None:
+                consent_form_ext = db_private_file_extension(self._db,
+                                                             consent_form_id)
+                if consent_form_ext is not None:
+                    consent_form_url = (self._db.config.TRACKER_WEB +
+                                        'private_file' + consent_form_id +
+                                        '/consent-form.' + consent_form_ext)
+            return consent_form_url
+        elif name == 'consent_form_filename':
+            if not have_consent_forms(self._db):
+                return None
+            consent_form_id = self._db.person.get(id, 'consent_form')
+            consent_form_filename = None
+            if consent_form_id is not None:
+                consent_form_filename = self._db.filename('private_file',
+                                                          consent_form_id)
+            return consent_form_filename
         elif name == 'first_language':
             first_language = self._db.person.get(id, 'first_language')
             return self._db.language.get(first_language, 'name')

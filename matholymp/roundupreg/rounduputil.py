@@ -41,18 +41,25 @@ from roundup.date import Date
 from matholymp.fileutil import boolean_states, file_format_contents, \
     file_extension
 
-__all__ = ['distinguish_official', 'get_num_problems', 'get_marks_per_problem',
-           'scores_from_str', 'contestant_age', 'get_none_country_name',
-           'get_none_country', 'get_staff_country_name', 'get_staff_country',
+__all__ = ['distinguish_official', 'have_consent_forms', 'get_num_problems',
+           'get_marks_per_problem', 'scores_from_str', 'contestant_age',
+           'get_none_country_name', 'get_none_country',
+           'get_staff_country_name', 'get_staff_country',
            'normal_country_person', 'person_is_contestant', 'contestant_code',
            'pn_score', 'scores_final', 'any_scores_missing',
            'country_has_contestants', 'valid_country_problem', 'valid_score',
-           'create_rss', 'db_file_format_contents', 'db_file_extension']
+           'create_rss', 'db_file_format_contents', 'db_file_extension',
+           'db_private_file_format_contents', 'db_private_file_extension']
 
 def distinguish_official(db):
     """Return whether this event distinguishes official countries."""
     dist_off = db.config.ext['MATHOLYMP_DISTINGUISH_OFFICIAL']
     return boolean_states[dist_off.lower()]
+
+def have_consent_forms(db):
+    """Return whether this event has consent forms."""
+    consent_forms_date = db.config.ext['MATHOLYMP_CONSENT_FORMS_DATE']
+    return consent_forms_date != ''
 
 def get_num_problems(db):
     """Return the number of problems at this event."""
@@ -222,4 +229,22 @@ def db_file_extension(db, id):
     format that might be valid for some uploads.
     """
     name = db.file.get(id, 'name')
+    return file_extension(name)
+
+def db_private_file_format_contents(db, id):
+    """
+    Return the format (canonical filename extension) of an uploaded
+    private file based on its contents, or None if not a known format
+    that might be valid for some uploads.
+    """
+    filename = db.filename('private_file', id)
+    return file_format_contents(filename)
+
+def db_private_file_extension(db, id):
+    """
+    Return the format (canonical filename extension) of an uploaded
+    private file based on its filename extension, or None if not a
+    known format that might be valid for some uploads.
+    """
+    name = db.private_file.get(id, 'name')
     return file_extension(name)

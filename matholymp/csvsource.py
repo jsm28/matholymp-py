@@ -219,7 +219,8 @@ class CSVDataSource(DataSource):
                                    'arrival_flight': 'Arrival Flight',
                                    'departure_place': 'Departure Place',
                                    'departure_time': 'Departure Time',
-                                   'departure_flight': 'Departure Flight' }
+                                   'departure_flight': 'Departure Flight',
+                                   'consent_form_url': 'Consent Form URL' }
 
     _person_event_attr_map_int = { 'contestant_age': 'Contestant Age',
                                    'total_score': 'Total',
@@ -252,6 +253,20 @@ class CSVDataSource(DataSource):
                                                            'photos'),
                                          'photo', person_id)
             else:
+                url_path = url[len(self._cfg['url_base']):]
+                url_dirs = url_path.split('/')
+                return os.path.join(self._local_dir, *url_dirs)
+        if name == 'consent_form_filename':
+            k = 'Consent Form URL'
+            url = self._people[event_id][person_id][country_id][k]
+            if url == '':
+                return None
+            if self._reg_system:
+                return file_url_to_local(url, os.path.join(self._local_dir,
+                                                           'consent-forms'),
+                                         'consent-form', person_id)
+            else:
+                # Not actually a possible case.
                 url_path = url[len(self._cfg['url_base']):]
                 url_dirs = url_path.split('/')
                 return os.path.join(self._local_dir, *url_dirs)

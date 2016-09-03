@@ -37,19 +37,20 @@ __all__ = ['people_from_country_internal', 'people_from_country',
            'country_scores_table', 'scoreboard', 'has_nonempty_travel',
            'country_travel_copy_options', 'person_case_warning',
            'missing_person_details', 'registration_status',
-           'register_templating_utils']
+           'show_consent_form_ui', 'register_templating_utils']
 
 import cgi
 import json
 import re
 
 from roundup.cgi.templating import HTMLItem
+from roundup.date import Date
 
 from matholymp.caseconv import all_uppercase
 from matholymp.collate import coll_get_sort_key
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import distinguish_official, \
-    contestant_age, get_none_country, get_staff_country, \
+    have_consent_forms, contestant_age, get_none_country, get_staff_country, \
     normal_country_person, person_is_contestant, contestant_code, pn_score, \
     scores_final, any_scores_missing, country_has_contestants, \
     valid_country_problem
@@ -187,6 +188,13 @@ def missing_person_details(db, person):
     """Return a description of missing details for a person."""
 
     missing_list = []
+
+    if have_consent_forms(db) and not db.person.get(person, 'consent_form'):
+        consent_forms_date = db.config.ext['MATHOLYMP_CONSENT_FORMS_DATE']
+        date_of_birth = db.person.get(person, 'date_of_birth')
+        if date_of_birth is not None:
+            if date_of_birth >= Date(consent_forms_date):
+                missing_list.append('consent form')
 
     if not db.person.get(person, 'files'):
         missing_list.append('photo')
@@ -348,9 +356,24 @@ def registration_status(db):
 
     return text
 
+def show_consent_form_ui(db, person):
+    """Return whether to show the interface to upload a consent form."""
+    if not have_consent_forms(db):
+        return False
+    if db.person.get(person, 'consent_form'):
+        # Always show the interface if a form has been uploaded, even
+        # if the date of birth shows the form was unnecessary.
+        return True
+    date_of_birth = db.person.get(person, 'date_of_birth')
+    if date_of_birth is None:
+        return True
+    consent_forms_date = db.config.ext['MATHOLYMP_CONSENT_FORMS_DATE']
+    return date_of_birth >= Date(consent_forms_date)
+
 def register_templating_utils(instance):
     """Register functions for use from page templates with Roundup."""
     instance.registerUtil('distinguish_official', distinguish_official)
+    instance.registerUtil('have_consent_forms', have_consent_forms)
     instance.registerUtil('normal_country_person', normal_country_person)
     instance.registerUtil('person_is_contestant', person_is_contestant)
     instance.registerUtil('people_from_country', people_from_country)
@@ -370,3 +393,4 @@ def register_templating_utils(instance):
                           country_travel_copy_options)
     instance.registerUtil('person_case_warning', person_case_warning)
     instance.registerUtil('registration_status', registration_status)
+    instance.registerUtil('show_consent_form_ui', show_consent_form_ui)

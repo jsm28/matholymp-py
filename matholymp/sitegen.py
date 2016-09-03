@@ -1893,7 +1893,7 @@ class SiteGenerator(object):
                          'T-Shirt Size', 'Arrival Place', 'Arrival Time',
                          'Arrival Flight', 'Departure Place',
                          'Departure Time', 'Departure Flight', 'Room Number',
-                         'Phone Number'])
+                         'Phone Number', 'Consent Form URL'])
         return cols
 
     def person_csv_data(self, p, num_problems=None, scores_only=False,
@@ -1973,6 +1973,7 @@ class SiteGenerator(object):
             csv_out['Departure Flight'] = p.departure_flight or ''
             csv_out['Room Number'] = p.room_number or ''
             csv_out['Phone Number'] = p.phone_number or ''
+            csv_out['Consent Form URL'] = p.consent_form_url or ''
         return csv_out
 
     def generate_people_csv(self):

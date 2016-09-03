@@ -120,6 +120,30 @@ class RegSiteGenerator(SiteGenerator):
         output.close()
         return zip_bytes
 
+    def consent_forms_zip_bytes(self):
+        """Return the byte contents of the ZIP of consent_forms."""
+        output = io.BytesIO()
+        zip = zipfile.ZipFile(output, 'w', zipfile.ZIP_STORED)
+        zip.writestr('consent-forms/README.txt',
+                     'The consent forms in this file are arranged by internal'
+                     ' database identifier\nfor the person.\n')
+
+        e = self.event
+        person_list = sorted(e.person_list, key=lambda x:x.sort_key)
+        for p in person_list:
+            url = p.consent_form_url
+            if url is not None:
+                ext = file_extension(url)
+                filename = p.consent_form_filename
+                zip_filename = ('consent-forms/person%d/consent-form.%s' %
+                                (p.person.id, ext))
+                zip.write(filename, zip_filename)
+
+        zip.close()
+        zip_bytes = output.getvalue()
+        output.close()
+        return zip_bytes
+
     def display_scoreboard_text(self, e, display_start):
         """
         Return the text of one page of the display scoreboard for one

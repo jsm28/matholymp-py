@@ -24,6 +24,20 @@ Next version (unreleased)
   registration system identifier for the country or person, not by
   that for the file itself.
 
+* The registration system now supports uploading consent forms for
+  participants, where the host country requires this for participants
+  under a certain age. The new configuration variable
+  ``matholymp_consent_forms_date`` must be specified in
+  :file:`extensions/config.ini` for the registration system.  If
+  empty, consent forms are disabled; otherwise, it must be a date such
+  that participants born on or after that date require consent forms
+  to be uploaded.  :file:`person.item.html` and
+  :file:`person.index.html` are updated to support this feature (but
+  local changes may be needed to point people to an appropriate blank
+  consent form to fill in), and new templates
+  :file:`private_file.item.html` and :file:`private_file.index.html`
+  are added.
+
 Version 2016.05.0 (1 May 2016)
 ------------------------------
 

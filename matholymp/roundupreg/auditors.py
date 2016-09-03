@@ -38,10 +38,11 @@ from roundup.date import Date
 
 from matholymp.fileutil import boolean_states
 from matholymp.roundupreg.auditorutil import get_new_value, require_value
-from matholymp.roundupreg.rounduputil import get_num_problems, \
-    get_marks_per_problem, get_none_country, get_staff_country, \
-    any_scores_missing, valid_score, create_rss, db_file_format_contents, \
-    db_file_extension
+from matholymp.roundupreg.rounduputil import have_consent_forms, \
+    get_num_problems, get_marks_per_problem, get_none_country, \
+    get_staff_country, any_scores_missing, valid_score, create_rss, \
+    db_file_format_contents, db_file_extension, \
+    db_private_file_format_contents, db_private_file_extension
 from matholymp.roundupreg.staticsite import static_site_event_group, \
     static_site_file_data
 from matholymp.roundupreg.userauditor import audit_user_fields
@@ -257,6 +258,21 @@ def audit_person_fields(db, cl, nodeid, newvalues):
             if format_ext != format_contents:
                 raise ValueError('Filename extension for photo must match '
                                  'contents (%s)' % format_contents)
+
+    if have_consent_forms(db) and 'consent_form' in newvalues:
+        file_id = newvalues['consent_form']
+        if file_id is not None:
+            format_contents = db_private_file_format_contents(db, file_id)
+            format_ext = db_private_file_extension(db, file_id)
+            if format_contents != 'pdf':
+                raise ValueError('Consent forms must be in PDF format')
+            if format_ext != format_contents:
+                raise ValueError('Filename extension for consent form must '
+                                 'match contents (%s)' % format_contents)
+            if user_country != staff_country:
+                file_country = db.private_file.get(file_id, 'country')
+                if file_country is not None and file_country != user_country:
+                    raise ValueError('Consent form from another country')
 
     generic_url = get_new_value(db, cl, nodeid, newvalues, 'generic_url')
     if generic_url is not None and generic_url != '':

@@ -1314,6 +1314,17 @@ class PersonEvent(object):
         this event.
         """)
 
+    consent_form_url = _PersonEventPropertyDS(
+        'consent_form_url',
+        """The URL of the consent form of this person at this event.""")
+
+    consent_form_filename = _PersonEventPropertyDS(
+        'consent_form_filename',
+        """
+        The local filename of the consent form of this person at this
+        event.
+        """)
+
     first_language = _PersonEventPropertyDS(
         'first_language',
         """The first language of this person at this event.""")

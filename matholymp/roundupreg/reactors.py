@@ -29,7 +29,7 @@
 
 """This module provides reactors for the Roundup registration system."""
 
-__all__ = ['country_react', 'register_reactors']
+__all__ = ['country_react', 'person_react', 'register_reactors']
 
 import email
 import os.path
@@ -38,6 +38,7 @@ import roundup.mailer
 import roundup.password
 
 from matholymp.fileutil import read_text_from_file
+from matholymp.roundupreg.rounduputil import have_consent_forms
 
 def country_react(db, cl, nodeid, oldvalues):
     """Create an account for a country if required."""
@@ -86,7 +87,23 @@ def country_react(db, cl, nodeid, oldvalues):
     except roundup.mailer.MessageSendError:
         pass
 
+def person_react(db, cl, nodeid, oldvalues):
+    """Set the country for a person's consent form if required."""
+    if db.person.is_retired(nodeid):
+        return
+    if not have_consent_forms(db):
+        return
+    cf = db.person.get(nodeid, 'consent_form')
+    if not cf:
+        return
+    person_country = db.person.get(nodeid, 'country')
+    file_country = db.private_file.get(cf, 'country')
+    if file_country != person_country:
+        db.private_file.set(cf, country=person_country)
+
 def register_reactors(db):
     """Register the matholymp reactors with Roundup."""
     db.country.react('set', country_react)
     db.country.react('create', country_react)
+    db.person.react('set', person_react)
+    db.person.react('create', person_react)

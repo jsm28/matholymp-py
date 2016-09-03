@@ -183,6 +183,20 @@ class PhotosZIPAction(Action):
                               'attachment; filename=photos.zip')
         return RoundupSiteGenerator(self.db).photos_zip_bytes()
 
+class ConsentFormsZIPAction(Action):
+
+    """Action to return a ZIP file of consent forms."""
+
+    def handle(self):
+        """Output a ZIP file of consent forms of registered participants."""
+        if not self.hasPermission('Omnivident'):
+            raise Unauthorised('You do not have permission to access '
+                               'consent forms')
+        self.client.setHeader('Content-Type', 'application/zip')
+        self.client.setHeader('Content-Disposition',
+                              'attachment; filename=consent-forms.zip')
+        return RoundupSiteGenerator(self.db).consent_forms_zip_bytes()
+
 class ScoresRSSAction(Action):
 
     """Action to return an RSS feed of scores."""
@@ -241,4 +255,5 @@ def register_actions(instance):
     instance.registerAction('people_csv', PeopleCSVAction)
     instance.registerAction('flags_zip', FlagsZIPAction)
     instance.registerAction('photos_zip', PhotosZIPAction)
+    instance.registerAction('consent_forms_zip', ConsentFormsZIPAction)
     instance.registerAction('scores_rss', ScoresRSSAction)

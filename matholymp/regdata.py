@@ -39,7 +39,8 @@ from matholymp.fileutil import file_extension
 __all__ = ['file_url_to_local', 'lang_to_filename']
 
 _type_to_entity_type = { 'flag': 'country',
-                         'photo': 'person' }
+                         'photo': 'person',
+                         'consent-form': 'person' }
 
 def file_url_to_local(url, local_dir, type, id):
     """

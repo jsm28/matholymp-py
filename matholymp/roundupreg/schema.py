@@ -55,7 +55,7 @@
 """This module provides the Roundup registration schema."""
 
 from matholymp.roundupreg.rounduputil import distinguish_official, \
-    get_none_country
+    have_consent_forms, get_none_country
 
 __all__ = ['init_schema']
 
@@ -126,6 +126,10 @@ def init_schema(env):
                     name=String())
     arrival.setkey('name')
 
+    if have_consent_forms(db):
+        person_extra = { 'consent_form': Link('private_file') }
+    else:
+        person_extra = {}
     person=Class(db, 'person',
                  country=Link('country'),
                  given_name=String(),
@@ -151,7 +155,8 @@ def init_schema(env):
                  reuse_photo=Boolean(),
                  files=Link('file'),
                  scores=String(), # comma-separated scores on each problem
-                 extra_awards=String()
+                 extra_awards=String(),
+                 **person_extra
     )
     person.setorderprop('primary_role')
 
@@ -173,6 +178,9 @@ def init_schema(env):
 
     file = FileClass(db, 'file',
                     name=String())
+
+    private_file = FileClass(db, 'private_file',
+                             name=String(), country=Link('country'))
 
     # Set up permissions:
 
@@ -242,34 +250,20 @@ def init_schema(env):
     p = db.security.addPermission(name='View', klass='person',
                                   check=own_country_person)
     db.security.addPermissionToRole('Register', p)
+    person_reg_props = ['country', 'given_name', 'family_name', 'gender',
+                        'date_of_birth', 'primary_role', 'first_language',
+                        'second_language', 'diet', 'tshirt', 'arrival_place',
+                        'arrival_time', 'arrival_flight', 'departure_place',
+                        'departure_time', 'departure_flight', 'generic_url',
+                        'reuse_photo', 'files']
+    if have_consent_forms(db):
+        person_reg_props.append('consent_form')
     p = db.security.addPermission(name='Edit', klass='person',
                                   check=own_country_person,
-                                  properties=('country', 'given_name',
-                                              'family_name', 'gender',
-                                              'date_of_birth', 'primary_role',
-                                              'first_language',
-                                              'second_language', 'diet',
-                                              'tshirt', 'arrival_place',
-                                              'arrival_time', 'arrival_flight',
-                                              'departure_place',
-                                              'departure_time',
-                                              'departure_flight',
-                                              'generic_url',
-                                              'reuse_photo', 'files'))
+                                  properties=person_reg_props)
     db.security.addPermissionToRole('Register', p)
     p = db.security.addPermission(name='Create', klass='person',
-                                  properties=('country', 'given_name',
-                                              'family_name', 'gender',
-                                              'date_of_birth', 'primary_role',
-                                              'first_language',
-                                              'second_language', 'diet',
-                                              'tshirt', 'arrival_place',
-                                              'arrival_time', 'arrival_flight',
-                                              'departure_place',
-                                              'departure_time',
-                                              'departure_flight',
-                                              'generic_url',
-                                              'reuse_photo', 'files'))
+                                  properties=person_reg_props)
     db.security.addPermissionToRole('Register', p)
     def normal_can_view_person(db, userid, itemid):
         """Determine whether a normal user can view this person."""
@@ -283,6 +277,22 @@ def init_schema(env):
                                               'extra_awards', 'generic_url'))
     db.security.addPermissionToRole('User', p)
     db.security.addPermissionToRole('Anonymous', p)
+
+    # Registering users can create private files, and view them only
+    # when from their own country or created by that user (the latter
+    # as a case for access before the country is set).
+    db.security.addPermissionToRole('Register', 'Create', 'private_file')
+    def own_country_file(db, userid, itemid):
+        """Determine whether the userid matches the country of the private
+        file being accessed."""
+        user_country = db.user.get(userid, 'country')
+        file_country = db.private_file.get(itemid, 'country')
+        file_creator = db.private_file.get(itemid, 'creator')
+        return (user_country == file_country or
+                (file_country is None and userid == file_creator))
+    p = db.security.addPermission(name='View', klass='private_file',
+                                  check=own_country_file)
+    db.security.addPermissionToRole('Register', p)
 
     # Entering scores has its own Permission and Role.
     p = db.security.addPermission(name='Score')

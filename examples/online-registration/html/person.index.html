@@ -20,6 +20,11 @@
   CSV format</a>, and a <a href="person?@action=photos_zip">ZIP file
   of participant photos</a> is available.</p>
 
+<p tal:condition="python:utils.have_consent_forms(db._db) and
+  request.user.hasPermission('Omnivident')">A
+  <a href="person?@action=consent_forms_zip">ZIP file of participant consent
+  forms</a> is also available.</p>
+
 <tal:block tal:replace="structure python:utils.all_people_table(db._db)" />
 
 </span>

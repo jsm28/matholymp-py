@@ -280,6 +280,45 @@ define="edit_ok context/is_edit_ok"
   <td colspan="2">Photos should be uploaded as JPEG or PNG files.</td>
  </tr>
 
+<tal:block tal:condition="context/is_edit_ok">
+<tal:block tal:condition="python:utils.have_consent_forms(db._db)">
+<tal:block tal:condition="not:context/id">
+ <tr>
+  <th i18n:translate="">Upload consent form</th>
+  <td colspan=3><input type="file" name="private_file-1@content" size="20">
+  <input type="hidden" name="@link@consent_form" value="private_file-1"></td>
+ </tr>
+ <tr>
+  <td colspan="2">Consent forms are required for participants born on
+  or after <span tal:replace="python:db._db.config.ext['MATHOLYMP_CONSENT_FORMS_DATE']" />,
+  and should be uploaded as PDF files.</td>
+ </tr>
+</tal:block>
+<tal:block tal:condition="context/id">
+<tal:block tal:condition="python:utils.show_consent_form_ui(db._db, context.id)">
+ <tr>
+  <th i18n:translate="">Upload consent form</th>
+  <td colspan=3><input type="file" name="private_file-1@content" size="20">
+  <input type="hidden" name="@link@consent_form" value="private_file-1"></td>
+ </tr>
+ <tr>
+  <td colspan="2">Consent forms are required for participants born on
+  or after <span tal:replace="python:db._db.config.ext['MATHOLYMP_CONSENT_FORMS_DATE']" />,
+  and should be uploaded as PDF files.</td>
+ </tr>
+<tal:block tal:condition="context/consent_form">
+ <tr>
+  <td colspan="2">A <a tal:attributes="href
+  context/consent_form/download_url">consent form for this person</a>
+  has already been uploaded, but you may upload a new one to replace
+  it if you wish.</td>
+ </tr>
+</tal:block>
+</tal:block>
+</tal:block>
+</tal:block>
+</tal:block>
+
 <tal:block tal:condition="context/id">
 <tal:block tal:condition="python:not db._db.person.is_retired(context.id)">
 <tal:block tal:condition="python:utils.person_is_contestant(db._db, context.id)">

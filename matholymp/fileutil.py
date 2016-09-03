@@ -222,6 +222,10 @@ def file_format_contents(filename):
     if fmt in _file_format_ext_map:
         return _file_format_ext_map[fmt]
     else:
+        with open(filename, 'rb') as f:
+            h = f.read(5)
+        if h == b'%PDF-':
+            return 'pdf'
         return None
 
 if _py3:
@@ -233,7 +237,8 @@ _ascii_tolower = _maketrans(string.ascii_uppercase, string.ascii_lowercase)
 # Map extensions to their canonical forms.
 _file_ext_map = { 'jpg': 'jpg',
                   'jpeg': 'jpg',
-                  'png': 'png' }
+                  'png': 'png',
+                  'pdf': 'pdf' }
 
 def file_extension(name):
     """
