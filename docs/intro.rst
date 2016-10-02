@@ -105,6 +105,10 @@ Releases of matholymp are available for download:
 The current development sources of matholymp are available using `Git
 <https://git-scm.com/>`_::
 
+   git clone https://git.ukmt.org.uk/matholymp-py.git
+
+or::
+
    git clone git://git.ukmt.org.uk/git/matholymp-py.git
 
 There is also a `mirror on GitHub
