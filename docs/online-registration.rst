@@ -354,11 +354,13 @@ directory.
 Displaying scores
 ^^^^^^^^^^^^^^^^^
 
-A very plain version of the scoreboard that displays four countries on
-a page and automatically rotates through all countries is available
-for showing on screens or projecting at the olympiad site.  The system
-driving the display should run a (full-screen) browser pointed to the
-page ``person?@template=scoredisplay`` within the registration system.
+A very plain version of the scoreboard that displays multiple
+countries on a page (the number of rows and columns being configurable
+in :file:`extensions/config.ini`) and automatically rotates through
+all countries is available for showing on screens or projecting at the
+olympiad site.  The system driving the display should run a
+(full-screen) browser pointed to the page
+``person?@template=scoredisplay`` within the registration system.
 This browser does not need to be logged in; as with the main
 scoreboard, the display version is public (although it is not linked
 to from other pages, given the limited use of it).
