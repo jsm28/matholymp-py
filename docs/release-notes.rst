@@ -38,6 +38,10 @@ Next version (unreleased)
   :file:`private_file.item.html` and :file:`private_file.index.html`
   are added.
 
+* The registration system templates :file:`user.item.html` and
+  :file:`country.item.html` are updated to clarify the effects of
+  editing email addresses entered in the registration system.
+
 Version 2016.05.0 (1 May 2016)
 ------------------------------
 

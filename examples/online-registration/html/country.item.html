@@ -66,7 +66,9 @@ define="edit_ok context/is_edit_ok"
  <tr tal:condition="context/is_edit_ok">
   <td colspan="2">If a contact email address is entered, a
   registration system account will be automatically created for that
-  country if one does not already exist.</td>
+  country if one does not already exist.  This address is used only
+  for that purpose; contact the event organizers to change the
+  address used for general contact purposes.</td>
  </tr>
 
  <tr tal:define="name string:contact_email; label string:Contact email; value context/contact_email; edit_ok edit_ok" tal:condition="context/is_edit_ok">

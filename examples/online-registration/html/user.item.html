@@ -111,6 +111,13 @@ define="edit_ok context/is_edit_ok"
  </tr>
 
  <tr tal:condition="edit_ok">
+   <td colspan="2">Note that the address given here is only used if a
+   password reset is requested, not for general contact purposes.
+   Contact the event organizers to change the address used for
+   general contact purposes.</td>
+ </tr>
+
+ <tr tal:condition="edit_ok">
   <td>
    &nbsp;
    <input type="hidden" name="@template" value="item">
