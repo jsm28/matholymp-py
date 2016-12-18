@@ -1335,7 +1335,10 @@ class PersonEvent(object):
 
     diet = _PersonEventPropertyDS(
         'diet',
-        """The dietary requirements of this person at this event.""")
+        """
+        The allergies and dietary requirements of this person at this
+        event.
+        """)
 
     room_number = _PersonEventPropertyDS(
         'room_number',

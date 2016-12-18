@@ -1889,7 +1889,8 @@ class SiteGenerator(object):
             cols.extend(['Rank'])
         if private_data:
             cols.extend(['Gender', 'Date of Birth', 'First Language',
-                         'Second Language', 'Dietary Requirements',
+                         'Second Language',
+                         'Allergies and Dietary Requirements',
                          'T-Shirt Size', 'Arrival Place', 'Arrival Time',
                          'Arrival Flight', 'Departure Place',
                          'Departure Time', 'Departure Flight', 'Room Number',
@@ -1963,7 +1964,7 @@ class SiteGenerator(object):
             csv_out['Date of Birth'] = p.date_of_birth or ''
             csv_out['First Language'] = p.first_language or ''
             csv_out['Second Language'] = p.second_language or ''
-            csv_out['Dietary Requirements'] = p.diet or ''
+            csv_out['Allergies and Dietary Requirements'] = p.diet or ''
             csv_out['T-Shirt Size'] = p.tshirt or ''
             csv_out['Arrival Place'] = p.arrival_place or ''
             csv_out['Arrival Time'] = p.arrival_time or ''

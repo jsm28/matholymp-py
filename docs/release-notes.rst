@@ -42,6 +42,11 @@ Next version (unreleased)
   :file:`country.item.html` are updated to clarify the effects of
   editing email addresses entered in the registration system.
 
+* The registration system template :file:`person.item.html` now
+  collects information "Allergies and dietary requirements" rather
+  than simply "Dietary requirements".  The CSV file column is renamed
+  accordingly.
+
 Version 2016.05.0 (1 May 2016)
 ------------------------------
 

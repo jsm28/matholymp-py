@@ -208,7 +208,7 @@ class CSVDataSource(DataSource):
                                    'photo_url': 'Photo URL',
                                    'first_language': 'First Language',
                                    'second_language': 'Second Language',
-                                   'diet': 'Dietary Requirements',
+                                   'diet': 'Allergies and Dietary Requirements',
                                    'room_number': 'Room Number',
                                    'phone_number': 'Phone Number',
                                    'gender': 'Gender',

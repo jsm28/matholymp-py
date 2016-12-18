@@ -170,8 +170,8 @@ define="edit_ok context/is_edit_ok"
   if papers are desired in a language not included in the list.</td>
  </tr>
 
- <tr tal:define="name string:diet; label string:Dietary requirements; value context/diet; edit_ok edit_ok" tal:condition="context/is_edit_ok">
-  <th metal:use-macro="th_label">Dietary requirements</th>
+ <tr tal:define="name string:diet; label string:Allergies and dietary requirements; value context/diet; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label">Allergies and dietary requirements</th>
   <td><textarea rows="5" cols="40" tal:replace="structure context/diet/multiline"></textarea></td>
  </tr>
 
