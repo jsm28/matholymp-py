@@ -47,6 +47,13 @@ Next version (unreleased)
   than simply "Dietary requirements".  The CSV file column is renamed
   accordingly.
 
+* The registration system now supports requiring a date of birth to be
+  specified for all participants rather than just for contestants.
+  The new configuration variable ``matholymp_require_date_of_birth``
+  must be specified in :file:`extensions/config.ini` for the
+  registration system (as ``Yes`` or ``No``).
+  :file:`person.item.html` is updated accordingly.
+
 Version 2016.05.0 (1 May 2016)
 ------------------------------
 

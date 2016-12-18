@@ -37,7 +37,8 @@ __all__ = ['people_from_country_internal', 'people_from_country',
            'country_scores_table', 'scoreboard', 'has_nonempty_travel',
            'country_travel_copy_options', 'person_case_warning',
            'missing_person_details', 'registration_status',
-           'show_consent_form_ui', 'register_templating_utils']
+           'show_consent_form_ui', 'required_person_fields',
+           'register_templating_utils']
 
 import cgi
 import json
@@ -50,10 +51,10 @@ from matholymp.caseconv import all_uppercase
 from matholymp.collate import coll_get_sort_key
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import distinguish_official, \
-    have_consent_forms, contestant_age, get_none_country, get_staff_country, \
-    normal_country_person, person_is_contestant, contestant_code, pn_score, \
-    scores_final, any_scores_missing, country_has_contestants, \
-    valid_country_problem
+    have_consent_forms, require_dob, contestant_age, get_none_country, \
+    get_staff_country, normal_country_person, person_is_contestant, \
+    contestant_code, pn_score, scores_final, any_scores_missing, \
+    country_has_contestants, valid_country_problem
 
 def people_from_country_internal(db, country):
     """
@@ -370,10 +371,19 @@ def show_consent_form_ui(db, person):
     consent_forms_date = db.config.ext['MATHOLYMP_CONSENT_FORMS_DATE']
     return date_of_birth >= Date(consent_forms_date)
 
+def required_person_fields(db):
+    """Return the list of fields required for registered people."""
+    req = ['country', 'given_name', 'family_name', 'gender', 'primary_role',
+           'first_language', 'tshirt']
+    if require_dob(db):
+        req.append('date_of_birth')
+    return req
+
 def register_templating_utils(instance):
     """Register functions for use from page templates with Roundup."""
     instance.registerUtil('distinguish_official', distinguish_official)
     instance.registerUtil('have_consent_forms', have_consent_forms)
+    instance.registerUtil('require_dob', require_dob)
     instance.registerUtil('normal_country_person', normal_country_person)
     instance.registerUtil('person_is_contestant', person_is_contestant)
     instance.registerUtil('people_from_country', people_from_country)
@@ -394,3 +404,4 @@ def register_templating_utils(instance):
     instance.registerUtil('person_case_warning', person_case_warning)
     instance.registerUtil('registration_status', registration_status)
     instance.registerUtil('show_consent_form_ui', show_consent_form_ui)
+    instance.registerUtil('required_person_fields', required_person_fields)

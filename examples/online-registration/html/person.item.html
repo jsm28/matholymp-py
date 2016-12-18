@@ -57,7 +57,7 @@ define="edit_ok context/is_edit_ok"
  <td>&nbsp;fields are required.</td>
 </tr>
 </table>
-<table class="form">
+<table class="form" tal:condition="python:not utils.require_dob(db._db)">
 <tr>
  <td>Date of birth is required for contestants.</td>
 </tr>
@@ -72,7 +72,7 @@ define="edit_ok context/is_edit_ok"
 
 <form method="POST"
       name="itemSynopsis"
-      tal:define="required python:'country given_name family_name gender primary_role first_language tshirt'.split()"
+      tal:define="required python:utils.required_person_fields(db._db)"
       enctype="multipart/form-data"
       tal:attributes="action context/designator;
       onSubmit python:'return checkRequiredFields(\'%s\')'%'\', \''.join(required);
@@ -119,7 +119,7 @@ define="edit_ok context/is_edit_ok"
   { 'id' : 'gender' })">gender</td>
  </tr>
 
- <tr tal:define="name string:Date_of_birth; label string:Date of birth; value context/date_of_birth; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:date_of_birth; label string:Date of birth; value context/date_of_birth; edit_ok edit_ok" tal:condition="context/is_edit_ok">
   <th class="required" metal:use-macro="th_label">Date of birth</th>
   <td tal:content="structure
   python:context.date_of_birth.field(id='date_of_birth')"></td>

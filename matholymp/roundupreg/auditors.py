@@ -38,7 +38,7 @@ from roundup.date import Date
 
 from matholymp.fileutil import boolean_states
 from matholymp.roundupreg.auditorutil import get_new_value, require_value
-from matholymp.roundupreg.rounduputil import have_consent_forms, \
+from matholymp.roundupreg.rounduputil import have_consent_forms, require_dob, \
     get_num_problems, get_marks_per_problem, get_none_country, \
     get_staff_country, any_scores_missing, valid_score, create_rss, \
     db_file_format_contents, db_file_extension, \
@@ -200,13 +200,16 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     # in the regulations.  To avoid problems generating CSV files,
     # dates of birth, if specified for other people, must not be too
     # old for python's strftime.
+    dob_required = is_contestant or require_dob(db)
+    date_of_birth = get_new_value(db, cl, nodeid, newvalues, 'date_of_birth')
+    if dob_required:
+        date_of_birth = require_value(db, cl, nodeid, newvalues,
+                                      'date_of_birth',
+                                      'No date of birth specified')
+    if date_of_birth is not None:
+        if date_of_birth < Date('1902-01-01'):
+            raise ValueError('Participant implausibly old')
     if is_contestant:
-        date_of_birth = newvalues.get('date_of_birth', None)
-        if date_of_birth is None:
-            if nodeid is None:
-                raise ValueError('No date of birth specified for contestant')
-            date_of_birth = cl.get(nodeid, 'date_of_birth')
-            newvalues['date_of_birth'] = date_of_birth
         earliest_dob = Date(db.config.ext['MATHOLYMP_EARLIEST_DATE_OF_BIRTH'])
         if date_of_birth < earliest_dob:
             raise ValueError('Contestant too old')
@@ -216,11 +219,6 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         sanity_dob = Date(db.config.ext['MATHOLYMP_SANITY_DATE_OF_BIRTH'])
         if date_of_birth >= sanity_dob:
             raise ValueError('Contestant implausibly young')
-    else:
-        date_of_birth = newvalues.get('date_of_birth', None)
-        if date_of_birth is not None:
-            if date_of_birth < Date('1902-01-01'):
-                raise ValueError('Participant implausibly old')
 
     # Start with blank scores for contestants - and for other people
     # in case someone is first registered with another role then
