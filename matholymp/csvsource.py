@@ -220,7 +220,9 @@ class CSVDataSource(DataSource):
                                    'departure_place': 'Departure Place',
                                    'departure_time': 'Departure Time',
                                    'departure_flight': 'Departure Flight',
-                                   'consent_form_url': 'Consent Form URL' }
+                                   'consent_form_url': 'Consent Form URL',
+                                   'passport_number':
+                                   'Passport or Identity Card Number'}
 
     _person_event_attr_map_int = { 'contestant_age': 'Contestant Age',
                                    'total_score': 'Total',

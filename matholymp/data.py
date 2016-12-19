@@ -1364,6 +1364,13 @@ class PersonEvent(object):
         'date_of_birth',
         """The date of birth of this person at this event.""")
 
+    passport_number = _PersonEventPropertyDS(
+        'passport_number',
+        """
+        The passport or identity card number of this person at this
+        event.
+        """)
+
     tshirt = _PersonEventPropertyDS(
         'tshirt',
         """The T-shirt size of this person at this event.""")

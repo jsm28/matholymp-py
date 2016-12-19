@@ -51,10 +51,10 @@ from matholymp.caseconv import all_uppercase
 from matholymp.collate import coll_get_sort_key
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import distinguish_official, \
-    have_consent_forms, require_dob, contestant_age, get_none_country, \
-    get_staff_country, normal_country_person, person_is_contestant, \
-    contestant_code, pn_score, scores_final, any_scores_missing, \
-    country_has_contestants, valid_country_problem
+    have_consent_forms, have_passport_numbers, require_dob, contestant_age, \
+    get_none_country, get_staff_country, normal_country_person, \
+    person_is_contestant, contestant_code, pn_score, scores_final, \
+    any_scores_missing, country_has_contestants, valid_country_problem
 
 def people_from_country_internal(db, country):
     """
@@ -377,12 +377,15 @@ def required_person_fields(db):
            'first_language', 'tshirt']
     if require_dob(db):
         req.append('date_of_birth')
+    if have_passport_numbers(db):
+        req.append('passport_number')
     return req
 
 def register_templating_utils(instance):
     """Register functions for use from page templates with Roundup."""
     instance.registerUtil('distinguish_official', distinguish_official)
     instance.registerUtil('have_consent_forms', have_consent_forms)
+    instance.registerUtil('have_passport_numbers', have_passport_numbers)
     instance.registerUtil('require_dob', require_dob)
     instance.registerUtil('normal_country_person', normal_country_person)
     instance.registerUtil('person_is_contestant', person_is_contestant)

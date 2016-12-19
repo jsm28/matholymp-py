@@ -125,6 +125,14 @@ define="edit_ok context/is_edit_ok"
   python:context.date_of_birth.field(id='date_of_birth')"></td>
  </tr>
 
+<tal:block tal:condition="python:utils.have_passport_numbers(db._db)">
+ <tr tal:condition="context/is_edit_ok"
+     tal:define="name string:passport_number; label string:Passport or identity card number; value context/passport_number; edit_ok edit_ok">
+  <th class="required" metal:use-macro="th_label">Passport or identity card number</th>
+  <td><input name="passport_number" metal:use-macro="normal_input"></td>
+ </tr>
+</tal:block>
+
  <tr tal:condition="python:utils.normal_country_person(db._db,
   request.user.id)" tal:define="name string:primary_role; label string:Primary role; value context/primary_role; edit_ok edit_ok">
   <th metal:use-macro="th_label">Primary role</th>

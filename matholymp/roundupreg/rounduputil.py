@@ -41,9 +41,10 @@ from roundup.date import Date
 from matholymp.fileutil import boolean_states, file_format_contents, \
     file_extension
 
-__all__ = ['distinguish_official', 'have_consent_forms', 'require_dob',
-           'get_num_problems', 'get_marks_per_problem', 'scores_from_str',
-           'contestant_age', 'get_none_country_name', 'get_none_country',
+__all__ = ['distinguish_official', 'have_consent_forms',
+           'have_passport_numbers', 'require_dob', 'get_num_problems',
+           'get_marks_per_problem', 'scores_from_str', 'contestant_age',
+           'get_none_country_name', 'get_none_country',
            'get_staff_country_name', 'get_staff_country',
            'normal_country_person', 'person_is_contestant', 'contestant_code',
            'pn_score', 'scores_final', 'any_scores_missing',
@@ -60,6 +61,14 @@ def have_consent_forms(db):
     """Return whether this event has consent forms."""
     consent_forms_date = db.config.ext['MATHOLYMP_CONSENT_FORMS_DATE']
     return consent_forms_date != ''
+
+def have_passport_numbers(db):
+    """
+    Return whether passport or identity card numbers are collected for
+    this event.
+    """
+    req_passport = db.config.ext['MATHOLYMP_REQUIRE_PASSPORT_NUMBER']
+    return boolean_states[req_passport.lower()]
 
 def require_dob(db):
     """Return whether date of birth is required for all participants."""

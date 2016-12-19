@@ -54,6 +54,14 @@ Next version (unreleased)
   registration system (as ``Yes`` or ``No``).
   :file:`person.item.html` is updated accordingly.
 
+* The registration system now supports collecting passport or identity
+  card numbers for participants.  The new configuration variable
+  ``matholymp_require_passport_number`` must be specified in
+  :file:`extensions/config.ini` for the registration system.  If
+  ``Yes``, this information is collected and is required for all
+  participants.  If ``No``, this information is not collected.
+  :file:`person.item.html` is updated accordingly.
+
 Version 2016.05.0 (1 May 2016)
 ------------------------------
 

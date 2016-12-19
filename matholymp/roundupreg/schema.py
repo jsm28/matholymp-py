@@ -55,7 +55,7 @@
 """This module provides the Roundup registration schema."""
 
 from matholymp.roundupreg.rounduputil import distinguish_official, \
-    have_consent_forms, get_none_country
+    have_consent_forms, have_passport_numbers, get_none_country
 
 __all__ = ['init_schema']
 
@@ -126,10 +126,11 @@ def init_schema(env):
                     name=String())
     arrival.setkey('name')
 
+    person_extra={}
     if have_consent_forms(db):
-        person_extra = { 'consent_form': Link('private_file') }
-    else:
-        person_extra = {}
+        person_extra['consent_form'] = Link('private_file')
+    if have_passport_numbers(db):
+        person_extra['passport_number'] = String()
     person=Class(db, 'person',
                  country=Link('country'),
                  given_name=String(),
@@ -258,6 +259,8 @@ def init_schema(env):
                         'reuse_photo', 'files']
     if have_consent_forms(db):
         person_reg_props.append('consent_form')
+    if have_passport_numbers(db):
+        person_reg_props.append('passport_number')
     p = db.security.addPermission(name='Edit', klass='person',
                                   check=own_country_person,
                                   properties=person_reg_props)
