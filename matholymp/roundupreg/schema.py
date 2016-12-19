@@ -126,7 +126,7 @@ def init_schema(env):
                     name=String())
     arrival.setkey('name')
 
-    person_extra={}
+    person_extra = {}
     if have_consent_forms(db):
         person_extra['consent_form'] = Link('private_file')
     if have_passport_numbers(db):
