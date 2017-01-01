@@ -1,6 +1,6 @@
 # Initialise matholymp package.
 
-# Copyright 2014-2016 Joseph Samuel Myers.
+# Copyright 2014-2017 Joseph Samuel Myers.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ maintaining websites for mathematical olympiads, registration of
 participants and associated administration.
 """
 
-__version__ = '2016.12.0.dev0'
+__version__ = '2017.01.0.dev0'
 
 __all__ = ['caseconv', 'collate', 'csvsource', 'data', 'datasource', 'docgen',
            'fileutil', 'regdata', 'regsitegen', 'sitegen', 'stats']
