@@ -33,12 +33,12 @@ system.
 """
 
 __all__ = ['people_from_country_internal', 'people_from_country',
-           'country_people_table', 'all_people_table', 'person_scores_table',
-           'country_scores_table', 'scoreboard', 'has_nonempty_travel',
-           'country_travel_copy_options', 'person_case_warning',
-           'missing_person_details', 'registration_status',
-           'show_consent_form_ui', 'required_person_fields',
-           'register_templating_utils']
+           'show_country_people', 'country_people_table', 'all_people_table',
+           'person_scores_table', 'country_scores_table', 'scoreboard',
+           'has_nonempty_travel', 'country_travel_copy_options',
+           'person_case_warning', 'missing_person_details',
+           'registration_status', 'show_consent_form_ui',
+           'required_person_fields', 'register_templating_utils']
 
 import cgi
 import json
@@ -81,6 +81,11 @@ def people_from_country(db, country):
     """
     sorted_list = people_from_country_internal(db._db, country)
     return [HTMLItem(db._client, 'person', i) for i in sorted_list]
+
+def show_country_people(db, country):
+    """Return whether to show a table of people on a country's page."""
+    none_country = get_none_country(db)
+    return country != none_country and not db.country.is_retired(country)
 
 def country_people_table(db, country):
     """Show the table of people from a country on that country's page."""
@@ -390,6 +395,7 @@ def register_templating_utils(instance):
     instance.registerUtil('normal_country_person', normal_country_person)
     instance.registerUtil('person_is_contestant', person_is_contestant)
     instance.registerUtil('people_from_country', people_from_country)
+    instance.registerUtil('show_country_people', show_country_people)
     instance.registerUtil('country_people_table', country_people_table)
     instance.registerUtil('all_people_table', all_people_table)
     instance.registerUtil('contestant_code', contestant_code)

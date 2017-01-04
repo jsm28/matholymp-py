@@ -182,10 +182,7 @@ define="edit_ok context/is_edit_ok"
 </table>
 </tal:block>
 
-<tal:block tal:condition="python:not db._db.country.is_retired(context.id)">
-
-<tal:block tal:condition="python:db._db.country.get(context.id,
-			  'name') != 'None'">
+<tal:block tal:condition="python:utils.show_country_people(db._db, context.id)">
 
 <h2>Registered participants from this country</h2>
 
@@ -205,8 +202,6 @@ define="edit_ok context/is_edit_ok"
 <tal:block tal:replace="structure
 			python:utils.country_scores_table(db._db,
 			context.id)" />
-</tal:block>
-
 </tal:block>
 
 </tal:block>
