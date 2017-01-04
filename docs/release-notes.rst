@@ -31,7 +31,9 @@ Next version (unreleased)
   :file:`extensions/config.ini` for the registration system.  If
   empty, consent forms are disabled; otherwise, it must be a date such
   that participants born on or after that date require consent forms
-  to be uploaded.  :file:`person.item.html` and
+  to be uploaded.  If this feature is used, the configuration variable
+  ``matholymp_consent_forms_url`` must also be set, to the URL of the
+  blank consent form.  :file:`person.item.html` and
   :file:`person.index.html` are updated to support this feature (but
   local changes may be needed to point people to an appropriate blank
   consent form to fill in), and new templates

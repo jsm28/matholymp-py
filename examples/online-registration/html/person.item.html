@@ -299,7 +299,9 @@ define="edit_ok context/is_edit_ok"
  <tr>
   <td colspan="2">Consent forms are required for participants born on
   or after <span tal:replace="python:db._db.config.ext['MATHOLYMP_CONSENT_FORMS_DATE']" />,
-  and should be uploaded as PDF files.</td>
+  and should be uploaded as PDF files.  The
+  <a tal:attributes="href python:db._db.config.ext['MATHOLYMP_CONSENT_FORMS_URL']"
+  target="_blank">form to complete, sign and upload</a> is available.</td>
  </tr>
 </tal:block>
 <tal:block tal:condition="context/id">
@@ -312,7 +314,9 @@ define="edit_ok context/is_edit_ok"
  <tr>
   <td colspan="2">Consent forms are required for participants born on
   or after <span tal:replace="python:db._db.config.ext['MATHOLYMP_CONSENT_FORMS_DATE']" />,
-  and should be uploaded as PDF files.</td>
+  and should be uploaded as PDF files.  The
+  <a tal:attributes="href python:db._db.config.ext['MATHOLYMP_CONSENT_FORMS_URL']"
+  target="_blank">form to complete, sign and upload</a> is available.</td>
  </tr>
 <tal:block tal:condition="context/consent_form">
  <tr>
