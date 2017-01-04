@@ -64,7 +64,11 @@ define="edit_ok context/is_edit_ok"
 </table>
 <table class="form">
 <tr>
- <td>You can edit participant information and add a photo and
+ <td>You can edit participant information and add
+ <tal:block tal:condition="python:utils.have_consent_forms(db._db)">
+ a consent form (if needed),
+ </tal:block>
+ a photo and
  arrival/departure details after initial registration.</td>
 </tr>
 </table>
