@@ -35,10 +35,11 @@ system.
 __all__ = ['people_from_country_internal', 'people_from_country',
            'show_country_people', 'country_people_table', 'all_people_table',
            'person_scores_table', 'country_scores_table', 'scoreboard',
-           'has_nonempty_travel', 'country_travel_copy_options',
-           'person_case_warning', 'missing_person_details',
-           'registration_status', 'show_consent_form_ui',
-           'required_person_fields', 'register_templating_utils']
+           'has_nonempty_travel', 'show_travel_copy_options',
+           'country_travel_copy_options', 'person_case_warning',
+           'missing_person_details', 'registration_status',
+           'show_consent_form_ui', 'required_person_fields',
+           'register_templating_utils']
 
 import cgi
 import json
@@ -130,6 +131,17 @@ def has_nonempty_travel(db, person):
             db.person.get(person, 'departure_place') is not None or
             db.person.get(person, 'departure_time') is not None or
             db.person.get(person, 'departure_flight') is not None)
+
+def show_travel_copy_options(db, userid, person):
+    """Return whether to give options to copy travel details."""
+    if normal_country_person(db, userid):
+        return True
+    if not person:
+        return False
+    country = db.person.get(person, 'country')
+    none_country = get_none_country(db)
+    staff_country = get_staff_country(db)
+    return country != none_country and country != staff_country
 
 def country_travel_copy_options(db, country, person):
     """
@@ -408,6 +420,7 @@ def register_templating_utils(instance):
     instance.registerUtil('any_scores_missing', any_scores_missing)
     instance.registerUtil('country_has_contestants', country_has_contestants)
     instance.registerUtil('valid_country_problem', valid_country_problem)
+    instance.registerUtil('show_travel_copy_options', show_travel_copy_options)
     instance.registerUtil('country_travel_copy_options',
                           country_travel_copy_options)
     instance.registerUtil('person_case_warning', person_case_warning)

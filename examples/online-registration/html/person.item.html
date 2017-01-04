@@ -194,10 +194,7 @@ define="edit_ok context/is_edit_ok"
  </tr>
 
  <tr tal:condition="python:context.is_edit_ok() and
-  (utils.normal_country_person(db._db, request.user.id) or (context.id
-  and db._db.person.get(context.id, 'country') !=
-  db._db.country.lookup('None') and db._db.person.get(context.id, 'country') !=
-  db._db.country.lookup(db._db.config.ext['MATHOLYMP_SHORT_NAME'] + ' ' + db._db.config.ext['MATHOLYMP_YEAR'] + ' Staff')))">
+  utils.show_travel_copy_options(db._db, request.user.id, context.id)">
   <th></th>
   <td tal:condition="context/id" tal:content="structure
   python:utils.country_travel_copy_options(db._db,
