@@ -92,6 +92,9 @@ Next version (unreleased)
   participants.  If ``No``, this information is not collected.
   :file:`person.item.html` is updated accordingly.
 
+* My list of ideas for possible future improvements to matholymp is
+  now included in the documentation.  See :ref:`todo`.
+
 Version 2016.05.0 (1 May 2016)
 ------------------------------
 

@@ -59,6 +59,7 @@ Contents:
    release-notes
    copying
    thanks
+   todo
 
 Indices and tables
 ==================

@@ -26,6 +26,8 @@
    combination shall include the source code for the parts of OpenSSL
    used as well as that of the covered work.
 
+.. _contributing:
+
 Contributing to matholymp
 =========================
 
@@ -33,10 +35,11 @@ Although matholymp is intended to be configurable for the most common
 requirements of mathematical olympiads, it is likely you will find
 some features missing that would be useful for your event; I have a
 long list of possible future enhancements (and welcome suggestions for
-such features if you don't plan to implement them yourself).  If you
-do implement new features for matholymp, please try to contribute them
-back to me (even if only useful for some events, it is likely your own
-event is not the only one that could use a particular feature).
+such features if you don't plan to implement them yourself); see
+:ref:`todo`.  If you do implement new features for matholymp, please
+try to contribute them back to me (even if only useful for some
+events, it is likely your own event is not the only one that could use
+a particular feature).
 
 If you wish to contribute changes to matholymp, you should be working
 with the current Git version.  You can then send me diffs generated
