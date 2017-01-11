@@ -33,7 +33,7 @@ maintaining websites for mathematical olympiads, registration of
 participants and associated administration.
 """
 
-__version__ = '2017.01.0'
+__version__ = '2017.01.1.dev0'
 
 __all__ = ['caseconv', 'collate', 'csvsource', 'data', 'datasource', 'docgen',
            'fileutil', 'regdata', 'regsitegen', 'sitegen', 'stats']
