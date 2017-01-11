@@ -44,6 +44,17 @@ static site, to update the CSV data files with details of past events
 for any format changes in the new version of matholymp.  After doing
 so, run :command:`mo-static-generate`.
 
+Next version (unreleased)
+-------------------------
+
+* The registration system now supports collecting nationality
+  information for participants.  The new configuration variable
+  ``matholymp_require_nationality`` must be specified in
+  :file:`extensions/config.ini` for the registration system.  If
+  ``Yes``, this information is collected and is required for all
+  participants.  If ``No``, this information is not collected.
+  :file:`person.item.html` is updated accordingly.
+
 Version 2017.01.0 (8 January 2017)
 ----------------------------------
 

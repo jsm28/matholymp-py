@@ -114,8 +114,8 @@ class DataSource(object):
         extra_awards, photo_url, photo_filename, consent_form_url,
         consent_form_filename, first_language, second_language, diet,
         room_number, phone_number, generic_id, gender, date_of_birth,
-        passport_number, tshirt, arrival_place, arrival_time,
-        arrival_flight, departure_place, departure_time,
+        passport_number, nationality, tshirt, arrival_place,
+        arrival_time, arrival_flight, departure_place, departure_time,
         departure_flight.
         """
         raise NotImplementedError

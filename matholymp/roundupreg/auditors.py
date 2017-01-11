@@ -39,7 +39,7 @@ from roundup.date import Date
 from matholymp.fileutil import boolean_states
 from matholymp.roundupreg.auditorutil import get_new_value, require_value
 from matholymp.roundupreg.rounduputil import have_consent_forms, \
-    have_passport_numbers, require_dob, get_num_problems, \
+    have_passport_numbers, have_nationality, require_dob, get_num_problems, \
     get_marks_per_problem, get_none_country, get_staff_country, \
     any_scores_missing, valid_score, create_rss, db_file_format_contents, \
     db_file_extension, db_private_file_format_contents, \
@@ -225,6 +225,11 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     if have_passport_numbers(db):
         require_value(db, cl, nodeid, newvalues, 'passport_number',
                       'No passport or identity card number specified')
+
+    # If nationalities are collected, they are required.
+    if have_nationality(db):
+        require_value(db, cl, nodeid, newvalues, 'nationality',
+                      'No nationality specified')
 
     # Start with blank scores for contestants - and for other people
     # in case someone is first registered with another role then

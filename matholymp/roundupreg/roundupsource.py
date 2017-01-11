@@ -36,9 +36,9 @@ countries involved in them from which other data is derived.
 from matholymp.datasource import DataSource
 from matholymp.fileutil import comma_split, boolean_states
 from matholymp.roundupreg.rounduputil import distinguish_official, \
-    have_consent_forms, have_passport_numbers, get_num_problems, \
-    get_marks_per_problem, scores_from_str, contestant_age, get_none_country, \
-    db_file_extension, db_private_file_extension
+    have_consent_forms, have_passport_numbers, have_nationality, \
+    get_num_problems, get_marks_per_problem, scores_from_str, contestant_age, \
+    get_none_country, db_file_extension, db_private_file_extension
 
 __all__ = ['RoundupDataSource']
 
@@ -256,6 +256,10 @@ class RoundupDataSource(DataSource):
             if not have_passport_numbers(self._db):
                 return None
             return self._db.person.get(id, 'passport_number') or None
+        elif name == 'nationality':
+            if not have_nationality(self._db):
+                return None
+            return self._db.person.get(id, 'nationality') or None
         elif name == 'tshirt':
             tshirt = self._db.person.get(id, 'tshirt')
             return self._db.tshirt.get(tshirt, 'name')

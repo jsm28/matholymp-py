@@ -137,6 +137,14 @@ define="edit_ok context/is_edit_ok"
  </tr>
 </tal:block>
 
+<tal:block tal:condition="python:utils.have_nationality(db._db)">
+ <tr tal:condition="context/is_edit_ok"
+     tal:define="name string:nationality; label string:Nationality; value context/nationality; edit_ok edit_ok">
+  <th class="required" metal:use-macro="th_label">Nationality</th>
+  <td><input name="nationality" metal:use-macro="normal_input"></td>
+ </tr>
+</tal:block>
+
  <tr tal:condition="python:utils.normal_country_person(db._db,
   request.user.id)" tal:define="name string:primary_role; label string:Primary role; value context/primary_role; edit_ok edit_ok">
   <th metal:use-macro="th_label">Primary role</th>

@@ -1895,7 +1895,7 @@ class SiteGenerator(object):
                          'Arrival Flight', 'Departure Place',
                          'Departure Time', 'Departure Flight', 'Room Number',
                          'Phone Number', 'Consent Form URL',
-                         'Passport or Identity Card Number'])
+                         'Passport or Identity Card Number', 'Nationality'])
         return cols
 
     def person_csv_data(self, p, num_problems=None, scores_only=False,
@@ -1978,6 +1978,7 @@ class SiteGenerator(object):
             csv_out['Consent Form URL'] = p.consent_form_url or ''
             csv_out['Passport or Identity Card Number'] = (p.passport_number or
                                                            '')
+            csv_out['Nationality'] = p.nationality or ''
         return csv_out
 
     def generate_people_csv(self):

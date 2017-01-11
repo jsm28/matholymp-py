@@ -1371,6 +1371,10 @@ class PersonEvent(object):
         event.
         """)
 
+    nationality = _PersonEventPropertyDS(
+        'nationality',
+        """The nationality of this person at this event.""")
+
     tshirt = _PersonEventPropertyDS(
         'tshirt',
         """The T-shirt size of this person at this event.""")
