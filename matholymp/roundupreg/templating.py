@@ -34,12 +34,12 @@ system.
 
 __all__ = ['people_from_country_internal', 'people_from_country',
            'show_country_people', 'country_people_table', 'all_people_table',
-           'person_scores_table', 'country_scores_table', 'scoreboard',
-           'has_nonempty_travel', 'show_travel_copy_options',
-           'country_travel_copy_options', 'person_case_warning',
-           'missing_person_details', 'registration_status',
-           'show_consent_form_ui', 'required_person_fields',
-           'register_templating_utils']
+           'person_scores_table', 'country_scores_table', 'scoreboard_gen',
+           'scoreboard', 'display_scoreboard', 'has_nonempty_travel',
+           'show_travel_copy_options', 'country_travel_copy_options',
+           'person_case_warning', 'missing_person_details',
+           'registration_status', 'show_consent_form_ui',
+           'required_person_fields', 'register_templating_utils']
 
 import cgi
 import json
@@ -50,6 +50,7 @@ from roundup.date import Date
 
 from matholymp.caseconv import all_uppercase
 from matholymp.collate import coll_get_sort_key
+from matholymp.roundupreg.cache import cached_text
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import distinguish_official, \
     have_consent_forms, have_passport_numbers, have_nationality, require_dob, \
@@ -116,13 +117,19 @@ def country_scores_table(db, country):
     c = sitegen.event.country_map[int(country)]
     return sitegen.country_event_scores_table(c, show_rank=False)
 
-def scoreboard(db, for_display, display_start):
-    """Produce scoreboard page contents."""
+def scoreboard_gen(db):
+    """Produce scoreboard page contents from the database."""
     sitegen = RoundupSiteGenerator(db)
-    if for_display:
-        return sitegen.display_scoreboard_text(sitegen.event, display_start)
-    else:
-        return sitegen.scoreboard_text(sitegen.event)
+    return sitegen.scoreboard_text(sitegen.event)
+
+def scoreboard(db, force_regen):
+    """Produce scoreboard page contents, possibly cached."""
+    return cached_text(db, 'scoreboard', force_regen, scoreboard_gen)
+
+def display_scoreboard(db, display_start):
+    """Produce display scoreboard page contents."""
+    sitegen = RoundupSiteGenerator(db)
+    return sitegen.display_scoreboard_text(sitegen.event, display_start)
 
 def has_nonempty_travel(db, person):
     """Return whether a person has nonempty travel details."""
@@ -421,6 +428,7 @@ def register_templating_utils(instance):
     instance.registerUtil('person_scores_table', person_scores_table)
     instance.registerUtil('country_scores_table', country_scores_table)
     instance.registerUtil('scoreboard', scoreboard)
+    instance.registerUtil('display_scoreboard', display_scoreboard)
     instance.registerUtil('any_scores_missing', any_scores_missing)
     instance.registerUtil('country_has_contestants', country_has_contestants)
     instance.registerUtil('valid_country_problem', valid_country_problem)

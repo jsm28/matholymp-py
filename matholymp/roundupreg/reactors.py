@@ -29,7 +29,8 @@
 
 """This module provides reactors for the Roundup registration system."""
 
-__all__ = ['country_react', 'person_react', 'register_reactors']
+__all__ = ['country_react', 'person_react', 'scoreboard_react',
+           'register_reactors']
 
 import email
 import os.path
@@ -38,10 +39,15 @@ import roundup.mailer
 import roundup.password
 
 from matholymp.fileutil import read_text_from_file
+from matholymp.roundupreg.cache import invalidate_cache
 from matholymp.roundupreg.rounduputil import have_consent_forms
 
 def country_react(db, cl, nodeid, oldvalues):
-    """Create an account for a country if required."""
+    """
+    Mark the cached scoreboard invalid, and create an account for a
+    country if required.
+    """
+    scoreboard_react(db, cl, nodeid, oldvalues)
     if db.country.is_retired(nodeid):
         return
     email_addr = db.country.get(nodeid, 'contact_email')
@@ -88,7 +94,11 @@ def country_react(db, cl, nodeid, oldvalues):
         pass
 
 def person_react(db, cl, nodeid, oldvalues):
-    """Set the country for a person's consent form if required."""
+    """
+    Mark the cached scoreboard invalid, and set the country for a
+    person's consent form if required.
+    """
+    scoreboard_react(db, cl, nodeid, oldvalues)
     if db.person.is_retired(nodeid):
         return
     if not have_consent_forms(db):
@@ -101,9 +111,25 @@ def person_react(db, cl, nodeid, oldvalues):
     if file_country != person_country:
         db.private_file.set(cf, country=person_country)
 
+def scoreboard_react(db, cl, nodeid, oldvalues):
+    """Mark the cached scoreboard invalid."""
+    invalidate_cache(db, 'scoreboard')
+
 def register_reactors(db):
     """Register the matholymp reactors with Roundup."""
     db.country.react('set', country_react)
     db.country.react('create', country_react)
+    db.country.react('retire', country_react)
+    db.country.react('restore', country_react)
     db.person.react('set', person_react)
     db.person.react('create', person_react)
+    db.person.react('retire', person_react)
+    db.person.react('restore', person_react)
+    db.event.react('set', scoreboard_react)
+    db.event.react('create', scoreboard_react)
+    db.event.react('retire', scoreboard_react)
+    db.event.react('restore', scoreboard_react)
+    db.matholymprole.react('set', scoreboard_react)
+    db.matholymprole.react('create', scoreboard_react)
+    db.matholymprole.react('retire', scoreboard_react)
+    db.matholymprole.react('restore', scoreboard_react)

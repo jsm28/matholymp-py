@@ -26,7 +26,7 @@
   format</a>.  An <a href="country?@action=scores_rss">RSS feed of
   new scores</a> is also available.</p>
 
-<tal:block tal:replace="structure python:utils.scoreboard(db._db, False, 0)" />
+<tal:block tal:replace="structure python:utils.scoreboard(db._db, request.user.hasPermission('Score'))" />
 
 </span>
 

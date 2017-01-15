@@ -55,6 +55,14 @@ Next version (unreleased)
   participants.  If ``No``, this information is not collected.
   :file:`person.item.html` is updated accordingly.
 
+* The registration system now caches the generated scoreboard to avoid
+  high system load when many people are accessing it simultaneously
+  while coordination is going on.  The templates
+  :file:`person.scoreboard.html` and :file:`person.scoredisplay.html`
+  are updated accordingly.  This functionality only works on a
+  Unix-like operating system; on other systems, the online scoreboard
+  will still be regenerated every time it is accessed.
+
 Version 2017.01.0 (8 January 2017)
 ----------------------------------
 
