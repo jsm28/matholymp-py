@@ -249,6 +249,9 @@ Registration system
 * Add more registration system sanity checks against mistakes by
   administrative users (open-ended issue).
 
+* Make all registration system actions verify they are applied only to
+  the intended class.
+
 * Verify that arrival date/time are not after departure date/time.
 
 * Support multiple new people being the same person on the static site
@@ -261,6 +264,10 @@ Registration system
   (:py:mod:`matholymp.regsitegen` module) (facilitates code sharing
   between multiple registration back ends).  Specifically, the
   registration status page.
+
+* Use common :py:func:`file_extension` in
+  :py:mod:`matholymp.staticsite` instead of local code for filename
+  extensions.
 
 The following ideas are more speculative.
 
