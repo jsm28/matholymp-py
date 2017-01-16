@@ -266,8 +266,8 @@ Registration system
   registration status page.
 
 * Use common :py:func:`file_extension` in
-  :py:mod:`matholymp.staticsite` instead of local code for filename
-  extensions.
+  :py:mod:`matholymp.roundupreg.staticsite` instead of local code for
+  filename extensions.
 
 The following ideas are more speculative.
 
