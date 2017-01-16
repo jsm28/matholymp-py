@@ -63,6 +63,16 @@ Next version (unreleased)
   Unix-like operating system; on other systems, the online scoreboard
   will still be regenerated every time it is accessed.
 
+* The registration system now supports scaling down excessively large
+  photos uploaded when registering participants.  To support this
+  feature, matholymp now requires the `Pillow
+  <https://python-pillow.org/>`_ library if the registration system is
+  used.  The new configuration variables ``matholymp_photo_max_size``
+  and ``matholymp_photo_min_dimen`` must be specified in
+  :file:`extensions/config.ini` for the registration system.  The
+  registration status page shows a list of people with large photos
+  and provides the option to scale down those photos.
+
 Version 2017.01.0 (8 January 2017)
 ----------------------------------
 

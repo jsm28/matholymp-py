@@ -43,6 +43,7 @@ __all__ = ['people_from_country_internal', 'people_from_country',
 
 import cgi
 import json
+import os
 import re
 
 from roundup.cgi.templating import HTMLItem
@@ -369,6 +370,46 @@ def registration_status(db):
         text += '<tr><th>Country</th><th>Person</th><th>Role</th></tr>\n'
         text += rooms_needed
         text += '</table>\n'
+
+    max_photo_size = int(db.config.ext['MATHOLYMP_PHOTO_MAX_SIZE'])
+    large_photos_list = []
+    for c in country_list_all:
+        person_list = people_from_country_internal(db, c)
+        for p in person_list:
+            photo_id = db.person.get(p, 'files')
+            if photo_id:
+                filename = db.filename('file', photo_id)
+                photo_size = os.stat(filename).st_size
+                if photo_size > max_photo_size:
+                    p_text = ('<tr><td>%s (%s)</td>'
+                              '<td><a href="person%s">%s %s</a></td>'
+                              '<td>%d</td><td>'
+                              '<form method="POST" '
+                              'enctype="multipart/form-data" '
+                              'action="person%s">'
+                              '<input type="hidden" name="@action" '
+                              'value="scale_photo">'
+                              '<input type="submit" value="Scale down">'
+                              '</form></td></tr>\n' %
+                              (cgi.escape(country_names[c]),
+                               cgi.escape(country_codes[c]),
+                               p,
+                               cgi.escape(db.person.get(p, 'given_name')),
+                               cgi.escape(db.person.get(p,
+                                                        'family_name')),
+                               photo_size, p))
+                    large_photos_list.append(p_text)
+    if large_photos_list:
+        text += '<h2>Photos with large file size</h2>\n'
+        text += ('<p>These participants have photos that are over '
+                 '%d bytes in size.  Although not strictly required, scaling '
+                 'them down will make the site quicker for users and may '
+                 'also speed up printing name badges.</p>\n' % max_photo_size)
+        text += '<table class="list">\n'
+        text += ('<tr><th>Country</th><th>Person</th><th>File size</th>'
+                 '<th>Scale down</th></tr>\n')
+        text += '\n'.join(large_photos_list)
+        text += '\n</table>\n'
 
     flags_needed = ''
     for c in country_list:

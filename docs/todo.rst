@@ -180,12 +180,12 @@ Registration system
 * Extend automatic checks / warnings for all-uppercase names: also
   warn on the registration status page.
 
-* Add more automation to restrict file sizes for uploaded photos (or
-  scale down large files on upload, or on request linked from
-  registration status page).  File extension and contents should also
-  be checked to agree with MIME type.  Apply checks also to flags and
-  photos reused from previous years, but quietly don't reuse in that
-  case if format and extension mismatch.
+* Possibly make :file:`person.item.html` advise people of the
+  recommended maximum file size for photos (in human-friendly form
+  rather than a raw number of bytes).  File extension and contents
+  should also be checked to agree with MIME type.  Apply checks also
+  to flags and photos reused from previous years, but quietly don't
+  reuse in that case if format and extension mismatch.
 
 * Add more automation for rotating photos server-side.
 

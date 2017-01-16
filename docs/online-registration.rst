@@ -223,20 +223,17 @@ Monitoring registration
 There is a :guilabel:`Registration Status` link to a page with a
 summary of possible issues with the registration data, and it is
 useful to keep a watch on this page and to chase up countries that are
-late in completing all required information.
+late in completing all required information (as well as acting on
+points there that do not require information from participating
+countries, such as scaling down large photos).
 
 In addition to the points listed on this page, there are some things
 you should check manually from time to time.
 
-* If any photos uploaded are excessively large (more than 1.5MB file
-  size is probably excessive), download them, scale them down and
-  upload the smaller photo on that person's page; although not
-  strictly required, this will make the site quicker for users and may
-  also speed up printing name badges.  If any photos are in the wrong
-  orientation, rotate them and upload the rotated version;
-  :command:`jpegtran` can be used to rotate JPEG images without
-  uncompressing and recompressing.  (Future versions of matholymp may
-  add more automation in this area.)
+* If any photos are in the wrong orientation, rotate them and upload
+  the rotated version; :command:`jpegtran` can be used to rotate JPEG
+  images without uncompressing and recompressing.  (Future versions of
+  matholymp may add more automation in this area.)
 
 * If some names are entered with all-uppercase surnames (or entirely
   in uppercase), convert them to mixed case for consistency.  (The

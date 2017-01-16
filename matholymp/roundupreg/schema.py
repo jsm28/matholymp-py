@@ -318,6 +318,11 @@ def init_schema(env):
     p = db.security.addPermission(name='RegisterAllCountries')
     db.security.addPermissionToRole('Admin', p)
 
+    # Online manipulation of participant photos has its own
+    # Permission.
+    p = db.security.addPermission(name='EditPhotos')
+    db.security.addPermissionToRole('Admin', p)
+
     # Downloading full person data has its own Permission.
     p = db.security.addPermission(name='Omnivident')
     db.security.addPermissionToRole('Admin', p)

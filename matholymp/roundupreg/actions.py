@@ -29,12 +29,16 @@
 
 """This module provides actions for the Roundup registration system."""
 
-__all__ = ['ScoreAction', 'RetireCountryAction', 'CountryCSVAction',
-           'ScoresCSVAction', 'PeopleCSVAction', 'FlagsZIPAction',
-           'PhotosZIPAction', 'ScoresRSSAction', 'register_actions']
+__all__ = ['ScoreAction', 'RetireCountryAction', 'ScalePhotoAction',
+           'CountryCSVAction', 'ScoresCSVAction', 'PeopleCSVAction',
+           'FlagsZIPAction', 'PhotosZIPAction', 'ScoresRSSAction',
+           'register_actions']
 
 import cgi
+import io
+import os
 
+from PIL import Image
 from roundup.cgi.actions import Action
 from roundup.cgi.exceptions import Unauthorised
 
@@ -126,6 +130,51 @@ class RetireCountryAction(Action):
             self.db.person.set(g, guide_for=guide_for)
         self.db.country.retire(self.nodeid)
         self.db.commit()
+
+class ScalePhotoAction(Action):
+
+    """Action to scale a person's photo to make the file size smaller."""
+
+    name = 'scale the photo for'
+    permissionType = 'EditPhotos'
+
+    def handle(self):
+        """Scale a person's photo."""
+        if self.nodeid is None:
+            raise ValueError('No id specified to scale photo for')
+        if self.classname != 'person':
+            raise ValueError('Photos can only be scaled for people')
+        photo_id = self.db.person.get(self.nodeid, 'files')
+        if not photo_id:
+            raise ValueError('This person has no photo to scale')
+        filename = self.db.filename('file', photo_id)
+        max_size_bytes = int(self.db.config.ext['MATHOLYMP_PHOTO_MAX_SIZE'])
+        min_photo_dimen = int(self.db.config.ext['MATHOLYMP_PHOTO_MIN_DIMEN'])
+        cur_size_bytes = os.stat(filename).st_size
+        if cur_size_bytes <= max_size_bytes:
+            raise ValueError('This photo is already small enough')
+        photo_orig = Image.open(filename)
+        size_xy = photo_orig.size
+        scale_factor = 1
+        while size_xy[0] >= min_photo_dimen and size_xy[1] >= min_photo_dimen:
+            photo_scaled = photo_orig.resize(size_xy, Image.LANCZOS)
+            photo_out = io.BytesIO()
+            photo_scaled.save(photo_out, format='JPEG', quality=90)
+            photo_bytes = photo_out.getvalue()
+            photo_out.close()
+            if len(photo_bytes) <= max_size_bytes:
+                photo_data = {'name': 'photo-smaller.jpg',
+                              'type': 'image/jpeg',
+                              'content': photo_bytes}
+                new_photo_id = self.db.file.create(**photo_data)
+                self.db.person.set(self.nodeid, files=new_photo_id)
+                self.db.commit()
+                self.client.add_ok_message('Photo reduced in size, '
+                                           'scaled down by %d' % scale_factor)
+                return
+            size_xy = (size_xy[0] // 2, size_xy[1] // 2)
+            scale_factor *= 2
+        raise ValueError('Could not make this photo small enough')
 
 class CountryCSVAction(Action):
 
@@ -250,6 +299,7 @@ def register_actions(instance):
     """Register the matholymp actions with Roundup."""
     instance.registerAction('score', ScoreAction)
     instance.registerAction('retirecountry', RetireCountryAction)
+    instance.registerAction('scale_photo', ScalePhotoAction)
     instance.registerAction('country_csv', CountryCSVAction)
     instance.registerAction('scores_csv', ScoresCSVAction)
     instance.registerAction('people_csv', PeopleCSVAction)

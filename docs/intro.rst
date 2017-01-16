@@ -75,6 +75,10 @@ matholymp:
   registration system data; not needed if that part of matholymp is
   not used).
 
+* `Pillow <https://python-pillow.org/>`_, built with support for JPEG
+  and PNG files (used in the registration system; not needed if that
+  part of matholymp is not used).
+
 * `LaTeX <https://latex-project.org/>`_; specifically, the
   :command:`pdflatex` command (used in generating PDF documents from
   registration system data; not needed if that part of matholymp is
