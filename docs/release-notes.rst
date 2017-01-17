@@ -73,6 +73,10 @@ Next version (unreleased)
   registration status page shows a list of people with large photos
   and provides the option to scale down those photos.
 
+* The example :file:`person.item.html` now explicitly states the
+  format to use to enter dates of birth (if not selecting with the
+  calendar widget).
+
 Version 2017.01.0 (8 January 2017)
 ----------------------------------
 

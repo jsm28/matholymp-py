@@ -271,9 +271,6 @@ Registration system
 
 The following ideas are more speculative.
 
-* Make :file:`person.item.html` explicitly say that ``yyyy-mm-dd``
-  should be used for dates of birth if not using the calendar widget.
-
 * Reduce the differences between static site and registration system
   CSV files (generally, include more data in registration system
   files, at least once results complete).

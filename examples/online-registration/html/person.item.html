@@ -129,6 +129,10 @@ define="edit_ok context/is_edit_ok"
   python:context.date_of_birth.field(id='date_of_birth')"></td>
  </tr>
 
+ <tr tal:condition="context/is_edit_ok">
+  <td colspan="2">Enter dates of birth in the form yyyy-mm-dd.</td>
+ </tr>
+
 <tal:block tal:condition="python:utils.have_passport_numbers(db._db)">
  <tr tal:condition="context/is_edit_ok"
      tal:define="name string:passport_number; label string:Passport or identity card number; value context/passport_number; edit_ok edit_ok">
