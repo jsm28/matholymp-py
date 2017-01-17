@@ -77,6 +77,12 @@ Next version (unreleased)
   format to use to enter dates of birth (if not selecting with the
   calendar widget).
 
+* The registration system now applies the sanity check that dates of
+  birth are not too recent to all participants with a date of birth
+  registered rather than just to contestants.  The example
+  :file:`extensions/config.ini` is updated accordingly (change to the
+  comment on ``matholymp_sanity_date_of_birth`` only).
+
 Version 2017.01.0 (8 January 2017)
 ----------------------------------
 

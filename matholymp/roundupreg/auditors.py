@@ -210,16 +210,16 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     if date_of_birth is not None:
         if date_of_birth < Date('1902-01-01'):
             raise ValueError('Participant implausibly old')
+        # As a sanity check against users entering e.g. today's date
+        # by mistake, require participants to be born before a sanity
+        # check date.
+        sanity_dob = Date(db.config.ext['MATHOLYMP_SANITY_DATE_OF_BIRTH'])
+        if date_of_birth >= sanity_dob:
+            raise ValueError('Participant implausibly young')
     if is_contestant:
         earliest_dob = Date(db.config.ext['MATHOLYMP_EARLIEST_DATE_OF_BIRTH'])
         if date_of_birth < earliest_dob:
             raise ValueError('Contestant too old')
-        # As a sanity check against users entering e.g. today's date
-        # by mistake, require contestants to be born before a sanity
-        # check date.
-        sanity_dob = Date(db.config.ext['MATHOLYMP_SANITY_DATE_OF_BIRTH'])
-        if date_of_birth >= sanity_dob:
-            raise ValueError('Contestant implausibly young')
 
     # If passport numbers are collected, they are required.
     if have_passport_numbers(db):
