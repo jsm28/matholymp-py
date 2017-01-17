@@ -1398,8 +1398,8 @@ class SiteGenerator(object):
                 this_base_url = re.sub('country[0-9]*$', '', src_url)
                 if base_url:
                     if this_base_url != base_url:
-                        raise ValueError('annual URL inconsistency: %s != %s'
-                                         % (base_url, this_base_url))
+                        raise ValueError('annual URL inconsistency: %s != %s' %
+                                         (base_url, this_base_url))
                 else:
                     base_url = this_base_url
         if not base_url:

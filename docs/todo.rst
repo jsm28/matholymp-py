@@ -131,6 +131,12 @@ General and global changes
 * Use more specific exception classes rather than :py:exc:`ValueError`
   etc. everywhere.
 
+* Review code style against the current version of :pep:`8` and fix or
+  update style accordingly.  One specific point: the code currently
+  follows an older version of :pep:`8` that said to break lines after
+  binary operators, but the the more recent recommendation is to break
+  lines before binary operators.
+
 Static site
 -----------
 
