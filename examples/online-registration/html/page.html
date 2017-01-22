@@ -56,7 +56,7 @@ columns string:id;
    <span tal:condition="python:request.user.hasPermission('Create', 'country')">
     <a href="country?@template=item" i18n:translate="">Add Country</a><br>
    </span>
-   <span tal:condition="python:request.user.hasPermission('Omnivident')">
+   <span tal:condition="python:request.user.hasPermission('RegistrationStatus')">
     <a href="person?@template=status" i18n:translate="">Registration Status</a><br>
    </span>
    <span tal:condition="python:request.user.hasPermission('Score')">

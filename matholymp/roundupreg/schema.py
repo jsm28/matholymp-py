@@ -323,6 +323,12 @@ def init_schema(env):
     p = db.security.addPermission(name='EditPhotos')
     db.security.addPermissionToRole('Admin', p)
 
+    # Viewing registration status pages (whether for everyone, or just
+    # for one's own country) has its own permission.
+    p = db.security.addPermission(name='RegistrationStatus')
+    db.security.addPermissionToRole('Admin', p)
+    db.security.addPermissionToRole('Register', p)
+
     # Downloading full person data has its own Permission.
     p = db.security.addPermission(name='Omnivident')
     db.security.addPermissionToRole('Admin', p)

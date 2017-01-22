@@ -37,9 +37,9 @@ __all__ = ['people_from_country_internal', 'people_from_country',
            'person_scores_table', 'country_scores_table', 'scoreboard_gen',
            'scoreboard', 'display_scoreboard', 'has_nonempty_travel',
            'show_travel_copy_options', 'country_travel_copy_options',
-           'person_case_warning', 'registration_status',
-           'show_consent_form_ui', 'required_person_fields',
-           'register_templating_utils']
+           'person_case_warning', 'list_expected_roles', 'registration_status',
+           'registration_status_country', 'show_consent_form_ui',
+           'required_person_fields', 'register_templating_utils']
 
 import cgi
 import json
@@ -211,21 +211,38 @@ def person_case_warning(db, person):
         warn_text = '<strong>%s</strong>' % warn_text
     return warn_text
 
-def registration_status(db):
-    """Produce registration status page contents."""
-
-    sitegen = RoundupSiteGenerator(db)
+def list_expected_roles(db):
+    """List the roles expected to be present for a normal country."""
     main_role_list = ['Leader', 'Deputy Leader']
     cont_per_team = int(db.config.ext['MATHOLYMP_NUM_CONTESTANTS_PER_TEAM'])
     main_role_list.extend([('Contestant %d' % (i + 1))
                            for i in range(cont_per_team)])
+    return main_role_list
 
+def registration_status(db):
+    """Produce registration status page contents for all countries."""
+    sitegen = RoundupSiteGenerator(db)
+    main_role_list = list_expected_roles(db)
     consent_forms_date = db.config.ext['MATHOLYMP_CONSENT_FORMS_DATE']
     if consent_forms_date == '':
         consent_forms_date = None
     max_photo_size = int(db.config.ext['MATHOLYMP_PHOTO_MAX_SIZE'])
     return sitegen.registration_status_text(main_role_list, consent_forms_date,
                                             max_photo_size)
+
+def registration_status_country(db, userid):
+    """Produce registration status page contents for one country."""
+    if not normal_country_person(db, userid):
+        return '<p>Cannot produce registration status for this user.</p>\n'
+    sitegen = RoundupSiteGenerator(db)
+    main_role_list = list_expected_roles(db)
+    consent_forms_date = db.config.ext['MATHOLYMP_CONSENT_FORMS_DATE']
+    if consent_forms_date == '':
+        consent_forms_date = None
+    user_country = db.user.get(userid, 'country')
+    c = sitegen.event.country_map[int(user_country)]
+    return sitegen.registration_status_country_text(c, main_role_list,
+                                                    consent_forms_date)
 
 def show_consent_form_ui(db, person):
     """Return whether to show the interface to upload a consent form."""
@@ -282,5 +299,7 @@ def register_templating_utils(instance):
                           country_travel_copy_options)
     instance.registerUtil('person_case_warning', person_case_warning)
     instance.registerUtil('registration_status', registration_status)
+    instance.registerUtil('registration_status_country',
+                          registration_status_country)
     instance.registerUtil('show_consent_form_ui', show_consent_form_ui)
     instance.registerUtil('required_person_fields', required_person_fields)

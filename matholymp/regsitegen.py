@@ -233,6 +233,63 @@ class RegSiteGenerator(SiteGenerator):
 
         return missing_list
 
+    def missing_roles_text(self, c, expected_roles):
+        """Return a description of people not registered for a country."""
+        person_list = c.person_list
+        if not person_list:
+            return ('<p>No participants registered from'
+                    ' <strong>%s</strong>.</p>\n' %
+                    cgi.escape(c.name_with_code))
+        else:
+            have_roles = [p.primary_role for p in person_list]
+            missing_roles = [r for r in expected_roles
+                             if not r in have_roles]
+            if missing_roles:
+                return ('<p>Not registered from <strong>%s</strong>:'
+                        ' %s.</p>\n' %
+                        (cgi.escape(c.name_with_code),
+                         cgi.escape(', '.join(missing_roles))))
+            else:
+                return ''
+
+    def missing_person_details_text(self, people, consent_forms_date,
+                                    show_country):
+        """Return a table of missing details for people."""
+        text = ''
+        if show_country:
+            cols = ['Country']
+        else:
+            cols = []
+        cols.extend(['Person', 'Missing data'])
+        head_row_list = [self.html_tr_th_list(cols)]
+        body_row_list = []
+        missing_photo = False
+        missing_phone = False
+        for p in people:
+            p_needed = self.missing_person_details(p, consent_forms_date)
+            if p_needed:
+                if 'photo' in p_needed:
+                    missing_photo = True
+                if 'phone number' in p_needed:
+                    missing_phone = True
+                if show_country:
+                    row = [cgi.escape(p.country.name_with_code)]
+                else:
+                    row = []
+                row.extend([self.link_for_person(p.person, cgi.escape(p.name)),
+                            ', '.join(p_needed)])
+                body_row_list.append(self.html_tr_td_list(row))
+        if body_row_list:
+            text += self.html_table_thead_tbody_list(head_row_list,
+                                                     body_row_list) + '\n'
+        if missing_photo:
+            text += ('<p>Photos are optional but recommended; they appear'
+                     ' on the website and may appear on name badges.</p>\n')
+        if missing_phone:
+            text += ('<p>Phone numbers (for Guides) need only be entered'
+                     ' if they will appear on name badges.</p>\n')
+        return text
+
     def photo_scale_form(self, p):
         """Return a form to scale down a person's photo."""
         raise NotImplementedError
@@ -252,42 +309,12 @@ class RegSiteGenerator(SiteGenerator):
         text += '<h2>Action needed by participating countries</h2>\n'
 
         for c in normal_countries:
-            person_list = c.person_list
-            if not person_list:
-                text += ('<p>No participants registered from'
-                         ' <strong>%s</strong>.</p>\n' %
-                         cgi.escape(c.name_with_code))
-            else:
-                have_roles = [p.primary_role for p in person_list]
-                missing_roles = [r for r in expected_roles
-                                 if not r in have_roles]
-                if missing_roles:
-                    text += ('<p>Not registered from <strong>%s</strong>:'
-                             ' %s.</p>\n' %
-                             (cgi.escape(c.name_with_code),
-                              cgi.escape(', '.join(missing_roles))))
+            text += self.missing_roles_text(c, expected_roles)
         text += ('<p>Some countries may intend to send Observers'
                  ' but not have registered them all.</p>\n')
 
-        head_row_list = [self.html_tr_th_list(['Country', 'Person',
-                                               'Missing data'])]
-        body_row_list = []
-        missing_photo = False
-        for p in normal_people:
-            p_needed = self.missing_person_details(p, consent_forms_date)
-            if p_needed:
-                if 'photo' in p_needed:
-                    missing_photo = True
-                row = [cgi.escape(p.country.name_with_code),
-                       self.link_for_person(p.person, cgi.escape(p.name)),
-                       ', '.join(p_needed)]
-                body_row_list.append(self.html_tr_td_list(row))
-        if body_row_list:
-            text += self.html_table_thead_tbody_list(head_row_list,
-                                                     body_row_list) + '\n'
-        if missing_photo:
-            text += ('<p>Photos are optional but recommended; they appear'
-                     ' on the website and may appear on name badges.</p>\n')
+        text += self.missing_person_details_text(normal_people,
+                                                 consent_forms_date, True)
 
         text += '<h2>Action needed by the organisers</h2>\n'
 
@@ -299,29 +326,8 @@ class RegSiteGenerator(SiteGenerator):
         text += ('<p>The system cannot tell automatically if not all'
                  ' staff have been registered.</p>\n')
 
-        head_row_list = [self.html_tr_th_list(['Person', 'Missing data'])]
-        body_row_list = []
-        missing_photo = False
-        missing_phone = False
-        for p in staff:
-            p_needed = self.missing_person_details(p, consent_forms_date)
-            if p_needed:
-                if 'photo' in p_needed:
-                    missing_photo = True
-                if 'phone number' in p_needed:
-                    missing_phone = True
-                row = [self.link_for_person(p.person, cgi.escape(p.name)),
-                       ', '.join(p_needed)]
-                body_row_list.append(self.html_tr_td_list(row))
-        if body_row_list:
-            text += self.html_table_thead_tbody_list(head_row_list,
-                                                     body_row_list) + '\n'
-        if missing_photo:
-            text += ('<p>Photos are optional but recommended; they appear'
-                     ' on the website and may appear on name badges.</p>\n')
-        if missing_phone:
-            text += ('<p>Phone numbers (for Guides) need only be entered'
-                     ' if they will appear on name badges.</p>\n')
+        text += self.missing_person_details_text(staff, consent_forms_date,
+                                                 False)
 
         head_row_list = [self.html_tr_th_list(['Country', 'Person', 'Role'])]
         body_row_list = []
@@ -376,5 +382,19 @@ class RegSiteGenerator(SiteGenerator):
             text += ('<h2>Action needed by registration system'
                      ' maintainers</h2>\n')
             text += flags_needed
+
+        return text
+
+    def registration_status_country_text(self, country, expected_roles,
+                                         consent_forms_date):
+        """Return the text of the registration status page for one country."""
+        people = sorted(country.person_list, key=lambda x:x.sort_key)
+        text = ''
+        text += self.missing_roles_text(country, expected_roles)
+        text += ('<p>The system cannot tell automatically if there are any'
+                 ' Observers you have not yet registered.</p>\n')
+
+        text += self.missing_person_details_text(people, consent_forms_date,
+                                                 False)
 
         return text

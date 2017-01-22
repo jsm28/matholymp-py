@@ -211,9 +211,6 @@ Registration system
 * Support other registration information (e.g., passport scan) where
   useful.
 
-* Support for registration contacts to view subset of Registration
-  Status information applicable to their countries.
-
 * Use database to describe maximum / expected number of people in a
   given role from a country rather than hardcoding.
 

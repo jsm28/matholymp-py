@@ -104,6 +104,12 @@ Next version (unreleased)
   CSV file before generating the papers.  Labels for contestant desks
   only list at most two languages.
 
+* Registration system users with ordinary accounts for registering
+  participants from their own country can now see a registration
+  status page with information about missing registration information
+  from their country.  The example :file:`page.html` and
+  :file:`person.status.html` are updated accordingly.
+
 Version 2017.01.0 (8 January 2017)
 ----------------------------------
 
