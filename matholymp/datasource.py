@@ -133,7 +133,7 @@ class DataSource(object):
         """
         Return the value of an attribute for a CountryEvent.  Possible
         names are: annual_url, code, name, flag_url, flag_filename,
-        is_official, _person_ids, _guide_ids, generic_id.
+        is_official, is_normal, _person_ids, _guide_ids, generic_id.
         """
         raise NotImplementedError
 

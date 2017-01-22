@@ -69,8 +69,6 @@ def read_docgen_config(top_directory):
     config_data = read_config(config_file_name, 'matholymp.documentgen',
                               cfg_str_keys, cfg_int_keys,
                               cfg_int_none_keys, cfg_bool_keys)
-    config_data['staff_country'] = (config_data['short_name'] + ' ' +
-                                    config_data['year'] + ' Staff')
     return config_data
 
 class DocumentGenerator(object):
@@ -304,7 +302,7 @@ class DocumentGenerator(object):
         template_fields['name'] = person.name
 
         country = person.country
-        if country.name == self._cfg['staff_country']:
+        if not country.is_normal:
             is_staff = True
             if (self._cfg['show_countries_for_guides'] and
                 primary_role == 'Guide'):

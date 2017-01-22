@@ -1613,6 +1613,13 @@ class CountryEvent(object):
         'is_official', _get_is_official,
         """Whether this country is an official country at this event.""")
 
+    is_normal = _CountryEventPropertyDS(
+        'is_normal',
+        """
+        Whether this country is a normal country (one that may have
+        non-staff participants) at this event.
+        """)
+
     def _get_person_list(self):
         ds = self.country.event_group._ds
         if ds.country_event_have_attr(self.country.id, self.event.id,

@@ -346,4 +346,8 @@ class CSVDataSource(DataSource):
             if s == 'No':
                 return False
             raise ValueError('unexpected official setting %s', s)
+        if name == 'is_normal':
+            staff_name = (self._cfg['short_name'] + ' ' +
+                          self._events[event_id]['Year'] + ' Staff')
+            return self._countries[event_id][country_id]['Name'] != staff_name
         raise KeyError(name)

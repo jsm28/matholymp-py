@@ -38,7 +38,8 @@ from matholymp.fileutil import comma_split, boolean_states
 from matholymp.roundupreg.rounduputil import distinguish_official, \
     have_consent_forms, have_passport_numbers, have_nationality, \
     get_num_problems, get_marks_per_problem, scores_from_str, contestant_age, \
-    get_none_country, db_file_extension, db_private_file_extension
+    get_none_country, get_staff_country, db_file_extension, \
+    db_private_file_extension
 
 __all__ = ['RoundupDataSource']
 
@@ -57,10 +58,16 @@ class RoundupDataSource(DataSource):
         # anonymous user, but should be ignored for the purposes of
         # the general data model used here.
         self._none_country = None
+        # The special staff country.
+        self._staff_country = None
 
     def _get_none_country(self):
         if self._none_country is None:
             self._none_country = get_none_country(self._db)
+
+    def _get_staff_country(self):
+        if self._staff_country is None:
+            self._staff_country = get_staff_country(self._db)
 
     def event_group_get_attr(self, name):
         if name == 'short_name':
@@ -318,6 +325,9 @@ class RoundupDataSource(DataSource):
             return flag_filename
         elif name == 'is_official':
             return self._db.country.get(id, 'official')
+        elif name == 'is_normal':
+            self._get_staff_country()
+            return id != self._staff_country
         elif name == '_person_ids':
             person_list = self._db.person.filter(None, {'country': id})
             return [int(p) for p in person_list]
