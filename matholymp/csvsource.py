@@ -206,8 +206,6 @@ class CSVDataSource(DataSource):
                                    'family_name': 'Family Name',
                                    'award': 'Award',
                                    'photo_url': 'Photo URL',
-                                   'first_language': 'First Language',
-                                   'second_language': 'Second Language',
                                    'diet': 'Allergies and Dietary Requirements',
                                    'room_number': 'Room Number',
                                    'phone_number': 'Phone Number',
@@ -273,6 +271,9 @@ class CSVDataSource(DataSource):
                 url_path = url[len(self._cfg['url_base']):]
                 url_dirs = url_path.split('/')
                 return os.path.join(self._local_dir, *url_dirs)
+        if name == 'languages':
+            s = self._people[event_id][person_id][country_id]['Languages']
+            return comma_split(s)
         if name == 'other_roles':
             s = self._people[event_id][person_id][country_id]['Other Roles']
             return comma_split(s)

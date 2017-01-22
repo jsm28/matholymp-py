@@ -1888,8 +1888,7 @@ class SiteGenerator(object):
         if not reg_system:
             cols.extend(['Rank'])
         if private_data:
-            cols.extend(['Gender', 'Date of Birth', 'First Language',
-                         'Second Language',
+            cols.extend(['Gender', 'Date of Birth', 'Languages',
                          'Allergies and Dietary Requirements',
                          'T-Shirt Size', 'Arrival Place', 'Arrival Time',
                          'Arrival Flight', 'Departure Place',
@@ -1963,8 +1962,7 @@ class SiteGenerator(object):
         if private_data:
             csv_out['Gender'] = p.gender or ''
             csv_out['Date of Birth'] = p.date_of_birth or ''
-            csv_out['First Language'] = p.first_language or ''
-            csv_out['Second Language'] = p.second_language or ''
+            csv_out['Languages'] = comma_join(p.languages)
             csv_out['Allergies and Dietary Requirements'] = p.diet or ''
             csv_out['T-Shirt Size'] = p.tshirt or ''
             csv_out['Arrival Place'] = p.arrival_place or ''

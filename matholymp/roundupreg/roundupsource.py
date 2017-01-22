@@ -225,15 +225,14 @@ class RoundupDataSource(DataSource):
                 consent_form_filename = self._db.filename('private_file',
                                                           consent_form_id)
             return consent_form_filename
-        elif name == 'first_language':
+        elif name == 'languages':
             first_language = self._db.person.get(id, 'first_language')
-            return self._db.language.get(first_language, 'name')
-        elif name == 'second_language':
-            first_language = self._db.person.get(id, 'first_language')
+            first_language_name = self._db.language.get(first_language, 'name')
             second_language = self._db.person.get(id, 'second_language')
             if second_language is None or second_language == first_language:
-                return None
-            return self._db.language.get(second_language, 'name')
+                return [first_language_name]
+            return [first_language_name,
+                    self._db.language.get(second_language, 'name')]
         elif name == 'diet':
             return self._db.person.get(id, 'diet') or None
         elif name == 'room_number':

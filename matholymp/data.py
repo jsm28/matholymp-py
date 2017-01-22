@@ -758,10 +758,8 @@ class Event(object):
     def _get_language_list(self):
         langs = set()
         for p in self.contestant_list:
-            if p.first_language:
-                langs.add(p.first_language)
-            if p.second_language:
-                langs.add(p.second_language)
+            for l in p.languages:
+                langs.add(l)
         return list(langs)
 
     language_list = _PropertyCached(
@@ -1356,13 +1354,9 @@ class PersonEvent(object):
         event.
         """)
 
-    first_language = _PersonEventPropertyDS(
-        'first_language',
-        """The first language of this person at this event.""")
-
-    second_language = _PersonEventPropertyDS(
-        'second_language',
-        """The second language of this person at this event.""")
+    languages = _PersonEventPropertyDS(
+        'languages',
+        """The languages of this person at this event.""")
 
     diet = _PersonEventPropertyDS(
         'diet',

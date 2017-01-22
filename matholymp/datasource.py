@@ -112,8 +112,8 @@ class DataSource(object):
         primary_role, other_roles, _guide_for_ids, contestant_age,
         given_name, family_name, problem_scores, total_score, award,
         extra_awards, photo_url, photo_filename, consent_form_url,
-        consent_form_filename, first_language, second_language, diet,
-        room_number, phone_number, generic_id, gender, date_of_birth,
+        consent_form_filename, languages, diet, room_number,
+        phone_number, generic_id, gender, date_of_birth,
         passport_number, nationality, tshirt, arrival_place,
         arrival_time, arrival_flight, departure_place, departure_time,
         departure_flight.

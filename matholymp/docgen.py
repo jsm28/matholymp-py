@@ -395,8 +395,12 @@ class DocumentGenerator(object):
         label_list = [('\\placecard{%s}{%s}{%s}{%s}' %
                        (self.text_to_latex(p.contestant_code),
                         self.text_to_latex(p.name),
-                        self.text_to_latex(p.first_language or ''),
-                        self.text_to_latex(p.second_language or '')))
+                        self.text_to_latex(p.languages[0]
+                                           if p.languages
+                                           else ''),
+                        self.text_to_latex(p.languages[1]
+                                           if len(p.languages) > 1
+                                           else '')))
                       for p in contestants]
         label_list_text = '%\n'.join(label_list)
         template_fields = { 'desk_labels': label_list_text }
@@ -668,8 +672,7 @@ class DocumentGenerator(object):
             for d in days:
                 for p in contestants:
                     ccode = p.contestant_code
-                    lang_list = [p.first_language, p.second_language]
-                    lang_list = [lang for lang in lang_list if lang]
+                    lang_list = p.languages
                     for lang in lang_list:
                         lang_filename = lang_to_filename(lang)
                         paper_text = self.one_paper_latex(lang_filename,
@@ -724,22 +727,11 @@ class DocumentGenerator(object):
         one_language_contestants = []
         for p in sorted(self._event.contestant_list, key=lambda x:x.sort_key):
             ccode = p.contestant_code
-            lang1 = p.first_language
-            lang2 = p.second_language
-            have_both_languages = True
-            if lang1:
-                if lang1 not in all_languages:
-                    all_languages[lang1] = []
-                all_languages[lang1].append(ccode)
-            else:
-                have_both_languages = False
-            if lang2:
-                if lang2 not in all_languages:
-                    all_languages[lang2] = []
-                all_languages[lang2].append(ccode)
-            else:
-                have_both_languages = False
-            if not have_both_languages:
+            for lang in p.languages:
+                if lang not in all_languages:
+                    all_languages[lang] = []
+                all_languages[lang].append(ccode)
+            if len(p.languages) <= 1:
                 one_language_contestants.append(ccode)
         lang_text_list = []
         for lang in sorted(all_languages, key=coll_get_sort_key):

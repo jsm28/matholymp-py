@@ -70,10 +70,6 @@ General and global changes
 * Support disqualifications (explicitly showing that there was one
   rather than just removing people and countries).
 
-* Don't hardcode that people have at most two languages (even if
-  hardcoded in the registration system, make the underlying data model
-  and CSV files use a list of languages instead).
-
 * Support name orders other than given-family.
 
 * Support mononymous people.
@@ -305,6 +301,9 @@ The following ideas are more speculative.
 
 * Support logical role ordering within countries rather than only
   alphabetical.
+
+* Allow people to have a configurable maximum number of languages,
+  rather than hardcoded two as at present.
 
 * Add a public list of country contacts.  Or a private list for future
   hosts, or both with support for different contacts on the two lists.

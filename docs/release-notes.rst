@@ -94,6 +94,16 @@ Next version (unreleased)
   of accessing invalid URLs instead of treating them as equivalent to
   other valid URLs.
 
+* The full version of the CSV file of person details now lists
+  languages in a single ``Languages`` column (which contains a
+  comma-separated list interpreted as if it were the single row of a
+  CSV file) instead of separate columns for first and second
+  languages.  At most two languages can be requested at registration,
+  but this change allows papers in more than two languages to be
+  generated for a contestant in special circumstances by editing the
+  CSV file before generating the papers.  Labels for contestant desks
+  only list at most two languages.
+
 Version 2017.01.0 (8 January 2017)
 ----------------------------------
 
