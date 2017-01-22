@@ -142,7 +142,7 @@ def init_data(env):
     gender = db.getclass('gender')
     gender.create(name='Female')
     gender.create(name='Male')
-    gender.create(name='Other')
+    gender.create(name='Non-binary')
 
     # Create T-shirt sizes.
     tshirt = db.getclass('tshirt')
