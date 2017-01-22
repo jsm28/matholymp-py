@@ -34,7 +34,9 @@ content from within the registration system.
 
 __all__ = ['RegSiteGenerator']
 
+import cgi
 import io
+import os
 import zipfile
 
 from matholymp.data import EventGroup
@@ -196,4 +198,162 @@ class RegSiteGenerator(SiteGenerator):
             text += ('<p>Medal boundaries: Gold %d, Silver %d,'
                      ' Bronze %d.</p>\n' %
                      (e.gold_boundary, e.silver_boundary, e.bronze_boundary))
+        return text
+
+    def missing_person_details(self, p, consent_forms_date):
+        """Return a description of missing details for a person."""
+
+        missing_list = []
+
+        if consent_forms_date is not None and p.consent_form_url is None:
+            if p.date_of_birth is not None:
+                if p.date_of_birth >= consent_forms_date:
+                    missing_list.append('consent form')
+
+        if p.photo_url is None:
+            missing_list.append('photo')
+
+        have_travel_details = True
+        if p.arrival_place is None or p.arrival_time is None:
+            have_travel_details = False
+        elif p.departure_place is None or p.departure_time is None:
+            have_travel_details = False
+        else:
+            if 'Airport' in p.arrival_place:
+                if p.arrival_flight is None:
+                    have_travel_details = False
+            if 'Airport' in p.departure_place:
+                if p.departure_flight is None:
+                    have_travel_details = False
+        if not have_travel_details:
+            missing_list.append('travel details')
+
+        if p.primary_role == 'Guide' and p.phone_number is None:
+            missing_list.append('phone number')
+
+        return ', '.join(missing_list)
+
+    def photo_scale_form(self, p):
+        """Return a form to scale down a person's photo."""
+        raise NotImplementedError
+
+    def registration_status_text(self, expected_roles, consent_forms_date,
+                                 max_photo_size):
+        """Return the text of the registration status page."""
+        e = self.event
+        normal_countries = sorted(e.normal_country_list,
+                                  key=lambda x:x.sort_key)
+        staff_countries = sorted(e.staff_country_list, key=lambda x:x.sort_key)
+        people = sorted(e.person_list, key=lambda x:x.sort_key)
+        normal_people = sorted(e.normal_person_list, key=lambda x:x.sort_key)
+        staff = sorted(e.staff_list, key=lambda x:x.sort_key)
+        text = ''
+
+        text += '<h2>Action needed by participating countries</h2>\n'
+
+        for c in normal_countries:
+            person_list = c.person_list
+            if not person_list:
+                text += ('<p>No participants registered from'
+                         ' <strong>%s</strong>.</p>\n' %
+                         cgi.escape(c.name_with_code))
+            else:
+                have_roles = [p.primary_role for p in person_list]
+                missing_roles = [r for r in expected_roles
+                                 if not r in have_roles]
+                if missing_roles:
+                    text += ('<p>Not registered from <strong>%s</strong>:'
+                             ' %s.</p>\n' %
+                             (cgi.escape(c.name_with_code),
+                              cgi.escape(', '.join(missing_roles))))
+        text += ('<p>Some countries may intend to send Observers'
+                 ' but not have registered them all.</p>\n')
+
+        head_row_list = [self.html_tr_th_list(['Country', 'Person',
+                                               'Missing data'])]
+        body_row_list = []
+        for p in normal_people:
+            p_needed = self.missing_person_details(p, consent_forms_date)
+            if p_needed:
+                row = [cgi.escape(p.country.name_with_code),
+                       self.link_for_person(p.person, cgi.escape(p.name)),
+                       p_needed]
+                body_row_list.append(self.html_tr_td_list(row))
+        if body_row_list:
+            text += self.html_table_thead_tbody_list(head_row_list,
+                                                     body_row_list) + '\n'
+
+        text += '<h2>Action needed by the organisers</h2>\n'
+
+        for c in normal_countries:
+            if not c.guide_list:
+                text += ('<p>No guide registered for'
+                         ' <strong>%s</strong>.</p>\n' %
+                         cgi.escape(c.name_with_code))
+        text += ('<p>The system cannot tell automatically if not all'
+                 ' staff have been registered.</p>\n')
+
+        head_row_list = [self.html_tr_th_list(['Person', 'Missing data'])]
+        body_row_list = []
+        for p in staff:
+            p_needed = self.missing_person_details(p, consent_forms_date)
+            if p_needed:
+                row = [self.link_for_person(p.person, cgi.escape(p.name)),
+                       p_needed]
+                body_row_list.append(self.html_tr_td_list(row))
+        if body_row_list:
+            text += self.html_table_thead_tbody_list(head_row_list,
+                                                     body_row_list) + '\n'
+
+        head_row_list = [self.html_tr_th_list(['Country', 'Person', 'Role'])]
+        body_row_list = []
+        for p in people:
+            if p.room_number is None:
+                row = [cgi.escape(p.country.name_with_code),
+                       self.link_for_person(p.person, cgi.escape(p.name)),
+                       cgi.escape(p.primary_role)]
+                body_row_list.append(self.html_tr_td_list(row))
+        if body_row_list:
+            text += '<h2>Room allocations needed</h2>\n'
+            text += ('<p>For staff using their own accommodation,'
+                     ' enter &lsquo;Own accommodation&rsquo;,'
+                     ' or a more precise location for any Guides'
+                     ' (whose room numbers will appear on badges of'
+                     ' their team members).</p>\n')
+            text += self.html_table_thead_tbody_list(head_row_list,
+                                                     body_row_list) + '\n'
+
+        head_row_list = [self.html_tr_th_list(['Country', 'Person', 'File size',
+                                               'Scale down'])]
+        body_row_list = []
+        for p in people:
+            filename = p.photo_filename
+            if filename is not None:
+                photo_size = os.stat(filename).st_size
+                if photo_size > max_photo_size:
+                    row = [cgi.escape(p.country.name_with_code),
+                           self.link_for_person(p.person, cgi.escape(p.name)),
+                           str(photo_size),
+                           self.photo_scale_form(p.person)]
+                    body_row_list.append(self.html_tr_td_list(row))
+        if body_row_list:
+            text += '<h2>Photos with large file size</h2>\n'
+            text += ('<p>These participants have photos that are over '
+                     '%d bytes in size.  Although not strictly required, '
+                     'scaling them down will make the site quicker for users '
+                     'and may also speed up printing name badges.</p>\n' %
+                     max_photo_size)
+            text += self.html_table_thead_tbody_list(head_row_list,
+                                                     body_row_list) + '\n'
+
+        flags_needed = ''
+        for c in normal_countries:
+            if not c.flag_url:
+                flags_needed += ('<p>No flag for <strong>%s</strong>.</p>\n' %
+                                 cgi.escape(c.name_with_code))
+        if flags_needed:
+            text += ('<h2>Action needed by registration system'
+                     ' maintainers</h2>\n')
+            text += flags_needed
+
         return text

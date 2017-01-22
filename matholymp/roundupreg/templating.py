@@ -37,9 +37,9 @@ __all__ = ['people_from_country_internal', 'people_from_country',
            'person_scores_table', 'country_scores_table', 'scoreboard_gen',
            'scoreboard', 'display_scoreboard', 'has_nonempty_travel',
            'show_travel_copy_options', 'country_travel_copy_options',
-           'person_case_warning', 'missing_person_details',
-           'registration_status', 'show_consent_form_ui',
-           'required_person_fields', 'register_templating_utils']
+           'person_case_warning', 'registration_status',
+           'show_consent_form_ui', 'required_person_fields',
+           'register_templating_utils']
 
 import cgi
 import json
@@ -211,217 +211,21 @@ def person_case_warning(db, person):
         warn_text = '<strong>%s</strong>' % warn_text
     return warn_text
 
-def missing_person_details(db, person):
-    """Return a description of missing details for a person."""
-
-    missing_list = []
-
-    if have_consent_forms(db) and not db.person.get(person, 'consent_form'):
-        consent_forms_date = db.config.ext['MATHOLYMP_CONSENT_FORMS_DATE']
-        date_of_birth = db.person.get(person, 'date_of_birth')
-        if date_of_birth is not None:
-            if date_of_birth >= Date(consent_forms_date):
-                missing_list.append('consent form')
-
-    if not db.person.get(person, 'files'):
-        missing_list.append('photo')
-
-    have_travel_details = True
-    arrival_place = db.person.get(person, 'arrival_place')
-    arrival_time = db.person.get(person, 'arrival_time')
-    departure_place = db.person.get(person, 'departure_place')
-    departure_time = db.person.get(person, 'departure_time')
-    if not arrival_place or not arrival_time:
-        have_travel_details = False
-    elif not departure_place or not departure_time:
-        have_travel_details = False
-    else:
-        arrival_place_name = db.arrival.get(arrival_place, 'name')
-        if 'Airport' in arrival_place_name:
-            arrival_flight = db.person.get(person, 'arrival_flight')
-            if not arrival_flight:
-                have_travel_details = False
-        departure_place_name = db.arrival.get(departure_place, 'name')
-        if 'Airport' in departure_place_name:
-            departure_flight = db.person.get(person, 'departure_flight')
-            if not departure_flight:
-                have_travel_details = False
-    if not have_travel_details:
-        missing_list.append('travel details')
-
-    role = db.person.get(person, 'primary_role')
-    guide = db.matholymprole.lookup('Guide')
-    if role == guide and not db.person.get(person, 'phone_number'):
-        missing_list.append('phone number')
-
-    return ', '.join(missing_list)
-
 def registration_status(db):
     """Produce registration status page contents."""
 
-    country_list_all = db.country.list()
-    none_country = get_none_country(db)
-    staff_country = get_staff_country(db)
-    country_list_all = [c for c in country_list_all if c != none_country]
-    country_codes = {}
-    country_names = {}
-    for c in country_list_all:
-        country_codes[c] = db.country.get(c, 'code')
-        country_names[c] = db.country.get(c, 'name')
-    country_list_all = sorted(country_list_all, key=lambda x:country_codes[x])
-    country_list = [c for c in country_list_all if c != staff_country]
+    sitegen = RoundupSiteGenerator(db)
     main_role_list = ['Leader', 'Deputy Leader']
     cont_per_team = int(db.config.ext['MATHOLYMP_NUM_CONTESTANTS_PER_TEAM'])
     main_role_list.extend([('Contestant %d' % (i + 1))
                            for i in range(cont_per_team)])
 
-    text = '<h2>Action needed by participating countries</h2>\n'
-    details_needed = ''
-    for c in country_list:
-        person_list = people_from_country_internal(db, c)
-        if not person_list:
-            text += ('<p>No participants registered from'
-                     ' <strong>%s (%s)</strong>.</p>\n' %
-                     (cgi.escape(country_names[c]),
-                      cgi.escape(country_codes[c])))
-        else:
-            have_roles = [
-                db.matholymprole.get(db.person.get(p, 'primary_role'), 'name')
-                for p in person_list]
-            missing_roles = [r for r in main_role_list if not r in have_roles]
-            if missing_roles:
-                text += ('<p>Not registered from <strong>%s (%s)</strong>:'
-                         ' %s.</p>\n' %
-                         (cgi.escape(country_names[c]),
-                          cgi.escape(country_codes[c]),
-                          ', '.join(missing_roles)))
-        for p in person_list:
-            p_needed = missing_person_details(db, p)
-            if p_needed:
-                details_needed += ('<tr><td>%s (%s)</td>'
-                                   '<td><a href="person%s">%s %s</a></td>'
-                                   '<td>%s</td></tr>\n' %
-                                   (cgi.escape(country_names[c]),
-                                    cgi.escape(country_codes[c]),
-                                    p,
-                                    cgi.escape(db.person.get(p, 'given_name')),
-                                    cgi.escape(db.person.get(p,
-                                                             'family_name')),
-                                    p_needed))
-    text += ('<p>Some countries may intend to send Observers'
-             ' but not have registered them all.</p>\n')
-    if details_needed:
-        text += '<table class="list">\n'
-        text += ('<tr><th>Country</th><th>Person</th>'
-                 '<th>Missing data</th></tr>\n')
-        text += details_needed
-        text += '</table>\n'
-
-    text += '<h2>Action needed by the organisers</h2>\n'
-    for c in country_list:
-        if not db.person.filter(None, {'guide_for': c}):
-            text += ('<p>No guide registered for'
-                     ' <strong>%s (%s)</strong>.</p>\n' %
-                     (cgi.escape(country_names[c]),
-                      cgi.escape(country_codes[c])))
-    text += ('<p>The system cannot tell automatically if not all'
-             ' staff have been registered.</p>\n')
-    person_list = people_from_country_internal(db, staff_country)
-    s_details_needed = ''
-    for p in person_list:
-        p_needed = missing_person_details(db, p)
-        if p_needed:
-            s_details_needed += ('<tr><td><a href="person%s">%s %s</a></td>'
-                                 '<td>%s</td></tr>\n' %
-                                 (p,
-                                  cgi.escape(db.person.get(p, 'given_name')),
-                                  cgi.escape(db.person.get(p, 'family_name')),
-                                  p_needed))
-    if s_details_needed:
-        text += '<table class="list">\n'
-        text += '<tr><th>Person</th><th>Missing data</th></tr>\n'
-        text += s_details_needed
-        text += '</table>\n'
-
-    rooms_needed = ''
-    for c in country_list_all:
-        person_list = people_from_country_internal(db, c)
-        for p in person_list:
-            if not db.person.get(p, 'room_number'):
-                rooms_needed += ('<tr><td>%s (%s)</td>'
-                                 '<td><a href="person%s">%s %s</a></td>'
-                                 '<td>%s</td></tr>\n' %
-                                 (cgi.escape(country_names[c]),
-                                  cgi.escape(country_codes[c]),
-                                  p,
-                                  cgi.escape(db.person.get(p, 'given_name')),
-                                  cgi.escape(db.person.get(p, 'family_name')),
-                                  cgi.escape(db.matholymprole.get(
-                                      db.person.get(p, 'primary_role'),
-                                      'name'))))
-    if rooms_needed:
-        text += '<h2>Room allocations needed</h2>\n'
-        text += ('<p>For staff using their own accommodation,'
-                 ' enter &lsquo;Own accommodation&rsquo;,'
-                 ' or a more precise location for any Guides'
-                 ' (whose room numbers will appear on badges of'
-                 ' their team members).</p>\n')
-        text += '<table class="list">\n'
-        text += '<tr><th>Country</th><th>Person</th><th>Role</th></tr>\n'
-        text += rooms_needed
-        text += '</table>\n'
-
+    consent_forms_date = db.config.ext['MATHOLYMP_CONSENT_FORMS_DATE']
+    if consent_forms_date == '':
+        consent_forms_date = None
     max_photo_size = int(db.config.ext['MATHOLYMP_PHOTO_MAX_SIZE'])
-    large_photos_list = []
-    for c in country_list_all:
-        person_list = people_from_country_internal(db, c)
-        for p in person_list:
-            photo_id = db.person.get(p, 'files')
-            if photo_id:
-                filename = db.filename('file', photo_id)
-                photo_size = os.stat(filename).st_size
-                if photo_size > max_photo_size:
-                    p_text = ('<tr><td>%s (%s)</td>'
-                              '<td><a href="person%s">%s %s</a></td>'
-                              '<td>%d</td><td>'
-                              '<form method="POST" '
-                              'enctype="multipart/form-data" '
-                              'action="person%s">'
-                              '<input type="hidden" name="@action" '
-                              'value="scale_photo">'
-                              '<input type="submit" value="Scale down">'
-                              '</form></td></tr>\n' %
-                              (cgi.escape(country_names[c]),
-                               cgi.escape(country_codes[c]),
-                               p,
-                               cgi.escape(db.person.get(p, 'given_name')),
-                               cgi.escape(db.person.get(p,
-                                                        'family_name')),
-                               photo_size, p))
-                    large_photos_list.append(p_text)
-    if large_photos_list:
-        text += '<h2>Photos with large file size</h2>\n'
-        text += ('<p>These participants have photos that are over '
-                 '%d bytes in size.  Although not strictly required, scaling '
-                 'them down will make the site quicker for users and may '
-                 'also speed up printing name badges.</p>\n' % max_photo_size)
-        text += '<table class="list">\n'
-        text += ('<tr><th>Country</th><th>Person</th><th>File size</th>'
-                 '<th>Scale down</th></tr>\n')
-        text += '\n'.join(large_photos_list)
-        text += '\n</table>\n'
-
-    flags_needed = ''
-    for c in country_list:
-        if not db.country.get(c, 'files'):
-            flags_needed += ('<p>No flag for <strong>%s (%s)</strong>.</p>\n' %
-                             (cgi.escape(country_names[c]),
-                              cgi.escape(country_codes[c])))
-    if flags_needed:
-        text += '<h2>Action needed by registration system maintainers</h2>\n'
-        text += flags_needed
-
-    return text
+    return sitegen.registration_status_text(main_role_list, consent_forms_date,
+                                            max_photo_size)
 
 def show_consent_form_ui(db, person):
     """Return whether to show the interface to upload a consent form."""

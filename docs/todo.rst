@@ -261,12 +261,11 @@ Registration system
   (e.g., same new person as deputy for multiple countries, such as
   host country main and B teams).
 
-* Make more registration system code use the general
-  :py:mod:`matholymp.data` interface rather than depending on Roundup
-  interfaces, and move to general site generation code
-  (:py:mod:`matholymp.regsitegen` module) (facilitates code sharing
-  between multiple registration back ends).  Specifically, the
-  registration status page.
+* Move more registration system code out of
+  :py:mod:`matholymp.roundupreg` rather than depending on Roundup
+  interfaces (facilitates code sharing between multiple registration
+  back ends).  At least, most of the logic for scaling down photos and
+  maybe most of the caching code.
 
 The following ideas are more speculative.
 

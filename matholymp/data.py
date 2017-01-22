@@ -697,6 +697,23 @@ class Event(object):
     def _person_id_list(self):
         return self._person_ids
 
+    def _get_normal_person_list(self):
+        return [p for p in self.person_list if p.country.is_normal]
+
+    normal_person_list = _PropertyCached(
+        'normal_person_list', _get_normal_person_list,
+        """
+        A list of all normal (non-staff) people (PersonEvent objects)
+        at this event.
+        """)
+
+    def _get_staff_list(self):
+        return [p for p in self.person_list if not p.country.is_normal]
+
+    staff_list = _PropertyCached(
+        'staff_list', _get_staff_list,
+        """A list of all staff (PersonEvent objects) at this event.""")
+
     def _get_contestant_list(self):
         return [p for p in self.person_list if p.is_contestant]
 
@@ -815,6 +832,20 @@ class Event(object):
 
     def _country_id_list(self):
         return self._country_ids
+
+    def _get_normal_country_list(self):
+        return [c for c in self.country_list if c.is_normal]
+
+    normal_country_list = _PropertyCached(
+        'normal_country_list', _get_normal_country_list,
+        """A list of all normal countries at this event.""")
+
+    def _get_staff_country_list(self):
+        return [c for c in self.country_list if not c.is_normal]
+
+    staff_country_list = _PropertyCached(
+        'staff_country_list', _get_staff_country_list,
+        """A list of all staff countries at this event.""")
 
     def _get_country_with_contestants_list(self):
         return [c for c in self.country_list if c.num_contestants]

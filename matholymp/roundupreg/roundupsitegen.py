@@ -75,3 +75,12 @@ class RoundupSiteGenerator(RegSiteGenerator):
 
     def link_for_person(self, person, link_body):
         return self.html_a(link_body, 'person' + str(person.id))
+
+    def photo_scale_form(self, person):
+        return ('<form method="POST" '
+                'enctype="multipart/form-data" '
+                'action="person%d">'
+                '<input type="hidden" name="@action" '
+                'value="scale_photo">'
+                '<input type="submit" value="Scale down">'
+                '</form>' % person.id)
