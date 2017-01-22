@@ -231,7 +231,7 @@ class RegSiteGenerator(SiteGenerator):
         if p.primary_role == 'Guide' and p.phone_number is None:
             missing_list.append('phone number')
 
-        return ', '.join(missing_list)
+        return missing_list
 
     def photo_scale_form(self, p):
         """Return a form to scale down a person's photo."""
@@ -272,16 +272,22 @@ class RegSiteGenerator(SiteGenerator):
         head_row_list = [self.html_tr_th_list(['Country', 'Person',
                                                'Missing data'])]
         body_row_list = []
+        missing_photo = False
         for p in normal_people:
             p_needed = self.missing_person_details(p, consent_forms_date)
             if p_needed:
+                if 'photo' in p_needed:
+                    missing_photo = True
                 row = [cgi.escape(p.country.name_with_code),
                        self.link_for_person(p.person, cgi.escape(p.name)),
-                       p_needed]
+                       ', '.join(p_needed)]
                 body_row_list.append(self.html_tr_td_list(row))
         if body_row_list:
             text += self.html_table_thead_tbody_list(head_row_list,
                                                      body_row_list) + '\n'
+        if missing_photo:
+            text += ('<p>Photos are optional but recommended; they appear'
+                     ' on the website and may appear on name badges.</p>\n')
 
         text += '<h2>Action needed by the organisers</h2>\n'
 
@@ -295,15 +301,27 @@ class RegSiteGenerator(SiteGenerator):
 
         head_row_list = [self.html_tr_th_list(['Person', 'Missing data'])]
         body_row_list = []
+        missing_photo = False
+        missing_phone = False
         for p in staff:
             p_needed = self.missing_person_details(p, consent_forms_date)
             if p_needed:
+                if 'photo' in p_needed:
+                    missing_photo = True
+                if 'phone number' in p_needed:
+                    missing_phone = True
                 row = [self.link_for_person(p.person, cgi.escape(p.name)),
-                       p_needed]
+                       ', '.join(p_needed)]
                 body_row_list.append(self.html_tr_td_list(row))
         if body_row_list:
             text += self.html_table_thead_tbody_list(head_row_list,
                                                      body_row_list) + '\n'
+        if missing_photo:
+            text += ('<p>Photos are optional but recommended; they appear'
+                     ' on the website and may appear on name badges.</p>\n')
+        if missing_phone:
+            text += ('<p>Phone numbers (for Guides) need only be entered'
+                     ' if they will appear on name badges.</p>\n')
 
         head_row_list = [self.html_tr_th_list(['Country', 'Person', 'Role'])]
         body_row_list = []
@@ -315,7 +333,10 @@ class RegSiteGenerator(SiteGenerator):
                 body_row_list.append(self.html_tr_td_list(row))
         if body_row_list:
             text += '<h2>Room allocations needed</h2>\n'
-            text += ('<p>For staff using their own accommodation,'
+            text += ('<p>Room numbers need only be entered if they will'
+                     ' appear on name badges, or if the organisers find'
+                     ' it useful for other purposes to have that information'
+                     ' here.  For staff using their own accommodation,'
                      ' enter &lsquo;Own accommodation&rsquo;,'
                      ' or a more precise location for any Guides'
                      ' (whose room numbers will appear on badges of'
