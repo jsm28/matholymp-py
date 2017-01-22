@@ -83,6 +83,13 @@ Next version (unreleased)
   :file:`extensions/config.ini` is updated accordingly (change to the
   comment on ``matholymp_sanity_date_of_birth`` only).
 
+* The registration system configuration variable
+  ``matholymp_require_contestants_female`` is replaced by a variable
+  ``matholymp_contestant_genders`` with a comma-separated list of
+  genders allowed for contestants.  If empty, all genders are allowed,
+  which is equivalent to a value of ``Female, Male, Non-binary`` with
+  the default set of genders.
+
 Version 2017.01.0 (8 January 2017)
 ----------------------------------
 

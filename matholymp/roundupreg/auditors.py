@@ -189,13 +189,16 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     else:
         is_contestant = False
 
-    # Contestants must be female if so configured.
-    req_female = db.config.ext['MATHOLYMP_REQUIRE_CONTESTANTS_FEMALE']
-    req_female = boolean_states[req_female.lower()]
-    if req_female:
-        female = db.gender.lookup('Female')
-        if is_contestant and gender != female:
-            raise ValueError('Contestants must be female')
+    # Contestants must have one of the permitted genders.
+    if is_contestant:
+        req_genders = db.config.ext['MATHOLYMP_CONTESTANT_GENDERS'].split(',')
+        req_genders = [g.strip() for g in req_genders]
+        req_genders = [g for g in req_genders if g != '']
+        if req_genders:
+            gender_name = db.gender.get(gender, 'name')
+            if gender_name not in req_genders:
+                raise ValueError('Contestant gender must be %s' %
+                                 (' or '.join(req_genders)))
 
     # Contestants must have been born on or after the date specified
     # in the regulations.  To avoid problems generating CSV files,
