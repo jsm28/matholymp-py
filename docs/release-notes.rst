@@ -90,6 +90,10 @@ Next version (unreleased)
   which is equivalent to a value of ``Female, Male, Non-binary`` with
   the default set of genders.
 
+* The registration system now detects and gives errors for more cases
+  of accessing invalid URLs instead of treating them as equivalent to
+  other valid URLs.
+
 Version 2017.01.0 (8 January 2017)
 ----------------------------------
 

@@ -255,9 +255,6 @@ Registration system
 * Add more registration system sanity checks against mistakes by
   administrative users (open-ended issue).
 
-* Make all registration system actions verify they are applied only to
-  the intended class.
-
 * Verify that arrival date/time are not after departure date/time.
 
 * Support multiple new people being the same person on the static site

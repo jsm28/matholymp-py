@@ -63,6 +63,10 @@ class ScoreAction(Action):
         if self.db.event.get('1', 'registration_enabled'):
             raise Unauthorised('Registration must be disabled before'
                                ' scores are entered')
+        if self.classname != 'person':
+            raise ValueError('Scores can only be entered for people')
+        if self.nodeid is not None:
+            raise ValueError('Node id specified when entering scores')
         if not valid_country_problem(self.db, self.form):
             raise ValueError('Country or problem invalid or not specified')
         country = self.form['country'].value
@@ -109,6 +113,8 @@ class RetireCountryAction(Action):
         """Retire a country, making other consequent changes."""
         if self.nodeid is None:
             raise ValueError('No id specified to retire')
+        if self.classname != 'country':
+            raise ValueError('This action only applies to countries')
         if not self.hasPermission('Retire', classname=self.classname,
                                   itemid=self.nodeid):
             raise Unauthorised('You do not have permission to retire'
@@ -182,6 +188,10 @@ class CountryCSVAction(Action):
 
     def handle(self):
         """Output the list of countries as a CSV file."""
+        if self.classname != 'country':
+            raise ValueError('This action only applies to countries')
+        if self.nodeid is not None:
+            raise ValueError('Node id specified for CSV generation')
         self.client.setHeader('Content-Type', 'text/csv; charset=UTF-8')
         self.client.setHeader('Content-Disposition',
                               'attachment; filename=countries.csv')
@@ -193,6 +203,10 @@ class ScoresCSVAction(Action):
 
     def handle(self):
         """Output the scores as a CSV file."""
+        if self.classname != 'person':
+            raise ValueError('This action only applies to people')
+        if self.nodeid is not None:
+            raise ValueError('Node id specified for CSV generation')
         self.client.setHeader('Content-Type', 'text/csv; charset=UTF-8')
         self.client.setHeader('Content-Disposition',
                               'attachment; filename=scores.csv')
@@ -204,6 +218,10 @@ class PeopleCSVAction(Action):
 
     def handle(self):
         """Output the list of people as a CSV file."""
+        if self.classname != 'person':
+            raise ValueError('This action only applies to people')
+        if self.nodeid is not None:
+            raise ValueError('Node id specified for CSV generation')
         self.client.setHeader('Content-Type', 'text/csv; charset=UTF-8')
         self.client.setHeader('Content-Disposition',
                               'attachment; filename=people.csv')
@@ -216,6 +234,10 @@ class FlagsZIPAction(Action):
 
     def handle(self):
         """Output a ZIP file of flags of registered countries."""
+        if self.classname != 'country':
+            raise ValueError('This action only applies to countries')
+        if self.nodeid is not None:
+            raise ValueError('Node id specified for ZIP generation')
         self.client.setHeader('Content-Type', 'application/zip')
         self.client.setHeader('Content-Disposition',
                               'attachment; filename=flags.zip')
@@ -227,6 +249,10 @@ class PhotosZIPAction(Action):
 
     def handle(self):
         """Output a ZIP file of photos of registered participants."""
+        if self.classname != 'person':
+            raise ValueError('This action only applies to people')
+        if self.nodeid is not None:
+            raise ValueError('Node id specified for ZIP generation')
         self.client.setHeader('Content-Type', 'application/zip')
         self.client.setHeader('Content-Disposition',
                               'attachment; filename=photos.zip')
@@ -238,6 +264,10 @@ class ConsentFormsZIPAction(Action):
 
     def handle(self):
         """Output a ZIP file of consent forms of registered participants."""
+        if self.classname != 'person':
+            raise ValueError('This action only applies to people')
+        if self.nodeid is not None:
+            raise ValueError('Node id specified for ZIP generation')
         if not self.hasPermission('Omnivident'):
             raise Unauthorised('You do not have permission to access '
                                'consent forms')
@@ -252,6 +282,9 @@ class ScoresRSSAction(Action):
 
     def handle(self):
         """Output the RSS feed for scores."""
+        if self.classname != 'country':
+            raise ValueError('This action only applies to countries')
+
         self.client.setHeader('Content-Type', 'application/rss+xml')
 
         if self.nodeid is None:
