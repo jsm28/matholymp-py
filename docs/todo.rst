@@ -191,6 +191,9 @@ Registration system
 
 * Add more automation for rotating photos server-side.
 
+* Restrict access to retired files, similar to the restrictions on
+  access to retired person and country records.
+
 * Support (staff only?) uploading a photo that appears on name badges
   but not public on the site.
 
