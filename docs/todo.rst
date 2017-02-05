@@ -263,6 +263,10 @@ Registration system
   back ends).  At least, most of the logic for scaling down photos and
   maybe most of the caching code.
 
+* Support automatic suggestions of possible medal boundaries, with
+  information provided about how close those boundaries are to ideal
+  on various metrics.
+
 The following ideas are more speculative.
 
 * Reduce the differences between static site and registration system
