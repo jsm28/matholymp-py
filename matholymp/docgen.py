@@ -682,7 +682,7 @@ class DocumentGenerator(object):
                         paper_list.append(paper_text)
                     country_code = p.country.code
                     if country_code not in country_langs:
-                        country_langs[country_code] = lang_list
+                        country_langs[country_code] = list(lang_list)
                     else:
                         for lang in lang_list:
                             if lang not in country_langs[country_code]:
