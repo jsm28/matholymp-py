@@ -110,6 +110,10 @@ Next version (unreleased)
   from their country.  The example :file:`page.html` and
   :file:`person.status.html` are updated accordingly.
 
+* The example :file:`badge-template.tex` is updated to reflect that
+  allergies information is collected together with dietary
+  requirements.
+
 Version 2017.01.0 (8 January 2017)
 ----------------------------------
 
