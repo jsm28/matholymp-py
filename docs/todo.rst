@@ -137,8 +137,8 @@ Static site
 -----------
 
 * Allow CSV files to specify event short and long names, and the
-  number of contestants for ranking, so those can vary from year to
-  year.
+  number of contestants for ranking, and the description of the day
+  ages are shown as of, so those can vary from year to year.
 
 * Support not showing the host country / city if always the same.
 
@@ -157,6 +157,10 @@ Static site
   generally ensure the site looks sensible when there are no past
   events.
 
+* Make :command:`mo-static-generate` support running a command to
+  postprocess its ouput, or commands to postprocess and push to
+  production.
+
 * Make :command:`mo-static-import` ignore excess data (e.g., from
   having the full version of :file:`people.csv` instead of the public
   version) rather than giving errors for it.
@@ -167,6 +171,10 @@ Static site
   :file:`staticsite.cfg`, so just running :command:`mo-static-import`
   with no arguments does everything needed after an event to transfer
   data to the static site.
+
+* Make :command:`mo-static-import` support automatically running
+  :command:`mo-static-generate` (possibly with postprocessing
+  commands).
 
 Registration system
 -------------------
