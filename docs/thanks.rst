@@ -52,6 +52,8 @@ limited to:
 
 * Rachel Greenhalgh
 
+* Jo Harbour
+
 * Vesna Kadelburg
 
 * Viviane Kehl

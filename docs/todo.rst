@@ -88,6 +88,10 @@ General and global changes
 * Add graphical statistics of results and individual and country
   performance over time.
 
+* Display (and include in CSV files) also ranks limited to official
+  countries and contestants, and support distinguishing them in tables
+  by using different CSS styles.
+
 * Support gender as optionally public information (generally or for
   contestants).
 
@@ -275,6 +279,16 @@ Registration system
   information provided about how close those boundaries are to ideal
   on various metrics.
 
+* Make table of country results distinguish a total of zero on a
+  question from not having any scores entered for that question (e.g.,
+  show a blank for the total in the latter case).
+
+* Generally indicate the maximum score a person or country could
+  achieve when their scores are incomplete (similar to how the table
+  of cumulative statistics shows how many people might achieve a
+  score).  (The display scoreboard should probably not show this, to
+  keep it compact.)
+
 The following ideas are more speculative.
 
 * Reduce the differences between static site and registration system
@@ -334,6 +348,10 @@ The following ideas are more speculative.
   bugs related to dates; the calendar widget isn't particularly
   relevant to matholymp uses; but such a change to the type of a field
   does prevent upgrades while registration is active).
+
+* Support entering ranges for scores during coordination, so that
+  medal boundaries can be considered based on such partial
+  information.
 
 Document generation
 -------------------
