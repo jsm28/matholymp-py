@@ -93,9 +93,6 @@ def audit_country_fields(db, cl, nodeid, newvalues):
     name = require_value(db, cl, nodeid, newvalues, 'name',
                          'No country name specified')
     if nodeid is not None:
-        if not db.country.get(nodeid, 'is_normal'):
-            if name != db.country.get(nodeid, 'name'):
-                raise ValueError('Cannot rename special countries')
         if ('is_normal' in newvalues and
             newvalues['is_normal'] != db.country.get(nodeid, 'is_normal')):
             raise ValueError('Cannot change whether a country is normal')

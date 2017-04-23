@@ -1,4 +1,4 @@
-﻿XMO Number,Country Number,Annual URL,Code,Name,Flag URL
-1,1,https://www.example.org/registration/2014/country3,DEF,One Country,
-1,2,https://www.example.org/registration/2014/country2,ABC,Two Three,
-1,3,https://www.example.org/registration/2014/country1,ZYX,Four Five,
+﻿XMO Number,Country Number,Annual URL,Code,Name,Flag URL,Normal
+1,1,https://www.example.org/registration/2014/country3,DEF,One Country,,Yes
+1,2,https://www.example.org/registration/2014/country2,ABC,Two Three,,Yes
+1,3,https://www.example.org/registration/2014/country1,ZYX,Four Five,,Yes

@@ -1776,6 +1776,7 @@ class SiteGenerator(object):
             cols.extend(['Generic Number'])
         if distinguish_official:
             cols.extend([self._cfg['official_desc']])
+        cols.extend(['Normal'])
         if not reg_system:
             cols.extend(['Contestants', 'Gold Medals', 'Silver Medals',
                          'Bronze Medals'])
@@ -1814,6 +1815,7 @@ class SiteGenerator(object):
                     c.is_official and 'Yes' or 'No'
             else:
                 csv_out[self._cfg['official_desc']] = ''
+        csv_out['Normal'] = 'Yes' if c.is_normal else 'No'
         if not reg_system:
             if c.num_contestants:
                 csv_out['Contestants'] = str(c.num_contestants)

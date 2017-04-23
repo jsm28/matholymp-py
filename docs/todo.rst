@@ -100,10 +100,6 @@ General and global changes
 
 * Add web interfaces for more things currently done on command line.
 
-* Distinguish normal and staff countries in CSV files explicitly to
-  avoid hardcoded use of country names for identifying staff countries
-  in document generation.  Then allow renaming staff countries.
-
 * Don't hardcode ``en_GB`` as locale for collation.
 
 * Add Python 3 support in Sphinx document generation (may work, not

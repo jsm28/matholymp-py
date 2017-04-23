@@ -314,6 +314,8 @@ class CSVDataSource(DataSource):
 
     _country_event_attr_map_int = { 'generic_id': 'Generic Number' }
 
+    _country_event_attr_map_bool = { 'is_normal': 'Normal' }
+
     def country_event_get_attr(self, country_id, event_id, name):
         if name in CSVDataSource._country_event_attr_map_str:
             k = CSVDataSource._country_event_attr_map_str[name]
@@ -328,6 +330,10 @@ class CSVDataSource(DataSource):
                 return None
             else:
                 return int(s)
+        if name in CSVDataSource._country_event_attr_map_bool:
+            k = CSVDataSource._country_event_attr_map_bool[name]
+            s = self._countries[event_id][country_id][k]
+            return boolean_states[s.lower()]
         if name == 'flag_filename':
             url = self._countries[event_id][country_id]['Flag URL']
             if url == '':
@@ -348,8 +354,4 @@ class CSVDataSource(DataSource):
             if s == 'No':
                 return False
             raise ValueError('unexpected official setting %s', s)
-        if name == 'is_normal':
-            staff_name = (self._cfg['short_name'] + ' ' +
-                          self._events[event_id]['Year'] + ' Staff')
-            return self._countries[event_id][country_id]['Name'] != staff_name
         raise KeyError(name)

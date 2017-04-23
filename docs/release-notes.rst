@@ -125,9 +125,10 @@ the registration system is not active.
 
 * It is now possible to have multiple staff countries in the
   registration system (e.g., to separate different kinds of staff),
-  although exactly one staff country is created automatically and its
-  name cannot then be changed.  The example :file:`country.item.html`
-  is updated for this change.
+  although exactly one staff country is created automatically.  The
+  example :file:`country.item.html` is updated for this change.  CSV
+  files listing countries now explicitly track whether a country is a
+  normal or staff country.
 
 Version 2017.01.0 (8 January 2017)
 ----------------------------------

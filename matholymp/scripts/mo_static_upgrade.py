@@ -41,7 +41,7 @@ import os
 import matholymp
 from matholymp.fileutil import read_utf8_csv, write_utf8_csv, comma_join
 from matholymp.sitegen import read_sitegen_config, sitegen_events_csv, \
-    sitegen_people_csv
+    sitegen_countries_csv, sitegen_people_csv
 
 __all__ = ['main']
 
@@ -62,13 +62,17 @@ def main():
 
     cfg_data = read_sitegen_config(top_directory)
     events_csv = sitegen_events_csv(top_directory, cfg_data)
+    countries_csv = sitegen_countries_csv(top_directory, cfg_data)
     people_csv = sitegen_people_csv(top_directory, cfg_data)
 
     e_max_num_problems = 0
     e_honourable_mentions_available_varies = False
     e_distinguish_official_varies = False
+    e_staff_names = {}
     events_data = read_utf8_csv(events_csv)
     for e in events_data:
+        e_staff_names[e['Number']] = (cfg_data['short_name'] + ' ' +
+                                      e['Year'] + ' Staff')
         i = e_max_num_problems + 1
         while ('P%d Max' % i) in e:
             e_max_num_problems = i
@@ -94,6 +98,20 @@ def main():
     if e_distinguish_official_varies:
         events_header.extend(['Distinguish Official Countries'])
     write_utf8_csv(events_csv, events_data, events_header)
+
+    countries_data = read_utf8_csv(countries_csv)
+    for c in countries_data:
+        if 'Normal' not in c:
+            # Updating from 2015.01.0 or earlier.
+            e_number = c[cfg_data['num_key']]
+            is_normal = c['Name'] != e_staff_names[e_number]
+            c['Normal'] = 'Yes' if is_normal else 'No'
+    countries_header = [cfg_data['num_key'], 'Country Number', 'Annual URL',
+                        'Code', 'Name', 'Flag URL']
+    if cfg_data['distinguish_official']:
+        countries_header.extend([cfg_data['official_desc']])
+    countries_header.extend(['Normal'])
+    write_utf8_csv(countries_csv, countries_data, countries_header)
 
     max_num_problems = 0
     people_data = read_utf8_csv(people_csv)

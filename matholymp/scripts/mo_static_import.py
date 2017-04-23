@@ -134,6 +134,7 @@ def main():
         for c in countries_data:
             if cfg_data['official_desc'] not in c:
                 c[cfg_data['official_desc']] = ''
+    countries_header.extend(['Normal'])
     write_utf8_csv(countries_csv, countries_data, countries_header)
 
     people_data = read_utf8_csv(people_csv)
