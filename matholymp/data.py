@@ -1234,6 +1234,17 @@ class PersonEvent(object):
         A list of the scores this contestant on each problem at this event.
         """)
 
+    def _get_have_any_scores(self):
+        assert self.is_contestant
+        for s in self.problem_scores:
+            if s is not None:
+                return True
+        return False
+
+    have_any_scores = _PropertyCached(
+        'have_any_scores', _get_have_any_scores,
+        """Whether any scores are known for this contestant at this event.""")
+
     def _get_total_score(self):
         assert self.is_contestant
         t = sum([s for s in self.problem_scores if s is not None])

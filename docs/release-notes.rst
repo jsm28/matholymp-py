@@ -130,6 +130,11 @@ the registration system is not active.
   files listing countries now explicitly track whether a country is a
   normal or staff country.
 
+* The online scoreboard now indicates the maximum score a contestant
+  could achieve when only partial scores for that contestant have been
+  entered, and shows a contestant's total score as a blank rather than
+  zero if no scores for that contestant have been entered.
+
 Version 2017.01.0 (8 January 2017)
 ----------------------------------
 

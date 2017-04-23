@@ -179,6 +179,7 @@ class RegSiteGenerator(SiteGenerator):
                         self.person_scoreboard_row(p,
                                                    show_rank=False,
                                                    show_name=False,
+                                                   show_range=False,
                                                    show_award=False,
                                                    link=False))
                 ctext += self.html_table_thead_tbody_list(head_row_list,

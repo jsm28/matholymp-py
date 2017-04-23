@@ -1000,7 +1000,8 @@ class SiteGenerator(object):
         return self.html_tr_list(row)
 
     def person_scoreboard_row(self, p, show_rank=True, show_code=True,
-                              show_name=True, show_award=True, link=True):
+                              show_name=True, show_range=True, show_award=True,
+                              link=True):
         """Generate the scoreboard row for one person."""
         scores_row = []
         for i in range(p.event.num_problems):
@@ -1023,7 +1024,13 @@ class SiteGenerator(object):
         if show_name:
             row.extend([linker(p.person, cgi.escape(p.name))])
         row.extend(scores_row)
-        row.extend([str(p.total_score)])
+        total_score_str = str(p.total_score)
+        if not p.have_any_scores:
+            total_score_str = ''
+        elif show_range and p.max_total_score > p.total_score:
+            total_score_str = ('%d (max %d)' %
+                               (p.total_score, p.max_total_score))
+        row.extend([total_score_str])
         if show_award:
             row.extend([cgi.escape(p.awards_str)])
         return self.html_tr_td_scores_list(row)

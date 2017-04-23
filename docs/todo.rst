@@ -273,11 +273,9 @@ Registration system
   question from not having any scores entered for that question (e.g.,
   show a blank for the total in the latter case).
 
-* Generally indicate the maximum score a person or country could
-  achieve when their scores are incomplete (similar to how the table
-  of cumulative statistics shows how many people might achieve a
-  score).  (The display scoreboard should probably not show this, to
-  keep it compact.)
+* Generally indicate the maximum score a country could achieve when
+  their scores are incomplete (similar to how the table of cumulative
+  statistics shows how many people might achieve a score).
 
 The following ideas are more speculative.
 
