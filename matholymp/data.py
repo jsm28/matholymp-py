@@ -1740,12 +1740,32 @@ class CountryEvent(object):
         this event.
         """)
 
+    def _get_have_any_scores(self):
+        for p in self.contestant_list:
+            if p.have_any_scores:
+                return True
+        return False
+
+    have_any_scores = _PropertyCached(
+        'have_any_scores', _get_have_any_scores,
+        """Whether any scores are known for this country at this event.""")
+
     def _get_total_score(self):
         return sum([p.total_score for p in self.contestant_list])
 
     total_score = _PropertyCached(
         'total_score', _get_total_score,
         """The total score for contestants from this country at this event.""")
+
+    def _get_max_total_score(self):
+        return sum([p.max_total_score for p in self.contestant_list])
+
+    max_total_score = _PropertyCached(
+        'max_total_score', _get_max_total_score,
+        """
+        The maximum possible total score for contestants from this
+        country at this event.
+        """)
 
     def _get_total_score_for_rank(self):
         scores = sorted([p.total_score for p in self.contestant_list],
@@ -1761,6 +1781,39 @@ class CountryEvent(object):
         The total score for ranking purposes for this country at this event.
         """)
 
+    def _get_max_total_score_for_rank(self):
+        scores = sorted([p.max_total_score for p in self.contestant_list],
+                        reverse=True)
+        count = self.event.rank_top_n
+        if count is not None and count < len(scores):
+            scores = scores[0:count]
+        return sum(scores)
+
+    max_total_score_for_rank = _PropertyCached(
+        'max_total_score_for_rank', _get_max_total_score_for_rank,
+        """
+        The maximum possible total score for ranking purposes for this
+        country at this event.
+        """)
+
+    def _get_have_any_problem_scores(self):
+        r = []
+        for n in range(self.event.num_problems):
+            have_any = False
+            for p in self.contestant_list:
+                if p.problem_scores[n] is not None:
+                    have_any = True
+                    break
+            r.append(have_any)
+        return r
+
+    have_any_problem_scores = _PropertyCached(
+        'have_any_problem_scores', _get_have_any_problem_scores,
+        """
+        A list of whether any scores are known for each problem for
+        contestants from this country at this event.
+        """)
+
     def _get_problem_totals(self):
         r = []
         for n in range(self.event.num_problems):
@@ -1773,6 +1826,25 @@ class CountryEvent(object):
         """
         A list of the total score on each problem for contestants from
         this country at this event.
+        """)
+
+    def _get_max_problem_totals(self):
+        r = []
+        for n in range(self.event.num_problems):
+            t = 0
+            for p in self.contestant_list:
+                if p.problem_scores[n] is None:
+                    t += self.event.marks_per_problem[n]
+                else:
+                    t += p.problem_scores[n]
+            r.append(t)
+        return r
+
+    max_problem_totals = _PropertyCached(
+        'max_problem_totals', _get_max_problem_totals,
+        """
+        A list of the maximum possible total score on each problem for
+        contestants from this country at this event.
         """)
 
     def _get_rank(self):

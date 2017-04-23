@@ -131,9 +131,11 @@ the registration system is not active.
   normal or staff country.
 
 * The online scoreboard now indicates the maximum score a contestant
-  could achieve when only partial scores for that contestant have been
-  entered, and shows a contestant's total score as a blank rather than
-  zero if no scores for that contestant have been entered.
+  or country could achieve when only partial scores for that
+  contestant or country have been entered, and shows a contestant's or
+  country's total score, or a country's total score on a problem, as a
+  blank rather than zero if no scores for that contestant or country,
+  or for that country on that problem, have been entered.
 
 Version 2017.01.0 (8 January 2017)
 ----------------------------------

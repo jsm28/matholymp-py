@@ -1094,12 +1094,37 @@ class SiteGenerator(object):
                 self.link_for_country_at_event(c,
                                                cgi.escape(c.name_with_code)))
         row.append(str(c.num_contestants))
-        row.extend([str(t) for t in c.problem_totals])
+        for i in range(c.event.num_problems):
+            t = c.problem_totals[i]
+            tmax = c.max_problem_totals[i]
+            if not c.have_any_problem_scores[i]:
+                s = ''
+            elif t < tmax:
+                s = '%d (max %d)' % (t, tmax)
+            else:
+                s = str(t)
+            row.append(s)
         row.extend(['' for i in range(c.event.num_problems,
                                       num_problems_to_show)])
-        row.extend([str(c.total_score)])
+        t = c.total_score
+        tmax = c.max_total_score
+        if not c.have_any_scores:
+            s = ''
+        elif t < tmax:
+            s = '%d (max %d)' % (t, tmax)
+        else:
+            s = str(t)
+        row.append(s)
         if total_top_n:
-            row.extend([str(c.total_score_for_rank)])
+            t = c.total_score_for_rank
+            tmax = c.max_total_score_for_rank
+            if not c.have_any_scores:
+                s = ''
+            elif t < tmax:
+                s = '%d (max %d)' % (t, tmax)
+            else:
+                s = str(t)
+            row.append(s)
         row.extend([(c.num_awards['Gold Medal'] is not None and
                      str(c.num_awards['Gold Medal']) or ''),
                     (c.num_awards['Silver Medal'] is not None and
