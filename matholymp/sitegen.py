@@ -522,7 +522,8 @@ class SiteGenerator(object):
                 (self.link_for_event(event,
                                      cgi.escape(event.short_name_with_year)),
                  self.link_for_country(event.host_country,
-                                       cgi.escape(event.host_country_name))))
+                                       cgi.escape(
+                                           event.host_country_name_in))))
 
     def generate_sidebar_out(self):
         """Generate HTML text for the sidebar."""
@@ -912,7 +913,7 @@ class SiteGenerator(object):
         header = ('%s in %s' %
                   (cgi.escape(e.short_name_with_year),
                    self.link_for_country(e.host_country,
-                                         cgi.escape(e.host_country_name))))
+                                         cgi.escape(e.host_country_name_in))))
         self.write_html_to_file(text, title, header, self.path_for_event(e))
 
     def generate_one_event_countries_summary(self, e):
@@ -1549,7 +1550,7 @@ class SiteGenerator(object):
                      (cgi.escape(c.name_with_code),
                       cgi.escape(e.short_name_with_year)))
             hl = self.link_for_country(e.host_country,
-                                       cgi.escape(e.host_country_name))
+                                       cgi.escape(e.host_country_name_in))
             year_text += ('<h2>%s in %s</h2>\n' %
                           (self.link_for_country_at_event(c, cltxt), hl))
             year_text += self.country_event_text(c, 'h3', False)
@@ -1644,6 +1645,7 @@ class SiteGenerator(object):
             csv_out['Year'] = e.year
             csv_out['Country Number'] = str(e.host_country.id)
             csv_out['Country'] = e.host_country_name
+            csv_out['Country Name In'] = e.host_country_name_in
             csv_out['City'] = e.host_city or ''
             csv_out['Start Date'] = e.start_date or ''
             csv_out['End Date'] = e.end_date or ''
@@ -1722,7 +1724,7 @@ class SiteGenerator(object):
                         ' Teams'] = ''
             events_data_output.append(csv_out)
         events_columns = ['Number', 'Year', 'Country Number', 'Country',
-                          'City', 'Start Date', 'End Date',
+                          'Country Name In', 'City', 'Start Date', 'End Date',
                           'Home Page URL', 'Contact Name',
                           'Contact Email', 'Number of Exams',
                           'Number of Problems']

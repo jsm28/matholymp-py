@@ -40,7 +40,8 @@ import os
 
 import matholymp
 from matholymp.fileutil import read_utf8_csv, write_utf8_csv, comma_join
-from matholymp.sitegen import read_sitegen_config, sitegen_people_csv
+from matholymp.sitegen import read_sitegen_config, sitegen_events_csv, \
+    sitegen_people_csv
 
 __all__ = ['main']
 
@@ -60,7 +61,39 @@ def main():
     top_directory = os.getcwd()
 
     cfg_data = read_sitegen_config(top_directory)
+    events_csv = sitegen_events_csv(top_directory, cfg_data)
     people_csv = sitegen_people_csv(top_directory, cfg_data)
+
+    e_max_num_problems = 0
+    e_honourable_mentions_available_varies = False
+    e_distinguish_official_varies = False
+    events_data = read_utf8_csv(events_csv)
+    for e in events_data:
+        i = e_max_num_problems + 1
+        while ('P%d Max' % i) in e:
+            e_max_num_problems = i
+            i += 1
+        if 'Honourable Mentions Available' in e:
+            e_honourable_mentions_available_varies = True
+        if 'Distinguish Official Countries' in e:
+            e_distinguish_official_varies = True
+        if 'Country Name In' not in e:
+            # Updating from 2017.01.0 or earlier.
+            e['Country Name In'] = e['Country']
+    events_header = ['Number', 'Year', 'Country Number', 'Country',
+                     'Country Name In', 'City', 'Start Date', 'End Date',
+                     'Home Page URL', 'Contact Name',
+                     'Contact Email', 'Number of Exams',
+                     'Number of Problems']
+    events_header.extend(['P%d Max' % (i + 1)
+                          for i in range(e_max_num_problems)])
+    events_header.extend(['Gold Boundary', 'Silver Boundary',
+                          'Bronze Boundary'])
+    if e_honourable_mentions_available_varies:
+        events_header.extend(['Honourable Mentions Available'])
+    if e_distinguish_official_varies:
+        events_header.extend(['Distinguish Official Countries'])
+    write_utf8_csv(events_csv, events_data, events_header)
 
     max_num_problems = 0
     people_data = read_utf8_csv(people_csv)

@@ -114,6 +114,11 @@ Next version (unreleased)
   allergies information is collected together with dietary
   requirements.
 
+* Static site generation now supports having a different form of a
+  host country's name that appears after "in", for names requiring
+  "the" in that context.  A ``Country Name In`` column is added to the
+  CSV file of events for that purpose.
+
 Version 2017.01.0 (8 January 2017)
 ----------------------------------
 

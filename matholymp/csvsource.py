@@ -144,6 +144,7 @@ class CSVDataSource(DataSource):
 
     _event_attr_map_str = { 'year': 'Year',
                             'host_country_name': 'Country',
+                            'host_country_name_in': 'Country Name In',
                             'host_city': 'City',
                             'start_date': 'Start Date',
                             'end_date': 'End Date',

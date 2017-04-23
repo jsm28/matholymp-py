@@ -393,8 +393,15 @@ class Event(object):
         'host_country_name',
         """The name of the host country of this event.""")
 
+    host_country_name_in = _EventPropertyDS(
+        'host_country_name_in',
+        """
+        The name of the host country of this event, in the form to use
+        after 'in'.
+        """)
+
     def _get_short_name_with_year_and_country(self):
-        return self.short_name_with_year + ' in ' + self.host_country_name
+        return self.short_name_with_year + ' in ' + self.host_country_name_in
 
     short_name_with_year_and_country = _PropertyCached(
         'short_name_with_year_and_country',

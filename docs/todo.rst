@@ -81,10 +81,6 @@ General and global changes
 * Make all static site and registration system text generated from
   Python code rather than templates more customisable.
 
-* For the static site and registration system, make configurable
-  whether to use "the" with country names in prose to avoid generating
-  text such as "in United Kingdom".
-
 * Add graphical statistics of results and individual and country
   performance over time.
 
