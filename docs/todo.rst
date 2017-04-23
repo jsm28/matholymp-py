@@ -100,11 +100,9 @@ General and global changes
 
 * Add web interfaces for more things currently done on command line.
 
-* Flag staff countries, or non-normal countries (in registration
-  system and CSV files) explicitly to avoid hardcoded use of country
-  names (in registration system and document generation) other than
-  for initial creation.  Likewise flag "None" country (in registration
-  system only), or have tristate country type there.
+* Distinguish normal and staff countries in CSV files explicitly to
+  avoid hardcoded use of country names for identifying staff countries
+  in document generation.  Then allow renaming staff countries.
 
 * Don't hardcode ``en_GB`` as locale for collation.
 
@@ -319,7 +317,8 @@ The following ideas are more speculative.
   multiple problems for the same country at the same time; conceivably
   others).
 
-* Support having multiple staff countries.
+* Support retiring special countries, as long as this doesn't affect
+  the special "anonymous" or "admin" users.
 
 * Support logical role ordering within countries rather than only
   alphabetical.

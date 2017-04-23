@@ -47,6 +47,10 @@ so, run :command:`mo-static-generate`.
 Next version (unreleased)
 -------------------------
 
+Because of changes to how data is represented in the registration
+system, upgrades to this version can only be made between events when
+the registration system is not active.
+
 * The registration system now supports collecting nationality
   information for participants.  The new configuration variable
   ``matholymp_require_nationality`` must be specified in
@@ -118,6 +122,12 @@ Next version (unreleased)
   host country's name that appears after "in", for names requiring
   "the" in that context.  A ``Country Name In`` column is added to the
   CSV file of events for that purpose.
+
+* It is now possible to have multiple staff countries in the
+  registration system (e.g., to separate different kinds of staff),
+  although exactly one staff country is created automatically and its
+  name cannot then be changed.  The example :file:`country.item.html`
+  is updated for this change.
 
 Version 2017.01.0 (8 January 2017)
 ----------------------------------

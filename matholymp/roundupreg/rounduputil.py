@@ -44,12 +44,11 @@ from matholymp.fileutil import boolean_states, file_format_contents, \
 __all__ = ['distinguish_official', 'have_consent_forms',
            'have_passport_numbers', 'have_nationality', 'require_dob',
            'get_num_problems', 'get_marks_per_problem', 'scores_from_str',
-           'contestant_age', 'get_none_country_name', 'get_none_country',
-           'get_staff_country_name', 'get_staff_country',
-           'normal_country_person', 'person_is_contestant', 'contestant_code',
-           'pn_score', 'scores_final', 'any_scores_missing',
-           'country_has_contestants', 'valid_country_problem', 'valid_score',
-           'create_rss', 'db_file_format_contents', 'db_file_extension',
+           'contestant_age', 'get_staff_country_name', 'normal_country_person',
+           'person_is_contestant', 'contestant_code', 'pn_score',
+           'scores_final', 'any_scores_missing', 'country_has_contestants',
+           'valid_country_problem', 'valid_score', 'create_rss',
+           'db_file_format_contents', 'db_file_extension',
            'db_private_file_format_contents', 'db_private_file_extension']
 
 def distinguish_official(db):
@@ -120,29 +119,16 @@ def contestant_age(db, person):
         diff -= 1
     return diff
 
-def get_none_country_name(db):
-    """Return the name of the special 'None' country."""
-    return 'None'
-
-def get_none_country(db):
-    """Return the id of the special 'None' country."""
-    return db.country.lookup(get_none_country_name(db))
-
 def get_staff_country_name(db):
     """Return the name of the special staff country."""
     short_name = db.config.ext['MATHOLYMP_SHORT_NAME']
     year = db.config.ext['MATHOLYMP_YEAR']
     return short_name + ' ' + year + ' Staff'
 
-def get_staff_country(db):
-    """Return the id of the special staff country."""
-    return db.country.lookup(get_staff_country_name(db))
-
 def normal_country_person(db, userid):
     """Determine whether the user is from a normal country."""
     user_country = db.user.get(userid, 'country')
-    return (user_country != get_none_country(db) and
-            user_country != get_staff_country(db))
+    return db.country.get(user_country, 'is_normal')
 
 def person_is_contestant(db, person):
     """Determine whether a person is a contestant."""

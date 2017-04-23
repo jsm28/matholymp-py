@@ -44,8 +44,7 @@ from roundup.cgi.exceptions import Unauthorised
 
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import get_marks_per_problem, \
-    scores_from_str, get_none_country, get_staff_country, \
-    person_is_contestant, contestant_code, scores_final, \
+    scores_from_str, person_is_contestant, contestant_code, scores_final, \
     valid_country_problem, valid_score, create_rss, db_file_extension
 
 class ScoreAction(Action):
@@ -119,10 +118,8 @@ class RetireCountryAction(Action):
                                   itemid=self.nodeid):
             raise Unauthorised('You do not have permission to retire'
                                ' this country')
-        if self.nodeid == get_none_country(self.db):
-            raise Unauthorised('The special country None cannot be retired')
-        if self.nodeid == get_staff_country(self.db):
-            raise Unauthorised('The special staff country cannot be retired')
+        if not self.db.country.get(self.nodeid, 'is_normal'):
+            raise Unauthorised('Special countries cannot be retired')
         users = self.db.user.filter(None, {'country': self.nodeid})
         people = self.db.person.filter(None, {'country': self.nodeid})
         guides = self.db.person.filter(None, {'guide_for': self.nodeid})

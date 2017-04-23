@@ -55,8 +55,7 @@
 """This module provides the Roundup registration schema."""
 
 from matholymp.roundupreg.rounduputil import distinguish_official, \
-    have_consent_forms, have_passport_numbers, have_nationality, \
-    get_none_country
+    have_consent_forms, have_passport_numbers, have_nationality
 
 __all__ = ['init_schema']
 
@@ -99,6 +98,8 @@ def init_schema(env):
                     generic_url=String(),
                     reuse_flag=Boolean(),
                     files=Link('file'),
+                    is_normal=Boolean(),
+                    participants_ok=Boolean(),
                     **country_extra)
     country.setkey('name')
     country.setorderprop('code')
@@ -223,9 +224,10 @@ def init_schema(env):
     # retired countries.
     def can_view_country(db, userid, itemid):
         """Determine whether a normal user can view this country."""
-        return (itemid != get_none_country(db) and
+        return (db.country.get(itemid, 'participants_ok') and
                 not db.country.is_retired(itemid))
-    country_public_props = ['code', 'name', 'generic_url', 'files']
+    country_public_props = ['code', 'name', 'generic_url', 'files',
+                            'is_normal']
     if distinguish_official(db):
         country_public_props.append('official')
     p = db.security.addPermission(

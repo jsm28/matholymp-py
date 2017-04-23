@@ -55,8 +55,7 @@
 """This module provides the Roundup initial data setup."""
 
 from matholymp.roundupreg.rounduputil import distinguish_official, \
-    get_none_country_name, get_none_country, get_staff_country_name, \
-    get_staff_country
+    get_staff_country_name
 from matholymp.roundupreg.staticsite import static_site_event_group
 
 __all__ = ['init_data']
@@ -74,7 +73,6 @@ def init_data(env):
     admin_email = env['admin_email']
 
     staff_country_name = get_staff_country_name(db)
-    none_country_name = get_none_country_name(db)
 
     # The year, from the configuration file.
     year = db.config.ext['MATHOLYMP_YEAR']
@@ -97,8 +95,12 @@ def init_data(env):
         country_extra = { 'official': False }
     else:
         country_extra = {}
-    country.create(code='ZZA', name=staff_country_name, **country_extra)
-    country.create(code='ZZN', name=none_country_name, **country_extra)
+    staff_country = country.create(code='ZZA', name=staff_country_name,
+                                   is_normal=False, participants_ok=True,
+                                   **country_extra)
+    none_country = country.create(code='ZZN', name='None',
+                                  is_normal=False, participants_ok=False,
+                                  **country_extra)
 
     # Create standard roles for olympiad participants.
     matholymprole = db.getclass('matholymprole')
@@ -182,6 +184,6 @@ def init_data(env):
     user = db.getclass('user')
     user.create(username='admin', password=adminpw,
                 address=admin_email, roles='Admin',
-                country=get_staff_country(db))
+                country=staff_country)
     user.create(username='anonymous', roles='Anonymous',
-                country=get_none_country(db))
+                country=none_country)

@@ -55,10 +55,9 @@ from matholymp.roundupreg.cache import cached_text
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import distinguish_official, \
     have_consent_forms, have_passport_numbers, have_nationality, require_dob, \
-    contestant_age, get_none_country, get_staff_country, \
-    normal_country_person, person_is_contestant, contestant_code, pn_score, \
-    scores_final, any_scores_missing, country_has_contestants, \
-    valid_country_problem
+    contestant_age, normal_country_person, person_is_contestant, \
+    contestant_code, pn_score, scores_final, any_scores_missing, \
+    country_has_contestants, valid_country_problem
 
 def people_from_country_internal(db, country):
     """
@@ -88,8 +87,8 @@ def people_from_country(db, country):
 
 def show_country_people(db, country):
     """Return whether to show a table of people on a country's page."""
-    none_country = get_none_country(db)
-    return country != none_country and not db.country.is_retired(country)
+    return (db.country.get(country, 'participants_ok') and
+            not db.country.is_retired(country))
 
 def country_people_table(db, country):
     """Show the table of people from a country on that country's page."""
@@ -148,9 +147,7 @@ def show_travel_copy_options(db, userid, person):
     if not person:
         return False
     country = db.person.get(person, 'country')
-    none_country = get_none_country(db)
-    staff_country = get_staff_country(db)
-    return country != none_country and country != staff_country
+    return db.country.get(country, 'is_normal')
 
 def country_travel_copy_options(db, country, person):
     """

@@ -38,8 +38,7 @@ from matholymp.fileutil import comma_split, boolean_states
 from matholymp.roundupreg.rounduputil import distinguish_official, \
     have_consent_forms, have_passport_numbers, have_nationality, \
     get_num_problems, get_marks_per_problem, scores_from_str, contestant_age, \
-    get_none_country, get_staff_country, db_file_extension, \
-    db_private_file_extension
+    db_file_extension, db_private_file_extension
 
 __all__ = ['RoundupDataSource']
 
@@ -54,20 +53,6 @@ class RoundupDataSource(DataSource):
         templates).
         """
         self._db = db
-        # The special country "None" exists to be the country of the
-        # anonymous user, but should be ignored for the purposes of
-        # the general data model used here.
-        self._none_country = None
-        # The special staff country.
-        self._staff_country = None
-
-    def _get_none_country(self):
-        if self._none_country is None:
-            self._none_country = get_none_country(self._db)
-
-    def _get_staff_country(self):
-        if self._staff_country is None:
-            self._staff_country = get_staff_country(self._db)
 
     def event_group_get_attr(self, name):
         if name == 'short_name':
@@ -89,9 +74,8 @@ class RoundupDataSource(DataSource):
         elif name == '_person_ids':
             return [int(p) for p in self._db.person.list()]
         elif name == '_country_ids':
-            self._get_none_country()
             return [int(c) for c in self._db.country.list()
-                    if c != self._none_country]
+                    if self._db.country.get(c, 'participants_ok')]
         raise KeyError(name)
 
     def event_exists(self, id):
@@ -104,10 +88,9 @@ class RoundupDataSource(DataSource):
 
     def country_exists(self, id):
         id = str(id)
-        self._get_none_country()
-        return (id != self._none_country and
-                self._db.country.hasnode(id) and
-                not self._db.country.is_retired(id))
+        return (self._db.country.hasnode(id) and
+                not self._db.country.is_retired(id) and
+                self._db.country.get(id, 'participants_ok'))
 
     def person_event_exists(self, person_id, event_id):
         return self.person_exists(person_id)
@@ -138,9 +121,8 @@ class RoundupDataSource(DataSource):
         elif name == '_person_ids':
             return [int(p) for p in self._db.person.list()]
         elif name == '_country_ids':
-            self._get_none_country()
             return [int(c) for c in self._db.country.list()
-                    if c != self._none_country]
+                    if self._db.country.get(c, 'participants_ok')]
         raise KeyError(name)
 
     def person_event_get_attr(self, person_id, country_id, event_id, name):
@@ -325,8 +307,7 @@ class RoundupDataSource(DataSource):
         elif name == 'is_official':
             return self._db.country.get(id, 'official')
         elif name == 'is_normal':
-            self._get_staff_country()
-            return id != self._staff_country
+            return self._db.country.get(id, 'is_normal')
         elif name == '_person_ids':
             person_list = self._db.person.filter(None, {'country': id})
             return [int(p) for p in person_list]

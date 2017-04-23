@@ -88,6 +88,30 @@ define="edit_ok context/is_edit_ok"
  </tr>
 </tal:block>
 
+<tal:block tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:is_normal; label string:Is this country normal (non-staff participants)?; value context/is_normal; edit_ok edit_ok">
+  <th class="required" metal:use-macro="th_label">Is this country normal (non-staff participants)?</th>
+  <tal:if condition="context/id">
+   <td tal:content="structure context/is_normal/field">normal</td>
+  </tal:if>
+  <tal:if condition="not:context/id">
+   <td><input type="radio" checked="checked" name="is_normal" value="yes">Yes<input type="radio" name="is_normal" value="no">No</td>
+  </tal:if>
+ </tr>
+</tal:block>
+
+<tal:block tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:participants_ok; label string:Can this country have participants?; value context/participants_ok; edit_ok edit_ok">
+  <th class="required" metal:use-macro="th_label">Can this country have participants?</th>
+  <tal:if condition="context/id">
+   <td tal:content="structure context/participants_ok/field">participants</td>
+  </tal:if>
+  <tal:if condition="not:context/id">
+   <td><input type="radio" checked="checked" name="participants_ok" value="yes">Yes<input type="radio" name="participants_ok" value="no">No</td>
+  </tal:if>
+ </tr>
+</tal:block>
+
  <tr tal:condition="context/is_edit_ok">
   <td colspan="2">If this country has participated at a previous <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_SHORT_NAME']" />, please enter the corresponding <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_GENERIC_URL_DESC']" /> (for example, <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_GENERIC_URL_BASE']+'countries/country1234/'" />) below; otherwise, leave this box blank.</td>
  </tr>

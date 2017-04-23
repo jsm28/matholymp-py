@@ -40,10 +40,9 @@ from matholymp.fileutil import boolean_states
 from matholymp.roundupreg.auditorutil import get_new_value, require_value
 from matholymp.roundupreg.rounduputil import have_consent_forms, \
     have_passport_numbers, have_nationality, require_dob, get_num_problems, \
-    get_marks_per_problem, get_none_country, get_staff_country, \
-    any_scores_missing, valid_score, create_rss, db_file_format_contents, \
-    db_file_extension, db_private_file_format_contents, \
-    db_private_file_extension
+    get_marks_per_problem, any_scores_missing, valid_score, create_rss, \
+    db_file_format_contents, db_file_extension, \
+    db_private_file_format_contents, db_private_file_extension
 from matholymp.roundupreg.staticsite import static_site_event_group, \
     static_site_file_data
 from matholymp.roundupreg.userauditor import audit_user_fields
@@ -94,9 +93,17 @@ def audit_country_fields(db, cl, nodeid, newvalues):
     name = require_value(db, cl, nodeid, newvalues, 'name',
                          'No country name specified')
     if nodeid is not None:
-        if nodeid == get_staff_country(db) or nodeid == get_none_country(db):
+        if not db.country.get(nodeid, 'is_normal'):
             if name != db.country.get(nodeid, 'name'):
                 raise ValueError('Cannot rename special countries')
+        if ('is_normal' in newvalues and
+            newvalues['is_normal'] != db.country.get(nodeid, 'is_normal')):
+            raise ValueError('Cannot change whether a country is normal')
+        if ('participants_ok' in newvalues and
+            newvalues['participants_ok'] != db.country.get(nodeid,
+                                                           'participants_ok')):
+            raise ValueError('Cannot change whether a country '
+                             'can have participants')
 
     if 'files' in newvalues:
         file_id = newvalues['files']
@@ -143,20 +150,18 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     together with other person entries in the database."""
 
     userid = db.getuid()
-    none_country = get_none_country(db)
-    staff_country = get_staff_country(db)
 
     # A country must be specified and ordinary users cannot create or
     # modify records for other countries.
     country = require_value(db, cl, nodeid, newvalues, 'country',
                             'No country specified')
     user_country = db.user.get(userid, 'country')
-    if (user_country != none_country
-        and user_country != staff_country
+    user_country_normal = db.country.get(user_country, 'is_normal')
+    if (user_country_normal
         and user_country != country):
         raise ValueError('Person must be from your country')
 
-    if (user_country != staff_country
+    if (user_country_normal
         and not db.event.get('1', 'registration_enabled')):
         raise ValueError('Registration is now disabled, please contact'
                          ' the event organisers to change details of'
@@ -281,7 +286,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
             if format_ext != format_contents:
                 raise ValueError('Filename extension for consent form must '
                                  'match contents (%s)' % format_contents)
-            if user_country != staff_country:
+            if user_country_normal:
                 file_country = db.private_file.get(file_id, 'country')
                 if file_country is not None and file_country != user_country:
                     raise ValueError('Consent form from another country')
@@ -319,13 +324,13 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     # must be no secondary roles, other than committee membership.
     # For an administrative country, the roles must all be
     # administrative.
-    if country == none_country:
+    if not db.country.get(country, 'participants_ok'):
         raise ValueError('Invalid country')
 
     other_roles = get_new_value(db, cl, nodeid, newvalues, 'other_roles')
     if other_roles is None:
         other_roles = []
-    if country == staff_country:
+    if not db.country.get(country, 'is_normal'):
         if not db.matholymprole.get(primary_role, 'isadmin'):
             raise ValueError('Staff must have administrative roles')
         for role in other_roles:
@@ -358,7 +363,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     for c in guide_for:
         if primary_role != guide:
             raise ValueError('Only normal Guides may guide a country')
-        if c == staff_country or c == none_country:
+        if not db.country.get(c, 'is_normal'):
             raise ValueError('May only guide normal countries')
 
     # Likewise phone_number.
