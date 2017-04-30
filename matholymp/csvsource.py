@@ -152,7 +152,7 @@ class CSVDataSource(DataSource):
                             'contact_email': 'Contact Email' }
 
     _event_attr_map_date = { 'start_date': 'Start Date',
-                            'end_date': 'End Date' }
+                             'end_date': 'End Date' }
 
     _event_attr_map_int = { '_host_country_id': 'Country Number',
                             'num_exams': 'Number of Exams',
