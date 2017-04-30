@@ -40,6 +40,7 @@ import re
 from matholymp.collate import coll_get_sort_key
 from matholymp.csvsource import CSVDataSource
 from matholymp.data import EventGroup
+from matholymp.datetimeutil import date_range_html, date_to_ymd_iso
 from matholymp.fileutil import read_utf8_csv, write_utf8_csv, \
     comma_join, write_text_to_file, read_text_from_file, read_config
 
@@ -603,47 +604,7 @@ class SiteGenerator(object):
             if e.start_date is None or e.end_date is None:
                 dates = ''
             else:
-                start_date = e.start_date
-                end_date = e.end_date
-                m = re.match('^([0-9]{4})-([0-9]{2})-([0-9]{2})\\Z',
-                             start_date)
-                if not m:
-                    raise ValueError('Bad start date')
-                start_year = m.group(1)
-                start_month = m.group(2)
-                start_day = m.group(3)
-                m = re.match('^([0-9]{4})-([0-9]{2})-([0-9]{2})\\Z', end_date)
-                if not m:
-                    raise ValueError('Bad end date')
-                end_year = m.group(1)
-                end_month = m.group(2)
-                end_day = m.group(3)
-                if start_year != e.year or end_year != e.year:
-                    raise ValueError('Dates not in expected year')
-                start_month = int(start_month)
-                end_month = int(end_month)
-                if start_month < 1 or start_month > 12:
-                    raise ValueError('Bad start month')
-                if end_month < 1 or end_month > 12:
-                    raise ValueError('Bad end month')
-                if start_month > end_month:
-                    raise ValueError('Start month after end month')
-                if start_month == end_month and int(start_day) > int(end_day):
-                    raise ValueError('Start day after end day')
-                # The output is meant to be locale-independent, so
-                # hardcode months here.
-                months = ['January', 'February', 'March', 'April', 'May',
-                          'June', 'July', 'August', 'September', 'October',
-                          'November', 'December']
-                start_month_name = months[start_month - 1]
-                end_month_name = months[end_month - 1]
-                if start_month == end_month:
-                    dates = ('%s&ndash;%s&nbsp;%s' %
-                             (start_day, end_day, end_month_name))
-                else:
-                    dates = ('%s&nbsp;%s&ndash;%s&nbsp;%s' %
-                             (start_day, start_month_name,
-                              end_day, end_month_name))
+                dates = date_range_html(e.start_date, e.end_date, int(e.year))
             num_contestants = e.num_contestants
             if num_contestants:
                 num_gold = e.num_awards['Gold Medal']
@@ -811,8 +772,8 @@ class SiteGenerator(object):
                      self.link_for_country(e.host_country,
                                            cgi.escape(e.host_country_name))],
                     ['City', cgi.escape(e.host_city or '')],
-                    ['Start date', cgi.escape(e.start_date or '')],
-                    ['End date', cgi.escape(e.end_date or '')],
+                    ['Start date', cgi.escape(date_to_ymd_iso(e.start_date))],
+                    ['End date', cgi.escape(date_to_ymd_iso(e.end_date))],
                     ['Contact name', cgi.escape(e.contact_name or '')],
                     ['Contact email', cgi.escape(e.contact_email or '')]]
         if e.num_contestants:
@@ -1679,8 +1640,8 @@ class SiteGenerator(object):
             csv_out['Country'] = e.host_country_name
             csv_out['Country Name In'] = e.host_country_name_in
             csv_out['City'] = e.host_city or ''
-            csv_out['Start Date'] = e.start_date or ''
-            csv_out['End Date'] = e.end_date or ''
+            csv_out['Start Date'] = date_to_ymd_iso(e.start_date)
+            csv_out['End Date'] = date_to_ymd_iso(e.end_date)
             csv_out['Home Page URL'] = e.home_page_url or ''
             csv_out['Contact Name'] = e.contact_name or ''
             csv_out['Contact Email'] = e.contact_email or ''

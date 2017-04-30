@@ -424,11 +424,11 @@ class Event(object):
 
     start_date = _EventPropertyDS(
         'start_date',
-        """The start date (yyyy-mm-dd) of this event.""")
+        """The start date (datetime.date object) of this event.""")
 
     end_date = _EventPropertyDS(
         'end_date',
-        """The end date (yyyy-mm-dd) of this event.""")
+        """The end date (datetime.date object) of this event.""")
 
     home_page_url = _EventPropertyDS(
         'home_page_url',

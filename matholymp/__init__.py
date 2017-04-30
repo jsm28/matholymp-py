@@ -35,5 +35,6 @@ participants and associated administration.
 
 __version__ = '2017.04.0.dev0'
 
-__all__ = ['caseconv', 'collate', 'csvsource', 'data', 'datasource', 'docgen',
-           'fileutil', 'regdata', 'regsitegen', 'sitegen', 'stats']
+__all__ = ['caseconv', 'collate', 'csvsource', 'data', 'datasource',
+           'datetimeutil', 'docgen', 'fileutil', 'regdata', 'regsitegen',
+           'sitegen', 'stats']

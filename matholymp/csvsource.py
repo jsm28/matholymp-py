@@ -37,6 +37,7 @@ import os.path
 
 from matholymp.data import Paper
 from matholymp.datasource import DataSource
+from matholymp.datetimeutil import date_from_ymd_iso
 from matholymp.fileutil import comma_split, boolean_states
 from matholymp.regdata import file_url_to_local
 
@@ -146,11 +147,12 @@ class CSVDataSource(DataSource):
                             'host_country_name': 'Country',
                             'host_country_name_in': 'Country Name In',
                             'host_city': 'City',
-                            'start_date': 'Start Date',
-                            'end_date': 'End Date',
                             'home_page_url': 'Home Page URL',
                             'contact_name': 'Contact Name',
                             'contact_email': 'Contact Email' }
+
+    _event_attr_map_date = { 'start_date': 'Start Date',
+                            'end_date': 'End Date' }
 
     _event_attr_map_int = { '_host_country_id': 'Country Number',
                             'num_exams': 'Number of Exams',
@@ -170,6 +172,13 @@ class CSVDataSource(DataSource):
             if s == '':
                 s = None
             return s
+        if name in CSVDataSource._event_attr_map_date:
+            k = CSVDataSource._event_attr_map_date[name]
+            s = self._events[id][k]
+            if s == '':
+                return None
+            else:
+                return date_from_ymd_iso(k, s)
         if name in CSVDataSource._event_attr_map_int:
             s = self._events[id][CSVDataSource._event_attr_map_int[name]]
             if s == '':
