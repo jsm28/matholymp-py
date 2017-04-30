@@ -1958,7 +1958,7 @@ class SiteGenerator(object):
                 csv_out['Generic Number'] = str(p.generic_id)
         if private_data:
             csv_out['Gender'] = p.gender or ''
-            csv_out['Date of Birth'] = p.date_of_birth or ''
+            csv_out['Date of Birth'] = date_to_ymd_iso(p.date_of_birth)
             csv_out['Languages'] = comma_join(p.languages)
             csv_out['Allergies and Dietary Requirements'] = p.diet or ''
             csv_out['T-Shirt Size'] = p.tshirt or ''

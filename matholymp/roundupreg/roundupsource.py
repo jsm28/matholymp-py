@@ -37,8 +37,9 @@ from matholymp.datasource import DataSource
 from matholymp.fileutil import comma_split, boolean_states
 from matholymp.roundupreg.rounduputil import distinguish_official, \
     have_consent_forms, have_passport_numbers, have_nationality, \
-    get_num_problems, get_marks_per_problem, scores_from_str, contestant_age, \
-    db_file_extension, db_private_file_extension
+    get_num_problems, get_marks_per_problem, scores_from_str, \
+    person_date_of_birth, contestant_age, db_file_extension, \
+    db_private_file_extension
 
 __all__ = ['RoundupDataSource']
 
@@ -235,11 +236,7 @@ class RoundupDataSource(DataSource):
             gender = self._db.person.get(id, 'gender')
             return self._db.gender.get(gender, 'name')
         elif name == 'date_of_birth':
-            date_of_birth = self._db.person.get(id, 'date_of_birth')
-            if date_of_birth is None:
-                return None
-            else:
-                return date_of_birth.pretty('%Y-%m-%d')
+            return person_date_of_birth(self._db, id)
         elif name == 'passport_number':
             if not have_passport_numbers(self._db):
                 return None

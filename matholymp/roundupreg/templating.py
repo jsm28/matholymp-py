@@ -39,25 +39,29 @@ __all__ = ['people_from_country_internal', 'people_from_country',
            'show_travel_copy_options', 'country_travel_copy_options',
            'person_case_warning', 'list_expected_roles', 'registration_status',
            'registration_status_country', 'show_consent_form_ui',
-           'required_person_fields', 'register_templating_utils']
+           'string_select', 'date_of_birth_select', 'required_person_fields',
+           'register_templating_utils']
 
 import cgi
+import datetime
 import json
 import os
 import re
 
 from roundup.cgi.templating import HTMLItem
-from roundup.date import Date
 
 from matholymp.caseconv import all_uppercase
 from matholymp.collate import coll_get_sort_key
+from matholymp.datetimeutil import month_name
 from matholymp.roundupreg.cache import cached_text
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import distinguish_official, \
-    have_consent_forms, have_passport_numbers, have_nationality, require_dob, \
-    contestant_age, normal_country_person, person_is_contestant, \
-    contestant_code, pn_score, scores_final, any_scores_missing, \
-    country_has_contestants, valid_country_problem
+    get_consent_forms_date, have_consent_forms, have_passport_numbers, \
+    have_nationality, require_dob, get_earliest_date_of_birth, \
+    get_sanity_date_of_birth, person_date_of_birth, contestant_age, \
+    normal_country_person, person_is_contestant, contestant_code, pn_score, \
+    scores_final, any_scores_missing, country_has_contestants, \
+    valid_country_problem
 
 def people_from_country_internal(db, country):
     """
@@ -220,9 +224,7 @@ def registration_status(db):
     """Produce registration status page contents for all countries."""
     sitegen = RoundupSiteGenerator(db)
     main_role_list = list_expected_roles(db)
-    consent_forms_date = db.config.ext['MATHOLYMP_CONSENT_FORMS_DATE']
-    if consent_forms_date == '':
-        consent_forms_date = None
+    consent_forms_date = get_consent_forms_date(db)
     max_photo_size = int(db.config.ext['MATHOLYMP_PHOTO_MAX_SIZE'])
     return sitegen.registration_status_text(main_role_list, consent_forms_date,
                                             max_photo_size)
@@ -233,9 +235,7 @@ def registration_status_country(db, userid):
         return '<p>Cannot produce registration status for this user.</p>\n'
     sitegen = RoundupSiteGenerator(db)
     main_role_list = list_expected_roles(db)
-    consent_forms_date = db.config.ext['MATHOLYMP_CONSENT_FORMS_DATE']
-    if consent_forms_date == '':
-        consent_forms_date = None
+    consent_forms_date = get_consent_forms_date(db)
     user_country = db.user.get(userid, 'country')
     c = sitegen.event.country_map[int(user_country)]
     return sitegen.registration_status_country_text(c, main_role_list,
@@ -249,18 +249,62 @@ def show_consent_form_ui(db, person):
         # Always show the interface if a form has been uploaded, even
         # if the date of birth shows the form was unnecessary.
         return True
-    date_of_birth = db.person.get(person, 'date_of_birth')
+    date_of_birth = person_date_of_birth(db, person)
     if date_of_birth is None:
         return True
-    consent_forms_date = db.config.ext['MATHOLYMP_CONSENT_FORMS_DATE']
-    return date_of_birth >= Date(consent_forms_date)
+    consent_forms_date = get_consent_forms_date(db)
+    return date_of_birth >= consent_forms_date
+
+def string_select(name, default_label, entry_list, selected):
+    """Return form content for selecting from a list of string choices."""
+    option_list = []
+    found_sel = False
+    for e in entry_list:
+        e_value = e[0]
+        e_label = e[1]
+        sel = ''
+        if e_value == selected:
+            sel = 'selected="selected" '
+            found_sel = True
+        option_list.append('<option %svalue="%s">%s</option>' %
+                           (sel, cgi.escape(e_value, quote=True),
+                            cgi.escape(e_label)))
+    d_sel = ''
+    if not found_sel:
+        d_sel = 'selected="selected" '
+    option_list.insert(0, ('<option %svalue="">%s</option>' %
+                           (d_sel, cgi.escape(default_label))))
+    return ('<select id="%s" name="%s">%s</select>' %
+            (name, name, '\n'.join(option_list)))
+
+def date_of_birth_select(db, year, month, day):
+    """Return form content for selecting a date of birth."""
+    earliest_dob = get_earliest_date_of_birth(db)
+    sanity_dob = get_sanity_date_of_birth(db)
+    latest_dob = sanity_dob - datetime.timedelta(1)
+    earliest_year = earliest_dob.year
+    latest_year = latest_dob.year
+    year_range = range(latest_year, earliest_year - 1, -1)
+    year_list = [(str(y), str(y)) for y in year_range]
+    year_select = string_select('date_of_birth_year', '(year)', year_list,
+                                year)
+    month_range = range(1, 13)
+    month_list = [('%02d' % m, month_name(m)) for m in month_range]
+    month_select = string_select('date_of_birth_month', '(month)', month_list,
+                                 month)
+    day_range = range(1, 32)
+    day_list = [('%02d' % d, str(d)) for d in day_range]
+    day_select = string_select('date_of_birth_day', '(day)', day_list, day)
+    return '%s\n%s\n%s' % (day_select, month_select, year_select)
 
 def required_person_fields(db):
     """Return the list of fields required for registered people."""
     req = ['country', 'given_name', 'family_name', 'gender', 'primary_role',
            'first_language', 'tshirt']
     if require_dob(db):
-        req.append('date_of_birth')
+        req.append('date_of_birth_year')
+        req.append('date_of_birth_month')
+        req.append('date_of_birth_day')
     if have_passport_numbers(db):
         req.append('passport_number')
     if have_nationality(db):
@@ -299,4 +343,5 @@ def register_templating_utils(instance):
     instance.registerUtil('registration_status_country',
                           registration_status_country)
     instance.registerUtil('show_consent_form_ui', show_consent_form_ui)
+    instance.registerUtil('date_of_birth_select', date_of_birth_select)
     instance.registerUtil('required_person_fields', required_person_fields)

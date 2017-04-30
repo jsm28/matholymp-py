@@ -220,7 +220,6 @@ class CSVDataSource(DataSource):
                                    'room_number': 'Room Number',
                                    'phone_number': 'Phone Number',
                                    'gender': 'Gender',
-                                   'date_of_birth': 'Date of Birth',
                                    'tshirt': 'T-Shirt Size',
                                    'arrival_place': 'Arrival Place',
                                    'arrival_time': 'Arrival Time',
@@ -232,6 +231,8 @@ class CSVDataSource(DataSource):
                                    'passport_number':
                                    'Passport or Identity Card Number',
                                    'nationality': 'Nationality'}
+
+    _person_event_attr_map_date = { 'date_of_birth': 'Date of Birth' }
 
     _person_event_attr_map_int = { 'contestant_age': 'Contestant Age',
                                    'total_score': 'Total',
@@ -248,6 +249,13 @@ class CSVDataSource(DataSource):
             if s == '':
                 s = None
             return s
+        if name in CSVDataSource._person_event_attr_map_date:
+            k = CSVDataSource._person_event_attr_map_str[name]
+            s = self._people[event_id][person_id][country_id][k]
+            if s == '':
+                return None
+            else:
+                return date_from_ymd_iso(k, s)
         if name in CSVDataSource._person_event_attr_map_int:
             k = CSVDataSource._person_event_attr_map_int[name]
             s = self._people[event_id][person_id][country_id][k]

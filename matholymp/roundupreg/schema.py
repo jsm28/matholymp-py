@@ -140,7 +140,9 @@ def init_schema(env):
                  given_name=String(),
                  family_name=String(),
                  gender=Link('gender'),
-                 date_of_birth=Date(),
+                 date_of_birth_year=String(),
+                 date_of_birth_month=String(),
+                 date_of_birth_day=String(),
                  primary_role=Link('matholymprole'),
                  other_roles=Multilink('matholymprole'),
                  guide_for=Multilink('country'),
@@ -257,7 +259,8 @@ def init_schema(env):
                                   check=own_country_person)
     db.security.addPermissionToRole('Register', p)
     person_reg_props = ['country', 'given_name', 'family_name', 'gender',
-                        'date_of_birth', 'primary_role', 'first_language',
+                        'date_of_birth_year', 'date_of_birth_month',
+                        'date_of_birth_day', 'primary_role', 'first_language',
                         'second_language', 'diet', 'tshirt', 'arrival_place',
                         'arrival_time', 'arrival_flight', 'departure_place',
                         'departure_time', 'departure_flight', 'generic_url',

@@ -34,8 +34,8 @@ This module provides date and time support for matholymp use.
 import datetime
 import re
 
-__all__ = ['date_from_ymd_str', 'date_from_ymd_iso', 'date_range_html',
-           'date_to_ymd_iso']
+__all__ = ['date_from_ymd_str', 'date_from_ymd_iso', 'month_name',
+           'date_range_html', 'date_to_ymd_iso', 'age_on_date']
 
 def date_from_ymd_str(desc, year, month, day):
     """
@@ -75,14 +75,18 @@ _english_months = ['January', 'February', 'March', 'April', 'May', 'June',
                    'July', 'August', 'September', 'October', 'November',
                    'December']
 
+def month_name(month):
+    """Return the English name for a month."""
+    return _english_months[month - 1]
+
 def date_range_html(start_date, end_date, year):
     """Return HTML for a range of dates, within the given year."""
     if start_date.year != year or end_date.year != year:
         raise ValueError('Dates not in expected year')
     if start_date > end_date:
         raise ValueError('Start date after end date')
-    start_month_name = _english_months[start_date.month - 1]
-    end_month_name = _english_months[end_date.month - 1]
+    start_month_name = month_name(start_date.month)
+    end_month_name = month_name(end_date.month)
     if start_date.month == end_date.month:
         return ('%02d&ndash;%02d&nbsp;%s' %
                 (start_date.day, end_date.day, end_month_name))
@@ -99,3 +103,11 @@ def date_to_ymd_iso(date):
     if date is None:
         return ''
     return '%04d-%02d-%02d' % (date.year, date.month, date.day)
+
+def age_on_date(date1, date2):
+    """Return the age on the second date of a person born on the first date."""
+    diff = date2.year - date1.year
+    if ((date2.month < date1.month) or (date2.month == date1.month and
+                                        date2.day < date1.day)):
+        diff -= 1
+    return diff

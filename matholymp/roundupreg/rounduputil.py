@@ -33,17 +33,21 @@ registration system.
 """
 
 import cgi
+import datetime
 import re
 import time
 
-from roundup.date import Date
-
+from matholymp.datetimeutil import date_from_ymd_str, date_from_ymd_iso, \
+    age_on_date
 from matholymp.fileutil import boolean_states, file_format_contents, \
     file_extension
 
-__all__ = ['distinguish_official', 'have_consent_forms',
+__all__ = ['distinguish_official', 'get_consent_forms_date_str',
+           'get_consent_forms_date', 'have_consent_forms',
            'have_passport_numbers', 'have_nationality', 'require_dob',
            'get_num_problems', 'get_marks_per_problem', 'scores_from_str',
+           'get_earliest_date_of_birth', 'get_sanity_date_of_birth',
+           'get_earliest_date_of_birth_contestant', 'person_date_of_birth',
            'contestant_age', 'get_staff_country_name', 'normal_country_person',
            'person_is_contestant', 'contestant_code', 'pn_score',
            'scores_final', 'any_scores_missing', 'country_has_contestants',
@@ -56,10 +60,27 @@ def distinguish_official(db):
     dist_off = db.config.ext['MATHOLYMP_DISTINGUISH_OFFICIAL']
     return boolean_states[dist_off.lower()]
 
+def get_consent_forms_date_str(db):
+    """
+    Return the earliest date of birth for which participants require
+    consent forms, as a string, or the empty string if not required.
+    """
+    return db.config.ext['MATHOLYMP_CONSENT_FORMS_DATE']
+
+def get_consent_forms_date(db):
+    """
+    Return the earliest date of birth for which participants require
+    consent forms, as a datetime.date object, or None if not required.
+    """
+    s = get_consent_forms_date_str(db)
+    if s == '':
+        return None
+    else:
+        return date_from_ymd_iso('consent forms date', s)
+
 def have_consent_forms(db):
     """Return whether this event has consent forms."""
-    consent_forms_date = db.config.ext['MATHOLYMP_CONSENT_FORMS_DATE']
-    return consent_forms_date != ''
+    return get_consent_forms_date_str(db) != ''
 
 def have_passport_numbers(db):
     """
@@ -107,17 +128,39 @@ def scores_from_str(db, score_str):
         scores = scores[0:num_problems]
     return scores
 
+def get_earliest_date_of_birth(db):
+    """Return the earliest date of birth allowed for any participant."""
+    # Avoid problems with strftime by disallowing dates before 1902.
+    return datetime.date(1902, 1, 1)
+
+def get_sanity_date_of_birth(db):
+    """
+    Return a date of birth such that participants may not be born on
+    or after that date.
+    """
+    return date_from_ymd_iso('sanity date of birth',
+                             db.config.ext['MATHOLYMP_SANITY_DATE_OF_BIRTH'])
+
+def get_earliest_date_of_birth_contestant(db):
+    """Return the earliest date of birth allowed for contestants."""
+    return date_from_ymd_iso('earliest date of birth for contestants',
+                             db.config.ext['MATHOLYMP_EARLIEST_DATE_OF_BIRTH'])
+
+def person_date_of_birth(db, person):
+    """Return the date of birth for a registered participant, or None."""
+    dob_year = db.person.get(person, 'date_of_birth_year')
+    dob_month = db.person.get(person, 'date_of_birth_month')
+    dob_day = db.person.get(person, 'date_of_birth_day')
+    if dob_year is None or dob_month is None or dob_day is None:
+        return None
+    return date_from_ymd_str('date of birth', dob_year, dob_month, dob_day)
+
 def contestant_age(db, person):
     """Return the age of a contestant on the configured day."""
-    date1 = db.person.get(person, 'date_of_birth')
-    date2 = Date(db.config.ext['MATHOLYMP_AGE_DAY_DATE'])
-    date1t = date1.get_tuple()
-    date2t = date2.get_tuple()
-    diff = date2t[0] - date1t[0]
-    if (date2t[1] < date1t[1]) or (date2t[1] == date1t[1] and
-                                   date2t[2] < date1t[2]):
-        diff -= 1
-    return diff
+    date1 = person_date_of_birth(db, person)
+    date2 = date_from_ymd_iso('age day date',
+                              db.config.ext['MATHOLYMP_AGE_DAY_DATE'])
+    return age_on_date(date1, date2)
 
 def get_staff_country_name(db):
     """Return the name of the special staff country."""

@@ -123,14 +123,10 @@ define="edit_ok context/is_edit_ok"
   { 'id' : 'gender' })">gender</td>
  </tr>
 
- <tr tal:define="name string:date_of_birth; label string:Date of birth; value context/date_of_birth; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:date_of_birth_year; label string:Date of birth; edit_ok edit_ok" tal:condition="context/is_edit_ok">
   <th class="required" metal:use-macro="th_label">Date of birth</th>
   <td tal:content="structure
-  python:context.date_of_birth.field(id='date_of_birth')"></td>
- </tr>
-
- <tr tal:condition="context/is_edit_ok">
-  <td colspan="2">Enter dates of birth in the form yyyy-mm-dd.</td>
+  python:utils.date_of_birth_select(db._db, context.date_of_birth_year.plain(), context.date_of_birth_month.plain(), context.date_of_birth_day.plain())"></td>
  </tr>
 
 <tal:block tal:condition="python:utils.have_passport_numbers(db._db)">

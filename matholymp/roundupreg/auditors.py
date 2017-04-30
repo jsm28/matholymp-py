@@ -36,13 +36,16 @@ import re
 
 from roundup.date import Date
 
+from matholymp.datetimeutil import date_from_ymd_str
 from matholymp.fileutil import boolean_states
 from matholymp.roundupreg.auditorutil import get_new_value, require_value
 from matholymp.roundupreg.rounduputil import have_consent_forms, \
     have_passport_numbers, have_nationality, require_dob, get_num_problems, \
-    get_marks_per_problem, any_scores_missing, valid_score, create_rss, \
-    db_file_format_contents, db_file_extension, \
-    db_private_file_format_contents, db_private_file_extension
+    get_marks_per_problem, get_earliest_date_of_birth, \
+    get_sanity_date_of_birth, get_earliest_date_of_birth_contestant, \
+    any_scores_missing, valid_score, create_rss, db_file_format_contents, \
+    db_file_extension, db_private_file_format_contents, \
+    db_private_file_extension
 from matholymp.roundupreg.staticsite import static_site_event_group, \
     static_site_file_data
 from matholymp.roundupreg.userauditor import audit_user_fields
@@ -207,23 +210,44 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     # dates of birth, if specified for other people, must not be too
     # old for python's strftime.
     dob_required = is_contestant or require_dob(db)
-    date_of_birth = get_new_value(db, cl, nodeid, newvalues, 'date_of_birth')
+    dob_year = get_new_value(db, cl, nodeid, newvalues, 'date_of_birth_year')
+    dob_month = get_new_value(db, cl, nodeid, newvalues, 'date_of_birth_month')
+    dob_day = get_new_value(db, cl, nodeid, newvalues, 'date_of_birth_day')
     if dob_required:
-        date_of_birth = require_value(db, cl, nodeid, newvalues,
-                                      'date_of_birth',
-                                      'No date of birth specified')
+        dob_year = require_value(db, cl, nodeid, newvalues,
+                                 'date_of_birth_year',
+                                 'No year of birth specified')
+        dob_month = require_value(db, cl, nodeid, newvalues,
+                                  'date_of_birth_month',
+                                  'No month of birth specified')
+        dob_day = require_value(db, cl, nodeid, newvalues,
+                                'date_of_birth_day',
+                                'No day of birth specified')
+    # Do not allow partially specified dates of birth.
+    if dob_year is None or dob_month is None or dob_day is None:
+        if dob_year is not None:
+            dob_year = None
+            newvalues['date_of_birth_year'] = None
+        if dob_month is not None:
+            dob_month = None
+            newvalues['date_of_birth_month'] = None
+        if dob_day is not None:
+            dob_day = None
+            newvalues['date_of_birth_day'] = None
+        date_of_birth = None
+    else:
+        date_of_birth = date_from_ymd_str('date of birth', dob_year, dob_month,
+                                          dob_day)
     if date_of_birth is not None:
-        if date_of_birth < Date('1902-01-01'):
+        if date_of_birth < get_earliest_date_of_birth(db):
             raise ValueError('Participant implausibly old')
         # As a sanity check against users entering e.g. today's date
         # by mistake, require participants to be born before a sanity
         # check date.
-        sanity_dob = Date(db.config.ext['MATHOLYMP_SANITY_DATE_OF_BIRTH'])
-        if date_of_birth >= sanity_dob:
+        if date_of_birth >= get_sanity_date_of_birth(db):
             raise ValueError('Participant implausibly young')
     if is_contestant:
-        earliest_dob = Date(db.config.ext['MATHOLYMP_EARLIEST_DATE_OF_BIRTH'])
-        if date_of_birth < earliest_dob:
+        if date_of_birth < get_earliest_date_of_birth_contestant(db):
             raise ValueError('Contestant too old')
 
     # If passport numbers are collected, they are required.

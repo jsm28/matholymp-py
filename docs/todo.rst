@@ -321,10 +321,9 @@ The following ideas are more speculative.
 * Support separate date/time entry for arrival/departure rather than
   requiring people to put both in the same field in a specified form.
 
-* Use String rather than Date fields for all date and time input
-  (facilitates the previous idea; allows people to enter just time for
-  arrival / departure if on the standard dates; avoids irrelevant time
-  information appearing in the date of birth field after entry, and
+* Use String rather than Date fields for arrival/departure date and
+  time input (facilitates the previous idea; allows people to enter
+  just time for arrival / departure if on the standard dates; avoids
   irrelevant seconds in arrival/departure times; avoids some Roundup
   bugs related to dates; the calendar widget isn't particularly
   relevant to matholymp uses; but such a change to the type of a field

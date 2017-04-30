@@ -137,6 +137,12 @@ the registration system is not active.
   blank rather than zero if no scores for that contestant or country,
   or for that country on that problem, have been entered.
 
+* In the registration system, dates of birth now use separate
+  drop-down menus for day, month and year, instead of needing to be
+  entered as text in a particular format or using a pop-up not
+  designed for dates far in the past.  :file:`person.item.html` is
+  updated accordingly.
+
 Version 2017.01.0 (8 January 2017)
 ----------------------------------
 
