@@ -37,7 +37,7 @@ import os.path
 
 from matholymp.data import Paper
 from matholymp.datasource import DataSource
-from matholymp.datetimeutil import date_from_ymd_iso
+from matholymp.datetimeutil import date_from_ymd_iso, time_from_hhmm_iso
 from matholymp.fileutil import comma_split, boolean_states
 from matholymp.regdata import file_url_to_local
 
@@ -222,17 +222,20 @@ class CSVDataSource(DataSource):
                                    'gender': 'Gender',
                                    'tshirt': 'T-Shirt Size',
                                    'arrival_place': 'Arrival Place',
-                                   'arrival_time': 'Arrival Time',
                                    'arrival_flight': 'Arrival Flight',
                                    'departure_place': 'Departure Place',
-                                   'departure_time': 'Departure Time',
                                    'departure_flight': 'Departure Flight',
                                    'consent_form_url': 'Consent Form URL',
                                    'passport_number':
                                    'Passport or Identity Card Number',
                                    'nationality': 'Nationality'}
 
-    _person_event_attr_map_date = { 'date_of_birth': 'Date of Birth' }
+    _person_event_attr_map_date = { 'date_of_birth': 'Date of Birth',
+                                    'arrival_date': 'Arrival Date',
+                                    'departure_date': 'Departure Date' }
+
+    _person_event_attr_map_time = { 'arrival_time': 'Arrival Time',
+                                    'departure_time': 'Departure Time' }
 
     _person_event_attr_map_int = { 'contestant_age': 'Contestant Age',
                                    'total_score': 'Total',
@@ -256,6 +259,13 @@ class CSVDataSource(DataSource):
                 return None
             else:
                 return date_from_ymd_iso(k, s)
+        if name in CSVDataSource._person_event_attr_map_time:
+            k = CSVDataSource._person_event_attr_map_str[name]
+            s = self._people[event_id][person_id][country_id][k]
+            if s == '':
+                return None
+            else:
+                return time_from_hhmm_iso(k, s)
         if name in CSVDataSource._person_event_attr_map_int:
             k = CSVDataSource._person_event_attr_map_int[name]
             s = self._people[event_id][person_id][country_id][k]

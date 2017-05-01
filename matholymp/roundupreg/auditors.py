@@ -29,23 +29,22 @@
 
 """This module provides auditors for the Roundup registration system."""
 
-__all__ = ['audit_event_fields', 'audit_country_fields', 'audit_person_fields',
-           'register_auditors']
+__all__ = ['audit_event_fields', 'audit_country_fields', 'audit_person_arrdep',
+           'audit_person_fields', 'register_auditors']
 
 import re
 
-from roundup.date import Date
-
-from matholymp.datetimeutil import date_from_ymd_str
+from matholymp.datetimeutil import date_from_ymd_str, date_from_ymd_iso, \
+    time_from_hhmm_str
 from matholymp.fileutil import boolean_states
 from matholymp.roundupreg.auditorutil import get_new_value, require_value
 from matholymp.roundupreg.rounduputil import have_consent_forms, \
     have_passport_numbers, have_nationality, require_dob, get_num_problems, \
     get_marks_per_problem, get_earliest_date_of_birth, \
     get_sanity_date_of_birth, get_earliest_date_of_birth_contestant, \
-    any_scores_missing, valid_score, create_rss, db_file_format_contents, \
-    db_file_extension, db_private_file_format_contents, \
-    db_private_file_extension
+    get_arrdep_bounds, any_scores_missing, valid_score, create_rss, \
+    db_file_format_contents, db_file_extension, \
+    db_private_file_format_contents, db_private_file_extension
 from matholymp.roundupreg.staticsite import static_site_event_group, \
     static_site_file_data
 from matholymp.roundupreg.userauditor import audit_user_fields
@@ -144,6 +143,35 @@ def audit_country_fields(db, cl, nodeid, newvalues):
         if not guok:
             raise ValueError(gudesc + ' for previous participation must'
                              ' be in the form ' + gubase + 'N/')
+
+def audit_person_arrdep(db, cl, nodeid, newvalues, kind):
+    """Check arrival or departure details for a person."""
+    date = get_new_value(db, cl, nodeid, newvalues, '%s_date' % kind)
+    hour = get_new_value(db, cl, nodeid, newvalues, '%s_time_hour' % kind)
+    minute = get_new_value(db, cl, nodeid, newvalues, '%s_time_minute' % kind)
+    if date is None:
+        if hour is not None:
+            hour = None
+            newvalues['%s_time_hour' % kind] = None
+    else:
+        date = date_from_ymd_iso('%s date' % kind, date)
+    if hour is None:
+        if minute is not None:
+            minute = None
+            newvalues['%s_time_minute' % kind] = None
+        time = None
+    else:
+        if minute is None:
+            # Default minute to 00 if only hour specified.
+            minute = '00'
+            newvalues['%s_time_minute' % kind] = '00'
+        time = time_from_hhmm_str('%s time' % kind, hour, minute)
+    if date is not None:
+        earliest, latest = get_arrdep_bounds(db, kind)
+        if date < earliest:
+            raise ValueError('%s date too early' % kind)
+        if date > latest:
+            raise ValueError('%s date too late' % kind)
 
 def audit_person_fields(db, cl, nodeid, newvalues):
     """Make sure person properties are valid, both individually and
@@ -268,23 +296,9 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         scores_list = ['' for i in range(num_problems)]
         newvalues['scores'] = ','.join(scores_list)
 
-    # Sanity check arrival and departure times.
-    arrival_time = newvalues.get('arrival_time', None)
-    if arrival_time is not None:
-        earliest_arr = Date(db.config.ext['MATHOLYMP_EARLIEST_ARRIVAL_DATE'])
-        if arrival_time < earliest_arr:
-            raise ValueError('Arrival date too early')
-        latest_arr = Date(db.config.ext['MATHOLYMP_LATEST_ARRIVAL_DATE'])
-        if arrival_time > latest_arr:
-            raise ValueError('Arrival date too late')
-    departure_time = newvalues.get('departure_time', None)
-    if departure_time is not None:
-        earliest_dep = Date(db.config.ext['MATHOLYMP_EARLIEST_DEPARTURE_DATE'])
-        if departure_time < earliest_dep:
-            raise ValueError('Departure date too early')
-        latest_dep = Date(db.config.ext['MATHOLYMP_LATEST_DEPARTURE_DATE'])
-        if departure_time > latest_dep:
-            raise ValueError('Departure date too late')
+    # Sanity check arrival and departure dates and times.
+    audit_person_arrdep(db, cl, nodeid, newvalues, 'arrival')
+    audit_person_arrdep(db, cl, nodeid, newvalues, 'departure')
 
     if 'files' in newvalues:
         file_id = newvalues['files']

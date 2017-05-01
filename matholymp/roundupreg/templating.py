@@ -39,7 +39,8 @@ __all__ = ['people_from_country_internal', 'people_from_country',
            'show_travel_copy_options', 'country_travel_copy_options',
            'person_case_warning', 'list_expected_roles', 'registration_status',
            'registration_status_country', 'show_consent_form_ui',
-           'string_select', 'date_of_birth_select', 'required_person_fields',
+           'string_select', 'date_of_birth_select', 'arrdep_date_select',
+           'arrdep_time_select', 'required_person_fields',
            'register_templating_utils']
 
 import cgi
@@ -52,16 +53,16 @@ from roundup.cgi.templating import HTMLItem
 
 from matholymp.caseconv import all_uppercase
 from matholymp.collate import coll_get_sort_key
-from matholymp.datetimeutil import month_name
+from matholymp.datetimeutil import month_name, date_to_ymd_iso, date_to_name
 from matholymp.roundupreg.cache import cached_text
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import distinguish_official, \
     get_consent_forms_date, have_consent_forms, have_passport_numbers, \
     have_nationality, require_dob, get_earliest_date_of_birth, \
     get_sanity_date_of_birth, person_date_of_birth, contestant_age, \
-    normal_country_person, person_is_contestant, contestant_code, pn_score, \
-    scores_final, any_scores_missing, country_has_contestants, \
-    valid_country_problem
+    get_arrdep_bounds, normal_country_person, person_is_contestant, \
+    contestant_code, pn_score, scores_final, any_scores_missing, \
+    country_has_contestants, valid_country_problem
 
 def people_from_country_internal(db, country):
     """
@@ -138,10 +139,14 @@ def display_scoreboard(db, display_start):
 def has_nonempty_travel(db, person):
     """Return whether a person has nonempty travel details."""
     return (db.person.get(person, 'arrival_place') is not None or
-            db.person.get(person, 'arrival_time') is not None or
+            db.person.get(person, 'arrival_date') is not None or
+            db.person.get(person, 'arrival_time_hour') is not None or
+            db.person.get(person, 'arrival_time_minute') is not None or
             db.person.get(person, 'arrival_flight') is not None or
             db.person.get(person, 'departure_place') is not None or
-            db.person.get(person, 'departure_time') is not None or
+            db.person.get(person, 'departure_date') is not None or
+            db.person.get(person, 'departure_time_hour') is not None or
+            db.person.get(person, 'departure_time_minute') is not None or
             db.person.get(person, 'departure_flight') is not None)
 
 def show_travel_copy_options(db, userid, person):
@@ -164,18 +169,27 @@ def country_travel_copy_options(db, country, person):
     travel_list = []
     for person in person_list:
         prop_js_list = []
-        text_props = ['arrival_flight', 'arrival_time',
-                      'departure_flight', 'departure_time']
+        text_props = ('arrival_flight', 'departure_flight')
         for prop in text_props:
             val = db.person.get(person, prop)
             if val is None:
                 val = ''
             prop_js_list.append('this.form.elements["%s"].value = %s' %
                                 (prop, json.dumps(str(val))))
-        for prop in 'arrival_place', 'departure_place':
+        sel_props = (('arrival_place', '-1'),
+                     ('arrival_date', ''),
+                     ('arrival_time_hour', ''),
+                     ('arrival_time_minute', ''),
+                     ('departure_place', '-1'),
+                     ('departure_date', ''),
+                     ('departure_time_hour', ''),
+                     ('departure_time_minute', ''))
+        for prop_t in sel_props:
+            prop = prop_t[0]
+            no_sel_val = prop_t[1]
             val = db.person.get(person, prop)
             if val is None:
-                val = '-1'
+                val = no_sel_val
                 prop_js_list.append('this.form.elements["%s"].selectedIndex'
                                     ' = -1' % prop)
             prop_js_list.append(
@@ -297,6 +311,30 @@ def date_of_birth_select(db, year, month, day):
     day_select = string_select('date_of_birth_day', '(day)', day_list, day)
     return '%s\n%s\n%s' % (day_select, month_select, year_select)
 
+def arrdep_date_select(db, kind, date):
+    """Return form content for selecting an arrival or departure date."""
+    earliest, latest = get_arrdep_bounds(db, kind)
+    date_list = []
+    d = earliest
+    while d <= latest:
+        d_iso = date_to_ymd_iso(d)
+        d_label = date_to_name(d)
+        date_list.append((d_iso, d_label))
+        d = d + datetime.timedelta(1)
+    return string_select('%s_date' % kind, '(date)', date_list, date)
+
+def arrdep_time_select(db, kind, hour, minute):
+    """Return form content for selecting an arrival or departure time."""
+    hour_range = range(0, 24)
+    hour_list = [('%02d' % h, '%02d' % h) for h in hour_range]
+    hour_select = string_select('%s_time_hour' % kind, '(hour)', hour_list,
+                                hour)
+    minute_range = range(0, 60)
+    minute_list = [('%02d' % h, '%02d' % h) for h in minute_range]
+    minute_select = string_select('%s_time_minute' % kind, '(minute)',
+                                  minute_list, minute)
+    return '%s : %s' % (hour_select, minute_select)
+
 def required_person_fields(db):
     """Return the list of fields required for registered people."""
     req = ['country', 'given_name', 'family_name', 'gender', 'primary_role',
@@ -344,4 +382,6 @@ def register_templating_utils(instance):
                           registration_status_country)
     instance.registerUtil('show_consent_form_ui', show_consent_form_ui)
     instance.registerUtil('date_of_birth_select', date_of_birth_select)
+    instance.registerUtil('arrdep_date_select', arrdep_date_select)
+    instance.registerUtil('arrdep_time_select', arrdep_time_select)
     instance.registerUtil('required_person_fields', required_person_fields)

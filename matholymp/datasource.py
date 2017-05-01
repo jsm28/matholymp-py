@@ -116,8 +116,8 @@ class DataSource(object):
         consent_form_filename, languages, diet, room_number,
         phone_number, generic_id, gender, date_of_birth,
         passport_number, nationality, tshirt, arrival_place,
-        arrival_time, arrival_flight, departure_place, departure_time,
-        departure_flight.
+        arrival_date, arrival_time, arrival_flight, departure_place,
+        departure_date, departure_time, departure_flight.
         """
         raise NotImplementedError
 

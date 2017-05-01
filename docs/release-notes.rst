@@ -143,6 +143,19 @@ the registration system is not active.
   designed for dates far in the past.  :file:`person.item.html` is
   updated accordingly.
 
+* In the registration system, arrival and departure times now use
+  separate drop-down menus for date (restricted to dates within the
+  permitted range), hour and minute, instead of needing to be entered
+  as text in a particular format or using a pop-up calendar.
+  :file:`person.item.html` is updated accordingly.  The full version
+  of the CSV file of person details now lists the arrival and
+  departure dates separately from the arrival and departure times.
+  Arrivals and departures after midnight at the start of the
+  configured latest arrival and departure dates are now allowed as
+  intended.  The :file:`extensions/config.ini` configuration variable
+  ``matholymp_date_template`` is no longer used and is removed from
+  the example file.
+
 Version 2017.01.0 (8 January 2017)
 ----------------------------------
 

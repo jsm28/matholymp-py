@@ -318,16 +318,8 @@ The following ideas are more speculative.
   (More generally, add automation for keeping user account passwords
   from year to year.)
 
-* Support separate date/time entry for arrival/departure rather than
-  requiring people to put both in the same field in a specified form.
-
-* Use String rather than Date fields for arrival/departure date and
-  time input (facilitates the previous idea; allows people to enter
-  just time for arrival / departure if on the standard dates; avoids
-  irrelevant seconds in arrival/departure times; avoids some Roundup
-  bugs related to dates; the calendar widget isn't particularly
-  relevant to matholymp uses; but such a change to the type of a field
-  does prevent upgrades while registration is active).
+* Allow people to enter just time for arrival / departure if on the
+  standard dates.
 
 * Support entering ranges for scores during coordination, so that
   medal boundaries can be considered based on such partial

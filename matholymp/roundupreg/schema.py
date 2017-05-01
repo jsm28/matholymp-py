@@ -70,7 +70,6 @@ def init_schema(env):
     FileClass = env['FileClass']
     String = env['String']
     Password = env['Password']
-    Date = env['Date']
     Link = env['Link']
     Multilink = env['Multilink']
     Boolean = env['Boolean']
@@ -151,10 +150,14 @@ def init_schema(env):
                  diet=String(),
                  tshirt=Link('tshirt'),
                  arrival_place=Link('arrival'),
-                 arrival_time=Date(),
+                 arrival_date=String(),
+                 arrival_time_hour=String(),
+                 arrival_time_minute=String(),
                  arrival_flight=String(),
                  departure_place=Link('arrival'),
-                 departure_time=Date(),
+                 departure_date=String(),
+                 departure_time_hour=String(),
+                 departure_time_minute=String(),
                  departure_flight=String(),
                  room_number=String(),
                  phone_number=String(),
@@ -262,9 +265,12 @@ def init_schema(env):
                         'date_of_birth_year', 'date_of_birth_month',
                         'date_of_birth_day', 'primary_role', 'first_language',
                         'second_language', 'diet', 'tshirt', 'arrival_place',
-                        'arrival_time', 'arrival_flight', 'departure_place',
-                        'departure_time', 'departure_flight', 'generic_url',
-                        'reuse_photo', 'files']
+                        'arrival_date', 'arrival_time_hour',
+                        'arrival_time_minute', 'arrival_flight',
+                        'departure_place', 'departure_date',
+                        'departure_time_hour', 'departure_time_minute',
+                        'departure_flight', 'generic_url', 'reuse_photo',
+                        'files']
     if have_consent_forms(db):
         person_reg_props.append('consent_form')
     if have_passport_numbers(db):

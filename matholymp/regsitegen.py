@@ -215,9 +215,13 @@ class RegSiteGenerator(SiteGenerator):
             missing_list.append('photo')
 
         have_travel_details = True
-        if p.arrival_place is None or p.arrival_time is None:
+        if (p.arrival_place is None or
+            p.arrival_date is None or
+            p.arrival_time is None):
             have_travel_details = False
-        elif p.departure_place is None or p.departure_time is None:
+        elif (p.departure_place is None or
+              p.departure_date is None or
+              p.departure_time is None):
             have_travel_details = False
         else:
             if 'Airport' in p.arrival_place:

@@ -35,7 +35,8 @@ import datetime
 import re
 
 __all__ = ['date_from_ymd_str', 'date_from_ymd_iso', 'month_name',
-           'date_range_html', 'date_to_ymd_iso', 'age_on_date']
+           'date_range_html', 'date_to_ymd_iso', 'date_to_name', 'age_on_date',
+           'time_from_hhmm_str', 'time_from_hhmm_iso', 'time_to_hhmm']
 
 def date_from_ymd_str(desc, year, month, day):
     """
@@ -104,6 +105,10 @@ def date_to_ymd_iso(date):
         return ''
     return '%04d-%02d-%02d' % (date.year, date.month, date.day)
 
+def date_to_name(date):
+    """Return the English (day month year) name of a date."""
+    return '%d %s %d' % (date.day, month_name(date.month), date.year)
+
 def age_on_date(date1, date2):
     """Return the age on the second date of a person born on the first date."""
     diff = date2.year - date1.year
@@ -111,3 +116,41 @@ def age_on_date(date1, date2):
                                         date2.day < date1.day)):
         diff -= 1
     return diff
+
+def time_from_hhmm_str(desc, hour, minute):
+    """
+    Return a time object for the given hour and minute, given as
+    strings (exactly two digits).
+    """
+    if not re.match('^[0-9]{2}\\Z', hour):
+        raise ValueError('%s: invalid hour' % desc)
+    if not re.match('^[0-9]{2}\\Z', minute):
+        raise ValueError('%s: invalid minute' % desc)
+    hour = int(hour)
+    minute = int(minute)
+    err = None
+    try:
+        ret = datetime.time(hour, minute)
+    except ValueError as exc:
+        err = exc.args[0]
+    if err is not None:
+        raise ValueError('%s: %s' % (desc, err))
+    return ret
+
+def time_from_hhmm_iso(desc, time_str):
+    """Return a time object for the given ISO hh:mm string."""
+    m = re.match('^([0-9]{2}):([0-9]{2})\\Z', time_str)
+    if not m:
+        raise ValueError('%s: bad time' % desc)
+    hour = m.group(1)
+    minute = m.group(2)
+    return time_from_hhmm_str(desc, hour, minute)
+
+def time_to_hhmm(time):
+    """
+    Convert a time to an hh:mm string.  The time may be None, in which
+    case the empty string is returned.
+    """
+    if time is None:
+        return ''
+    return '%02d:%02d' % (time.hour, time.minute)

@@ -34,6 +34,7 @@ countries involved in them from which other data is derived.
 """
 
 from matholymp.datasource import DataSource
+from matholymp.datetimeutil import date_from_ymd_iso, time_from_hhmm_str
 from matholymp.fileutil import comma_split, boolean_states
 from matholymp.roundupreg.rounduputil import distinguish_official, \
     have_consent_forms, have_passport_numbers, have_nationality, \
@@ -254,12 +255,19 @@ class RoundupDataSource(DataSource):
                 return None
             else:
                 return self._db.arrival.get(arrival_place, 'name')
-        elif name == 'arrival_time':
-            arrival_time = self._db.person.get(id, 'arrival_time')
-            if arrival_time is None:
+        elif name == 'arrival_date':
+            date = self._db.person.get(id, 'arrival_date')
+            if date is None:
                 return None
             else:
-                return arrival_time.pretty('%Y-%m-%d.%H:%M')
+                return date_from_ymd_iso('arrival date', date)
+        elif name == 'arrival_time':
+            hour = self._db.person.get(id, 'arrival_time_hour')
+            minute = self._db.person.get(id, 'arrival_time_minute')
+            if hour is None or minute is None:
+                return None
+            else:
+                return time_from_hhmm_str('arrival time', hour, minute)
         elif name == 'arrival_flight':
             return self._db.person.get(id, 'arrival_flight') or None
         elif name == 'departure_place':
@@ -268,12 +276,19 @@ class RoundupDataSource(DataSource):
                 return None
             else:
                 return self._db.arrival.get(departure_place, 'name')
-        elif name == 'departure_time':
-            departure_time = self._db.person.get(id, 'departure_time')
-            if departure_time is None:
+        elif name == 'departure_date':
+            date = self._db.person.get(id, 'departure_date')
+            if date is None:
                 return None
             else:
-                return departure_time.pretty('%Y-%m-%d.%H:%M')
+                return date_from_ymd_iso('departure date', date)
+        elif name == 'departure_time':
+            hour = self._db.person.get(id, 'departure_time_hour')
+            minute = self._db.person.get(id, 'departure_time_minute')
+            if hour is None or minute is None:
+                return None
+            else:
+                return time_from_hhmm_str('departure time', hour, minute)
         elif name == 'departure_flight':
             return self._db.person.get(id, 'departure_flight') or None
         raise KeyError(name)

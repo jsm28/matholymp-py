@@ -40,7 +40,8 @@ import re
 from matholymp.collate import coll_get_sort_key
 from matholymp.csvsource import CSVDataSource
 from matholymp.data import EventGroup
-from matholymp.datetimeutil import date_range_html, date_to_ymd_iso
+from matholymp.datetimeutil import date_range_html, date_to_ymd_iso, \
+    time_to_hhmm
 from matholymp.fileutil import read_utf8_csv, write_utf8_csv, \
     comma_join, write_text_to_file, read_text_from_file, read_config
 
@@ -1887,10 +1888,11 @@ class SiteGenerator(object):
         if private_data:
             cols.extend(['Gender', 'Date of Birth', 'Languages',
                          'Allergies and Dietary Requirements',
-                         'T-Shirt Size', 'Arrival Place', 'Arrival Time',
-                         'Arrival Flight', 'Departure Place',
-                         'Departure Time', 'Departure Flight', 'Room Number',
-                         'Phone Number', 'Consent Form URL',
+                         'T-Shirt Size', 'Arrival Place', 'Arrival Date',
+                         'Arrival Time', 'Arrival Flight', 'Departure Place',
+                         'Departure Date', 'Departure Time',
+                         'Departure Flight', 'Room Number', 'Phone Number',
+                         'Consent Form URL',
                          'Passport or Identity Card Number', 'Nationality'])
         return cols
 
@@ -1963,10 +1965,12 @@ class SiteGenerator(object):
             csv_out['Allergies and Dietary Requirements'] = p.diet or ''
             csv_out['T-Shirt Size'] = p.tshirt or ''
             csv_out['Arrival Place'] = p.arrival_place or ''
-            csv_out['Arrival Time'] = p.arrival_time or ''
+            csv_out['Arrival Date'] = date_to_ymd_iso(p.arrival_date)
+            csv_out['Arrival Time'] = time_to_hhmm(p.arrival_time)
             csv_out['Arrival Flight'] = p.arrival_flight or ''
             csv_out['Departure Place'] = p.departure_place or ''
-            csv_out['Departure Time'] = p.departure_time or ''
+            csv_out['Departure Date'] = date_to_ymd_iso(p.departure_date)
+            csv_out['Departure Time'] = time_to_hhmm(p.departure_time)
             csv_out['Departure Flight'] = p.departure_flight or ''
             csv_out['Room Number'] = p.room_number or ''
             csv_out['Phone Number'] = p.phone_number or ''

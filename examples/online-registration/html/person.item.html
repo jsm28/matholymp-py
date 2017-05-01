@@ -217,9 +217,14 @@ define="edit_ok context/is_edit_ok"
   <td tal:content="structure context/arrival_place/menu">arrival_place</td>
  </tr>
 
- <tr tal:define="name string:arrival_time; label string:Arrival time; value context/arrival_time; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:arrival_date; label string:Arrival date; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label">Arrival date</th>
+  <td tal:content="structure python:utils.arrdep_date_select(db._db, 'arrival', context.arrival_date.plain())"></td>
+ </tr>
+
+ <tr tal:define="name string:arrival_time_hour; label string:Arrival time; edit_ok edit_ok" tal:condition="context/is_edit_ok">
   <th metal:use-macro="th_label">Arrival time</th>
-  <td tal:content="structure context/arrival_time/field">arrival_time</td>
+  <td tal:content="structure python:utils.arrdep_time_select(db._db, 'arrival', context.arrival_time_hour.plain(), context.arrival_time_minute.plain())"></td>
  </tr>
 
  <tr tal:define="name string:arrival_flight; label string:Arrival flight number; value context/arrival_flight; edit_ok edit_ok" tal:condition="context/is_edit_ok">
@@ -232,15 +237,28 @@ define="edit_ok context/is_edit_ok"
   <td tal:content="structure context/departure_place/menu">departure_place</td>
  </tr>
 
- <tr tal:define="name string:departure_time; label string:Departure time; value context/departure_time; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:departure_date; label string:Departure date; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label">Departure date</th>
+  <td tal:content="structure python:utils.arrdep_date_select(db._db, 'departure', context.departure_date.plain())"></td>
+ </tr>
+
+ <tr tal:define="name string:departure_time_hour; label string:Departure time; edit_ok edit_ok" tal:condition="context/is_edit_ok">
   <th metal:use-macro="th_label">Departure time</th>
-  <td tal:content="structure context/departure_time/field">departure_time</td>
+  <td tal:content="structure python:utils.arrdep_time_select(db._db, 'departure', context.departure_time_hour.plain(), context.departure_time_minute.plain())"></td>
  </tr>
 
  <tr tal:define="name string:departure_flight; label string:Departure flight number; value context/departure_flight; edit_ok edit_ok" tal:condition="context/is_edit_ok">
   <th metal:use-macro="th_label">Departure flight number</th>
   <td><input name="departure_flight" metal:use-macro="normal_input"></td>
  </tr>
+
+<tal:block tal:condition="context/is_edit_ok">
+ <tr>
+  <td colspan="2">If you wish to arrive before or depart after the standard
+  dates, please consult the organisers about availability of transport and
+  accommodation.</td>
+ </tr>
+</tal:block>
 
  <tr tal:define="name string:room_number; label string:Room number; value context/room_number; edit_ok context/room_number/is_edit_ok" tal:condition="context/is_edit_ok">
   <th metal:use-macro="th_label">Room number</th>
@@ -375,9 +393,6 @@ define="edit_ok context/is_edit_ok"
 </form>
 
 <table class="form" tal:condition="context/is_edit_ok">
-<tr>
- <td>Enter arrival and departure times in the form <span tal:replace="python:db._db.config.ext['MATHOLYMP_DATE_TEMPLATE']" />.hh:mm.</td>
-</tr>
 <tr>
  <td>Room numbers will be assigned by event organisers.</td>
 </tr>

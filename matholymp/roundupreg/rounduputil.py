@@ -48,11 +48,11 @@ __all__ = ['distinguish_official', 'get_consent_forms_date_str',
            'get_num_problems', 'get_marks_per_problem', 'scores_from_str',
            'get_earliest_date_of_birth', 'get_sanity_date_of_birth',
            'get_earliest_date_of_birth_contestant', 'person_date_of_birth',
-           'contestant_age', 'get_staff_country_name', 'normal_country_person',
-           'person_is_contestant', 'contestant_code', 'pn_score',
-           'scores_final', 'any_scores_missing', 'country_has_contestants',
-           'valid_country_problem', 'valid_score', 'create_rss',
-           'db_file_format_contents', 'db_file_extension',
+           'contestant_age', 'get_arrdep_bounds', 'get_staff_country_name',
+           'normal_country_person', 'person_is_contestant', 'contestant_code',
+           'pn_score', 'scores_final', 'any_scores_missing',
+           'country_has_contestants', 'valid_country_problem', 'valid_score',
+           'create_rss', 'db_file_format_contents', 'db_file_extension',
            'db_private_file_format_contents', 'db_private_file_extension']
 
 def distinguish_official(db):
@@ -161,6 +161,21 @@ def contestant_age(db, person):
     date2 = date_from_ymd_iso('age day date',
                               db.config.ext['MATHOLYMP_AGE_DAY_DATE'])
     return age_on_date(date1, date2)
+
+_early_vars = {'arrival': 'MATHOLYMP_EARLIEST_ARRIVAL_DATE',
+               'departure': 'MATHOLYMP_EARLIEST_DEPARTURE_DATE'}
+_late_vars = {'arrival': 'MATHOLYMP_LATEST_ARRIVAL_DATE',
+              'departure': 'MATHOLYMP_LATEST_DEPARTURE_DATE'}
+
+def get_arrdep_bounds(db, kind):
+    """Return the bounds on arrival or departure dates."""
+    early_var = _early_vars[kind]
+    late_var = _late_vars[kind]
+    early_date = date_from_ymd_iso('earliest %s date' % kind,
+                                   db.config.ext[early_var])
+    late_date = date_from_ymd_iso('latest %s date' % kind,
+                                  db.config.ext[late_var])
+    return (early_date, late_date)
 
 def get_staff_country_name(db):
     """Return the name of the special staff country."""
