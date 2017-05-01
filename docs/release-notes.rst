@@ -77,10 +77,6 @@ the registration system is not active.
   registration status page shows a list of people with large photos
   and provides the option to scale down those photos.
 
-* The example :file:`person.item.html` now explicitly states the
-  format to use to enter dates of birth (if not selecting with the
-  calendar widget).
-
 * The registration system now applies the sanity check that dates of
   birth are not too recent to all participants with a date of birth
   registered rather than just to contestants.  The example
