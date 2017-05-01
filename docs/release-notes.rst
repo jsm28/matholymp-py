@@ -156,6 +156,9 @@ the registration system is not active.
   ``matholymp_date_template`` is no longer used and is removed from
   the example file.
 
+* The registration system now gives an error if a person is registered
+  as departing before they arrive.
+
 Version 2017.01.0 (8 January 2017)
 ----------------------------------
 

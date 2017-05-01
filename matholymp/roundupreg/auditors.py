@@ -145,7 +145,10 @@ def audit_country_fields(db, cl, nodeid, newvalues):
                              ' be in the form ' + gubase + 'N/')
 
 def audit_person_arrdep(db, cl, nodeid, newvalues, kind):
-    """Check arrival or departure details for a person."""
+    """
+    Check arrival or departure details for a person.  Return the date
+    and time specified.
+    """
     date = get_new_value(db, cl, nodeid, newvalues, '%s_date' % kind)
     hour = get_new_value(db, cl, nodeid, newvalues, '%s_time_hour' % kind)
     minute = get_new_value(db, cl, nodeid, newvalues, '%s_time_minute' % kind)
@@ -172,6 +175,7 @@ def audit_person_arrdep(db, cl, nodeid, newvalues, kind):
             raise ValueError('%s date too early' % kind)
         if date > latest:
             raise ValueError('%s date too late' % kind)
+    return date, time
 
 def audit_person_fields(db, cl, nodeid, newvalues):
     """Make sure person properties are valid, both individually and
@@ -297,8 +301,17 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         newvalues['scores'] = ','.join(scores_list)
 
     # Sanity check arrival and departure dates and times.
-    audit_person_arrdep(db, cl, nodeid, newvalues, 'arrival')
-    audit_person_arrdep(db, cl, nodeid, newvalues, 'departure')
+    arr_date, arr_time = audit_person_arrdep(db, cl, nodeid, newvalues,
+                                             'arrival')
+    dep_date, dep_time = audit_person_arrdep(db, cl, nodeid, newvalues,
+                                             'departure')
+    if arr_date is not None and dep_date is not None:
+        if dep_date < arr_date:
+            raise ValueError('Departure date before arrival date')
+        elif dep_date == arr_date:
+            if arr_time is not None and dep_time is not None:
+                if dep_time < arr_time:
+                    raise ValueError('Departure time before arrival time')
 
     if 'files' in newvalues:
         file_id = newvalues['files']

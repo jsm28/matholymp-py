@@ -253,8 +253,6 @@ Registration system
 * Add more registration system sanity checks against mistakes by
   administrative users (open-ended issue).
 
-* Verify that arrival date/time are not after departure date/time.
-
 * Support multiple new people being the same person on the static site
   (e.g., same new person as deputy for multiple countries, such as
   host country main and B teams).
