@@ -114,6 +114,10 @@ a matter of personal preference.)
 
 Releases of matholymp are available for download:
 
+* 2017.05.0 (`sources
+  <https://www.polyomino.org.uk/mathematics/olympiad-software/matholymp-2017.05.0.tar.gz>`_,
+  `GPG signature <https://www.polyomino.org.uk/mathematics/olympiad-software/matholymp-2017.05.0.tar.gz.sig>`_).
+
 * 2017.01.0 (`sources
   <https://www.polyomino.org.uk/mathematics/olympiad-software/matholymp-2017.01.0.tar.gz>`_,
   `GPG signature <https://www.polyomino.org.uk/mathematics/olympiad-software/matholymp-2017.01.0.tar.gz.sig>`_).
