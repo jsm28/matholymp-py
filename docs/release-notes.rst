@@ -57,6 +57,10 @@ Next version (unreleased)
   of flags and photos from the registration system, instead of
   requiring you to unpack them manually.
 
+* :command:`mo-static-import` now sets ``event_active_number`` to
+  empty in :file:`staticsite.cfg` if it was previously set to the
+  number of the event for which data is being imported.
+
 Version 2017.05.0 (1 May 2017)
 ------------------------------
 

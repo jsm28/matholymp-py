@@ -50,13 +50,14 @@ working directory.
 import argparse
 import os
 import os.path
+import re
 import shutil
 import tempfile
 import zipfile
 
 import matholymp
 from matholymp.fileutil import read_utf8_csv, write_utf8_csv, \
-    make_dirs_for_file, file_extension
+    make_dirs_for_file, write_text_to_file, read_text_from_file, file_extension
 from matholymp.regdata import file_url_to_local
 from matholymp.sitegen import read_sitegen_config, sitegen_countries_csv, \
     sitegen_people_csv
@@ -209,6 +210,14 @@ def _import_from_dir(top_directory, input_directory, temp_dir):
                                     'scoreboard', 'rss.xml')
     make_dirs_for_file(rss_dst_filename)
     shutil.copyfile(input_scores_rss, rss_dst_filename)
+
+    if cfg_data['event_active_number'] == int(event_number):
+        static_cfg = os.path.join(top_directory, 'staticsite.cfg')
+        cfg_text = read_text_from_file(static_cfg)
+        cfg_text = re.sub('^event_active_number *= *[0-9]*$',
+                          'event_active_number =', cfg_text,
+                          flags=re.MULTILINE)
+        write_text_to_file(cfg_text, static_cfg)
 
 def main():
     """Main program for mo-static-import."""
