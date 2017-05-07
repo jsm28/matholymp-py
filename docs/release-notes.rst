@@ -44,6 +44,15 @@ static site, to update the CSV data files with details of past events
 for any format changes in the new version of matholymp.  After doing
 so, run :command:`mo-static-generate`.
 
+Next version (unreleased)
+-------------------------
+
+* Static site generation now supports different events having
+  different descriptions of the day for which contestant ages are
+  given.  If the CSV file of events has a column ``Age Day
+  Description``, the text from that column will be used instead of
+  ``age_day_desc`` from :file:`staticsite.cfg`.
+
 Version 2017.05.0 (1 May 2017)
 ------------------------------
 

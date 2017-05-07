@@ -169,7 +169,8 @@ rules of a particular event allowed for Honourable Mentions to be
 awarded; a column ``Distinguish Official Countries`` may be used to
 indicate whether there was a distinction between official and
 unofficial countries that should be reflected in the lists of
-countries and results.
+countries and results.  The ``Age Day Description`` column, present
+for EGMO, is also optional.
 
 Creating the other files initially, with details of past events, is
 more complicated.  You may start with files simply containing the CSV

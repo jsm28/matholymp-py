@@ -90,7 +90,7 @@ class DataSource(object):
         registration_active, gold_boundary, silver_boundary,
         bronze_boundary, paper_list, _person_ids, _country_ids,
         distinguish_official, rank_top_n,
-        honourable_mentions_available.
+        honourable_mentions_available, age_day_desc.
         """
         raise NotImplementedError
 

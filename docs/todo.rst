@@ -131,8 +131,8 @@ Static site
 -----------
 
 * Allow CSV files to specify event short and long names, and the
-  number of contestants for ranking, and the description of the day
-  ages are shown as of, so those can vary from year to year.
+  number of contestants for ranking, so those can vary from year to
+  year.
 
 * Support not showing the host country / city if always the same.
 

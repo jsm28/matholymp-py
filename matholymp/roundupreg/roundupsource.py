@@ -125,6 +125,8 @@ class RoundupDataSource(DataSource):
         elif name == '_country_ids':
             return [int(c) for c in self._db.country.list()
                     if self._db.country.get(c, 'participants_ok')]
+        elif name == 'age_day_desc':
+            return self._db.config.ext['MATHOLYMP_AGE_DAY_DESC']
         raise KeyError(name)
 
     def person_event_get_attr(self, person_id, country_id, event_id, name):

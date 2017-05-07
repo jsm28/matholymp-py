@@ -197,6 +197,18 @@ class EventGroup(object):
         event as to whether Honourable Mentions can be awarded.
         """)
 
+    def _get_age_day_desc_varies(self):
+        s = {e.age_day_desc for e in self.event_list}
+        return len(s) > 1
+
+    age_day_desc_varies = _PropertyCached(
+        'age_day_desc_varies',
+        _get_age_day_desc_varies,
+        """
+        Whether the description of the day for which contestant ages
+        are given varies from event to event.
+        """)
+
     def _get_award_types(self):
         if self.honourable_mentions_available:
             return _award_types
@@ -954,6 +966,10 @@ class Event(object):
         Mentions to contestants not receiving a medal but with a
         perfect score on at least one problem.
         """)
+
+    age_day_desc = _EventPropertyDS(
+        'age_day_desc',
+        """Description of the day for which contestant ages are given.""")
 
     def _get_sort_key(self):
         return self.id

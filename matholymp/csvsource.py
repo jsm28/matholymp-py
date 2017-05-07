@@ -201,6 +201,10 @@ class CSVDataSource(DataSource):
             return list(self._people[id].keys())
         if name == '_country_ids':
             return list(self._countries[id].keys())
+        if name == 'age_day_desc':
+            if 'Age Day Description' in self._events[id]:
+                return self._events[id]['Age Day Description']
+            return self._cfg['age_day_desc']
         raise KeyError(name)
 
     def event_have_attr(self, id, name):

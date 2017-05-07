@@ -1583,7 +1583,7 @@ class SiteGenerator(object):
         """Generate main page for one person."""
         text = ''
         year_list = []
-        have_age = False
+        age_desc_list = []
         for p in pd.participation_list:
             e = p.event
             year_text = ''
@@ -1608,7 +1608,11 @@ class SiteGenerator(object):
                 year_rows.append(['Guide for', ', '.join(gtlist)])
             if p.is_contestant and p.contestant_age is not None:
                 year_rows.append(['Contestant age', str(p.contestant_age)])
-                have_age = True
+                age_desc = e.age_day_desc
+                if age_desc_list and age_desc_list[-1][0] == age_desc:
+                    age_desc_list[-1][2] = e.year
+                else:
+                    age_desc_list.append([age_desc, e.year, e.year])
             year_text += self.html_table_list_th_td(year_rows) + '\n'
             year_text += '</td><td>\n'
             if p.photo_url:
@@ -1622,7 +1626,17 @@ class SiteGenerator(object):
             year_list.append(year_text)
         year_list.reverse()
         text += '\n'.join(year_list)
-        if have_age:
+        if len(age_desc_list) > 1:
+            age_text_list = []
+            for a in age_desc_list:
+                if a[1] == a[2]:
+                    age_text_list.append('%s (%s)' % (a[0], a[1]))
+                else:
+                    age_text_list.append('%s (%s&ndash;%s)' %
+                                         (a[0], a[1], a[2]))
+            age_text = ', '.join(age_text_list)
+            text += '<p>Contestant ages are given on %s.</p>\n' % age_text
+        elif age_desc_list:
             text += ('<p>Contestant ages are given on %s at each %s.</p>\n' %
                      (cgi.escape(self._cfg['age_day_desc']),
                       cgi.escape(self._data.short_name)))
@@ -1672,6 +1686,8 @@ class SiteGenerator(object):
             if self._data.distinguish_official_varies:
                 csv_out['Distinguish Official Countries'] = \
                     e.distinguish_official and 'Yes' or 'No'
+            if self._data.age_day_desc_varies:
+                csv_out['Age Day Description'] = e.age_day_desc
             if e.num_contestants:
                 csv_out['Contestants'] = str(e.num_contestants)
                 csv_out['Gold Medals'] = str(e.num_awards['Gold Medal'])
@@ -1730,6 +1746,8 @@ class SiteGenerator(object):
             events_columns.extend(['Honourable Mentions Available'])
         if self._data.distinguish_official_varies:
             events_columns.extend(['Distinguish Official Countries'])
+        if self._data.age_day_desc_varies:
+            events_columns.extend(['Age Day Description'])
         events_columns.extend(['Contestants', 'Gold Medals', 'Silver Medals',
                                'Bronze Medals'])
         if self._data.honourable_mentions_available:
