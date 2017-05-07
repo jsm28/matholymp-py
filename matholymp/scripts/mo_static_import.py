@@ -33,15 +33,15 @@ registration system to the static site, after an event has finished.
 The argument is the directory with the files to import.  This
 directory should contain files countries.csv, people.csv (the file
 downloaded when not logged in, so only including public information)
-and scores-rss.xml (the final RSS feed of all scores), and
-subdirectories flags and photos from unpacking files flags.zip and
-photos.zip from the registration system.  The data/<event>s.csv file
-needs updating manually to include all relevant data (in particular,
-the number of problems, the maximum marks for each problem and the
-medal boundaries); this may be done before or after running
-mo-static-import.  Once <event>s.csv has been updated and
-mo-static-import has been run, mo-static-generate needs to be run to
-update the site to reflect the newly imported data.  As with
+and scores-rss.xml (the final RSS feed of all scores), and either
+files flags.zip and photos.zip or subdirectories flags and photos from
+unpacking those files from the registration system.  The
+data/<event>s.csv file needs updating manually to include all relevant
+data (in particular, the number of problems, the maximum marks for
+each problem and the medal boundaries); this may be done before or
+after running mo-static-import.  Once <event>s.csv has been updated
+and mo-static-import has been run, mo-static-generate needs to be run
+to update the site to reflect the newly imported data.  As with
 mo-static-generate, mo-static-import should be run with the toplevel
 directory for the website, containing the file staticsite.cfg, as its
 working directory.
