@@ -31,8 +31,8 @@
 
 __all__ = ['ScoreAction', 'RetireCountryAction', 'ScalePhotoAction',
            'CountryCSVAction', 'ScoresCSVAction', 'PeopleCSVAction',
-           'FlagsZIPAction', 'PhotosZIPAction', 'ScoresRSSAction',
-           'register_actions']
+           'MedalBoundariesCSVAction', 'FlagsZIPAction', 'PhotosZIPAction',
+           'ScoresRSSAction', 'register_actions']
 
 import cgi
 import io
@@ -225,6 +225,21 @@ class PeopleCSVAction(Action):
         show_all = self.hasPermission('Omnivident')
         return RoundupSiteGenerator(self.db).people_csv_bytes(show_all)
 
+class MedalBoundariesCSVAction(Action):
+
+    """Action to return a CSV file of medal boundaries."""
+
+    def handle(self):
+        """Output the medal boundaries as a CSV file."""
+        if self.classname != 'event':
+            raise ValueError('This action only applies to events')
+        if self.nodeid is not None:
+            raise ValueError('Node id specified for CSV generation')
+        self.client.setHeader('Content-Type', 'text/csv; charset=UTF-8')
+        self.client.setHeader('Content-Disposition',
+                              'attachment; filename=medal-boundaries.csv')
+        return RoundupSiteGenerator(self.db).medal_boundaries_csv_bytes()
+
 class FlagsZIPAction(Action):
 
     """Action to return a ZIP file of flags."""
@@ -333,6 +348,7 @@ def register_actions(instance):
     instance.registerAction('country_csv', CountryCSVAction)
     instance.registerAction('scores_csv', ScoresCSVAction)
     instance.registerAction('people_csv', PeopleCSVAction)
+    instance.registerAction('medal_boundaries_csv', MedalBoundariesCSVAction)
     instance.registerAction('flags_zip', FlagsZIPAction)
     instance.registerAction('photos_zip', PhotosZIPAction)
     instance.registerAction('consent_forms_zip', ConsentFormsZIPAction)

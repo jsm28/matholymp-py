@@ -76,6 +76,19 @@ class RegSiteGenerator(SiteGenerator):
                                                  private_data=private_data)
         return write_utf8_csv_bytes(data[0], data[1])
 
+    def medal_boundaries_csv_bytes(self):
+        """Return the byte contents of the CSV of medal boundaries."""
+        csv_out = {}
+        e = self.event
+        csv_out['Gold Boundary'] = \
+            str(e.gold_boundary) if e.gold_boundary is not None else ''
+        csv_out['Silver Boundary'] = \
+            str(e.silver_boundary) if e.silver_boundary is not None else ''
+        csv_out['Bronze Boundary'] = \
+            str(e.bronze_boundary) if e.bronze_boundary is not None else ''
+        columns = ['Gold Boundary', 'Silver Boundary', 'Bronze Boundary']
+        return write_utf8_csv_bytes([csv_out], columns)
+
     def flags_zip_bytes(self):
         """Return the byte contents of the ZIP of flags."""
         output = io.BytesIO()

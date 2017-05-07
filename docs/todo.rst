@@ -164,10 +164,10 @@ Static site
   version) rather than giving errors for it.
 
 * Make :command:`mo-static-import` support downloading all data itself
-  (including medal boundaries, via xmlrpc or new action), and setting
-  medal boundaries, so just running :command:`mo-static-import` with
-  no arguments does everything needed after an event to transfer data
-  to the static site.
+  (including medal boundaries, via the medal_boundaries_csv action),
+  and setting medal boundaries, so just running
+  :command:`mo-static-import` with no arguments does everything needed
+  after an event to transfer data to the static site.
 
 * Make :command:`mo-static-import` and
   :command:`mo-static-papers-import` support automatically running
