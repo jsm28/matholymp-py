@@ -165,10 +165,9 @@ Static site
 
 * Make :command:`mo-static-import` support downloading all data itself
   (including medal boundaries, via xmlrpc or new action), and setting
-  medal boundaries and removing ``event_active_number`` from
-  :file:`staticsite.cfg`, so just running :command:`mo-static-import`
-  with no arguments does everything needed after an event to transfer
-  data to the static site.
+  medal boundaries, so just running :command:`mo-static-import` with
+  no arguments does everything needed after an event to transfer data
+  to the static site.
 
 * Make :command:`mo-static-import` and
   :command:`mo-static-papers-import` support automatically running
