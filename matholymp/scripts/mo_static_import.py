@@ -51,6 +51,8 @@ import argparse
 import os
 import os.path
 import shutil
+import tempfile
+import zipfile
 
 import matholymp
 from matholymp.fileutil import read_utf8_csv, write_utf8_csv, \
@@ -61,22 +63,21 @@ from matholymp.sitegen import read_sitegen_config, sitegen_countries_csv, \
 
 __all__ = ['main']
 
-def main():
-    """Main program for mo-static-import."""
-
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--version', action='version',
-                        version='%(prog)s '+matholymp.__version__)
-    parser.add_argument('input_directory', help='directory with input data')
-    args = vars(parser.parse_args())
-
-    top_directory = os.getcwd()
-    input_directory = args['input_directory']
-
+def _import_from_dir(top_directory, input_directory, temp_dir):
     input_countries_csv = os.path.join(input_directory, 'countries.csv')
     input_people_csv = os.path.join(input_directory, 'people.csv')
     input_flags_dir = os.path.join(input_directory, 'flags')
+    if not os.access(input_flags_dir, os.F_OK):
+        with zipfile.ZipFile(os.path.join(input_directory, 'flags.zip'),
+                             'r') as z:
+            z.extractall(temp_dir)
+        input_flags_dir = os.path.join(temp_dir, 'flags')
     input_photos_dir = os.path.join(input_directory, 'photos')
+    if not os.access(input_photos_dir, os.F_OK):
+        with zipfile.ZipFile(os.path.join(input_directory, 'photos.zip'),
+                             'r') as z:
+            z.extractall(temp_dir)
+        input_photos_dir = os.path.join(temp_dir, 'photos')
     input_scores_rss = os.path.join(input_directory, 'scores-rss.xml')
 
     cfg_data = read_sitegen_config(top_directory)
@@ -208,3 +209,18 @@ def main():
                                     'scoreboard', 'rss.xml')
     make_dirs_for_file(rss_dst_filename)
     shutil.copyfile(input_scores_rss, rss_dst_filename)
+
+def main():
+    """Main program for mo-static-import."""
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s '+matholymp.__version__)
+    parser.add_argument('input_directory', help='directory with input data')
+    args = vars(parser.parse_args())
+
+    temp_dir = tempfile.mkdtemp()
+    try:
+        _import_from_dir(os.getcwd(), args['input_directory'], temp_dir)
+    finally:
+        shutil.rmtree(temp_dir)

@@ -296,10 +296,11 @@ that variable to empty).  Download the following files from the
 registration system, while not logged in administratively, and put
 them in a directory (*input-directory* below) outside the website: the
 list of countries (:file:`countries.csv`), the list of people
-(:file:`people.csv`), the ZIP file of flags (unpack it to form a
-directory :file:`flags/`), the ZIP file of participant photos (unpack
-it to form a directory :file:`photos/`), the RSS feed of scores (save
-it as :file:`scores-rss.xml`).  Then:
+(:file:`people.csv`), the ZIP file of flags (:file:`flags.zip`), the
+ZIP file of participant photos (:file:`photos.zip`), the RSS feed of
+scores (save it as :file:`scores-rss.xml`).  (The ZIP files do not
+need to be unpacked; if they are, the directories :file:`flags/` and
+:file:`photos/` will be used instead of the ZIP files.)  Then:
 
 .. parsed-literal::
 

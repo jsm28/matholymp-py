@@ -53,6 +53,10 @@ Next version (unreleased)
   Description``, the text from that column will be used instead of
   ``age_day_desc`` from :file:`staticsite.cfg`.
 
+* :command:`mo-static-import` can now work directly with the ZIP files
+  of flags and photos from the registration system, instead of
+  requiring you to unpack them manually.
+
 Version 2017.05.0 (1 May 2017)
 ------------------------------
 
