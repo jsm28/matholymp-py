@@ -215,10 +215,17 @@ Registration system
 * Support for registration contact to view room allocations for their
   country and people sharing rooms with them.
 
+* Support for allocating room numbers for many people from one page
+  rather than needing to click through to each individual person's
+  page.
+
 * Support entering accommodation preferences / requests.
 
 * Support other registration information (e.g., passport scan) where
   useful.
+
+* Support requiring allergies / dietary requirements (possibly "None")
+  to be entered on registration for everyone.
 
 * Use database to describe maximum / expected number of people in a
   given role from a country rather than hardcoding.
@@ -229,6 +236,12 @@ Registration system
   number, whether should have phone number, which badge background to
   use.  (Need to pass some information through to CSV files so
   registration status generation can work from those.)
+
+* Allow other options for which roles are (initially) allowed or
+  expected to have phone numbers instead of just Guides; the
+  explanatory text on person.item.html should also be configurable.
+  (More complicated if allowed for non-staff participants as well as
+  staff.)
 
 * Use database to describe which arrival points are airports rather
   than hardcoding reference to ``Airport`` text.  (Need to pass
