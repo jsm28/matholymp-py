@@ -39,8 +39,8 @@ from matholymp.datetimeutil import date_from_ymd_str, date_from_ymd_iso, \
 from matholymp.fileutil import boolean_states
 from matholymp.roundupreg.auditorutil import get_new_value, require_value
 from matholymp.roundupreg.rounduputil import have_consent_forms, \
-    have_passport_numbers, have_nationality, require_dob, get_num_problems, \
-    get_marks_per_problem, get_earliest_date_of_birth, \
+    have_passport_numbers, have_nationality, require_diet, require_dob, \
+    get_num_problems, get_marks_per_problem, get_earliest_date_of_birth, \
     get_sanity_date_of_birth, get_earliest_date_of_birth_contestant, \
     get_arrdep_bounds, any_scores_missing, valid_score, create_rss, \
     db_file_format_contents, db_file_extension, \
@@ -291,6 +291,11 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     if have_nationality(db):
         require_value(db, cl, nodeid, newvalues, 'nationality',
                       'No nationality specified')
+
+    # Dietary requirements may be required.
+    if require_diet(db):
+        require_value(db, cl, nodeid, newvalues, 'diet',
+                      'Allergies and dietary requirements not specified')
 
     # Start with blank scores for contestants - and for other people
     # in case someone is first registered with another role then

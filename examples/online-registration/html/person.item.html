@@ -191,8 +191,16 @@ define="edit_ok context/is_edit_ok"
  </tr>
 
  <tr tal:define="name string:diet; label string:Allergies and dietary requirements; value context/diet; edit_ok edit_ok" tal:condition="context/is_edit_ok">
-  <th metal:use-macro="th_label">Allergies and dietary requirements</th>
+  <th class="required" metal:use-macro="th_label">Allergies and dietary requirements</th>
   <td><textarea rows="5" cols="40" tal:replace="structure context/diet/multiline"></textarea></td>
+ </tr>
+
+ <tr tal:condition="context/is_edit_ok">
+  <td colspan="2">Allergies and dietary requirements should be
+  entered so that appropriate food can be arranged.
+ <tal:block tal:condition="python:utils.require_diet(db._db)">
+  If none, please enter &lsquo;None&rsquo;.
+ </tal:block></td>
  </tr>
 
  <tr tal:define="name string:tshirt; label string:T-shirt size; value context/tshirt; edit_ok edit_ok" tal:condition="context/is_edit_ok">

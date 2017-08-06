@@ -44,15 +44,16 @@ from matholymp.fileutil import boolean_states, file_format_contents, \
 
 __all__ = ['distinguish_official', 'get_consent_forms_date_str',
            'get_consent_forms_date', 'have_consent_forms',
-           'have_passport_numbers', 'have_nationality', 'require_dob',
-           'get_num_problems', 'get_marks_per_problem', 'scores_from_str',
-           'get_earliest_date_of_birth', 'get_sanity_date_of_birth',
-           'get_earliest_date_of_birth_contestant', 'person_date_of_birth',
-           'contestant_age', 'get_arrdep_bounds', 'get_staff_country_name',
-           'normal_country_person', 'person_is_contestant', 'contestant_code',
-           'pn_score', 'scores_final', 'any_scores_missing',
-           'country_has_contestants', 'valid_country_problem', 'valid_score',
-           'create_rss', 'db_file_format_contents', 'db_file_extension',
+           'have_passport_numbers', 'have_nationality', 'require_diet',
+           'require_dob', 'get_num_problems', 'get_marks_per_problem',
+           'scores_from_str', 'get_earliest_date_of_birth',
+           'get_sanity_date_of_birth', 'get_earliest_date_of_birth_contestant',
+           'person_date_of_birth', 'contestant_age', 'get_arrdep_bounds',
+           'get_staff_country_name', 'normal_country_person',
+           'person_is_contestant', 'contestant_code', 'pn_score',
+           'scores_final', 'any_scores_missing', 'country_has_contestants',
+           'valid_country_problem', 'valid_score', 'create_rss',
+           'db_file_format_contents', 'db_file_extension',
            'db_private_file_format_contents', 'db_private_file_extension']
 
 def distinguish_official(db):
@@ -94,6 +95,14 @@ def have_nationality(db):
     """Return whether nationalities are collected for this event."""
     req_nationality = db.config.ext['MATHOLYMP_REQUIRE_NATIONALITY']
     return boolean_states[req_nationality.lower()]
+
+def require_diet(db):
+    """
+    Return whether dietary requirements information is required for
+    all participants.
+    """
+    req_diet = db.config.ext['MATHOLYMP_REQUIRE_DIET']
+    return boolean_states[req_diet.lower()]
 
 def require_dob(db):
     """Return whether date of birth is required for all participants."""

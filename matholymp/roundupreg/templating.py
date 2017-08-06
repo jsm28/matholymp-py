@@ -58,7 +58,7 @@ from matholymp.roundupreg.cache import cached_text
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import distinguish_official, \
     get_consent_forms_date, have_consent_forms, have_passport_numbers, \
-    have_nationality, require_dob, get_earliest_date_of_birth, \
+    have_nationality, require_diet, require_dob, get_earliest_date_of_birth, \
     get_sanity_date_of_birth, person_date_of_birth, contestant_age, \
     get_arrdep_bounds, normal_country_person, person_is_contestant, \
     contestant_code, pn_score, scores_final, any_scores_missing, \
@@ -347,6 +347,8 @@ def required_person_fields(db):
         req.append('passport_number')
     if have_nationality(db):
         req.append('nationality')
+    if require_diet(db):
+        req.append('diet')
     return req
 
 def register_templating_utils(instance):
@@ -355,6 +357,7 @@ def register_templating_utils(instance):
     instance.registerUtil('have_consent_forms', have_consent_forms)
     instance.registerUtil('have_passport_numbers', have_passport_numbers)
     instance.registerUtil('have_nationality', have_nationality)
+    instance.registerUtil('require_diet', require_diet)
     instance.registerUtil('require_dob', require_dob)
     instance.registerUtil('normal_country_person', normal_country_person)
     instance.registerUtil('person_is_contestant', person_is_contestant)

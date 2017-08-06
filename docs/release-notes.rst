@@ -67,6 +67,16 @@ Next version (unreleased)
   for other staff for other administrative purposes.
   :file:`person.item.html` is updated accordingly.
 
+* The registration system now supports requiring allergies and dietary
+  requirements information to be specified explicitly, possibly as
+  ``None``, rather than left blank.  The new configuration variable
+  ``matholymp_require_diet`` must be specified in
+  :file:`extensions/config.ini` for the registration system.  If
+  ``Yes``, this information is required for all people at
+  registration.  If ``No``, that field can be left blank at
+  registration, as before.  :file:`person.item.html` is updated
+  accordingly.
+
 Version 2017.05.0 (1 May 2017)
 ------------------------------
 

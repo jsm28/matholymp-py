@@ -224,9 +224,6 @@ Registration system
 * Support other registration information (e.g., passport scan) where
   useful.
 
-* Support requiring allergies / dietary requirements (possibly "None")
-  to be entered on registration for everyone.
-
 * Use database to describe maximum / expected number of people in a
   given role from a country rather than hardcoding.
 
