@@ -217,6 +217,10 @@ Registration system
 
 * Support entering accommodation preferences / requests.
 
+* Support for automatic room allocation based on information about the
+  capacities of available rooms and which rooms should have people in
+  which roles.
+
 * Support other registration information (e.g., passport scan) where
   useful.
 
