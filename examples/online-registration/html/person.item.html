@@ -265,8 +265,8 @@ define="edit_ok context/is_edit_ok"
   <td><input name="room_number" metal:use-macro="normal_input"></td>
  </tr>
 
- <tr tal:define="name string:phone_number; label string:Phone number (guides only); value context/phone_number; edit_ok context/phone_number/is_edit_ok" tal:condition="python:(context.is_edit_ok() and not utils.normal_country_person(db._db, request.user.id))">
-  <th metal:use-macro="th_label">Phone number (guides only)</th>
+ <tr tal:define="name string:phone_number; label string:Phone number (staff only); value context/phone_number; edit_ok context/phone_number/is_edit_ok" tal:condition="python:(context.is_edit_ok() and not utils.normal_country_person(db._db, request.user.id))">
+  <th metal:use-macro="th_label">Phone number (staff only)</th>
   <td><input name="phone_number" metal:use-macro="normal_input"></td>
  </tr>
 

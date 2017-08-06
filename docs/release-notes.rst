@@ -61,6 +61,12 @@ Next version (unreleased)
   empty in :file:`staticsite.cfg` if it was previously set to the
   number of the event for which data is being imported.
 
+* The registration system now allows entering phone numbers for all
+  staff, not just Guides.  Document generation will only use this
+  information in the case of Guides, but it may sometimes be useful
+  for other staff for other administrative purposes.
+  :file:`person.item.html` is updated accordingly.
+
 Version 2017.05.0 (1 May 2017)
 ------------------------------
 

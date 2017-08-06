@@ -237,11 +237,10 @@ Registration system
   use.  (Need to pass some information through to CSV files so
   registration status generation can work from those.)
 
-* Allow other options for which roles are (initially) allowed or
-  expected to have phone numbers instead of just Guides; the
-  explanatory text on person.item.html should also be configurable.
-  (More complicated if allowed for non-staff participants as well as
-  staff.)
+* Allow other options for which roles are (initially) expected to have
+  phone numbers instead of just Guides; this also affects the
+  explanatory text about missing phone numbers.  (More complicated if
+  allowed for non-staff participants as well as staff.)
 
 * Use database to describe which arrival points are airports rather
   than hardcoding reference to ``Airport`` text.  (Need to pass

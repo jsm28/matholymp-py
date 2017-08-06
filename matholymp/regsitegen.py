@@ -305,7 +305,9 @@ class RegSiteGenerator(SiteGenerator):
                      ' on the website and may appear on name badges.</p>\n')
         if missing_phone:
             text += ('<p>Phone numbers (for Guides) need only be entered'
-                     ' if they will appear on name badges.</p>\n')
+                     ' if they will appear on name badges or will be'
+                     ' used for some other purpose.  Only Guides are listed'
+                     ' as missing phone numbers, not other staff.</p>\n')
         return text
 
     def photo_scale_form(self, p):

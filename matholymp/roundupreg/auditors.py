@@ -378,7 +378,8 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     other_roles = get_new_value(db, cl, nodeid, newvalues, 'other_roles')
     if other_roles is None:
         other_roles = []
-    if not db.country.get(country, 'is_normal'):
+    is_normal = db.country.get(country, 'is_normal')
+    if not is_normal:
         if not db.matholymprole.get(primary_role, 'isadmin'):
             raise ValueError('Staff must have administrative roles')
         for role in other_roles:
@@ -414,14 +415,12 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         if not db.country.get(c, 'is_normal'):
             raise ValueError('May only guide normal countries')
 
-    # Likewise phone_number.
+    # Phone numbers may only be specified for staff.
     phone_number = get_new_value(db, cl, nodeid, newvalues, 'phone_number')
     if phone_number is None:
         phone_number = ''
-    if phone_number != '':
-        if primary_role != guide:
-            raise ValueError('Phone numbers may only be entered for'
-                             ' normal Guides')
+    if phone_number != '' and is_normal:
+        raise ValueError('Phone numbers may only be entered for staff')
 
 def register_auditors(db):
     """Register the matholymp auditors with Roundup."""
