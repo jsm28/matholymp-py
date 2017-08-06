@@ -1,0 +1,39 @@
+<tal:block metal:use-macro="templates/page/macros/icing">
+<title metal:fill-slot="head_title" i18n:translate="">Room allocations - <span
+ i18n:name="tracker" tal:replace="config/TRACKER_NAME" /></title>
+<span metal:fill-slot="body_title" tal:omit-tag="python:1"
+ i18n:translate="">Room allocations</span>
+
+<td class="content" metal:fill-slot="content">
+
+<span tal:condition="python:not (request.user.hasPermission('EditRooms')
+ or request.user.hasRole('Anonymous'))"
+ i18n:translate="">You are not allowed to view this page.</span>
+
+<span tal:condition="python:not request.user.hasPermission('EditRooms')
+ and request.user.hasRole('Anonymous')"
+ i18n:translate="">Please login with your username and password.</span>
+
+<span tal:condition="python:request.user.hasPermission('EditRooms')">
+
+<p>After entering or editing room numbers, use the &lsquo;Save changes
+to room numbers&rsquo; button to save the changes and view the results
+sorted by room number.</p>
+
+<form method="POST"
+      name="itemSynopsis"
+      enctype="multipart/form-data"
+      tal:attributes="action request/classname"
+      >
+<tal:block tal:replace="structure python:utils.edit_rooms(db._db)" />
+
+<input type="hidden" name="@action" value="edit">
+<input type="hidden" name="@template" value="rooms">
+<input type="submit" value="Save changes to room numbers">
+</form>
+
+</span>
+
+</td>
+
+</tal:block>

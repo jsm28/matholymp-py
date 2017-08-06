@@ -285,7 +285,9 @@ room number of one's guide and those of other team members).  Room
 numbers should be allocated and entered in the registration system
 manually (there is no automation for allocating rooms or uploading
 room numbers, although if desired the XMLRPC interface to Roundup
-could be used for bulk upload of this or other data).
+could be used for bulk upload of this or other data).  They can be
+entered through the :guilabel:`View and edit room allocations` page,
+or on the pages for individual people.
 
 Removing people or countries
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -340,6 +340,11 @@ def init_schema(env):
     db.security.addPermissionToRole('Admin', p)
     db.security.addPermissionToRole('Register', p)
 
+    # Viewing and editing the global set of room allocations has its
+    # own permission.
+    p = db.security.addPermission(name='EditRooms')
+    db.security.addPermissionToRole('Admin', p)
+
     # Downloading full person data has its own Permission.
     p = db.security.addPermission(name='Omnivident')
     db.security.addPermissionToRole('Admin', p)

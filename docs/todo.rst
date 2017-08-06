@@ -215,10 +215,6 @@ Registration system
 * Support for registration contact to view room allocations for their
   country and people sharing rooms with them.
 
-* Support for allocating room numbers for many people from one page
-  rather than needing to click through to each individual person's
-  page.
-
 * Support entering accommodation preferences / requests.
 
 * Support other registration information (e.g., passport scan) where

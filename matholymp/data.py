@@ -716,6 +716,18 @@ class Event(object):
     def _person_id_list(self):
         return self._person_ids
 
+    def _get_people_by_room(self):
+        r = {}
+        for p in self.person_list:
+            if p.room_number not in r:
+                r[p.room_number] = []
+            r[p.room_number].append(p)
+        return r
+
+    people_by_room = _PropertyCached(
+        'people_by_room', _get_people_by_room,
+        """A mapping from room number to a list of people in that room.""")
+
     def _get_normal_person_list(self):
         return [p for p in self.person_list if p.country.is_normal]
 

@@ -77,6 +77,10 @@ Next version (unreleased)
   registration, as before.  :file:`person.item.html` is updated
   accordingly.
 
+* The registration system now supports editing rooms for many people
+  from a single page.  The example :file:`page.html` is updated
+  accordingly, and a new :file:`person.rooms.html` is added.
+
 Version 2017.05.0 (1 May 2017)
 ------------------------------
 

@@ -59,6 +59,9 @@ columns string:id;
    <span tal:condition="python:request.user.hasPermission('RegistrationStatus')">
     <a href="person?@template=status" i18n:translate="">Registration Status</a><br>
    </span>
+   <span tal:condition="python:request.user.hasPermission('EditRooms')">
+    <a href="person?@template=rooms" i18n:translate="">View and edit room allocations</a><br>
+   </span>
    <span tal:condition="python:request.user.hasPermission('Score')">
     <a href="person?@template=scoreselect"  i18n:translate="">Enter scores</a><br>
    </span>

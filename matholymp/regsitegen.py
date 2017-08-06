@@ -418,3 +418,35 @@ class RegSiteGenerator(SiteGenerator):
                                                  False)
 
         return text
+
+    def room_edit_field(self, p):
+        """Return a form field to edit a person's room number."""
+        raise NotImplementedError
+
+    def edit_rooms_text(self):
+        """Return the text of the page for editing room numbers."""
+        e = self.event
+        people_by_room = e.people_by_room
+        rooms = sorted(people_by_room.keys())
+        rlist = []
+        for r in rooms:
+            if r == '':
+                rdesc = 'No room allocated'
+            else:
+                rdesc = 'Room: %s' % r
+            rtext = '<h2>%s</h2>\n' % cgi.escape(rdesc)
+            head_row_list = [self.html_tr_th_list(['Country', 'Person', 'Role',
+                                                   'Gender', 'Room'])]
+            body_row_list = []
+            for p in sorted(people_by_room[r], key=lambda x:x.sort_key):
+                row = [cgi.escape(p.country.name_with_code),
+                       self.link_for_person(p.person, cgi.escape(p.name)),
+                       cgi.escape(p.primary_role),
+                       cgi.escape(p.gender),
+                       self.room_edit_field(p)]
+                body_row_list.append(self.html_tr_td_list(row))
+                pass
+            rtext += self.html_table_thead_tbody_list(head_row_list,
+                                                      body_row_list) + '\n'
+            rlist.append(rtext)
+        return ''.join(rlist)

@@ -38,7 +38,7 @@ __all__ = ['people_from_country_internal', 'people_from_country',
            'scoreboard', 'display_scoreboard', 'has_nonempty_travel',
            'show_travel_copy_options', 'country_travel_copy_options',
            'person_case_warning', 'list_expected_roles', 'registration_status',
-           'registration_status_country', 'show_consent_form_ui',
+           'registration_status_country', 'edit_rooms', 'show_consent_form_ui',
            'string_select', 'date_of_birth_select', 'arrdep_date_select',
            'arrdep_time_select', 'required_person_fields',
            'register_templating_utils']
@@ -255,6 +255,11 @@ def registration_status_country(db, userid):
     return sitegen.registration_status_country_text(c, main_role_list,
                                                     consent_forms_date)
 
+def edit_rooms(db):
+    """Produce contents of page for viewing and editing room numbers."""
+    sitegen = RoundupSiteGenerator(db)
+    return sitegen.edit_rooms_text()
+
 def show_consent_form_ui(db, person):
     """Return whether to show the interface to upload a consent form."""
     if not have_consent_forms(db):
@@ -383,6 +388,7 @@ def register_templating_utils(instance):
     instance.registerUtil('registration_status', registration_status)
     instance.registerUtil('registration_status_country',
                           registration_status_country)
+    instance.registerUtil('edit_rooms', edit_rooms)
     instance.registerUtil('show_consent_form_ui', show_consent_form_ui)
     instance.registerUtil('date_of_birth_select', date_of_birth_select)
     instance.registerUtil('arrdep_date_select', arrdep_date_select)
