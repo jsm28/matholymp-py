@@ -155,10 +155,6 @@ Static site
   postprocess its ouput, or commands to postprocess and push to
   production.
 
-* Make :command:`mo-static-generate` not write output files if they
-  are unchanged, to support dependency-based postprocessing only
-  regenerating those files that need regenerating.
-
 * Make :command:`mo-static-import` ignore excess data (e.g., from
   having the full version of :file:`people.csv` instead of the public
   version) rather than giving errors for it.

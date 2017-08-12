@@ -48,9 +48,9 @@ import string
 
 __all__ = ['read_utf8_csv', 'write_utf8_csv_bytes', 'write_utf8_csv',
            'comma_join', 'comma_split', 'make_dirs_for_file',
-           'write_text_to_file', 'read_text_from_file', 'read_config',
-           'boolean_states', 'remove_if_exists', 'file_format_contents',
-           'file_extension']
+           'write_bytes_to_file', 'write_text_to_file', 'read_text_from_file',
+           'read_config', 'boolean_states', 'remove_if_exists',
+           'file_format_contents', 'file_extension']
 
 if _py3:
     _text_open_args = { 'encoding': 'utf-8' }
@@ -102,8 +102,7 @@ def write_utf8_csv_bytes(rows, keys):
 
 def write_utf8_csv(csv_file_name, rows, keys):
     """Write a UTF-8 CSV file (with BOM) from an array of dictionaries."""
-    with open(csv_file_name, 'wb') as csv_file:
-        csv_file.write(write_utf8_csv_bytes(rows, keys))
+    write_bytes_to_file(write_utf8_csv_bytes(rows, keys), csv_file_name)
 
 def comma_join(val_list):
     """
@@ -156,11 +155,24 @@ def make_dirs_for_file(file_name):
     if not os.access(dir, os.F_OK):
         os.makedirs(dir)
 
+def write_bytes_to_file(out_bytes, out_file_name):
+    """Write some bytes to a file, but not if it would be unchanged."""
+    make_dirs_for_file(out_file_name)
+    if os.access(out_file_name, os.F_OK):
+        with open(out_file_name, 'rb') as in_file:
+            content = in_file.read()
+        if content == out_bytes:
+            return
+    with open(out_file_name, 'wb') as out_file:
+        out_file.write(out_bytes)
+
 def write_text_to_file(out_text, out_file_name):
     """Write some UTF-8 text to a file (without BOM)."""
-    make_dirs_for_file(out_file_name)
-    with open(out_file_name, 'w', **_text_open_args) as out_file:
-        out_file.write(out_text)
+    if _py3:
+        out_bytes = out_text.encode(encoding='utf-8')
+    else:
+        out_bytes = out_text
+    write_bytes_to_file(out_bytes, out_file_name)
 
 def read_text_from_file(file_name):
     """Read the UTF-8 (no BOM) text contents of a file."""

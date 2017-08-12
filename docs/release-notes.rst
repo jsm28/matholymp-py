@@ -81,6 +81,10 @@ Next version (unreleased)
   from a single page.  The example :file:`page.html` is updated
   accordingly, and a new :file:`person.rooms.html` is added.
 
+* :command:`mo-static-generate` no longer writes output files if their
+  contents would be unchanged, to support dependency-based
+  postprocessing of its output.
+
 Version 2017.05.0 (1 May 2017)
 ------------------------------
 
