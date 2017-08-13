@@ -39,8 +39,8 @@ from matholymp.fileutil import comma_split, boolean_states
 from matholymp.roundupreg.rounduputil import distinguish_official, \
     have_consent_forms, have_passport_numbers, have_nationality, \
     get_num_problems, get_marks_per_problem, scores_from_str, \
-    person_date_of_birth, contestant_age, db_file_extension, \
-    db_private_file_extension
+    get_language_numbers, person_date_of_birth, contestant_age, \
+    db_file_extension, db_private_file_extension
 
 __all__ = ['RoundupDataSource']
 
@@ -212,13 +212,15 @@ class RoundupDataSource(DataSource):
                                                           consent_form_id)
             return consent_form_filename
         elif name == 'languages':
-            first_language = self._db.person.get(id, 'first_language')
-            first_language_name = self._db.language.get(first_language, 'name')
-            second_language = self._db.person.get(id, 'second_language')
-            if second_language is None or second_language == first_language:
-                return [first_language_name]
-            return [first_language_name,
-                    self._db.language.get(second_language, 'name')]
+            ret = []
+            langs = set()
+            for i in get_language_numbers(self._db):
+                lang = self._db.person.get(id, 'language_%d' % i)
+                if lang is not None and lang not in langs:
+                    langs.add(lang)
+                    lang_name = self._db.language.get(lang, 'name')
+                    ret.append(lang_name)
+            return ret
         elif name == 'diet':
             return self._db.person.get(id, 'diet') or None
         elif name == 'room_number':

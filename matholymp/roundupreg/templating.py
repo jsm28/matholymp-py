@@ -58,11 +58,12 @@ from matholymp.roundupreg.cache import cached_text
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import distinguish_official, \
     get_consent_forms_date, have_consent_forms, have_passport_numbers, \
-    have_nationality, require_diet, require_dob, get_earliest_date_of_birth, \
-    get_sanity_date_of_birth, person_date_of_birth, contestant_age, \
-    get_arrdep_bounds, normal_country_person, person_is_contestant, \
-    contestant_code, pn_score, scores_final, any_scores_missing, \
-    country_has_contestants, valid_country_problem
+    have_nationality, require_diet, require_dob, get_language_numbers, \
+    get_earliest_date_of_birth, get_sanity_date_of_birth, \
+    person_date_of_birth, contestant_age, get_arrdep_bounds, \
+    normal_country_person, person_is_contestant, contestant_code, pn_score, \
+    scores_final, any_scores_missing, country_has_contestants, \
+    valid_country_problem
 
 def people_from_country_internal(db, country):
     """
@@ -343,7 +344,7 @@ def arrdep_time_select(db, kind, hour, minute):
 def required_person_fields(db):
     """Return the list of fields required for registered people."""
     req = ['country', 'given_name', 'family_name', 'gender', 'primary_role',
-           'first_language', 'tshirt']
+           'language_1', 'tshirt']
     if require_dob(db):
         req.append('date_of_birth_year')
         req.append('date_of_birth_month')
@@ -364,6 +365,7 @@ def register_templating_utils(instance):
     instance.registerUtil('have_nationality', have_nationality)
     instance.registerUtil('require_diet', require_diet)
     instance.registerUtil('require_dob', require_dob)
+    instance.registerUtil('get_language_numbers', get_language_numbers)
     instance.registerUtil('normal_country_person', normal_country_person)
     instance.registerUtil('person_is_contestant', person_is_contestant)
     instance.registerUtil('people_from_country', people_from_country)

@@ -214,7 +214,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
                                  'No primary role specified')
 
     # A first language must be specified.
-    require_value(db, cl, nodeid, newvalues, 'first_language',
+    require_value(db, cl, nodeid, newvalues, 'language_1',
                   'No first language specified')
 
     # A T-shirt size must be specified.

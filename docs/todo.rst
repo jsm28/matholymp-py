@@ -316,9 +316,6 @@ The following ideas are more speculative.
 * Support logical role ordering within countries rather than only
   alphabetical.
 
-* Allow people to have a configurable maximum number of languages,
-  rather than hardcoded two as at present.
-
 * Add a public list of country contacts.  Or a private list for future
   hosts, or both with support for different contacts on the two lists.
   Add support for editing contacts that affects future years as well.
@@ -345,3 +342,5 @@ Document generation
   and accented characters in documents).
 
 * Add borders round flags on name badges (and website?).
+
+* Allow labels for contestant desks to show more than two languages.

@@ -47,6 +47,10 @@ so, run :command:`mo-static-generate`.
 Next version (unreleased)
 -------------------------
 
+Because of changes to how data is represented in the registration
+system, upgrades to this version can only be made between events when
+the registration system is not active.
+
 * Static site generation now supports different events having
   different descriptions of the day for which contestant ages are
   given.  If the CSV file of events has a column ``Age Day
@@ -84,6 +88,15 @@ Next version (unreleased)
 * :command:`mo-static-generate` no longer writes output files if their
   contents would be unchanged, to support dependency-based
   postprocessing of its output.
+
+* The registration system now supports a configurable number of
+  languages being registered for each participant, rather than the
+  previous hardcoded two languages.  The new configuration variable
+  ``matholymp_num_languages`` must be specified in
+  :file:`extensions/config.ini` for the registration system.
+  :file:`person.item.html` is updated accordingly.  The first language
+  must be specified; the others are optional.  Labels for contestant
+  desks only list at most two languages.
 
 Version 2017.05.0 (1 May 2017)
 ------------------------------

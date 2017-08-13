@@ -46,14 +46,14 @@ __all__ = ['distinguish_official', 'get_consent_forms_date_str',
            'get_consent_forms_date', 'have_consent_forms',
            'have_passport_numbers', 'have_nationality', 'require_diet',
            'require_dob', 'get_num_problems', 'get_marks_per_problem',
-           'scores_from_str', 'get_earliest_date_of_birth',
-           'get_sanity_date_of_birth', 'get_earliest_date_of_birth_contestant',
-           'person_date_of_birth', 'contestant_age', 'get_arrdep_bounds',
-           'get_staff_country_name', 'normal_country_person',
-           'person_is_contestant', 'contestant_code', 'pn_score',
-           'scores_final', 'any_scores_missing', 'country_has_contestants',
-           'valid_country_problem', 'valid_score', 'create_rss',
-           'db_file_format_contents', 'db_file_extension',
+           'scores_from_str', 'get_num_languages', 'get_language_numbers',
+           'get_earliest_date_of_birth', 'get_sanity_date_of_birth',
+           'get_earliest_date_of_birth_contestant', 'person_date_of_birth',
+           'contestant_age', 'get_arrdep_bounds', 'get_staff_country_name',
+           'normal_country_person', 'person_is_contestant', 'contestant_code',
+           'pn_score', 'scores_final', 'any_scores_missing',
+           'country_has_contestants', 'valid_country_problem', 'valid_score',
+           'create_rss', 'db_file_format_contents', 'db_file_extension',
            'db_private_file_format_contents', 'db_private_file_extension']
 
 def distinguish_official(db):
@@ -136,6 +136,14 @@ def scores_from_str(db, score_str):
                                  ' scores entered: %s' % scores[i])
         scores = scores[0:num_problems]
     return scores
+
+def get_num_languages(db):
+    """Return the maximum number of languages for a person at this event."""
+    return int(db.config.ext['MATHOLYMP_NUM_LANGUAGES'])
+
+def get_language_numbers(db):
+    """Return the numbers of language database properties for a person."""
+    return range(1, get_num_languages(db) + 1)
 
 def get_earliest_date_of_birth(db):
     """Return the earliest date of birth allowed for any participant."""

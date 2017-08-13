@@ -55,7 +55,8 @@
 """This module provides the Roundup registration schema."""
 
 from matholymp.roundupreg.rounduputil import distinguish_official, \
-    have_consent_forms, have_passport_numbers, have_nationality
+    have_consent_forms, have_passport_numbers, have_nationality, \
+    get_language_numbers
 
 __all__ = ['init_schema']
 
@@ -134,6 +135,8 @@ def init_schema(env):
         person_extra['passport_number'] = String()
     if have_nationality(db):
         person_extra['nationality'] = String()
+    for i in get_language_numbers(db):
+        person_extra['language_%d' % i] = Link('language')
     person=Class(db, 'person',
                  country=Link('country'),
                  given_name=String(),
@@ -145,8 +148,6 @@ def init_schema(env):
                  primary_role=Link('matholymprole'),
                  other_roles=Multilink('matholymprole'),
                  guide_for=Multilink('country'),
-                 first_language=Link('language'),
-                 second_language=Link('language'),
                  diet=String(),
                  tshirt=Link('tshirt'),
                  arrival_place=Link('arrival'),
@@ -263,8 +264,8 @@ def init_schema(env):
     db.security.addPermissionToRole('Register', p)
     person_reg_props = ['country', 'given_name', 'family_name', 'gender',
                         'date_of_birth_year', 'date_of_birth_month',
-                        'date_of_birth_day', 'primary_role', 'first_language',
-                        'second_language', 'diet', 'tshirt', 'arrival_place',
+                        'date_of_birth_day', 'primary_role',
+                        'diet', 'tshirt', 'arrival_place',
                         'arrival_date', 'arrival_time_hour',
                         'arrival_time_minute', 'arrival_flight',
                         'departure_place', 'departure_date',
@@ -277,6 +278,8 @@ def init_schema(env):
         person_reg_props.append('passport_number')
     if have_nationality(db):
         person_reg_props.append('nationality')
+    for i in get_language_numbers(db):
+        person_reg_props.append('language_%d' % i)
     p = db.security.addPermission(name='Edit', klass='person',
                                   check=own_country_person,
                                   properties=person_reg_props)
