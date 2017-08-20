@@ -259,6 +259,12 @@ class RoundupDataSource(DataSource):
                 return None
             else:
                 return self._db.arrival.get(arrival_place, 'name')
+        elif name == 'arrival_is_airport':
+            arrival_place = self._db.person.get(id, 'arrival_place')
+            if arrival_place is None:
+                return False
+            else:
+                return self._db.arrival.get(arrival_place, 'isairport')
         elif name == 'arrival_date':
             date = self._db.person.get(id, 'arrival_date')
             if date is None:
@@ -280,6 +286,12 @@ class RoundupDataSource(DataSource):
                 return None
             else:
                 return self._db.arrival.get(departure_place, 'name')
+        elif name == 'departure_is_airport':
+            departure_place = self._db.person.get(id, 'departure_place')
+            if departure_place is None:
+                return False
+            else:
+                return self._db.arrival.get(departure_place, 'isairport')
         elif name == 'departure_date':
             date = self._db.person.get(id, 'departure_date')
             if date is None:

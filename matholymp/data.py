@@ -1454,6 +1454,10 @@ class PersonEvent(object):
         'arrival_place',
         """The arrival place of this person at this event.""")
 
+    arrival_is_airport = _PersonEventPropertyDS(
+        'arrival_is_airport',
+        """Whether this person is arriving at an airport at this event.""")
+
     arrival_date = _PersonEventPropertyDS(
         'arrival_date',
         """The arrival date of this person at this event.""")
@@ -1469,6 +1473,10 @@ class PersonEvent(object):
     departure_place = _PersonEventPropertyDS(
         'departure_place',
         """The departure place of this person at this event.""")
+
+    departure_is_airport = _PersonEventPropertyDS(
+        'departure_is_airport',
+        """Whether this person is departing from an airport at this event.""")
 
     departure_date = _PersonEventPropertyDS(
         'departure_date',

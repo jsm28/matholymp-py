@@ -125,7 +125,8 @@ def init_schema(env):
     language.setkey('name')
 
     arrival = Class(db, 'arrival',
-                    name=String())
+                    name=String(),
+                    isairport=Boolean())
     arrival.setkey('name')
 
     person_extra = {}

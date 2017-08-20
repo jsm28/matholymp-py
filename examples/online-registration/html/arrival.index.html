@@ -16,6 +16,7 @@
 <table width="100%" tal:condition="context/is_view_ok" class="list">
 <tr>
  <th i18n:translate="">Name</th>
+ <th i18n:translate="">Airport?</th>
 </tr>
 <tal:block repeat="arrival context/list">
 <tr tal:attributes="class python:['normal', 'alt'][repeat['arrival'].index%6/3]">
@@ -23,6 +24,7 @@
   <a tal:attributes="href string:arrival${arrival/id}"
      tal:content="arrival/name">name</a>
  </td>
+ <td tal:content="python:arrival.isairport.plain()">&nbsp;</td>
 </tr>
 </tal:block>
 </table>

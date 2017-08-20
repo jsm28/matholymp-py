@@ -237,10 +237,10 @@ class RegSiteGenerator(SiteGenerator):
               p.departure_time is None):
             have_travel_details = False
         else:
-            if 'Airport' in p.arrival_place:
+            if p.arrival_is_airport:
                 if p.arrival_flight is None:
                     have_travel_details = False
-            if 'Airport' in p.departure_place:
+            if p.departure_is_airport:
                 if p.departure_flight is None:
                     have_travel_details = False
         if not have_travel_details:

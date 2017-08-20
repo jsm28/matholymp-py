@@ -235,11 +235,6 @@ Registration system
   explanatory text about missing phone numbers.  (More complicated if
   allowed for non-staff participants as well as staff.)
 
-* Use database to describe which arrival points are airports rather
-  than hardcoding reference to ``Airport`` text.  (Need to pass
-  information through to CSV files so registration status generation
-  can work from those.)
-
 * Support for sending emails to registration contacts with reminders
   about missing data, and summaries of present data.
 

@@ -98,6 +98,11 @@ the registration system is not active.
   must be specified; the others are optional.  Labels for contestant
   desks only list at most two languages.
 
+* Information about which arrival / departure points are airports (and
+  so should have flight numbers entered when registering participants)
+  is now entered and stored explicitly in the registration system,
+  rather than being based on whether the name contains ``Airport``.
+
 Version 2017.05.0 (1 May 2017)
 ------------------------------
 

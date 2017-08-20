@@ -57,6 +57,15 @@ define="edit_ok context/is_edit_ok"
   <th class="required" metal:use-macro="th_label">Name</th>
   <td><input name="name" metal:use-macro="normal_input"></td>
  </tr>
+ <tr tal:define="name string:isairport; label string:Is this arrival point an airport?; value context/isairport; edit_ok edit_ok">
+  <th class="required" metal:use-macro="th_label">Is this arrival point an airport?</th>
+  <tal:if condition="context/id">
+   <td tal:content="structure context/isairport/field">airport</td>
+  </tal:if>
+  <tal:if condition="not:context/id">
+   <td><input type="radio" checked="checked" name="isairport" value="yes">Yes<input type="radio" name="isairport" value="no">No</td>
+  </tal:if>
+ </tr>
 
  <tr tal:condition="edit_ok">
   <td>
