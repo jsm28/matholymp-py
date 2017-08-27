@@ -719,9 +719,12 @@ class Event(object):
     def _get_people_by_room(self):
         r = {}
         for p in self.person_list:
-            if p.room_number not in r:
-                r[p.room_number] = []
-            r[p.room_number].append(p)
+            room = p.room_number
+            if room is None:
+                room = ''
+            if room not in r:
+                r[room] = []
+            r[room].append(p)
         return r
 
     people_by_room = _PropertyCached(
