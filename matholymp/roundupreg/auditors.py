@@ -413,10 +413,10 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     guide_for = get_new_value(db, cl, nodeid, newvalues, 'guide_for')
     if guide_for is None:
         guide_for = []
-    guide = db.matholymprole.lookup('Guide')
+    can_guide = db.matholymprole.get(primary_role, 'canguide')
     for c in guide_for:
-        if primary_role != guide:
-            raise ValueError('Only normal Guides may guide a country')
+        if not can_guide:
+            raise ValueError('People with this role may not guide a country')
         if not db.country.get(c, 'is_normal'):
             raise ValueError('May only guide normal countries')
 

@@ -18,6 +18,7 @@
  <th i18n:translate="">Name</th>
  <th i18n:translate="">Administrative?</th>
  <th i18n:translate="">Secondary for non-staff?</th>
+ <th i18n:translate="">Can guide countries?</th>
 </tr>
 <tal:block repeat="matholymprole context/list">
 <tr tal:attributes="class python:['normal', 'alt'][repeat['matholymprole'].index%6/3]">
@@ -27,6 +28,7 @@
  </td>
  <td tal:content="python:matholymprole.isadmin.plain()">&nbsp;</td>
  <td tal:content="python:matholymprole.secondaryok.plain()">&nbsp;</td>
+ <td tal:content="python:matholymprole.canguide.plain()">&nbsp;</td>
 </tr>
 </tal:block>
 </table>

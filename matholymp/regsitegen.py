@@ -246,7 +246,7 @@ class RegSiteGenerator(SiteGenerator):
         if not have_travel_details:
             missing_list.append('travel details')
 
-        if p.primary_role == 'Guide' and p.phone_number is None:
+        if p.guide_for and p.phone_number is None:
             missing_list.append('phone number')
 
         return missing_list

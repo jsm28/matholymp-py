@@ -107,7 +107,8 @@ def init_schema(env):
     matholymprole = Class(db, 'matholymprole',
                           name=String(),
                           isadmin=Boolean(),
-                          secondaryok=Boolean())
+                          secondaryok=Boolean(),
+                          canguide=Boolean())
     matholymprole.setkey('name')
 
     gender = Class(db, 'gender',

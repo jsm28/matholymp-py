@@ -305,7 +305,7 @@ class DocumentGenerator(object):
         if not country.is_normal:
             is_staff = True
             if (self._cfg['show_countries_for_guides'] and
-                primary_role == 'Guide'):
+                person.guide_for):
                 is_non_guide_staff = not self._cfg['show_rooms_for_guides']
                 country_list = sorted(person.guide_for,
                                       key=lambda x:x.sort_key)

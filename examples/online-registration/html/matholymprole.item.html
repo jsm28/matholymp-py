@@ -75,12 +75,21 @@ define="edit_ok context/is_edit_ok"
    <td><input type="radio" name="secondaryok" value="yes">Yes<input type="radio" checked="checked" name="secondaryok" value="no">No</td>
   </tal:if>
  </tr>
+ <tr tal:define="name string:canguide; label string:Can guide countries?; value context/canguide; edit_ok edit_ok">
+  <th class="required" metal:use-macro="th_label">Can guide countries?</th>
+  <tal:if condition="context/id">
+   <td tal:content="structure context/canguide/field">guide</td>
+  </tal:if>
+  <tal:if condition="not:context/id">
+   <td><input type="radio" name="canguide" value="yes">Yes<input type="radio" checked="checked" name="canguide" value="no">No</td>
+  </tal:if>
+ </tr>
 
  <tr tal:condition="edit_ok">
   <td>
    &nbsp;
    <input type="hidden" name="@template" value="item">
-   <input type="hidden" name="@required" value="name,isadmin,secondaryok"
+   <input type="hidden" name="@required" value="name,isadmin,secondaryok,canguide"
           tal:attributes="value python:','.join(required)">
   </td>
   <td><input type="submit" value="save" tal:replace="structure context/submit"><!--submit button here-->

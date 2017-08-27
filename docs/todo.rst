@@ -231,9 +231,10 @@ Registration system
   registration status generation can work from those.)
 
 * Allow other options for which roles are (initially) expected to have
-  phone numbers instead of just Guides; this also affects the
-  explanatory text about missing phone numbers.  (More complicated if
-  allowed for non-staff participants as well as staff.)
+  phone numbers instead of just participants guiding countries; this
+  also affects the explanatory text about missing phone numbers.
+  (More complicated if allowed for non-staff participants as well as
+  staff.)
 
 * Support for sending emails to registration contacts with reminders
   about missing data, and summaries of present data.

@@ -106,39 +106,53 @@ def init_data(env):
     matholymprole = db.getclass('matholymprole')
     for i in range(int(db.config.ext['MATHOLYMP_NUM_CONTESTANTS_PER_TEAM'])):
         rolename = 'Contestant %d' % (i + 1)
-        matholymprole.create(name=rolename, isadmin=False, secondaryok=False)
-    matholymprole.create(name='Leader', isadmin=False, secondaryok=False)
+        matholymprole.create(name=rolename, isadmin=False, secondaryok=False,
+                             canguide=False)
+    matholymprole.create(name='Leader', isadmin=False, secondaryok=False,
+                         canguide=False)
     matholymprole.create(name='Deputy Leader', isadmin=False,
-                         secondaryok=False)
+                         secondaryok=False, canguide=False)
     matholymprole.create(name='Observer with Contestants', isadmin=False,
-                         secondaryok=False)
+                         secondaryok=False, canguide=False)
     matholymprole.create(name='Observer with Leader', isadmin=False,
-                         secondaryok=False)
+                         secondaryok=False, canguide=False)
     matholymprole.create(name='Observer with Deputy', isadmin=False,
-                         secondaryok=False)
-    matholymprole.create(name='Staff', isadmin=True, secondaryok=False)
-    matholymprole.create(name='Jury Chair', isadmin=True, secondaryok=False)
+                         secondaryok=False, canguide=False)
+    matholymprole.create(name='Staff', isadmin=True, secondaryok=False,
+                         canguide=False)
+    matholymprole.create(name='Jury Chair', isadmin=True, secondaryok=False,
+                         canguide=False)
     matholymprole.create(name='Chief Coordinator', isadmin=True,
-                         secondaryok=False)
-    matholymprole.create(name='Coordinator', isadmin=True, secondaryok=False)
-    matholymprole.create(name='Chief Guide', isadmin=True, secondaryok=False)
+                         secondaryok=False, canguide=False)
+    matholymprole.create(name='Coordinator', isadmin=True, secondaryok=False,
+                         canguide=False)
+    matholymprole.create(name='Chief Guide', isadmin=True, secondaryok=False,
+                         canguide=False)
     matholymprole.create(name='Deputy Chief Guide', isadmin=True,
-                         secondaryok=False)
-    matholymprole.create(name='Guide', isadmin=True, secondaryok=False)
-    matholymprole.create(name='Treasurer', isadmin=True, secondaryok=False)
-    matholymprole.create(name='IT', isadmin=True, secondaryok=False)
-    matholymprole.create(name='Transport', isadmin=True, secondaryok=False)
-    matholymprole.create(name='Entertainment', isadmin=True, secondaryok=False)
-    matholymprole.create(name='Logistics', isadmin=True, secondaryok=False)
+                         secondaryok=False, canguide=False)
+    matholymprole.create(name='Guide', isadmin=True, secondaryok=False,
+                         canguide=True)
+    matholymprole.create(name='Treasurer', isadmin=True, secondaryok=False,
+                         canguide=False)
+    matholymprole.create(name='IT', isadmin=True, secondaryok=False,
+                         canguide=False)
+    matholymprole.create(name='Transport', isadmin=True, secondaryok=False,
+                         canguide=False)
+    matholymprole.create(name='Entertainment', isadmin=True, secondaryok=False,
+                         canguide=False)
+    matholymprole.create(name='Logistics', isadmin=True, secondaryok=False,
+                         canguide=False)
     matholymprole.create(name='Problem Selection Chair', isadmin=True,
-                         secondaryok=False)
+                         secondaryok=False, canguide=False)
     matholymprole.create(name='Problem Selection', isadmin=True,
-                         secondaryok=False)
+                         secondaryok=False, canguide=False)
     matholymprole.create(name='Chief Invigilator', isadmin=True,
-                         secondaryok=False)
-    matholymprole.create(name='Invigilator', isadmin=True, secondaryok=False)
+                         secondaryok=False, canguide=False)
+    matholymprole.create(name='Invigilator', isadmin=True, secondaryok=False,
+                         canguide=False)
     for r in extra_admin_roles_secondaryok:
-        matholymprole.create(name=r, isadmin=True, secondaryok=True)
+        matholymprole.create(name=r, isadmin=True, secondaryok=True,
+                             canguide=False)
 
     # Create three genders.
     gender = db.getclass('gender')
