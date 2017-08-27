@@ -102,6 +102,8 @@ the registration system is not active.
   so should have flight numbers entered when registering participants)
   is now entered and stored explicitly in the registration system,
   rather than being based on whether the name contains ``Airport``.
+  :file:`arrival.index.html` and :file:`arrival.item.html` are updated
+  accordingly.
 
 Version 2017.05.0 (1 May 2017)
 ------------------------------
