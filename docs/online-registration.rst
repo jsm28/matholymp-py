@@ -124,7 +124,7 @@ distribution, or an adapted version thereof.
 Set up Apache to provide SSL access (and no unencrypted access, to
 avoid issues with logins over unencrypted connections) to the site.
 Enable `mod_proxy
-<http://httpd.apache.org/docs/current/mod/mod_proxy.html>`_, but only
+<https://httpd.apache.org/docs/current/mod/mod_proxy.html>`_, but only
 as a reverse proxy, not as a forward proxy (that is, ``ProxyRequests
 Off``).  Set it up to forward requests for appropriate URLs to the
 internal server; inside the relevant ``VirtualHost``, put something
