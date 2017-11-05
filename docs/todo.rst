@@ -217,6 +217,9 @@ Registration system
   capacities of available rooms and which rooms should have people in
   which roles.
 
+* Support upload of sound files with pronunciation of participant
+  names.
+
 * Support other registration information (e.g., passport scan) where
   useful.
 
