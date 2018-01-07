@@ -113,6 +113,11 @@ the registration system is not active.
   country).  :file:`matholymprole.index.html` and
   :file:`matholymprole.item.html` are updated accordingly.
 
+* The example :file:`country.index.html` and :file:`person.index.html`
+  for the registration system no longer link to ZIP files of flags and
+  photos, so matching the lists in the static site which does not have
+  such ZIP files, unless logged in administratively.
+
 Version 2017.05.0 (1 May 2017)
 ------------------------------
 

@@ -17,8 +17,11 @@
 
 <p tal:condition="context/is_view_ok">The details of registered people
   may also be <a href="person?@action=people_csv">downloaded in UTF-8
-  CSV format</a>, and a <a href="person?@action=photos_zip">ZIP file
-  of participant photos</a> is available.</p>
+  CSV format</a>.</p>
+
+<p tal:condition="python:request.user.hasPermission('Omnivident')">A
+  <a href="person?@action=photos_zip">ZIP file of participant
+  photos</a> is also available.</p>
 
 <p tal:condition="python:utils.have_consent_forms(db._db) and
   request.user.hasPermission('Omnivident')">A

@@ -13,10 +13,17 @@
  and request.user.hasRole('Anonymous')"
  i18n:translate="">Please login with your username and password.</span>
 
-<p tal:condition="context/is_view_ok">The list of countries may also
-  be <a href="country?@action=country_csv">downloaded in UTF-8 CSV
-  format</a>, and a <a href="country?@action=flags_zip">ZIP file of
-  country flags</a> is available.</p>
+<span tal:condition="context/is_view_ok">
+
+<p>The list of countries may also be
+  <a href="country?@action=country_csv">downloaded in UTF-8 CSV
+  format</a>.</p>
+
+<p tal:condition="python:request.user.hasPermission('Omnivident')">A
+  <a href="country?@action=flags_zip">ZIP file of country flags</a> is
+  also available.</p>
+
+</span>
 
 <table width="100%" tal:condition="context/is_view_ok" class="list">
 <tr>
