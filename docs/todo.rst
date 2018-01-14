@@ -243,7 +243,9 @@ Registration system
   about missing data, and summaries of present data.
 
 * Add automation for bulk creation of countries in registration system
-  from command line.
+  from command line (or web interface).
+
+* Support for more than one contact email address for a country.
 
 * Support bulk upload of other registration details.
 
