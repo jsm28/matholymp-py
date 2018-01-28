@@ -290,16 +290,12 @@ been approved (and once any known corrections to participant names or
 other public details have been entered in the registration system).
 Ensure that the data for the relevant event in :file:`{event}s.csv` is
 complete, including the number of problems, the maximum number of
-marks for each problem and the medal boundaries.  Download the
-following files from the registration system, while not logged in
-administratively, and put them in a directory (*input-directory*
-below) outside the website: the list of countries
-(:file:`countries.csv`), the list of people (:file:`people.csv`), the
-ZIP file of flags (:file:`flags.zip`), the ZIP file of participant
-photos (:file:`photos.zip`), the RSS feed of scores (save it as
-:file:`scores-rss.xml`).  (The ZIP files do not need to be unpacked;
-if they are, the directories :file:`flags/` and :file:`photos/` will
-be used instead of the ZIP files.)  Then:
+marks for each problem and the medal boundaries.  Choose a directory
+(*input-directory* below) outside the website for
+:command:`mo-static-import` to download files into.  Make sure that
+``event_active_number`` is set in :file:`staticsite.cfg`; that is
+required for :command:`mo-static-import` to download files
+automatically.  Then:
 
 .. parsed-literal::
 
@@ -316,6 +312,26 @@ the static site, you may add them to your Apache configuration after
 regenerating the site.  Before doing this, make sure that anyone using
 the registration data administratively (e.g., to plan airport
 connections for departures) has all the data they need from the site.
+
+It is also possible to run :command:`mo-static-import` with files
+downloaded manually from the registration system rather than having it
+download them automatically.  To do so, download the following files
+from the registration system (the list of people must be downloaded
+while not logged in administratively), and put them in the directory
+*input-directory*: the list of countries (:file:`countries.csv`), the
+list of people (:file:`people.csv`), the ZIP file of flags
+(:file:`flags.zip`), the ZIP file of participant photos
+(:file:`photos.zip`), the RSS feed of scores (save it as
+:file:`scores-rss.xml`).  (The ZIP files do not need to be unpacked;
+if they are, the directories :file:`flags/` and :file:`photos/` will
+be used instead of the ZIP files.)  Any files already present in that
+directory will be used by :command:`mo-static-import` in preference to
+downloading files automatically.
+
+.. warning::
+
+   Python versions before 2.7.9, 3.4.3 and 3.5 do not check for TLS
+   certificate validity when downloading data from https URLs.
 
 Removing a photo
 ^^^^^^^^^^^^^^^^

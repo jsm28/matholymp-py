@@ -163,7 +163,9 @@ Static site
   (including medal boundaries, via the medal_boundaries_csv action),
   and setting medal boundaries, so just running
   :command:`mo-static-import` with no arguments does everything needed
-  after an event to transfer data to the static site.
+  after an event to transfer data to the static site.  At present, it
+  can download most data, but not medal boundaries, and requires a
+  directory to be specified explicitly.
 
 * Make :command:`mo-static-import` and
   :command:`mo-static-papers-import` support automatically running

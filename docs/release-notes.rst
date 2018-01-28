@@ -59,7 +59,9 @@ the registration system is not active.
 
 * :command:`mo-static-import` can now work directly with the ZIP files
   of flags and photos from the registration system, instead of
-  requiring you to unpack them manually.
+  requiring you to unpack them manually, and can automatically
+  download from the registration system any files not present in the
+  directory specified.
 
 * :command:`mo-static-import` now sets ``event_active_number`` to
   empty in :file:`staticsite.cfg` if it was previously set to the

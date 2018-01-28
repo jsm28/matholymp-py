@@ -31,20 +31,21 @@
 The mo-static-import script imports CSV files and images from the
 registration system to the static site, after an event has finished.
 The argument is the directory with the files to import.  This
-directory should contain files countries.csv, people.csv (the file
+directory may contain files countries.csv, people.csv (the file
 downloaded when not logged in, so only including public information)
 and scores-rss.xml (the final RSS feed of all scores), and either
 files flags.zip and photos.zip or subdirectories flags and photos from
-unpacking those files from the registration system.  The
-data/<event>s.csv file needs updating manually to include all relevant
-data (in particular, the number of problems, the maximum marks for
-each problem and the medal boundaries); this may be done before or
-after running mo-static-import.  Once <event>s.csv has been updated
-and mo-static-import has been run, mo-static-generate needs to be run
-to update the site to reflect the newly imported data.  As with
-mo-static-generate, mo-static-import should be run with the toplevel
-directory for the website, containing the file staticsite.cfg, as its
-working directory.
+unpacking those files from the registration system; where a file or
+corresponding directory is not present, it will be downloaded
+automatically.  The data/<event>s.csv file needs updating manually to
+include all relevant data (in particular, the number of problems, the
+maximum marks for each problem and the medal boundaries); this may be
+done before or after running mo-static-import.  Once <event>s.csv has
+been updated and mo-static-import has been run, mo-static-generate
+needs to be run to update the site to reflect the newly imported data.
+As with mo-static-generate, mo-static-import should be run with the
+toplevel directory for the website, containing the file
+staticsite.cfg, as its working directory.
 """
 
 import argparse
@@ -52,38 +53,83 @@ import os
 import os.path
 import re
 import shutil
+import sys
+_py3 = sys.version_info.major >= 3
 import tempfile
+if _py3:
+    import urllib.request
+    _urlretrieve = urllib.request.urlretrieve
+else:
+    import urllib
+    _urlretrieve = urllib.urlretrieve
 import zipfile
 
 import matholymp
 from matholymp.fileutil import read_utf8_csv, write_utf8_csv, \
     make_dirs_for_file, write_text_to_file, read_text_from_file, file_extension
 from matholymp.regdata import file_url_to_local
-from matholymp.sitegen import read_sitegen_config, sitegen_countries_csv, \
-    sitegen_people_csv
+from matholymp.sitegen import read_sitegen_config, sitegen_events_csv, \
+    sitegen_countries_csv, sitegen_people_csv
 
 __all__ = ['main']
 
 def _import_from_dir(top_directory, input_directory, temp_dir):
+    cfg_data = read_sitegen_config(top_directory)
+    events_csv = sitegen_events_csv(top_directory, cfg_data)
+    countries_csv = sitegen_countries_csv(top_directory, cfg_data)
+    people_csv = sitegen_people_csv(top_directory, cfg_data)
+    event_active_number = cfg_data['event_active_number']
+    reg_url = None
+    if event_active_number is not None:
+        events_data = read_utf8_csv(events_csv)
+        for e in events_data:
+            eid = int(e['Number'])
+            if eid == event_active_number:
+                if reg_url is not None:
+                    raise ValueError('duplicate event %d' % eid)
+                reg_url = '%sregistration/%s/' % (cfg_data['url_base'],
+                                                  e['Year'])
+
     input_countries_csv = os.path.join(input_directory, 'countries.csv')
+    if not os.access(input_countries_csv, os.F_OK):
+        if reg_url is None:
+            raise ValueError('downloading data for unknown event')
+        _urlretrieve(reg_url + 'country?@action=country_csv',
+                     input_countries_csv)
     input_people_csv = os.path.join(input_directory, 'people.csv')
+    if not os.access(input_people_csv, os.F_OK):
+        if reg_url is None:
+            raise ValueError('downloading data for unknown event')
+        _urlretrieve(reg_url + 'person?@action=people_csv',
+                     input_people_csv)
     input_flags_dir = os.path.join(input_directory, 'flags')
     if not os.access(input_flags_dir, os.F_OK):
-        with zipfile.ZipFile(os.path.join(input_directory, 'flags.zip'),
-                             'r') as z:
+        input_flags_zip = os.path.join(input_directory, 'flags.zip')
+        if not os.access(input_flags_zip, os.F_OK):
+            if reg_url is None:
+                raise ValueError('downloading data for unknown event')
+            _urlretrieve(reg_url + 'country?@action=flags_zip',
+                         input_flags_zip)
+        with zipfile.ZipFile(input_flags_zip, 'r') as z:
             z.extractall(temp_dir)
         input_flags_dir = os.path.join(temp_dir, 'flags')
     input_photos_dir = os.path.join(input_directory, 'photos')
     if not os.access(input_photos_dir, os.F_OK):
-        with zipfile.ZipFile(os.path.join(input_directory, 'photos.zip'),
-                             'r') as z:
+        input_photos_zip = os.path.join(input_directory, 'photos.zip')
+        if not os.access(input_photos_zip, os.F_OK):
+            if reg_url is None:
+                raise ValueError('downloading data for unknown event')
+            _urlretrieve(reg_url + 'person?@action=photos_zip',
+                         input_photos_zip)
+        with zipfile.ZipFile(input_photos_zip, 'r') as z:
             z.extractall(temp_dir)
         input_photos_dir = os.path.join(temp_dir, 'photos')
     input_scores_rss = os.path.join(input_directory, 'scores-rss.xml')
-
-    cfg_data = read_sitegen_config(top_directory)
-    countries_csv = sitegen_countries_csv(top_directory, cfg_data)
-    people_csv = sitegen_people_csv(top_directory, cfg_data)
+    if not os.access(input_scores_rss, os.F_OK):
+        if reg_url is None:
+            raise ValueError('downloading data for unknown event')
+        _urlretrieve(reg_url + 'person?@action=scores_rss',
+                     input_scores_rss)
 
     max_num_problems = 0
     event_number = None
@@ -211,7 +257,7 @@ def _import_from_dir(top_directory, input_directory, temp_dir):
     make_dirs_for_file(rss_dst_filename)
     shutil.copyfile(input_scores_rss, rss_dst_filename)
 
-    if cfg_data['event_active_number'] == int(event_number):
+    if event_active_number == int(event_number):
         static_cfg = os.path.join(top_directory, 'staticsite.cfg')
         cfg_text = read_text_from_file(static_cfg)
         cfg_text = re.sub('^event_active_number *= *[0-9]*$',
