@@ -109,7 +109,7 @@ the registration system is not active.
 
 * Which staff roles are allowed to be Guides for countries is now
   configured through the registration system database, rather than
-  being harcoded as only the ``Guide`` role.  The default is only the
+  being hardcoded as only the ``Guide`` role.  The default is only the
   ``Guide`` role, but other roles may be edited to allow them to guide
   countries (if, for example, a Deputy Chief Guide is also guiding a
   country).  :file:`matholymprole.index.html` and
