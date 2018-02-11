@@ -59,7 +59,7 @@ def mean_std_dev(data):
 
 def corr_coeff(data):
     """
-    Return the correlation coefficient or a list of pairs of integers,
+    Return the correlation coefficient of a list of pairs of integers,
     or None if either variable is constant.  Pairs containing a value
     None are ignored.
     """
