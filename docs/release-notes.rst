@@ -44,8 +44,8 @@ static site, to update the CSV data files with details of past events
 for any format changes in the new version of matholymp.  After doing
 so, run :command:`mo-static-generate`.
 
-Next version (unreleased)
--------------------------
+Version 2018.02.0 (11 February 2018)
+------------------------------------
 
 Because of changes to how data is represented in the registration
 system, upgrades to this version can only be made between events when
