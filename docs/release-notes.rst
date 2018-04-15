@@ -44,6 +44,13 @@ static site, to update the CSV data files with details of past events
 for any format changes in the new version of matholymp.  After doing
 so, run :command:`mo-static-generate`.
 
+Next version (unreleased)
+-------------------------
+
+* A bug has been fixed in :command:`mo-static-import` where it would
+  download an incorrect file as the RSS feed of scores when
+  downloading files automatically from the registration system.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

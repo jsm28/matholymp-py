@@ -128,7 +128,7 @@ def _import_from_dir(top_directory, input_directory, temp_dir):
     if not os.access(input_scores_rss, os.F_OK):
         if reg_url is None:
             raise ValueError('downloading data for unknown event')
-        _urlretrieve(reg_url + 'person?@action=scores_rss',
+        _urlretrieve(reg_url + 'country?@action=scores_rss',
                      input_scores_rss)
 
     max_num_problems = 0
