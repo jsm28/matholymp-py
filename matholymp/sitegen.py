@@ -1638,7 +1638,7 @@ class SiteGenerator(object):
             text += '<p>Contestant ages are given on %s.</p>\n' % age_text
         elif age_desc_list:
             text += ('<p>Contestant ages are given on %s at each %s.</p>\n' %
-                     (cgi.escape(self._cfg['age_day_desc']),
+                     (cgi.escape(age_desc_list[0][0]),
                       cgi.escape(self._data.short_name)))
         title = cgi.escape(pd.name)
         header = title

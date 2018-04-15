@@ -51,6 +51,12 @@ Next version (unreleased)
   download an incorrect file as the RSS feed of scores when
   downloading files automatically from the registration system.
 
+* A bug has been fixed that caused the static site to have incorrect
+  descriptions of the dates as of which ages are given for contestants
+  who competed in years all of which had the same such description but
+  for which that description was not the one in
+  :file:`staticsite.cfg`.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

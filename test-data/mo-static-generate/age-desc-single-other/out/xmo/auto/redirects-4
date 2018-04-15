@@ -1,0 +1,42 @@
+RewriteCond %{REQUEST_URI} ^/registration/2017/country3$
+RewriteRule ^.* https://www.example.org/xmos/xmo4/countries/country1/? [R=301,L]
+RewriteCond %{REQUEST_URI} ^/registration/2017/country$
+RewriteCond %{QUERY_STRING} ^@action=country_csv$
+RewriteRule ^.* https://www.example.org/xmos/xmo4/countries/countries.csv? [R=301,L]
+RewriteCond %{REQUEST_URI} ^/registration/2017/country$
+RewriteCond %{QUERY_STRING} ^%40action=country_csv$
+RewriteRule ^.* https://www.example.org/xmos/xmo4/countries/countries.csv? [R=301,L]
+RewriteCond %{REQUEST_URI} ^/registration/2017/country$
+RewriteCond %{QUERY_STRING} ^@action=scores_rss$
+RewriteRule ^.* https://www.example.org/xmos/xmo4/scoreboard/rss.xml? [R=301,L]
+RewriteCond %{REQUEST_URI} ^/registration/2017/country$
+RewriteCond %{QUERY_STRING} ^%40action=scores_rss$
+RewriteRule ^.* https://www.example.org/xmos/xmo4/scoreboard/rss.xml? [R=301,L]
+RewriteCond %{REQUEST_URI} ^/registration/2017/country$
+RewriteRule ^.* https://www.example.org/xmos/xmo4/countries/? [R=301,L]
+RewriteCond %{REQUEST_URI} ^/registration/2017/person4$
+RewriteRule ^.* https://www.example.org/people/person4/? [R=301,L]
+RewriteCond %{REQUEST_URI} ^/registration/2017/person5$
+RewriteRule ^.* https://www.example.org/people/person5/? [R=301,L]
+RewriteCond %{REQUEST_URI} ^/registration/2017/person$
+RewriteCond %{QUERY_STRING} ^@template=scoreboard$
+RewriteRule ^.* https://www.example.org/xmos/xmo4/scoreboard/? [R=301,L]
+RewriteCond %{REQUEST_URI} ^/registration/2017/person$
+RewriteCond %{QUERY_STRING} ^%40template=scoreboard$
+RewriteRule ^.* https://www.example.org/xmos/xmo4/scoreboard/? [R=301,L]
+RewriteCond %{REQUEST_URI} ^/registration/2017/person$
+RewriteCond %{QUERY_STRING} ^@action=people_csv$
+RewriteRule ^.* https://www.example.org/xmos/xmo4/people/people.csv? [R=301,L]
+RewriteCond %{REQUEST_URI} ^/registration/2017/person$
+RewriteCond %{QUERY_STRING} ^%40action=people_csv$
+RewriteRule ^.* https://www.example.org/xmos/xmo4/people/people.csv? [R=301,L]
+RewriteCond %{REQUEST_URI} ^/registration/2017/person$
+RewriteCond %{QUERY_STRING} ^@action=scores_csv$
+RewriteRule ^.* https://www.example.org/xmos/xmo4/scoreboard/scores.csv? [R=301,L]
+RewriteCond %{REQUEST_URI} ^/registration/2017/person$
+RewriteCond %{QUERY_STRING} ^%40action=scores_csv$
+RewriteRule ^.* https://www.example.org/xmos/xmo4/scoreboard/scores.csv? [R=301,L]
+RewriteCond %{REQUEST_URI} ^/registration/2017/person$
+RewriteRule ^.* https://www.example.org/xmos/xmo4/people/? [R=301,L]
+RewriteCond %{REQUEST_URI} ^/registration/2017/$
+RewriteRule ^.* https://www.example.org/xmos/xmo4/countries/? [R=301,L]
