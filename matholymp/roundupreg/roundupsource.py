@@ -40,7 +40,7 @@ from matholymp.roundupreg.rounduputil import distinguish_official, \
     have_consent_forms, have_passport_numbers, have_nationality, \
     get_num_problems, get_marks_per_problem, scores_from_str, \
     get_language_numbers, person_date_of_birth, contestant_age, \
-    db_file_extension, db_private_file_extension
+    db_file_url
 
 __all__ = ['RoundupDataSource']
 
@@ -176,13 +176,7 @@ class RoundupDataSource(DataSource):
             return comma_split(extra_awards_str)
         elif name == 'photo_url':
             photo_id = self._db.person.get(id, 'files')
-            photo_url = None
-            if photo_id is not None:
-                photo_ext = db_file_extension(self._db, photo_id)
-                if photo_ext is not None:
-                    photo_url = (self._db.config.TRACKER_WEB + 'file' +
-                                 photo_id + '/photo.' + photo_ext)
-            return photo_url
+            return db_file_url(self._db, 'file', 'photo', photo_id)
         elif name == 'photo_filename':
             photo_id = self._db.person.get(id, 'files')
             photo_filename = None
@@ -193,15 +187,8 @@ class RoundupDataSource(DataSource):
             if not have_consent_forms(self._db):
                 return None
             consent_form_id = self._db.person.get(id, 'consent_form')
-            consent_form_url = None
-            if consent_form_id is not None:
-                consent_form_ext = db_private_file_extension(self._db,
-                                                             consent_form_id)
-                if consent_form_ext is not None:
-                    consent_form_url = (self._db.config.TRACKER_WEB +
-                                        'private_file' + consent_form_id +
-                                        '/consent-form.' + consent_form_ext)
-            return consent_form_url
+            return db_file_url(self._db, 'private_file', 'consent-form',
+                               consent_form_id)
         elif name == 'consent_form_filename':
             if not have_consent_forms(self._db):
                 return None
@@ -319,13 +306,7 @@ class RoundupDataSource(DataSource):
             return self._db.country.get(id, 'name')
         elif name == 'flag_url':
             flag_id = self._db.country.get(id, 'files')
-            flag_url = None
-            if flag_id is not None:
-                flag_ext = db_file_extension(self._db, flag_id)
-                if flag_ext is not None:
-                    flag_url = (self._db.config.TRACKER_WEB + 'file' +
-                                flag_id + '/flag.' + flag_ext)
-            return flag_url
+            return db_file_url(self._db, 'file', 'flag', flag_id)
         elif name == 'flag_filename':
             flag_id = self._db.country.get(id, 'files')
             flag_filename = None

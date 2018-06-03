@@ -29,8 +29,8 @@
 
 """This module provides auditors for the Roundup registration system."""
 
-__all__ = ['audit_event_fields', 'audit_country_fields', 'audit_person_arrdep',
-           'audit_person_fields', 'register_auditors']
+__all__ = ['audit_event_fields', 'audit_file_format', 'audit_country_fields',
+           'audit_person_arrdep', 'audit_person_fields', 'register_auditors']
 
 import re
 
@@ -43,8 +43,7 @@ from matholymp.roundupreg.rounduputil import have_consent_forms, \
     get_num_problems, get_marks_per_problem, get_earliest_date_of_birth, \
     get_sanity_date_of_birth, get_earliest_date_of_birth_contestant, \
     get_arrdep_bounds, any_scores_missing, valid_score, create_rss, \
-    db_file_format_contents, db_file_extension, \
-    db_private_file_format_contents, db_private_file_extension
+    db_file_format_contents, db_file_extension
 from matholymp.roundupreg.staticsite import static_site_event_group, \
     static_site_file_data
 from matholymp.roundupreg.userauditor import audit_user_fields
@@ -81,6 +80,16 @@ def audit_event_fields(db, cl, nodeid, newvalues):
         medal_text = 'Medal boundaries: ' + ', '.join(medal_items)
         create_rss(db, 'Medal boundaries', medal_text)
 
+def audit_file_format(db, cls, id, desc1, desc2, fmts, fmtdesc):
+    """Check for format of an uploaded file."""
+    format_contents = db_file_format_contents(db, cls, id)
+    format_ext = db_file_extension(db, cls, id)
+    if format_contents not in fmts:
+        raise ValueError('%s must be in %s format' % (desc1, fmtdesc))
+    if format_ext != format_contents:
+        raise ValueError('Filename extension for %s must match '
+                         'contents (%s)' % (desc2, format_contents))
+
 def audit_country_fields(db, cl, nodeid, newvalues):
     """Make sure country properties are valid."""
     code = require_value(db, cl, nodeid, newvalues, 'code',
@@ -107,13 +116,8 @@ def audit_country_fields(db, cl, nodeid, newvalues):
     if 'files' in newvalues:
         file_id = newvalues['files']
         if file_id is not None:
-            format_contents = db_file_format_contents(db, file_id)
-            format_ext = db_file_extension(db, file_id)
-            if format_contents != 'png':
-                raise ValueError('Flags must be in PNG format')
-            if format_ext != format_contents:
-                raise ValueError('Filename extension for flag must match '
-                                 'contents (%s)' % format_contents)
+            audit_file_format(db, 'file', file_id, 'Flags', 'flag',
+                              ('png',), 'PNG')
 
     generic_url = get_new_value(db, cl, nodeid, newvalues, 'generic_url')
     if generic_url is not None and generic_url != '':
@@ -321,24 +325,14 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     if 'files' in newvalues:
         file_id = newvalues['files']
         if file_id is not None:
-            format_contents = db_file_format_contents(db, file_id)
-            format_ext = db_file_extension(db, file_id)
-            if format_contents not in ('jpg', 'png'):
-                raise ValueError('Photos must be in JPEG or PNG format')
-            if format_ext != format_contents:
-                raise ValueError('Filename extension for photo must match '
-                                 'contents (%s)' % format_contents)
+            audit_file_format(db, 'file', file_id, 'Photos', 'photo',
+                              ('jpg', 'png'), 'JPEG or PNG')
 
     if have_consent_forms(db) and 'consent_form' in newvalues:
         file_id = newvalues['consent_form']
         if file_id is not None:
-            format_contents = db_private_file_format_contents(db, file_id)
-            format_ext = db_private_file_extension(db, file_id)
-            if format_contents != 'pdf':
-                raise ValueError('Consent forms must be in PDF format')
-            if format_ext != format_contents:
-                raise ValueError('Filename extension for consent form must '
-                                 'match contents (%s)' % format_contents)
+            audit_file_format(db, 'private_file', file_id, 'Consent forms',
+                              'consent form', ('pdf',), 'PDF')
             if user_country_normal:
                 file_country = db.private_file.get(file_id, 'country')
                 if file_country is not None and file_country != user_country:

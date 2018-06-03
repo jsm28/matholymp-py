@@ -45,7 +45,7 @@ from roundup.cgi.exceptions import Unauthorised
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import get_marks_per_problem, \
     scores_from_str, person_is_contestant, contestant_code, scores_final, \
-    valid_country_problem, valid_score, create_rss, db_file_extension
+    valid_country_problem, valid_score, create_rss
 
 class ScoreAction(Action):
 

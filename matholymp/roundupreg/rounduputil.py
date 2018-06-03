@@ -54,7 +54,7 @@ __all__ = ['distinguish_official', 'get_consent_forms_date_str',
            'pn_score', 'scores_final', 'any_scores_missing',
            'country_has_contestants', 'valid_country_problem', 'valid_score',
            'create_rss', 'db_file_format_contents', 'db_file_extension',
-           'db_private_file_format_contents', 'db_private_file_extension']
+           'db_file_url']
 
 def distinguish_official(db):
     """Return whether this event distinguishes official countries."""
@@ -293,38 +293,32 @@ def create_rss(db, title, description, **args):
                              cgi.escape(date_text), cgi.escape(rss_url)))
     db.rss.set(rss_id, text=rss_text)
 
-def db_file_format_contents(db, id):
+def db_file_format_contents(db, cls, id):
     """
     Return the format (canonical filename extension) of an uploaded
     file based on its contents, or None if not a known format that
     might be valid for some uploads.
     """
-    filename = db.filename('file', id)
+    filename = db.filename(cls, id)
     return file_format_contents(filename)
 
-def db_file_extension(db, id):
+def db_file_extension(db, cls, id):
     """
     Return the format (canonical filename extension) of an uploaded
     file based on its filename extension, or None if not a known
     format that might be valid for some uploads.
     """
-    name = db.file.get(id, 'name')
+    name = db.getclass(cls).get(id, 'name')
     return file_extension(name)
 
-def db_private_file_format_contents(db, id):
+def db_file_url(db, cls, kind, id):
     """
-    Return the format (canonical filename extension) of an uploaded
-    private file based on its contents, or None if not a known format
-    that might be valid for some uploads.
+    Return a download URL of an uploaded file.  If the specified id is
+    None, return None.
     """
-    filename = db.filename('private_file', id)
-    return file_format_contents(filename)
-
-def db_private_file_extension(db, id):
-    """
-    Return the format (canonical filename extension) of an uploaded
-    private file based on its filename extension, or None if not a
-    known format that might be valid for some uploads.
-    """
-    name = db.private_file.get(id, 'name')
-    return file_extension(name)
+    url = None
+    if id is not None:
+        ext = db_file_extension(db, cls, id)
+        if ext is not None:
+            url = '%s%s%s/%s.%s' % (db.config.TRACKER_WEB, cls, id, kind, ext)
+    return url
