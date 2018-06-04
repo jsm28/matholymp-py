@@ -123,7 +123,7 @@ define="edit_ok context/is_edit_ok"
 
 <tal:block tal:condition="context/is_edit_ok">
 <tal:block tal:condition="context/id">
- <tr tal:condition="not:context/files" tal:define="name string:reuse_flag; label string:Reuse previous flag (if available); value context/reuse_flag; edit_ok edit_ok">
+ <tr tal:condition="not:context/flag" tal:define="name string:reuse_flag; label string:Reuse previous flag (if available); value context/reuse_flag; edit_ok edit_ok">
   <th metal:use-macro="th_label">Reuse previous flag (if available)</th>
   <td tal:content="structure context/reuse_flag/field">reuse_flag</td>
  </tr>
@@ -138,7 +138,8 @@ define="edit_ok context/is_edit_ok"
 
  <tr tal:condition="context/is_edit_ok">
   <th i18n:translate="">Upload flag</th>
-  <td colspan=3><input type="file" name="@file" size="20"></td>
+  <td colspan=3><input type="file" name="file-1@content" size="20">
+  <input type="hidden" name="@link@flag" value="file-1"></td>
  </tr>
 
  <tr tal:condition="context/is_edit_ok">
@@ -198,10 +199,10 @@ define="edit_ok context/is_edit_ok"
 <p><a tal:attributes="href context/generic_url">Previous <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_SHORT_NAME']" /> participation details</a> available.</p>
 </tal:block>
 
-<tal:block tal:condition="context/files">
+<tal:block tal:condition="context/flag">
 <table>
 <tr>
-  <td><img width="200" alt="" tal:attributes="src context/files/download_url"></td>
+  <td><img width="200" alt="" tal:attributes="src context/flag/download_url"></td>
 </tr>
 </table>
 </tal:block>

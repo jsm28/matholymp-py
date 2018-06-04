@@ -113,8 +113,8 @@ def audit_country_fields(db, cl, nodeid, newvalues):
             raise ValueError('Cannot change whether a country '
                              'can have participants')
 
-    if 'files' in newvalues:
-        file_id = newvalues['files']
+    if 'flag' in newvalues:
+        file_id = newvalues['flag']
         if file_id is not None:
             audit_file_format(db, 'file', file_id, 'Flags', 'flag',
                               ('png',), 'PNG')
@@ -139,11 +139,11 @@ def audit_country_fields(db, cl, nodeid, newvalues):
                                          ' participation not valid')
                     if (get_new_value(db, cl, nodeid, newvalues,
                                       'reuse_flag') and
-                        not get_new_value(db, cl, nodeid, newvalues, 'files')):
+                        not get_new_value(db, cl, nodeid, newvalues, 'flag')):
                         flag_url = sdata.country_map[cno].flag_url
                         flag_data = static_site_file_data(db, flag_url)
                         if flag_data:
-                            newvalues['files'] = db.file.create(**flag_data)
+                            newvalues['flag'] = db.file.create(**flag_data)
         if not guok:
             raise ValueError(gudesc + ' for previous participation must'
                              ' be in the form ' + gubase + 'N/')
@@ -322,8 +322,8 @@ def audit_person_fields(db, cl, nodeid, newvalues):
                 if dep_time < arr_time:
                     raise ValueError('Departure time before arrival time')
 
-    if 'files' in newvalues:
-        file_id = newvalues['files']
+    if 'photo' in newvalues:
+        file_id = newvalues['photo']
         if file_id is not None:
             audit_file_format(db, 'file', file_id, 'Photos', 'photo',
                               ('jpg', 'png'), 'JPEG or PNG')
@@ -358,11 +358,11 @@ def audit_person_fields(db, cl, nodeid, newvalues):
                                          ' participation not valid')
                     if (get_new_value(db, cl, nodeid, newvalues,
                                       'reuse_photo') and
-                        not get_new_value(db, cl, nodeid, newvalues, 'files')):
+                        not get_new_value(db, cl, nodeid, newvalues, 'photo')):
                         photo_url = sdata.person_map[pno].photo_url
                         photo_data = static_site_file_data(db, photo_url)
                         if photo_data:
-                            newvalues['files'] = db.file.create(**photo_data)
+                            newvalues['photo'] = db.file.create(**photo_data)
         if not guok:
             raise ValueError(gudesc + ' for previous participation'
                              ' must be in the form ' + gubase + 'N/')

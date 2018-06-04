@@ -97,7 +97,7 @@ def init_schema(env):
                     contact_email=String(),
                     generic_url=String(),
                     reuse_flag=Boolean(),
-                    files=Link('file'),
+                    flag=Link('file'),
                     is_normal=Boolean(),
                     participants_ok=Boolean(),
                     **country_extra)
@@ -166,7 +166,7 @@ def init_schema(env):
                  phone_number=String(),
                  generic_url=String(),
                  reuse_photo=Boolean(),
-                 files=Link('file'),
+                 photo=Link('file'),
                  scores=String(), # comma-separated scores on each problem
                  extra_awards=String(),
                  **person_extra
@@ -234,7 +234,7 @@ def init_schema(env):
         """Determine whether a normal user can view this country."""
         return (db.country.get(itemid, 'participants_ok') and
                 not db.country.is_retired(itemid))
-    country_public_props = ['code', 'name', 'generic_url', 'files',
+    country_public_props = ['code', 'name', 'generic_url', 'flag',
                             'is_normal']
     if distinguish_official(db):
         country_public_props.append('official')
@@ -273,7 +273,7 @@ def init_schema(env):
                         'departure_place', 'departure_date',
                         'departure_time_hour', 'departure_time_minute',
                         'departure_flight', 'generic_url', 'reuse_photo',
-                        'files']
+                        'photo']
     if have_consent_forms(db):
         person_reg_props.append('consent_form')
     if have_passport_numbers(db):
@@ -297,7 +297,7 @@ def init_schema(env):
                                   properties=('country', 'given_name',
                                               'family_name', 'primary_role',
                                               'other_roles', 'guide_for',
-                                              'files', 'scores',
+                                              'photo', 'scores',
                                               'extra_awards', 'generic_url'))
     db.security.addPermissionToRole('User', p)
     db.security.addPermissionToRole('Anonymous', p)

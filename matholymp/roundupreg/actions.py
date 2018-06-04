@@ -147,7 +147,7 @@ class ScalePhotoAction(Action):
             raise ValueError('No id specified to scale photo for')
         if self.classname != 'person':
             raise ValueError('Photos can only be scaled for people')
-        photo_id = self.db.person.get(self.nodeid, 'files')
+        photo_id = self.db.person.get(self.nodeid, 'photo')
         if not photo_id:
             raise ValueError('This person has no photo to scale')
         filename = self.db.filename('file', photo_id)
@@ -170,7 +170,7 @@ class ScalePhotoAction(Action):
                               'type': 'image/jpeg',
                               'content': photo_bytes}
                 new_photo_id = self.db.file.create(**photo_data)
-                self.db.person.set(self.nodeid, files=new_photo_id)
+                self.db.person.set(self.nodeid, photo=new_photo_id)
                 self.db.commit()
                 self.client.add_ok_message('Photo reduced in size, '
                                            'scaled down by %d' % scale_factor)

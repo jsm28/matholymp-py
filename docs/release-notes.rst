@@ -47,6 +47,10 @@ so, run :command:`mo-static-generate`.
 Next version (unreleased)
 -------------------------
 
+Because of changes to how data is represented in the registration
+system, upgrades to this version can only be made between events when
+the registration system is not active.
+
 * A bug has been fixed in :command:`mo-static-import` where it would
   download an incorrect file as the RSS feed of scores when
   downloading files automatically from the registration system.
@@ -56,6 +60,10 @@ Next version (unreleased)
   who competed in years all of which had the same such description but
   for which that description was not the one in
   :file:`staticsite.cfg`.
+
+* Changes have been made to how uploaded flags and photos are handled
+  in the registration system, which involve updates to
+  :file:`country.item.html` and :file:`person.item.html`.
 
 Version 2018.02.0 (11 February 2018)
 ------------------------------------

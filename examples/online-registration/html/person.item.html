@@ -286,13 +286,13 @@ define="edit_ok context/is_edit_ok"
 
 <tal:block tal:condition="context/is_edit_ok">
 <tal:block tal:condition="context/id">
- <tr tal:condition="not:context/files">
+ <tr tal:condition="not:context/photo">
   <td colspan="2">If a URL for previous participation is given, any
   photo provided for the most recent previous event at which this
   person participated will be reused unless you select
   &lsquo;No&rsquo; here or upload a new photo.</td>
  </tr>
- <tr tal:condition="not:context/files" tal:define="name string:reuse_photo; label string:Reuse previous photo (if available); value context/reuse_photo; edit_ok edit_ok">
+ <tr tal:condition="not:context/photo" tal:define="name string:reuse_photo; label string:Reuse previous photo (if available); value context/reuse_photo; edit_ok edit_ok">
   <th metal:use-macro="th_label">Reuse previous photo (if available)</th>
   <td tal:content="structure context/reuse_photo/field">reuse_photo</td>
  </tr>
@@ -313,7 +313,8 @@ define="edit_ok context/is_edit_ok"
 
  <tr tal:condition="context/is_edit_ok">
   <th i18n:translate="">Upload photo</th>
-  <td colspan=3><input type="file" name="@file" size="20"></td>
+  <td colspan=3><input type="file" name="file-1@content" size="20">
+  <input type="hidden" name="@link@photo" value="file-1"></td>
  </tr>
 
  <tr tal:condition="context/is_edit_ok">
@@ -420,10 +421,10 @@ define="edit_ok context/is_edit_ok"
 </tal:block>
 </tal:block>
 
-<tal:block tal:condition="context/files">
+<tal:block tal:condition="context/photo">
 <table>
 <tr>
-  <td><img width="200" alt="" tal:attributes="src context/files/download_url"></td>
+  <td><img width="200" alt="" tal:attributes="src context/photo/download_url"></td>
 </tr>
 </table>
 </tal:block>

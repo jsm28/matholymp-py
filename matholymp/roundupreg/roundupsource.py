@@ -175,10 +175,10 @@ class RoundupDataSource(DataSource):
                 return []
             return comma_split(extra_awards_str)
         elif name == 'photo_url':
-            photo_id = self._db.person.get(id, 'files')
+            photo_id = self._db.person.get(id, 'photo')
             return db_file_url(self._db, 'file', 'photo', photo_id)
         elif name == 'photo_filename':
-            photo_id = self._db.person.get(id, 'files')
+            photo_id = self._db.person.get(id, 'photo')
             photo_filename = None
             if photo_id is not None:
                 photo_filename = self._db.filename('file', photo_id)
@@ -305,10 +305,10 @@ class RoundupDataSource(DataSource):
         elif name == 'name':
             return self._db.country.get(id, 'name')
         elif name == 'flag_url':
-            flag_id = self._db.country.get(id, 'files')
+            flag_id = self._db.country.get(id, 'flag')
             return db_file_url(self._db, 'file', 'flag', flag_id)
         elif name == 'flag_filename':
-            flag_id = self._db.country.get(id, 'files')
+            flag_id = self._db.country.get(id, 'flag')
             flag_filename = None
             if flag_id is not None:
                 flag_filename = self._db.filename('file', flag_id)
