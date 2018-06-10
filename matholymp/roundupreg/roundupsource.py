@@ -176,12 +176,12 @@ class RoundupDataSource(DataSource):
             return comma_split(extra_awards_str)
         elif name == 'photo_url':
             photo_id = self._db.person.get(id, 'photo')
-            return db_file_url(self._db, 'file', 'photo', photo_id)
+            return db_file_url(self._db, 'photo', 'photo', photo_id)
         elif name == 'photo_filename':
             photo_id = self._db.person.get(id, 'photo')
             photo_filename = None
             if photo_id is not None:
-                photo_filename = self._db.filename('file', photo_id)
+                photo_filename = self._db.filename('photo', photo_id)
             return photo_filename
         elif name == 'consent_form_url':
             if not have_consent_forms(self._db):
@@ -306,12 +306,12 @@ class RoundupDataSource(DataSource):
             return self._db.country.get(id, 'name')
         elif name == 'flag_url':
             flag_id = self._db.country.get(id, 'flag')
-            return db_file_url(self._db, 'file', 'flag', flag_id)
+            return db_file_url(self._db, 'flag', 'flag', flag_id)
         elif name == 'flag_filename':
             flag_id = self._db.country.get(id, 'flag')
             flag_filename = None
             if flag_id is not None:
-                flag_filename = self._db.filename('file', flag_id)
+                flag_filename = self._db.filename('flag', flag_id)
             return flag_filename
         elif name == 'is_official':
             return self._db.country.get(id, 'official')

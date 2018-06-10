@@ -64,9 +64,12 @@ the registration system is not active.
 * Changes have been made to how uploaded flags and photos are handled
   in the registration system, which involve updates to
   :file:`country.item.html` and :file:`person.item.html`.  New files
-  :file:`consent_form.index.html` and :file:`consent_form.item.html`
-  are added, and :file:`private_file.index.html` and
-  :file:`private_file.item.html` are removed.
+  :file:`consent_form.index.html`, :file:`consent_form.item.html`,
+  :file:`flag.index.html`, :file:`flag.item.html`,
+  :file:`photo.index.html` and :file:`photo.item.html` are added, and
+  :file:`file.index.html`, :file:`file.item.html`,
+  :file:`private_file.index.html` and :file:`private_file.item.html`
+  are removed.
 
 Version 2018.02.0 (11 February 2018)
 ------------------------------------

@@ -1,0 +1,28 @@
+<tal:block metal:use-macro="templates/page/macros/icing">
+<title metal:fill-slot="head_title" i18n:translate=""
+ >List of flags - <span tal:replace="config/TRACKER_NAME" i18n:name="tracker" /></title>
+<span metal:fill-slot="body_title" tal:omit-tag="python:1"
+  i18n:translate="">List of flags</span>
+<td class="content" metal:fill-slot="content">
+
+<table class="otherinfo" tal:define="batch request/batch">
+ <tr><th style="padding-right: 10" i18n:translate="">Download</th>
+     <th style="padding-right: 10" i18n:translate="">Content Type</th>
+     <th style="padding-right: 10" i18n:translate="">Uploaded By</th>
+     <th style="padding-right: 10" i18n:translate="">Date</th>
+ </tr>
+ <tr tal:repeat="flag batch" tal:attributes="class python:['normal', 'alt'][repeat['flag'].index%6/3]">
+  <td>
+   <a tal:attributes="href string:flag${flag/id}/${flag/name}"
+      tal:content="flag/name">dld link</a>
+  </td>
+  <td tal:content="flag/type">content type</td>
+  <td tal:content="flag/creator">creator's name</td>
+  <td tal:content="flag/creation">creation date</td>
+ </tr>
+
+</table>
+
+</td>
+
+</tal:block>

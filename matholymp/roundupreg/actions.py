@@ -150,7 +150,7 @@ class ScalePhotoAction(Action):
         photo_id = self.db.person.get(self.nodeid, 'photo')
         if not photo_id:
             raise ValueError('This person has no photo to scale')
-        filename = self.db.filename('file', photo_id)
+        filename = self.db.filename('photo', photo_id)
         max_size_bytes = int(self.db.config.ext['MATHOLYMP_PHOTO_MAX_SIZE'])
         min_photo_dimen = int(self.db.config.ext['MATHOLYMP_PHOTO_MIN_DIMEN'])
         cur_size_bytes = os.stat(filename).st_size
@@ -169,7 +169,7 @@ class ScalePhotoAction(Action):
                 photo_data = {'name': 'photo-smaller.jpg',
                               'type': 'image/jpeg',
                               'content': photo_bytes}
-                new_photo_id = self.db.file.create(**photo_data)
+                new_photo_id = self.db.photo.create(**photo_data)
                 self.db.person.set(self.nodeid, photo=new_photo_id)
                 self.db.commit()
                 self.client.add_ok_message('Photo reduced in size, '

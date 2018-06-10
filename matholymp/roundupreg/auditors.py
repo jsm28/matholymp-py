@@ -116,7 +116,7 @@ def audit_country_fields(db, cl, nodeid, newvalues):
     if 'flag' in newvalues:
         file_id = newvalues['flag']
         if file_id is not None:
-            audit_file_format(db, 'file', file_id, 'Flags', 'flag',
+            audit_file_format(db, 'flag', file_id, 'Flags', 'flag',
                               ('png',), 'PNG')
 
     generic_url = get_new_value(db, cl, nodeid, newvalues, 'generic_url')
@@ -143,7 +143,7 @@ def audit_country_fields(db, cl, nodeid, newvalues):
                         flag_url = sdata.country_map[cno].flag_url
                         flag_data = static_site_file_data(db, flag_url)
                         if flag_data:
-                            newvalues['flag'] = db.file.create(**flag_data)
+                            newvalues['flag'] = db.flag.create(**flag_data)
         if not guok:
             raise ValueError(gudesc + ' for previous participation must'
                              ' be in the form ' + gubase + 'N/')
@@ -325,7 +325,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     if 'photo' in newvalues:
         file_id = newvalues['photo']
         if file_id is not None:
-            audit_file_format(db, 'file', file_id, 'Photos', 'photo',
+            audit_file_format(db, 'photo', file_id, 'Photos', 'photo',
                               ('jpg', 'png'), 'JPEG or PNG')
 
     if have_consent_forms(db) and 'consent_form' in newvalues:
@@ -362,7 +362,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
                         photo_url = sdata.person_map[pno].photo_url
                         photo_data = static_site_file_data(db, photo_url)
                         if photo_data:
-                            newvalues['photo'] = db.file.create(**photo_data)
+                            newvalues['photo'] = db.photo.create(**photo_data)
         if not guok:
             raise ValueError(gudesc + ' for previous participation'
                              ' must be in the form ' + gubase + 'N/')

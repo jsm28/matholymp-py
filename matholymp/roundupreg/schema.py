@@ -27,8 +27,8 @@
 # combination shall include the source code for the parts of OpenSSL
 # used as well as that of the covered work.
 
-# Parts relating to user and file classes based on schema.py from
-# Roundup, to which the following applies:
+# Parts relating to the user class based on schema.py from Roundup, to
+# which the following applies:
 
 # Copyright (c) 2003-2009 Richard Jones (richard@mechanicalcat.net)
 # Copyright (c) 2002 eKit.com Inc (http://www.ekit.com/)
@@ -97,7 +97,7 @@ def init_schema(env):
                     contact_email=String(),
                     generic_url=String(),
                     reuse_flag=Boolean(),
-                    flag=Link('file'),
+                    flag=Link('flag'),
                     is_normal=Boolean(),
                     participants_ok=Boolean(),
                     **country_extra)
@@ -166,7 +166,7 @@ def init_schema(env):
                  phone_number=String(),
                  generic_url=String(),
                  reuse_photo=Boolean(),
-                 photo=Link('file'),
+                 photo=Link('photo'),
                  scores=String(), # comma-separated scores on each problem
                  extra_awards=String(),
                  **person_extra
@@ -189,8 +189,11 @@ def init_schema(env):
     )
     user.setkey('username')
 
-    file = FileClass(db, 'file',
+    flag = FileClass(db, 'flag',
                     name=String())
+
+    photo = FileClass(db, 'photo',
+                      name=String())
 
     consent_form = FileClass(db, 'consent_form',
                              name=String(), country=Link('country'))
@@ -204,12 +207,10 @@ def init_schema(env):
     db.security.addPermissionToRole('User', 'Web Access')
     db.security.addPermissionToRole('Anonymous', 'Web Access')
 
-    for cl in 'file',:
+    for cl in ('flag', 'photo', 'matholymprole', 'gender', 'tshirt',
+               'language', 'arrival'):
         db.security.addPermissionToRole('User', 'View', cl)
-        db.security.addPermissionToRole('User', 'Create', cl)
-    for cl in 'matholymprole', 'gender', 'tshirt', 'language', 'arrival':
-        db.security.addPermissionToRole('User', 'View', cl)
-    for cl in 'file', 'matholymprole':
+    for cl in 'flag', 'photo', 'matholymprole':
         db.security.addPermissionToRole('Anonymous', 'View', cl)
 
     # Users should be able to edit their own details; this permission
@@ -301,6 +302,9 @@ def init_schema(env):
                                               'extra_awards', 'generic_url'))
     db.security.addPermissionToRole('User', p)
     db.security.addPermissionToRole('Anonymous', p)
+
+    # Register users can create photos.
+    db.security.addPermissionToRole('Register', 'Create', 'photo')
 
     # Registering users can create consent forms, and view them only
     # when from their own country or created by that user (the latter
