@@ -132,7 +132,7 @@ def init_schema(env):
 
     person_extra = {}
     if have_consent_forms(db):
-        person_extra['consent_form'] = Link('private_file')
+        person_extra['consent_form'] = Link('consent_form')
     if have_passport_numbers(db):
         person_extra['passport_number'] = String()
     if have_nationality(db):
@@ -192,7 +192,7 @@ def init_schema(env):
     file = FileClass(db, 'file',
                     name=String())
 
-    private_file = FileClass(db, 'private_file',
+    consent_form = FileClass(db, 'consent_form',
                              name=String(), country=Link('country'))
 
     # Set up permissions:
@@ -302,20 +302,20 @@ def init_schema(env):
     db.security.addPermissionToRole('User', p)
     db.security.addPermissionToRole('Anonymous', p)
 
-    # Registering users can create private files, and view them only
+    # Registering users can create consent forms, and view them only
     # when from their own country or created by that user (the latter
     # as a case for access before the country is set).
-    db.security.addPermissionToRole('Register', 'Create', 'private_file')
-    def own_country_file(db, userid, itemid):
-        """Determine whether the userid matches the country of the private
-        file being accessed."""
+    db.security.addPermissionToRole('Register', 'Create', 'consent_form')
+    def own_country_consent_form(db, userid, itemid):
+        """Determine whether the userid matches the country of the consent
+        form being accessed."""
         user_country = db.user.get(userid, 'country')
-        file_country = db.private_file.get(itemid, 'country')
-        file_creator = db.private_file.get(itemid, 'creator')
+        file_country = db.consent_form.get(itemid, 'country')
+        file_creator = db.consent_form.get(itemid, 'creator')
         return (user_country == file_country or
                 (file_country is None and userid == file_creator))
-    p = db.security.addPermission(name='View', klass='private_file',
-                                  check=own_country_file)
+    p = db.security.addPermission(name='View', klass='consent_form',
+                                  check=own_country_consent_form)
     db.security.addPermissionToRole('Register', p)
 
     # Entering scores has its own Permission and Role.

@@ -331,10 +331,10 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     if have_consent_forms(db) and 'consent_form' in newvalues:
         file_id = newvalues['consent_form']
         if file_id is not None:
-            audit_file_format(db, 'private_file', file_id, 'Consent forms',
+            audit_file_format(db, 'consent_form', file_id, 'Consent forms',
                               'consent form', ('pdf',), 'PDF')
             if user_country_normal:
-                file_country = db.private_file.get(file_id, 'country')
+                file_country = db.consent_form.get(file_id, 'country')
                 if file_country is not None and file_country != user_country:
                     raise ValueError('Consent form from another country')
 

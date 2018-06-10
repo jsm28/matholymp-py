@@ -187,7 +187,7 @@ class RoundupDataSource(DataSource):
             if not have_consent_forms(self._db):
                 return None
             consent_form_id = self._db.person.get(id, 'consent_form')
-            return db_file_url(self._db, 'private_file', 'consent-form',
+            return db_file_url(self._db, 'consent_form', 'consent-form',
                                consent_form_id)
         elif name == 'consent_form_filename':
             if not have_consent_forms(self._db):
@@ -195,7 +195,7 @@ class RoundupDataSource(DataSource):
             consent_form_id = self._db.person.get(id, 'consent_form')
             consent_form_filename = None
             if consent_form_id is not None:
-                consent_form_filename = self._db.filename('private_file',
+                consent_form_filename = self._db.filename('consent_form',
                                                           consent_form_id)
             return consent_form_filename
         elif name == 'languages':

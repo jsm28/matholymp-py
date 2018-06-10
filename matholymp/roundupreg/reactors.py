@@ -107,9 +107,9 @@ def person_react(db, cl, nodeid, oldvalues):
     if not cf:
         return
     person_country = db.person.get(nodeid, 'country')
-    file_country = db.private_file.get(cf, 'country')
+    file_country = db.consent_form.get(cf, 'country')
     if file_country != person_country:
-        db.private_file.set(cf, country=person_country)
+        db.consent_form.set(cf, country=person_country)
 
 def scoreboard_react(db, cl, nodeid, oldvalues):
     """Mark the cached scoreboard invalid."""

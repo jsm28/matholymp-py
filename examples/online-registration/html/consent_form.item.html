@@ -1,8 +1,8 @@
 <tal:block metal:use-macro="templates/page/macros/icing">
-<title metal:fill-slot="head_title" i18n:translate="">Private file display - <span
+<title metal:fill-slot="head_title" i18n:translate="">Consent form display - <span
  i18n:name="tracker" tal:replace="config/TRACKER_NAME" /></title>
 <span metal:fill-slot="body_title" tal:omit-tag="python:1"
- i18n:translate="">Private file display</span>
+ i18n:translate="">Consent form display</span>
 
 <td class="content" metal:fill-slot="content">
 
@@ -43,7 +43,7 @@
 </form>
 
 <a tal:condition="python:context.id and context.is_view_ok()"
- tal:attributes="href string:private_file${context/id}/${context/name}"
+ tal:attributes="href string:consent_form${context/id}/${context/name}"
  i18n:translate="">download</a>
 
 <tal:block tal:condition="context/is_edit_ok">

@@ -326,8 +326,8 @@ define="edit_ok context/is_edit_ok"
 <tal:block tal:condition="not:context/id">
  <tr>
   <th i18n:translate="">Upload consent form</th>
-  <td colspan=3><input type="file" name="private_file-1@content" size="20">
-  <input type="hidden" name="@link@consent_form" value="private_file-1"></td>
+  <td colspan=3><input type="file" name="consent_form-1@content" size="20">
+  <input type="hidden" name="@link@consent_form" value="consent_form-1"></td>
  </tr>
  <tr>
   <td colspan="2">Consent forms are required for participants born on
@@ -341,8 +341,8 @@ define="edit_ok context/is_edit_ok"
 <tal:block tal:condition="python:utils.show_consent_form_ui(db._db, context.id)">
  <tr>
   <th i18n:translate="">Upload consent form</th>
-  <td colspan=3><input type="file" name="private_file-1@content" size="20">
-  <input type="hidden" name="@link@consent_form" value="private_file-1"></td>
+  <td colspan=3><input type="file" name="consent_form-1@content" size="20">
+  <input type="hidden" name="@link@consent_form" value="consent_form-1"></td>
  </tr>
  <tr>
   <td colspan="2">Consent forms are required for participants born on
