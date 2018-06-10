@@ -83,7 +83,7 @@ def audit_user_fields(db, cl, nodeid, newvalues):
 
     for rolename in [r.lower().strip()
                      for r in newvalues.get('roles', '').split(',')]:
-        if rolename and not db.security.role.has_key(rolename):
+        if rolename and rolename not in db.security.role:
             raise ValueError('Role "%s" does not exist' % rolename)
 
     require_value(db, cl, nodeid, newvalues, 'country', 'No country specified')
