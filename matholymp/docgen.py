@@ -101,20 +101,20 @@ class DocumentGenerator(object):
 
     def text_to_latex(self, text):
         """Convert text into a form suitable for LaTeX input."""
-        special_chars = { '#': '\\#',
-                          '$': '\\$',
-                          '%': '\\%',
-                          '&': '\\&',
-                          '~': '\\~{ }',
-                          '_': '\\_',
-                          '^': '\\^{ }',
-                          '\\': '$\\backslash$',
-                          '{': '$\\{$',
-                          '}': '$\\}$',
-                          '"': '\\texttt{"}',
-                          '|': '$|$',
-                          '<': '$<$',
-                          '>': '$>$' }
+        special_chars = {'#': '\\#',
+                         '$': '\\$',
+                         '%': '\\%',
+                         '&': '\\&',
+                         '~': '\\~{ }',
+                         '_': '\\_',
+                         '^': '\\^{ }',
+                         '\\': '$\\backslash$',
+                         '{': '$\\{$',
+                         '}': '$\\}$',
+                         '"': '\\texttt{"}',
+                         '|': '$|$',
+                         '<': '$<$',
+                         '>': '$>$'}
         text = re.sub('[\\000-\\037]', ' ', text)
         text = re.sub('[\\\\#$%&~_^{}"|<>]',
                       lambda x:special_chars[x.group(0)],
@@ -405,7 +405,7 @@ class DocumentGenerator(object):
                                              else '')))
                       for p in contestants]
         label_list_text = '%\n'.join(label_list)
-        template_fields = { 'desk_labels': label_list_text }
+        template_fields = {'desk_labels': label_list_text}
         raw_fields = ['desk_labels']
         self.subst_and_pdflatex(template_file_base, output_file_base,
                                 template_fields, raw_fields)
@@ -435,17 +435,17 @@ class DocumentGenerator(object):
                 raise ValueError('Person %s not awarded' % id)
             contestants = [p]
             output_file_base = 'certificate-person' + id
-        award_map = { 'Gold Medal': 'gold',
-                      'Silver Medal': 'silver',
-                      'Bronze Medal': 'bronze',
-                      'Honourable Mention': 'hm' }
+        award_map = {'Gold Medal': 'gold',
+                     'Silver Medal': 'silver',
+                     'Bronze Medal': 'bronze',
+                     'Honourable Mention': 'hm'}
         cert_list = [('\\%scert{%s}{%s}'
                       % (award_map[p.award],
                          self.text_to_latex(p.name),
                          self.text_to_latex(p.country.name)))
                      for p in contestants]
         cert_list_text = '%\n'.join(cert_list)
-        template_fields = { 'certificates': cert_list_text }
+        template_fields = {'certificates': cert_list_text}
         if use_background:
             template_fields['use_background'] = 'true'
         else:
@@ -471,7 +471,7 @@ class DocumentGenerator(object):
                          self.text_to_latex(p.country.name),
                          self.role_text(p))) for p in people]
         cert_list_text = '%\n'.join(cert_list)
-        template_fields = { 'certificates': cert_list_text }
+        template_fields = {'certificates': cert_list_text}
         if use_background:
             template_fields['use_background'] = 'true'
         else:
@@ -772,7 +772,7 @@ class DocumentGenerator(object):
                              % (self.text_to_latex(c.name), pn, ctext_conts))
                     form_list.append(ctext)
         form_list_text = '%\n'.join(form_list)
-        template_fields = { 'coord_forms': form_list_text }
+        template_fields = {'coord_forms': form_list_text}
         template_fields['year'] = self._event.year
         template_fields['short_name'] = self._event.short_name
         template_fields['long_name'] = self._event.long_name

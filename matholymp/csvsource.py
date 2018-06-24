@@ -144,28 +144,28 @@ class CSVDataSource(DataSource):
     def country_event_exists(self, country_id, event_id):
         return country_id in self._countries[event_id]
 
-    _event_attr_map_str = { 'year': 'Year',
-                            'host_country_name': 'Country',
-                            'host_country_name_in': 'Country Name In',
-                            'host_city': 'City',
-                            'home_page_url': 'Home Page URL',
-                            'contact_name': 'Contact Name',
-                            'contact_email': 'Contact Email' }
+    _event_attr_map_str = {'year': 'Year',
+                           'host_country_name': 'Country',
+                           'host_country_name_in': 'Country Name In',
+                           'host_city': 'City',
+                           'home_page_url': 'Home Page URL',
+                           'contact_name': 'Contact Name',
+                           'contact_email': 'Contact Email'}
 
-    _event_attr_map_date = { 'start_date': 'Start Date',
-                             'end_date': 'End Date' }
+    _event_attr_map_date = {'start_date': 'Start Date',
+                            'end_date': 'End Date'}
 
-    _event_attr_map_int = { '_host_country_id': 'Country Number',
-                            'num_exams': 'Number of Exams',
-                            'num_problems': 'Number of Problems',
-                            'gold_boundary': 'Gold Boundary',
-                            'silver_boundary': 'Silver Boundary',
-                            'bronze_boundary': 'Bronze Boundary' }
+    _event_attr_map_int = {'_host_country_id': 'Country Number',
+                           'num_exams': 'Number of Exams',
+                           'num_problems': 'Number of Problems',
+                           'gold_boundary': 'Gold Boundary',
+                           'silver_boundary': 'Silver Boundary',
+                           'bronze_boundary': 'Bronze Boundary'}
 
-    _event_attr_map_bool_maybe = { 'distinguish_official':
-                                       'Distinguish Official Countries',
-                                   'honourable_mentions_available':
-                                       'Honourable Mentions Available' }
+    _event_attr_map_bool_maybe = {'distinguish_official':
+                                      'Distinguish Official Countries',
+                                  'honourable_mentions_available':
+                                      'Honourable Mentions Available'}
 
     def event_get_attr(self, id, name):
         if name in CSVDataSource._event_attr_map_str:
@@ -215,37 +215,36 @@ class CSVDataSource(DataSource):
                 return True
         return False
 
-    _person_event_attr_map_str = { 'annual_url': 'Annual URL',
-                                   'primary_role': 'Primary Role',
-                                   'given_name': 'Given Name',
-                                   'family_name': 'Family Name',
-                                   'award': 'Award',
-                                   'photo_url': 'Photo URL',
-                                   'diet': ('Allergies and '
-                                            'Dietary Requirements'),
-                                   'room_number': 'Room Number',
-                                   'phone_number': 'Phone Number',
-                                   'gender': 'Gender',
-                                   'tshirt': 'T-Shirt Size',
-                                   'arrival_place': 'Arrival Place',
-                                   'arrival_flight': 'Arrival Flight',
-                                   'departure_place': 'Departure Place',
-                                   'departure_flight': 'Departure Flight',
-                                   'consent_form_url': 'Consent Form URL',
-                                   'passport_number':
-                                   'Passport or Identity Card Number',
-                                   'nationality': 'Nationality'}
+    _person_event_attr_map_str = {'annual_url': 'Annual URL',
+                                  'primary_role': 'Primary Role',
+                                  'given_name': 'Given Name',
+                                  'family_name': 'Family Name',
+                                  'award': 'Award',
+                                  'photo_url': 'Photo URL',
+                                  'diet': 'Allergies and Dietary Requirements',
+                                  'room_number': 'Room Number',
+                                  'phone_number': 'Phone Number',
+                                  'gender': 'Gender',
+                                  'tshirt': 'T-Shirt Size',
+                                  'arrival_place': 'Arrival Place',
+                                  'arrival_flight': 'Arrival Flight',
+                                  'departure_place': 'Departure Place',
+                                  'departure_flight': 'Departure Flight',
+                                  'consent_form_url': 'Consent Form URL',
+                                  'passport_number':
+                                  'Passport or Identity Card Number',
+                                  'nationality': 'Nationality'}
 
-    _person_event_attr_map_date = { 'date_of_birth': 'Date of Birth',
-                                    'arrival_date': 'Arrival Date',
-                                    'departure_date': 'Departure Date' }
+    _person_event_attr_map_date = {'date_of_birth': 'Date of Birth',
+                                   'arrival_date': 'Arrival Date',
+                                   'departure_date': 'Departure Date'}
 
-    _person_event_attr_map_time = { 'arrival_time': 'Arrival Time',
-                                    'departure_time': 'Departure Time' }
+    _person_event_attr_map_time = {'arrival_time': 'Arrival Time',
+                                   'departure_time': 'Departure Time'}
 
-    _person_event_attr_map_int = { 'contestant_age': 'Contestant Age',
-                                   'total_score': 'Total',
-                                   'generic_id': 'Generic Number' }
+    _person_event_attr_map_int = {'contestant_age': 'Contestant Age',
+                                  'total_score': 'Total',
+                                  'generic_id': 'Generic Number'}
 
     def person_event_get_attr(self, person_id, country_id, event_id, name):
         if name == '_country_ids':
@@ -341,14 +340,14 @@ class CSVDataSource(DataSource):
     def person_event_have_attr(self, person_id, country_id, event_id, name):
         return True
 
-    _country_event_attr_map_str = { 'annual_url': 'Annual URL',
-                                    'code': 'Code',
-                                    'name': 'Name',
-                                    'flag_url': 'Flag URL' }
+    _country_event_attr_map_str = {'annual_url': 'Annual URL',
+                                   'code': 'Code',
+                                   'name': 'Name',
+                                   'flag_url': 'Flag URL'}
 
-    _country_event_attr_map_int = { 'generic_id': 'Generic Number' }
+    _country_event_attr_map_int = {'generic_id': 'Generic Number'}
 
-    _country_event_attr_map_bool = { 'is_normal': 'Normal' }
+    _country_event_attr_map_bool = {'is_normal': 'Normal'}
 
     def country_event_get_attr(self, country_id, event_id, name):
         if name in CSVDataSource._country_event_attr_map_str:

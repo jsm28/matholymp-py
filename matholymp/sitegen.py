@@ -137,9 +137,9 @@ class SiteGenerator(object):
         """Write HTML text to a file in standard template."""
         long_title = cgi.escape(self._data.long_name) + ': ' + title
         short_title = cgi.escape(self._data.short_name) + ': ' + header
-        page_data = { 'title': long_title,
-                      'header': short_title,
-                      'body': out_text }
+        page_data = {'title': long_title,
+                     'header': short_title,
+                     'body': out_text}
         text = self._cfg['page_template'] % page_data
         out_file_name = os.path.join(self._out_dir, *out_path)
         out_file_name = os.path.join(out_file_name,
@@ -860,7 +860,7 @@ class SiteGenerator(object):
                                                    '@template=scoreboard',
                                                    'live scoreboard')))
         extra_dir = '/'.join(self.path_for_event(e))
-        text += self._cfg['page_include_extra'] % { 'dir': extra_dir }
+        text += self._cfg['page_include_extra'] % {'dir': extra_dir}
         text += '\n'
         if e.num_exams:
             for day in range(1, e.num_exams + 1):

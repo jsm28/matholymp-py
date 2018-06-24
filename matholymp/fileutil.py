@@ -53,7 +53,7 @@ __all__ = ['read_utf8_csv', 'write_utf8_csv_bytes', 'write_utf8_csv',
            'file_format_contents', 'file_extension']
 
 if _py3:
-    _text_open_args = { 'encoding': 'utf-8' }
+    _text_open_args = {'encoding': 'utf-8'}
 else:
     _text_open_args = {}
 
@@ -65,7 +65,7 @@ def read_utf8_csv(csv_file_name):
     """
     if _py3:
         open_mode = 'r'
-        open_args = { 'encoding': 'utf-8-sig', 'newline': '' }
+        open_args = {'encoding': 'utf-8-sig', 'newline': ''}
     else:
         open_mode = 'rb'
         open_args = {}
@@ -221,8 +221,8 @@ if _py3:
     # Exported by the standard library from 3.2 onwards.
     _boolean_states = configparser.RawConfigParser.BOOLEAN_STATES
 else:
-    _boolean_states = { '1': True, 'yes': True, 'true': True, 'on': True,
-                        '0': False, 'no': False, 'false': False, 'off': False }
+    _boolean_states = {'1': True, 'yes': True, 'true': True, 'on': True,
+                       '0': False, 'no': False, 'false': False, 'off': False}
 boolean_states = _boolean_states
 """Mapping of boolean states to values in configuration files."""
 
@@ -234,8 +234,8 @@ def remove_if_exists(file_name):
 
 
 # Map file format names from imghdr to canonical extensions.
-_file_format_ext_map = { 'jpeg': 'jpg',
-                         'png': 'png' }
+_file_format_ext_map = {'jpeg': 'jpg',
+                        'png': 'png'}
 
 
 def file_format_contents(filename):
@@ -262,10 +262,10 @@ else:
 _ascii_tolower = _maketrans(string.ascii_uppercase, string.ascii_lowercase)
 
 # Map extensions to their canonical forms.
-_file_ext_map = { 'jpg': 'jpg',
-                  'jpeg': 'jpg',
-                  'png': 'png',
-                  'pdf': 'pdf' }
+_file_ext_map = {'jpg': 'jpg',
+                 'jpeg': 'jpg',
+                 'png': 'png',
+                 'pdf': 'pdf'}
 
 
 def file_extension(name):

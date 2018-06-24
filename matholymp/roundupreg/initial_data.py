@@ -93,7 +93,7 @@ def init_data(env):
     # Create country records for administration and special-case users.
     country = db.getclass('country')
     if distinguish_official(db):
-        country_extra = { 'official': False }
+        country_extra = {'official': False}
     else:
         country_extra = {}
     staff_country = country.create(code='ZZA', name=staff_country_name,

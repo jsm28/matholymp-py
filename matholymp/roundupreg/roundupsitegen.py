@@ -53,23 +53,23 @@ class RoundupSiteGenerator(RegSiteGenerator):
         Initialise a RoundupSiteGenerator from the given db object for
         that Roundup instance.
         """
-        html_ver_map = { 'html4': False,
-                         'xhtml': True }
+        html_ver_map = {'html4': False,
+                        'xhtml': True}
         use_xhtml = html_ver_map[db.config.HTML_VERSION]
-        cfg = { 'num_key': db.config.ext['MATHOLYMP_SHORT_NAME'] + ' Number',
-                'scores_css': db.config.ext['MATHOLYMP_SCORES_CLASS'],
-                'list_css': db.config.ext['MATHOLYMP_LIST_CLASS'],
-                'use_xhtml': use_xhtml,
-                'official_desc': db.config.ext['MATHOLYMP_OFFICIAL_DESC'],
-                'official_desc_lc':
-                    db.config.ext['MATHOLYMP_OFFICIAL_DESC_LC'],
-                'url_base': db.config.ext['MATHOLYMP_GENERIC_URL_BASE'],
-                'outer_scores_css':
-                    db.config.ext['MATHOLYMP_OUTER_SCORES_CLASS'],
-                'display_scoreboard_rows':
-                    int(db.config.ext['MATHOLYMP_DISPLAY_SCOREBOARD_ROWS']),
-                'display_scoreboard_columns':
-                    int(db.config.ext['MATHOLYMP_DISPLAY_SCOREBOARD_COLUMNS'])}
+        cfg = {'num_key': db.config.ext['MATHOLYMP_SHORT_NAME'] + ' Number',
+               'scores_css': db.config.ext['MATHOLYMP_SCORES_CLASS'],
+               'list_css': db.config.ext['MATHOLYMP_LIST_CLASS'],
+               'use_xhtml': use_xhtml,
+               'official_desc': db.config.ext['MATHOLYMP_OFFICIAL_DESC'],
+               'official_desc_lc':
+                   db.config.ext['MATHOLYMP_OFFICIAL_DESC_LC'],
+               'url_base': db.config.ext['MATHOLYMP_GENERIC_URL_BASE'],
+               'outer_scores_css':
+                   db.config.ext['MATHOLYMP_OUTER_SCORES_CLASS'],
+               'display_scoreboard_rows':
+                   int(db.config.ext['MATHOLYMP_DISPLAY_SCOREBOARD_ROWS']),
+               'display_scoreboard_columns':
+                   int(db.config.ext['MATHOLYMP_DISPLAY_SCOREBOARD_COLUMNS'])}
         event_group = EventGroup(RoundupDataSource(db))
         super(RoundupSiteGenerator, self).__init__(cfg, event_group)
 

@@ -70,9 +70,9 @@ def country_react(db, cl, nodeid, oldvalues):
     template_path = os.path.join(db.config.TRACKER_HOME, 'extensions',
                                  'email-template-new-user')
     template_text = read_text_from_file(template_path)
-    email_text = template_text % { 'country': country_name,
-                                   'username': username,
-                                   'password': pw }
+    email_text = template_text % {'country': country_name,
+                                  'username': username,
+                                  'password': pw}
     short_name = db.config.ext['MATHOLYMP_SHORT_NAME']
     year = db.config.ext['MATHOLYMP_YEAR']
     subject = '%s %s registration (%s)' % (short_name, year, country_name)

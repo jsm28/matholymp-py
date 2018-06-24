@@ -89,7 +89,7 @@ def init_schema(env):
                   bronze=String())
 
     if distinguish_official(db):
-        country_extra = { 'official': Boolean() }
+        country_extra = {'official': Boolean()}
     else:
         country_extra = {}
     country = Class(db, 'country',
