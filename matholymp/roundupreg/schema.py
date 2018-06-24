@@ -233,8 +233,8 @@ def init_schema(env):
     # retired countries.
     def can_view_country(db, userid, itemid):
         """Determine whether a normal user can view this country."""
-        return (db.country.get(itemid, 'participants_ok') and
-                not db.country.is_retired(itemid))
+        return (db.country.get(itemid, 'participants_ok')
+                and not db.country.is_retired(itemid))
     country_public_props = ['code', 'name', 'generic_url', 'flag',
                             'is_normal']
     if distinguish_official(db):
@@ -260,8 +260,8 @@ def init_schema(env):
     def own_country_person(db, userid, itemid):
         """Determine whether the userid matches the country of the person
         being accessed."""
-        return (db.user.get(userid, 'country') ==
-                db.person.get(itemid, 'country'))
+        return (db.user.get(userid, 'country')
+                == db.person.get(itemid, 'country'))
     p = db.security.addPermission(name='View', klass='person',
                                   check=own_country_person)
     db.security.addPermissionToRole('Register', p)
@@ -316,8 +316,8 @@ def init_schema(env):
         user_country = db.user.get(userid, 'country')
         file_country = db.consent_form.get(itemid, 'country')
         file_creator = db.consent_form.get(itemid, 'creator')
-        return (user_country == file_country or
-                (file_country is None and userid == file_creator))
+        return (user_country == file_country
+                or (file_country is None and userid == file_creator))
     p = db.security.addPermission(name='View', klass='consent_form',
                                   check=own_country_consent_form)
     db.security.addPermissionToRole('Register', p)

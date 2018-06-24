@@ -93,8 +93,8 @@ def people_from_country(db, country):
 
 def show_country_people(db, country):
     """Return whether to show a table of people on a country's page."""
-    return (db.country.get(country, 'participants_ok') and
-            not db.country.is_retired(country))
+    return (db.country.get(country, 'participants_ok')
+            and not db.country.is_retired(country))
 
 def country_people_table(db, country):
     """Show the table of people from a country on that country's page."""
@@ -139,16 +139,16 @@ def display_scoreboard(db, display_start):
 
 def has_nonempty_travel(db, person):
     """Return whether a person has nonempty travel details."""
-    return (db.person.get(person, 'arrival_place') is not None or
-            db.person.get(person, 'arrival_date') is not None or
-            db.person.get(person, 'arrival_time_hour') is not None or
-            db.person.get(person, 'arrival_time_minute') is not None or
-            db.person.get(person, 'arrival_flight') is not None or
-            db.person.get(person, 'departure_place') is not None or
-            db.person.get(person, 'departure_date') is not None or
-            db.person.get(person, 'departure_time_hour') is not None or
-            db.person.get(person, 'departure_time_minute') is not None or
-            db.person.get(person, 'departure_flight') is not None)
+    return (db.person.get(person, 'arrival_place') is not None
+            or db.person.get(person, 'arrival_date') is not None
+            or db.person.get(person, 'arrival_time_hour') is not None
+            or db.person.get(person, 'arrival_time_minute') is not None
+            or db.person.get(person, 'arrival_flight') is not None
+            or db.person.get(person, 'departure_place') is not None
+            or db.person.get(person, 'departure_date') is not None
+            or db.person.get(person, 'departure_time_hour') is not None
+            or db.person.get(person, 'departure_time_minute') is not None
+            or db.person.get(person, 'departure_flight') is not None)
 
 def show_travel_copy_options(db, userid, person):
     """Return whether to give options to copy travel details."""
@@ -175,8 +175,8 @@ def country_travel_copy_options(db, country, person):
             val = db.person.get(person, prop)
             if val is None:
                 val = ''
-            prop_js_list.append('this.form.elements["%s"].value = %s' %
-                                (prop, json.dumps(str(val))))
+            prop_js_list.append('this.form.elements["%s"].value = %s'
+                                % (prop, json.dumps(str(val))))
         sel_props = (('arrival_place', '-1'),
                      ('arrival_date', ''),
                      ('arrival_time_hour', ''),
@@ -196,17 +196,17 @@ def country_travel_copy_options(db, country, person):
             prop_js_list.append(
                 'for (var i = 0; i < this.form.elements["%s"].length; i++) '
                 '{ if (this.form.elements["%s"].options[i].value == "%s") '
-                'this.form.elements["%s"].selectedIndex = i; }' %
-                (prop, prop, val, prop))
+                'this.form.elements["%s"].selectedIndex = i; }'
+                % (prop, prop, val, prop))
         prop_js = ';'.join(prop_js_list)
         prop_js_esc = cgi.escape(prop_js, quote=True)
         prop_js_submit = ('<input type="button"'
                           ' value="Copy travel details from %s %s"'
-                          ' onclick="%s">' %
-                          (cgi.escape(db.person.get(person, 'given_name'),
-                                      quote=True),
-                           cgi.escape(db.person.get(person, 'family_name'),
-                                      quote=True), prop_js_esc))
+                          ' onclick="%s">'
+                          % (cgi.escape(db.person.get(person, 'given_name'),
+                                        quote=True),
+                             cgi.escape(db.person.get(person, 'family_name'),
+                                        quote=True), prop_js_esc))
         travel_list.append(prop_js_submit)
     return '\n'.join(travel_list)
 
@@ -286,16 +286,16 @@ def string_select(name, default_label, entry_list, selected):
         if e_value == selected:
             sel = 'selected="selected" '
             found_sel = True
-        option_list.append('<option %svalue="%s">%s</option>' %
-                           (sel, cgi.escape(e_value, quote=True),
-                            cgi.escape(e_label)))
+        option_list.append('<option %svalue="%s">%s</option>'
+                           % (sel, cgi.escape(e_value, quote=True),
+                              cgi.escape(e_label)))
     d_sel = ''
     if not found_sel:
         d_sel = 'selected="selected" '
-    option_list.insert(0, ('<option %svalue="">%s</option>' %
-                           (d_sel, cgi.escape(default_label))))
-    return ('<select id="%s" name="%s">%s</select>' %
-            (name, name, '\n'.join(option_list)))
+    option_list.insert(0, ('<option %svalue="">%s</option>'
+                           % (d_sel, cgi.escape(default_label))))
+    return ('<select id="%s" name="%s">%s</select>'
+            % (name, name, '\n'.join(option_list)))
 
 def date_of_birth_select(db, year, month, day):
     """Return form content for selecting a date of birth."""

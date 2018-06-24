@@ -777,8 +777,8 @@ class Event(object):
         r = {}
         for p in self.contestant_list:
             if p.contestant_code in r:
-                raise ValueError('duplicate contestant code %s' %
-                                 p.contestant_code)
+                raise ValueError('duplicate contestant code %s'
+                                 % p.contestant_code)
             r[p.contestant_code] = p
         return r
 

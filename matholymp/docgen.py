@@ -232,8 +232,8 @@ class DocumentGenerator(object):
             code = person.country.code + ' ' + role
         name = person.name
         room = person.room_number or ''
-        return (self.text_to_latex('(' + code + ') ' + name + ' ') +
-                '\\textbf{' + self.text_to_latex(room) + '}')
+        return (self.text_to_latex('(' + code + ') ' + name + ' ')
+                + '\\textbf{' + self.text_to_latex(room) + '}')
 
     def role_text(self, person):
         """Return a listing of one person's roles."""
@@ -275,11 +275,11 @@ class DocumentGenerator(object):
             background_type = 'contestant'
         elif primary_role == 'Observer with Contestants':
             background_type = 'observerc'
-        elif (primary_role == 'Leader' or
-              primary_role == 'Observer with Leader'):
+        elif (primary_role == 'Leader'
+              or primary_role == 'Observer with Leader'):
             background_type = 'leader'
-        elif (primary_role == 'Deputy Leader' or
-              primary_role == 'Observer with Deputy'):
+        elif (primary_role == 'Deputy Leader'
+              or primary_role == 'Observer with Deputy'):
             background_type = 'deputy'
         elif 'Chief Guide' in primary_role:
             background_type = 'chiefguide'
@@ -304,8 +304,8 @@ class DocumentGenerator(object):
         country = person.country
         if not country.is_normal:
             is_staff = True
-            if (self._cfg['show_countries_for_guides'] and
-                person.guide_for):
+            if (self._cfg['show_countries_for_guides']
+                and person.guide_for):
                 is_non_guide_staff = not self._cfg['show_rooms_for_guides']
                 country_list = sorted(person.guide_for,
                                       key=lambda x:x.sort_key)
@@ -392,15 +392,15 @@ class DocumentGenerator(object):
             p = self.get_contestant_by_id(id)
             contestants = [p]
             output_file_base = 'desk-label-person' + id
-        label_list = [('\\placecard{%s}{%s}{%s}{%s}' %
-                       (self.text_to_latex(p.contestant_code),
-                        self.text_to_latex(p.name),
-                        self.text_to_latex(p.languages[0]
-                                           if p.languages
-                                           else ''),
-                        self.text_to_latex(p.languages[1]
-                                           if len(p.languages) > 1
-                                           else '')))
+        label_list = [('\\placecard{%s}{%s}{%s}{%s}'
+                       % (self.text_to_latex(p.contestant_code),
+                          self.text_to_latex(p.name),
+                          self.text_to_latex(p.languages[0]
+                                             if p.languages
+                                             else ''),
+                          self.text_to_latex(p.languages[1]
+                                             if len(p.languages) > 1
+                                             else '')))
                       for p in contestants]
         label_list_text = '%\n'.join(label_list)
         template_fields = { 'desk_labels': label_list_text }
@@ -437,10 +437,10 @@ class DocumentGenerator(object):
                       'Silver Medal': 'silver',
                       'Bronze Medal': 'bronze',
                       'Honourable Mention': 'hm' }
-        cert_list = [('\\%scert{%s}{%s}' %
-                      (award_map[p.award],
-                       self.text_to_latex(p.name),
-                       self.text_to_latex(p.country.name)))
+        cert_list = [('\\%scert{%s}{%s}'
+                      % (award_map[p.award],
+                         self.text_to_latex(p.name),
+                         self.text_to_latex(p.country.name)))
                      for p in contestants]
         cert_list_text = '%\n'.join(cert_list)
         template_fields = { 'certificates': cert_list_text }
@@ -464,10 +464,10 @@ class DocumentGenerator(object):
             p = self.get_person_by_id(id)
             people = [p]
             output_file_base = 'participation-certificate-person' + id
-        cert_list = [('\\partcert{%s}{%s}{%s}' %
-                      (self.text_to_latex(p.name),
-                       self.text_to_latex(p.country.name),
-                       self.role_text(p))) for p in people]
+        cert_list = [('\\partcert{%s}{%s}{%s}'
+                      % (self.text_to_latex(p.name),
+                         self.text_to_latex(p.country.name),
+                         self.role_text(p))) for p in people]
         cert_list_text = '%\n'.join(cert_list)
         template_fields = { 'certificates': cert_list_text }
         if use_background:
@@ -496,9 +496,9 @@ class DocumentGenerator(object):
             return papers_dir_pdf_name
         if not os.access(papers_dir_tex_name, os.F_OK):
             raise IOError('PDF or TeX for %s not found' % lang_filename_day)
-        if (os.access(cache_tex_name, os.F_OK) and
-            os.access(cache_pdf_name, os.F_OK) and
-            filecmp.cmp(papers_dir_tex_name, cache_tex_name)):
+        if (os.access(cache_tex_name, os.F_OK)
+            and os.access(cache_pdf_name, os.F_OK)
+            and filecmp.cmp(papers_dir_tex_name, cache_tex_name)):
             return cache_pdf_name
         remove_if_exists(cache_pdf_name)
         remove_if_exists(cache_tex_name)
@@ -544,16 +544,16 @@ class DocumentGenerator(object):
             pdf_file.close()
         npages = self._langs_num_pages[lang_filename_day]
         if npages == 1:
-            return ('\\onepaper{%s}{%s}{%s}{%s}{%s}{}{1}' %
-                    (lang_filename_day, self.text_to_latex(lang), day,
-                     self.text_to_latex(desc), self.text_to_latex(code)))
+            return ('\\onepaper{%s}{%s}{%s}{%s}{%s}{}{1}'
+                    % (lang_filename_day, self.text_to_latex(lang), day,
+                       self.text_to_latex(desc), self.text_to_latex(code)))
         else:
             pages_list = []
             for n in range(1, npages + 1):
-                paper = ('\\onepaper{%s}{%s}{%s}{%s}{%s}{%d}{%d}' %
-                         (lang_filename_day, self.text_to_latex(lang), day,
-                          self.text_to_latex(desc),
-                          self.text_to_latex(code), n, npages))
+                paper = ('\\onepaper{%s}{%s}{%s}{%s}{%s}{%d}{%d}'
+                         % (lang_filename_day, self.text_to_latex(lang), day,
+                            self.text_to_latex(desc),
+                            self.text_to_latex(code), n, npages))
                 pages_list.append(paper)
             return '%\n'.join(pages_list)
 
@@ -646,8 +646,8 @@ class DocumentGenerator(object):
                         if new_paper_src is None:
                             do_this_paper = False
                     if do_this_paper:
-                        output_file_base = ('paper' + day_text + draft_text +
-                                            bg_text + '-' + lang_filename)
+                        output_file_base = ('paper' + day_text + draft_text
+                                            + bg_text + '-' + lang_filename)
                         paper_text = self.one_paper_latex(lang_filename, lang,
                                                           d, paper_draft, '')
                         paper_list.append(paper_text)
@@ -659,8 +659,8 @@ class DocumentGenerator(object):
                             make_dirs_for_file(new_paper_dst)
                             shutil.copyfile(new_paper_src, new_paper_dst)
                 if id == 'all-languages':
-                    output_file_base = ('paper' + day_text + draft_text +
-                                        bg_text + '-All')
+                    output_file_base = ('paper' + day_text + draft_text
+                                        + bg_text + '-All')
                     paper_list_text = '%\n'.join(paper_list)
                     template_fields['papers'] = paper_list_text
                     self.subst_and_pdflatex(template_file_base,
@@ -738,8 +738,8 @@ class DocumentGenerator(object):
             code_list = ' '.join(all_languages[lang])
             lang_text_list.append(lang + ' ' + code_list)
         out_text = '\n'.join(lang_text_list) + '\n'
-        out_text += ('\nOnly one language: ' +
-                     ' '.join(one_language_contestants))
+        out_text += ('\nOnly one language: '
+                     + ' '.join(one_language_contestants))
         out_text += '\n'
         write_text_to_file(out_text, os.path.join(self._out_dir,
                                                   'language-list.txt'))
@@ -763,11 +763,11 @@ class DocumentGenerator(object):
                             clist.append(ccode)
                         else:
                             clist.append('')
-                    ctext_conts = ''.join([('\\formrow{%s}' %
-                                            self.text_to_latex(cl))
+                    ctext_conts = ''.join([('\\formrow{%s}'
+                                            % self.text_to_latex(cl))
                                            for cl in clist])
-                    ctext = ('\\twoforms{%s}{%d}{%s}' %
-                             (self.text_to_latex(c.name), pn, ctext_conts))
+                    ctext = ('\\twoforms{%s}{%d}{%s}'
+                             % (self.text_to_latex(c.name), pn, ctext_conts))
                     form_list.append(ctext)
         form_list_text = '%\n'.join(form_list)
         template_fields = { 'coord_forms': form_list_text }
@@ -811,8 +811,8 @@ class DocumentGenerator(object):
                     pnstr = 'P%d' % pn
                     scores.append(p[pnstr])
                 scores_text = ','.join(scores)
-                cmd = ('$roundup_admin -i $instance set person%d scores=%s' %
-                       (id, scores_text))
+                cmd = ('$roundup_admin -i $instance set person%d scores=%s'
+                       % (id, scores_text))
                 out_text_list.append(cmd)
         out_text += '\n'.join(out_text_list) + '\n'
         write_text_to_file(out_text, os.path.join(self._out_dir,

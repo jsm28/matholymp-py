@@ -89,11 +89,11 @@ def date_range_html(start_date, end_date, year):
     start_month_name = month_name(start_date.month)
     end_month_name = month_name(end_date.month)
     if start_date.month == end_date.month:
-        return ('%02d&ndash;%02d&nbsp;%s' %
-                (start_date.day, end_date.day, end_month_name))
+        return ('%02d&ndash;%02d&nbsp;%s'
+                % (start_date.day, end_date.day, end_month_name))
     else:
-        return ('%02d&nbsp;%s&ndash;%02d&nbsp;%s' %
-                (start_date.day, start_month_name,
+        return ('%02d&nbsp;%s&ndash;%02d&nbsp;%s'
+                % (start_date.day, start_month_name,
                  end_date.day, end_month_name))
 
 def date_to_ymd_iso(date):
@@ -112,8 +112,8 @@ def date_to_name(date):
 def age_on_date(date1, date2):
     """Return the age on the second date of a person born on the first date."""
     diff = date2.year - date1.year
-    if ((date2.month < date1.month) or (date2.month == date1.month and
-                                        date2.day < date1.day)):
+    if ((date2.month < date1.month) or (date2.month == date1.month
+                                        and date2.day < date1.day)):
         diff -= 1
     return diff
 

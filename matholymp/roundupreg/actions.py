@@ -97,8 +97,8 @@ class ScoreAction(Action):
         title_text = country_node.code + ' P' + problem
         full_results_text = title_text + ': ' + ', '.join(results_list)
         create_rss(self.db, title_text, full_results_text, country=country)
-        self.client.add_ok_message('Scores entered for %s problem %s' %
-                                   (country_node.name, problem))
+        self.client.add_ok_message('Scores entered for %s problem %s'
+                                   % (country_node.name, problem))
         self.db.commit()
 
 class RetireCountryAction(Action):
@@ -314,27 +314,27 @@ class ScoresRSSAction(Action):
         text += ('<rss version="2.0"'
                  ' xmlns:atom="http://www.w3.org/2005/Atom">\n')
         text += '  <channel>\n'
-        text += ('    <title>%s %s%s Scores</title>\n' %
-                 (cgi.escape(short_name), cgi.escape(year),
-                  cgi.escape(title_extra)))
+        text += ('    <title>%s %s%s Scores</title>\n'
+                 % (cgi.escape(short_name), cgi.escape(year),
+                    cgi.escape(title_extra)))
         text += '    <link>%s</link>\n' % link_url
-        text += ('    <description>%s %s%s Scores Live Feed</description>\n' %
-                 (cgi.escape(short_name), cgi.escape(year),
-                  cgi.escape(title_extra)))
+        text += ('    <description>%s %s%s Scores Live Feed</description>\n'
+                 % (cgi.escape(short_name), cgi.escape(year),
+                    cgi.escape(title_extra)))
         text += '    <language>en-gb</language>\n'
         text += '    <docs>http://www.rssboard.org/rss-specification</docs>\n'
         text += ('    <atom:link href="%s" rel="self"'
-                 ' type="application/rss+xml" />\n    ' %
-                 cgi.escape((self.base + 'country' + url_id +
-                             '?@action=scores_rss'), quote=True))
+                 ' type="application/rss+xml" />\n    '
+                 % cgi.escape((self.base + 'country' + url_id
+                               + '?@action=scores_rss'), quote=True))
 
         rss_list = self.db.rss.list()
         rss_list = sorted(rss_list, key=lambda x:int(x), reverse=True)
         rss_text_list = [self.db.rss.get(r, 'text')
                          for r in rss_list
-                         if (self.nodeid is None or
-                             self.db.rss.get(r, 'country') is None or
-                             self.db.rss.get(r, 'country') == self.nodeid)]
+                         if (self.nodeid is None
+                             or self.db.rss.get(r, 'country') is None
+                             or self.db.rss.get(r, 'country') == self.nodeid)]
         text += '\n    '.join(rss_text_list)
 
         text += '\n  </channel>\n</rss>\n'

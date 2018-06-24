@@ -85,14 +85,14 @@ class RoundupDataSource(DataSource):
 
     def person_exists(self, id):
         id = str(id)
-        return (self._db.person.hasnode(id) and
-                not self._db.person.is_retired(id))
+        return (self._db.person.hasnode(id)
+                and not self._db.person.is_retired(id))
 
     def country_exists(self, id):
         id = str(id)
-        return (self._db.country.hasnode(id) and
-                not self._db.country.is_retired(id) and
-                self._db.country.get(id, 'participants_ok'))
+        return (self._db.country.hasnode(id)
+                and not self._db.country.is_retired(id)
+                and self._db.country.get(id, 'participants_ok'))
 
     def person_event_exists(self, person_id, event_id):
         return self.person_exists(person_id)
@@ -216,10 +216,10 @@ class RoundupDataSource(DataSource):
             return self._db.person.get(id, 'phone_number') or None
         elif name == 'generic_id':
             generic_url = self._db.person.get(id, 'generic_url')
-            gubase = (self._db.config.ext['MATHOLYMP_GENERIC_URL_BASE'] +
-                      'people/person')
-            if (generic_url is None or not generic_url.startswith(gubase) or
-                not generic_url.endswith('/')):
+            gubase = (self._db.config.ext['MATHOLYMP_GENERIC_URL_BASE']
+                      + 'people/person')
+            if (generic_url is None or not generic_url.startswith(gubase)
+                or not generic_url.endswith('/')):
                 generic_id = None
             else:
                 generic_id = int(generic_url[len(gubase):-1])
@@ -325,10 +325,10 @@ class RoundupDataSource(DataSource):
             return [int(p) for p in guide_list]
         elif name == 'generic_id':
             generic_url = self._db.country.get(id, 'generic_url')
-            gubase = (self._db.config.ext['MATHOLYMP_GENERIC_URL_BASE'] +
-                      'countries/country')
-            if (generic_url is None or not generic_url.startswith(gubase) or
-                not generic_url.endswith('/')):
+            gubase = (self._db.config.ext['MATHOLYMP_GENERIC_URL_BASE']
+                      + 'countries/country')
+            if (generic_url is None or not generic_url.startswith(gubase)
+                or not generic_url.endswith('/')):
                 generic_id = None
             else:
                 generic_id = int(generic_url[len(gubase):-1])

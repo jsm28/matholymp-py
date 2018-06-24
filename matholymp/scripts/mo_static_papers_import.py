@@ -70,8 +70,8 @@ def _import_paper(papers_data, cfg_data, docgen_config_data, top_directory,
                   input_papers_directory, day, language, description,
                   filename):
     paper_dst_list = [cfg_data['short_name_url_plural'],
-                      (cfg_data['short_name_url'] +
-                       str(docgen_config_data['event_number'])),
+                      (cfg_data['short_name_url']
+                       + str(docgen_config_data['event_number'])),
                       filename]
     p = { cfg_data['num_key']: str(docgen_config_data['event_number']),
           'Day': day or '1',

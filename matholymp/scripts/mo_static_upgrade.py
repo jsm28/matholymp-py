@@ -71,8 +71,8 @@ def main():
     e_staff_names = {}
     events_data = read_utf8_csv(events_csv)
     for e in events_data:
-        e_staff_names[e['Number']] = (cfg_data['short_name'] + ' ' +
-                                      e['Year'] + ' Staff')
+        e_staff_names[e['Number']] = (cfg_data['short_name'] + ' '
+                                      + e['Year'] + ' Staff')
         i = e_max_num_problems + 1
         while ('P%d Max' % i) in e:
             e_max_num_problems = i

@@ -104,12 +104,12 @@ def audit_country_fields(db, cl, nodeid, newvalues):
     name = require_value(db, cl, nodeid, newvalues, 'name',
                          'No country name specified')
     if nodeid is not None:
-        if ('is_normal' in newvalues and
-            newvalues['is_normal'] != db.country.get(nodeid, 'is_normal')):
+        if ('is_normal' in newvalues
+            and newvalues['is_normal'] != db.country.get(nodeid, 'is_normal')):
             raise ValueError('Cannot change whether a country is normal')
-        if ('participants_ok' in newvalues and
-            newvalues['participants_ok'] != db.country.get(nodeid,
-                                                           'participants_ok')):
+        if ('participants_ok' in newvalues
+            and (newvalues['participants_ok']
+                 != db.country.get(nodeid, 'participants_ok'))):
             raise ValueError('Cannot change whether a country '
                              'can have participants')
 
@@ -123,8 +123,8 @@ def audit_country_fields(db, cl, nodeid, newvalues):
     if generic_url is not None and generic_url != '':
         gudesc = db.config.ext['MATHOLYMP_GENERIC_URL_DESC_PLURAL']
         gudesc_sing = db.config.ext['MATHOLYMP_GENERIC_URL_DESC']
-        gubase = (db.config.ext['MATHOLYMP_GENERIC_URL_BASE'] +
-                  'countries/country')
+        gubase = (db.config.ext['MATHOLYMP_GENERIC_URL_BASE']
+                  + 'countries/country')
         guok = False
         if generic_url.startswith(gubase):
             generic_url = generic_url[len(gubase):]
@@ -137,9 +137,9 @@ def audit_country_fields(db, cl, nodeid, newvalues):
                     if cno not in sdata.country_map:
                         raise ValueError(gudesc_sing + ' for previous'
                                          ' participation not valid')
-                    if (get_new_value(db, cl, nodeid, newvalues,
-                                      'reuse_flag') and
-                        not get_new_value(db, cl, nodeid, newvalues, 'flag')):
+                    if (get_new_value(db, cl, nodeid, newvalues, 'reuse_flag')
+                        and not get_new_value(db, cl, nodeid, newvalues,
+                                              'flag')):
                         flag_url = sdata.country_map[cno].flag_url
                         flag_data = static_site_file_data(db, flag_url)
                         if flag_data:
@@ -238,8 +238,8 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         if req_genders:
             gender_name = db.gender.get(gender, 'name')
             if gender_name not in req_genders:
-                raise ValueError('Contestant gender must be %s' %
-                                 (' or '.join(req_genders)))
+                raise ValueError('Contestant gender must be %s'
+                                 % (' or '.join(req_genders)))
 
     # Contestants must have been born on or after the date specified
     # in the regulations.  To avoid problems generating CSV files,
@@ -342,8 +342,8 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     if generic_url is not None and generic_url != '':
         gudesc = db.config.ext['MATHOLYMP_GENERIC_URL_DESC_PLURAL']
         gudesc_sing = db.config.ext['MATHOLYMP_GENERIC_URL_DESC']
-        gubase = (db.config.ext['MATHOLYMP_GENERIC_URL_BASE'] +
-                  'people/person')
+        gubase = (db.config.ext['MATHOLYMP_GENERIC_URL_BASE']
+                  + 'people/person')
         guok = False
         if generic_url.startswith(gubase):
             generic_url = generic_url[len(gubase):]
@@ -356,9 +356,9 @@ def audit_person_fields(db, cl, nodeid, newvalues):
                     if pno not in sdata.person_map:
                         raise ValueError(gudesc_sing + ' for previous'
                                          ' participation not valid')
-                    if (get_new_value(db, cl, nodeid, newvalues,
-                                      'reuse_photo') and
-                        not get_new_value(db, cl, nodeid, newvalues, 'photo')):
+                    if (get_new_value(db, cl, nodeid, newvalues, 'reuse_photo')
+                        and not get_new_value(db, cl, nodeid, newvalues,
+                                              'photo')):
                         photo_url = sdata.person_map[pno].photo_url
                         photo_data = static_site_file_data(db, photo_url)
                         if photo_data:

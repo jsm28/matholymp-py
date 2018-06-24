@@ -72,8 +72,8 @@ def read_utf8_csv(csv_file_name):
         if not _py3:
             should_be_bom = csv_file.read(len(codecs.BOM_UTF8))
             if should_be_bom != codecs.BOM_UTF8:
-                raise ValueError('CSV file %s does not have BOM' %
-                                 csv_file_name)
+                raise ValueError('CSV file %s does not have BOM'
+                                 % csv_file_name)
         csv_reader = csv.DictReader(csv_file)
         rows = [row for row in csv_reader]
         return rows

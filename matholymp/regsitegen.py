@@ -150,8 +150,8 @@ class RegSiteGenerator(SiteGenerator):
             if url is not None:
                 ext = file_extension(url)
                 filename = p.consent_form_filename
-                zip_filename = ('consent-forms/person%d/consent-form.%s' %
-                                (p.person.id, ext))
+                zip_filename = ('consent-forms/person%d/consent-form.%s'
+                                % (p.person.id, ext))
                 zip.write(filename, zip_filename)
 
         zip.close()
@@ -210,8 +210,8 @@ class RegSiteGenerator(SiteGenerator):
         text += self.html_table('\n'.join(row_list), style='width:100%')
         if e.scores_final:
             text += ('<p>Medal boundaries: Gold %d, Silver %d,'
-                     ' Bronze %d.</p>\n' %
-                     (e.gold_boundary, e.silver_boundary, e.bronze_boundary))
+                     ' Bronze %d.</p>\n'
+                     % (e.gold_boundary, e.silver_boundary, e.bronze_boundary))
         return text
 
     def missing_person_details(self, p, consent_forms_date):
@@ -228,13 +228,13 @@ class RegSiteGenerator(SiteGenerator):
             missing_list.append('photo')
 
         have_travel_details = True
-        if (p.arrival_place is None or
-            p.arrival_date is None or
-            p.arrival_time is None):
+        if (p.arrival_place is None
+            or p.arrival_date is None
+            or p.arrival_time is None):
             have_travel_details = False
-        elif (p.departure_place is None or
-              p.departure_date is None or
-              p.departure_time is None):
+        elif (p.departure_place is None
+              or p.departure_date is None
+              or p.departure_time is None):
             have_travel_details = False
         else:
             if p.arrival_is_airport:
@@ -256,17 +256,17 @@ class RegSiteGenerator(SiteGenerator):
         person_list = c.person_list
         if not person_list:
             return ('<p>No participants registered from'
-                    ' <strong>%s</strong>.</p>\n' %
-                    cgi.escape(c.name_with_code))
+                    ' <strong>%s</strong>.</p>\n'
+                    % cgi.escape(c.name_with_code))
         else:
             have_roles = [p.primary_role for p in person_list]
             missing_roles = [r for r in expected_roles
                              if not r in have_roles]
             if missing_roles:
                 return ('<p>Not registered from <strong>%s</strong>:'
-                        ' %s.</p>\n' %
-                        (cgi.escape(c.name_with_code),
-                         cgi.escape(', '.join(missing_roles))))
+                        ' %s.</p>\n'
+                        % (cgi.escape(c.name_with_code),
+                           cgi.escape(', '.join(missing_roles))))
             else:
                 return ''
 
@@ -341,8 +341,8 @@ class RegSiteGenerator(SiteGenerator):
         for c in normal_countries:
             if not c.guide_list:
                 text += ('<p>No guide registered for'
-                         ' <strong>%s</strong>.</p>\n' %
-                         cgi.escape(c.name_with_code))
+                         ' <strong>%s</strong>.</p>\n'
+                         % cgi.escape(c.name_with_code))
         text += ('<p>The system cannot tell automatically if not all'
                  ' staff have been registered.</p>\n')
 
@@ -388,16 +388,16 @@ class RegSiteGenerator(SiteGenerator):
             text += ('<p>These participants have photos that are over '
                      '%d bytes in size.  Although not strictly required, '
                      'scaling them down will make the site quicker for users '
-                     'and may also speed up printing name badges.</p>\n' %
-                     max_photo_size)
+                     'and may also speed up printing name badges.</p>\n'
+                     % max_photo_size)
             text += self.html_table_thead_tbody_list(head_row_list,
                                                      body_row_list) + '\n'
 
         flags_needed = ''
         for c in normal_countries:
             if not c.flag_url:
-                flags_needed += ('<p>No flag for <strong>%s</strong>.</p>\n' %
-                                 cgi.escape(c.name_with_code))
+                flags_needed += ('<p>No flag for <strong>%s</strong>.</p>\n'
+                                 % cgi.escape(c.name_with_code))
         if flags_needed:
             text += ('<h2>Action needed by registration system'
                      ' maintainers</h2>\n')
