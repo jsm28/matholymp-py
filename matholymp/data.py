@@ -46,6 +46,7 @@ _award_types = ['Gold Medal', 'Silver Medal', 'Bronze Medal',
 
 _award_types_no_hm = ['Gold Medal', 'Silver Medal', 'Bronze Medal']
 
+
 class _LazyMap(collections.Mapping):
 
     """A mapping where values are created dynamically."""
@@ -85,6 +86,7 @@ class _LazyMap(collections.Mapping):
                     self._dict[key] = self._get_func(key)
             self._have_all_keys = True
 
+
 class _PropertyCached(property):
 
     """
@@ -101,6 +103,7 @@ class _PropertyCached(property):
         super(_PropertyCached, self).__init__(get_cached, None, None, doc)
         self.__doc__ = doc
 
+
 class _EventGroupPropertyDS(_PropertyCached):
 
     """Class for EventGroup attributes that are computed by a DataSource."""
@@ -109,6 +112,7 @@ class _EventGroupPropertyDS(_PropertyCached):
         def ds_get(obj):
             return obj._ds.event_group_get_attr(name)
         super(_EventGroupPropertyDS, self).__init__(name, ds_get, doc)
+
 
 class EventGroup(object):
 
@@ -321,6 +325,7 @@ class EventGroup(object):
         'max_num_problems', _get_max_num_problems,
         """The maximum number of problems at any event.""")
 
+
 class _EventPropertyDS(_PropertyCached):
 
     """Class for Event attributes that are computed by a DataSource."""
@@ -329,6 +334,7 @@ class _EventPropertyDS(_PropertyCached):
         def ds_get(obj):
             return obj.event_group._ds.event_get_attr(obj.id, name)
         super(_EventPropertyDS, self).__init__(name, ds_get, doc)
+
 
 class Event(object):
 
@@ -993,6 +999,7 @@ class Event(object):
         'sort_key', _get_sort_key,
         """General-purpose sort key.""")
 
+
 class Paper(object):
 
     """A paper represents one version of one paper at one Event."""
@@ -1013,6 +1020,7 @@ class Paper(object):
         """Any additional description of this paper."""
         self.url = url
         """The URL of this paper."""
+
 
 class Person(object):
 
@@ -1150,6 +1158,7 @@ class Person(object):
         'sort_key_hall_of_fame', _get_sort_key_hall_of_fame,
         """Sort key for the Hall of Fame by medal count.""")
 
+
 class _PersonEventPropertyDS(_PropertyCached):
 
     """Class for PersonEvent attributes that are computed by a DataSource."""
@@ -1162,6 +1171,7 @@ class _PersonEventPropertyDS(_PropertyCached):
                                             obj.event.id,
                                             name)
         super(_PersonEventPropertyDS, self).__init__(name, ds_get, doc)
+
 
 class PersonEvent(object):
 
@@ -1516,6 +1526,7 @@ class PersonEvent(object):
         'sort_key_exams', _get_sort_key_exams,
         """Sort key by contestant number for exams.""")
 
+
 class Country(object):
 
     """
@@ -1632,6 +1643,7 @@ class Country(object):
         'sort_key', _get_sort_key,
         """General-purpose sort key.""")
 
+
 class _CountryEventPropertyDS(_PropertyCached):
 
     """Class for CountryEvent attributes that are computed by a DataSource."""
@@ -1642,6 +1654,7 @@ class _CountryEventPropertyDS(_PropertyCached):
             return ds.country_event_get_attr(obj.country.id, obj.event.id,
                                              name)
         super(_CountryEventPropertyDS, self).__init__(name, ds_get, doc)
+
 
 class CountryEvent(object):
 

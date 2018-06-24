@@ -38,6 +38,7 @@ from matholymp.test.testutil import MoScriptTestCase, load_script_tests
 
 __all__ = ['load_tests', 'MoStaticPapersImportTestCase']
 
+
 class MoStaticPapersImportTestCase(MoScriptTestCase):
 
     """
@@ -55,6 +56,7 @@ class MoStaticPapersImportTestCase(MoScriptTestCase):
             assert self.check_dir
             in_doc_dir = os.path.join(self.full_dir, 'in-doc')
             self.args.append(in_doc_dir)
+
 
 def load_tests(loader, standard_tests, pattern):
     """Return a TestSuite for all the mo-static-papers-import tests."""

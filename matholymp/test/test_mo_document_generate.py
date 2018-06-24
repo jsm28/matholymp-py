@@ -39,6 +39,7 @@ from matholymp.test.testutil import MoScriptTestCase, load_script_tests
 
 __all__ = ['load_tests', 'MoDocumentGenerateTestCase']
 
+
 class MoDocumentGenerateTestCase(MoScriptTestCase):
 
     """
@@ -61,6 +62,7 @@ class MoDocumentGenerateTestCase(MoScriptTestCase):
         doc_have = os.listdir(os.path.join(self.out_dir, 'out'))
         doc_have = [doc for doc in doc_have if doc.endswith('.pdf')]
         self.assertEqual(sorted(self.doc_list), sorted(doc_have))
+
 
 def load_tests(loader, standard_tests, pattern):
     """Return a TestSuite for all the mo-document-generate tests."""

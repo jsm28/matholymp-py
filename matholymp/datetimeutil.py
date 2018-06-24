@@ -38,6 +38,7 @@ __all__ = ['date_from_ymd_str', 'date_from_ymd_iso', 'month_name',
            'date_range_html', 'date_to_ymd_iso', 'date_to_name', 'age_on_date',
            'time_from_hhmm_str', 'time_from_hhmm_iso', 'time_to_hhmm']
 
+
 def date_from_ymd_str(desc, year, month, day):
     """
     Return a date object for the given year, month and day, given as
@@ -61,6 +62,7 @@ def date_from_ymd_str(desc, year, month, day):
         raise ValueError('%s: %s' % (desc, err))
     return ret
 
+
 def date_from_ymd_iso(desc, date_str):
     """Return a date object for the given ISO yyyy-mm-dd string."""
     m = re.match('^([0-9]{1,})-([0-9]{2})-([0-9]{2})\\Z', date_str)
@@ -71,14 +73,17 @@ def date_from_ymd_iso(desc, date_str):
     day = m.group(3)
     return date_from_ymd_str(desc, year, month, day)
 
+
 # Output is meant to be locale-independent, so hardcode months here.
 _english_months = ['January', 'February', 'March', 'April', 'May', 'June',
                    'July', 'August', 'September', 'October', 'November',
                    'December']
 
+
 def month_name(month):
     """Return the English name for a month."""
     return _english_months[month - 1]
+
 
 def date_range_html(start_date, end_date, year):
     """Return HTML for a range of dates, within the given year."""
@@ -96,6 +101,7 @@ def date_range_html(start_date, end_date, year):
                 % (start_date.day, start_month_name,
                  end_date.day, end_month_name))
 
+
 def date_to_ymd_iso(date):
     """
     Convert a date to an ISO yyyy-mm-dd string.  The date may be None,
@@ -105,9 +111,11 @@ def date_to_ymd_iso(date):
         return ''
     return '%04d-%02d-%02d' % (date.year, date.month, date.day)
 
+
 def date_to_name(date):
     """Return the English (day month year) name of a date."""
     return '%d %s %d' % (date.day, month_name(date.month), date.year)
+
 
 def age_on_date(date1, date2):
     """Return the age on the second date of a person born on the first date."""
@@ -116,6 +124,7 @@ def age_on_date(date1, date2):
                                         and date2.day < date1.day)):
         diff -= 1
     return diff
+
 
 def time_from_hhmm_str(desc, hour, minute):
     """
@@ -137,6 +146,7 @@ def time_from_hhmm_str(desc, hour, minute):
         raise ValueError('%s: %s' % (desc, err))
     return ret
 
+
 def time_from_hhmm_iso(desc, time_str):
     """Return a time object for the given ISO hh:mm string."""
     m = re.match('^([0-9]{2}):([0-9]{2})\\Z', time_str)
@@ -145,6 +155,7 @@ def time_from_hhmm_iso(desc, time_str):
     hour = m.group(1)
     minute = m.group(2)
     return time_from_hhmm_str(desc, hour, minute)
+
 
 def time_to_hhmm(time):
     """

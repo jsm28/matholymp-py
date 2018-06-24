@@ -57,6 +57,7 @@ if _py3:
 else:
     _text_open_args = {}
 
+
 def read_utf8_csv(csv_file_name):
     """
     Read the contents of a UTF-8 CSV file (with BOM) into an array of
@@ -77,6 +78,7 @@ def read_utf8_csv(csv_file_name):
         csv_reader = csv.DictReader(csv_file)
         rows = [row for row in csv_reader]
         return rows
+
 
 def write_utf8_csv_bytes(rows, keys):
     """
@@ -100,9 +102,11 @@ def write_utf8_csv_bytes(rows, keys):
     csv_bytes_file_b.close()
     return csv_bytes
 
+
 def write_utf8_csv(csv_file_name, rows, keys):
     """Write a UTF-8 CSV file (with BOM) from an array of dictionaries."""
     write_bytes_to_file(write_utf8_csv_bytes(rows, keys), csv_file_name)
+
 
 def comma_join(val_list):
     """
@@ -127,6 +131,7 @@ def comma_join(val_list):
         csv_text = csv_text[:-1]
     return csv_text
 
+
 def comma_split(val_text):
     """
     Split the given comma-separated string as if it formed the row of
@@ -149,11 +154,13 @@ def comma_split(val_text):
     csv_text_file.close()
     return val_row
 
+
 def make_dirs_for_file(file_name):
     """Create directories needed to create a file."""
     dir = os.path.dirname(file_name)
     if not os.access(dir, os.F_OK):
         os.makedirs(dir)
+
 
 def write_bytes_to_file(out_bytes, out_file_name):
     """Write some bytes to a file, but not if it would be unchanged."""
@@ -166,6 +173,7 @@ def write_bytes_to_file(out_bytes, out_file_name):
     with open(out_file_name, 'wb') as out_file:
         out_file.write(out_bytes)
 
+
 def write_text_to_file(out_text, out_file_name):
     """Write some UTF-8 text to a file (without BOM)."""
     if _py3:
@@ -174,11 +182,13 @@ def write_text_to_file(out_text, out_file_name):
         out_bytes = out_text
     write_bytes_to_file(out_bytes, out_file_name)
 
+
 def read_text_from_file(file_name):
     """Read the UTF-8 (no BOM) text contents of a file."""
     with open(file_name, 'r', **_text_open_args) as in_file:
         text = in_file.read()
     return text
+
 
 def read_config(file_name, section, str_keys, int_keys, int_none_keys,
                 bool_keys):
@@ -206,6 +216,7 @@ def read_config(file_name, section, str_keys, int_keys, int_none_keys,
         ret[k] = cfg.getboolean(section, k)
     return ret
 
+
 if _py3:
     # Exported by the standard library from 3.2 onwards.
     _boolean_states = configparser.RawConfigParser.BOOLEAN_STATES
@@ -215,14 +226,17 @@ else:
 boolean_states = _boolean_states
 """Mapping of boolean states to values in configuration files."""
 
+
 def remove_if_exists(file_name):
     """Remove a file if it exists."""
     if os.access(file_name, os.F_OK):
         os.remove(file_name)
 
+
 # Map file format names from imghdr to canonical extensions.
 _file_format_ext_map = { 'jpeg': 'jpg',
                          'png': 'png' }
+
 
 def file_format_contents(filename):
     """
@@ -240,6 +254,7 @@ def file_format_contents(filename):
             return 'pdf'
         return None
 
+
 if _py3:
     _maketrans = str.maketrans
 else:
@@ -251,6 +266,7 @@ _file_ext_map = { 'jpg': 'jpg',
                   'jpeg': 'jpg',
                   'png': 'png',
                   'pdf': 'pdf' }
+
 
 def file_extension(name):
     """

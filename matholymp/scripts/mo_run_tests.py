@@ -39,6 +39,7 @@ import matholymp
 
 __all__ = ['main']
 
+
 def main():
     """Main program for mo-run-tests."""
 

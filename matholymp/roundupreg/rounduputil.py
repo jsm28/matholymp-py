@@ -56,10 +56,12 @@ __all__ = ['distinguish_official', 'get_consent_forms_date_str',
            'create_rss', 'db_file_format_contents', 'db_file_extension',
            'db_file_url']
 
+
 def distinguish_official(db):
     """Return whether this event distinguishes official countries."""
     dist_off = db.config.ext['MATHOLYMP_DISTINGUISH_OFFICIAL']
     return boolean_states[dist_off.lower()]
+
 
 def get_consent_forms_date_str(db):
     """
@@ -67,6 +69,7 @@ def get_consent_forms_date_str(db):
     consent forms, as a string, or the empty string if not required.
     """
     return db.config.ext['MATHOLYMP_CONSENT_FORMS_DATE']
+
 
 def get_consent_forms_date(db):
     """
@@ -79,9 +82,11 @@ def get_consent_forms_date(db):
     else:
         return date_from_ymd_iso('consent forms date', s)
 
+
 def have_consent_forms(db):
     """Return whether this event has consent forms."""
     return get_consent_forms_date_str(db) != ''
+
 
 def have_passport_numbers(db):
     """
@@ -91,10 +96,12 @@ def have_passport_numbers(db):
     req_passport = db.config.ext['MATHOLYMP_REQUIRE_PASSPORT_NUMBER']
     return boolean_states[req_passport.lower()]
 
+
 def have_nationality(db):
     """Return whether nationalities are collected for this event."""
     req_nationality = db.config.ext['MATHOLYMP_REQUIRE_NATIONALITY']
     return boolean_states[req_nationality.lower()]
+
 
 def require_diet(db):
     """
@@ -104,20 +111,24 @@ def require_diet(db):
     req_diet = db.config.ext['MATHOLYMP_REQUIRE_DIET']
     return boolean_states[req_diet.lower()]
 
+
 def require_dob(db):
     """Return whether date of birth is required for all participants."""
     req_dob = db.config.ext['MATHOLYMP_REQUIRE_DATE_OF_BIRTH']
     return boolean_states[req_dob.lower()]
 
+
 def get_num_problems(db):
     """Return the number of problems at this event."""
     return int(db.config.ext['MATHOLYMP_NUM_PROBLEMS'])
+
 
 def get_marks_per_problem(db):
     """Return the number of marks for each problem at this event."""
     marks_per_problem = db.config.ext['MATHOLYMP_MARKS_PER_PROBLEM']
     marks_per_problem = marks_per_problem.split()
     return [int(m) for m in marks_per_problem]
+
 
 def scores_from_str(db, score_str):
     """
@@ -137,18 +148,22 @@ def scores_from_str(db, score_str):
         scores = scores[0:num_problems]
     return scores
 
+
 def get_num_languages(db):
     """Return the maximum number of languages for a person at this event."""
     return int(db.config.ext['MATHOLYMP_NUM_LANGUAGES'])
+
 
 def get_language_numbers(db):
     """Return the numbers of language database properties for a person."""
     return range(1, get_num_languages(db) + 1)
 
+
 def get_earliest_date_of_birth(db):
     """Return the earliest date of birth allowed for any participant."""
     # Avoid problems with strftime by disallowing dates before 1902.
     return datetime.date(1902, 1, 1)
+
 
 def get_sanity_date_of_birth(db):
     """
@@ -158,10 +173,12 @@ def get_sanity_date_of_birth(db):
     return date_from_ymd_iso('sanity date of birth',
                              db.config.ext['MATHOLYMP_SANITY_DATE_OF_BIRTH'])
 
+
 def get_earliest_date_of_birth_contestant(db):
     """Return the earliest date of birth allowed for contestants."""
     return date_from_ymd_iso('earliest date of birth for contestants',
                              db.config.ext['MATHOLYMP_EARLIEST_DATE_OF_BIRTH'])
+
 
 def person_date_of_birth(db, person):
     """Return the date of birth for a registered participant, or None."""
@@ -172,6 +189,7 @@ def person_date_of_birth(db, person):
         return None
     return date_from_ymd_str('date of birth', dob_year, dob_month, dob_day)
 
+
 def contestant_age(db, person):
     """Return the age of a contestant on the configured day."""
     date1 = person_date_of_birth(db, person)
@@ -179,10 +197,12 @@ def contestant_age(db, person):
                               db.config.ext['MATHOLYMP_AGE_DAY_DATE'])
     return age_on_date(date1, date2)
 
+
 _early_vars = {'arrival': 'MATHOLYMP_EARLIEST_ARRIVAL_DATE',
                'departure': 'MATHOLYMP_EARLIEST_DEPARTURE_DATE'}
 _late_vars = {'arrival': 'MATHOLYMP_LATEST_ARRIVAL_DATE',
               'departure': 'MATHOLYMP_LATEST_DEPARTURE_DATE'}
+
 
 def get_arrdep_bounds(db, kind):
     """Return the bounds on arrival or departure dates."""
@@ -194,21 +214,25 @@ def get_arrdep_bounds(db, kind):
                                   db.config.ext[late_var])
     return (early_date, late_date)
 
+
 def get_staff_country_name(db):
     """Return the name of the special staff country."""
     short_name = db.config.ext['MATHOLYMP_SHORT_NAME']
     year = db.config.ext['MATHOLYMP_YEAR']
     return short_name + ' ' + year + ' Staff'
 
+
 def normal_country_person(db, userid):
     """Determine whether the user is from a normal country."""
     user_country = db.user.get(userid, 'country')
     return db.country.get(user_country, 'is_normal')
 
+
 def person_is_contestant(db, person):
     """Determine whether a person is a contestant."""
     role = db.person.get(person, 'primary_role')
     return db.matholymprole.get(role, 'name').startswith('Contestant ')
+
 
 def contestant_code(db, person):
     """Determine a contestant's contestant code."""
@@ -217,11 +241,13 @@ def contestant_code(db, person):
     number = db.matholymprole.get(role, 'name')[len('Contestant '):]
     return db.country.get(country, 'code') + number
 
+
 def pn_score(db, person, n):
     """Determine the score of a contestant on a given problem."""
     score_str = db.person.get(person, 'scores')
     scores = scores_from_str(db, score_str)
     return scores[n-1]
+
 
 def scores_final(db):
     """Determine whether the scores are final."""
@@ -230,6 +256,7 @@ def scores_final(db):
         return False
     else:
         return True
+
 
 def any_scores_missing(db):
     """Determine whether any scores have yet to be entered."""
@@ -244,6 +271,7 @@ def any_scores_missing(db):
                     return True
     return False
 
+
 def country_has_contestants(db, country):
     """Determine whether a country has any contestants registered."""
     people = db.person.filter(None, {'country': country})
@@ -251,6 +279,7 @@ def country_has_contestants(db, country):
         if person_is_contestant(db, person):
             return True
     return False
+
 
 def valid_country_problem(db, form):
     """Determine whether the country and problem are valid to enter scores."""
@@ -264,6 +293,7 @@ def valid_country_problem(db, form):
     if int(problem) > num_problems:
         return False
     return country_has_contestants(db, country)
+
 
 def valid_score(score_str, max_score):
     """
@@ -279,6 +309,7 @@ def valid_score(score_str, max_score):
         return False
     return True
 
+
 def create_rss(db, title, description, **args):
     """Create an RSS item."""
     date_text = time.strftime('%a, %d %b %Y %H:%M:%S +0000', time.gmtime())
@@ -293,6 +324,7 @@ def create_rss(db, title, description, **args):
                              cgi.escape(date_text), cgi.escape(rss_url)))
     db.rss.set(rss_id, text=rss_text)
 
+
 def db_file_format_contents(db, cls, id):
     """
     Return the format (canonical filename extension) of an uploaded
@@ -302,6 +334,7 @@ def db_file_format_contents(db, cls, id):
     filename = db.filename(cls, id)
     return file_format_contents(filename)
 
+
 def db_file_extension(db, cls, id):
     """
     Return the format (canonical filename extension) of an uploaded
@@ -310,6 +343,7 @@ def db_file_extension(db, cls, id):
     """
     name = db.getclass(cls).get(id, 'name')
     return file_extension(name)
+
 
 def db_file_url(db, cls, kind, id):
     """

@@ -49,6 +49,7 @@ __all__ = ['read_sitegen_config', 'sitegen_events_csv', 'sitegen_papers_csv',
            'sitegen_countries_csv', 'sitegen_people_csv',
            'sitegen_event_group', 'SiteGenerator']
 
+
 def read_sitegen_config(top_directory):
     """Read the configuration file for site generation."""
     cfg_file_name = os.path.join(top_directory, 'staticsite.cfg')
@@ -71,22 +72,27 @@ def read_sitegen_config(top_directory):
 
     return cfg_data
 
+
 def sitegen_events_csv(top_directory, cfg_data):
     """Return the path to the CSV file of events."""
     return os.path.join(top_directory, 'data',
                         cfg_data['short_name_url_plural'] + '.csv')
 
+
 def sitegen_papers_csv(top_directory, cfg_data):
     """Return the path to the CSV file of papers."""
     return os.path.join(top_directory, 'data', 'papers.csv')
+
 
 def sitegen_countries_csv(top_directory, cfg_data):
     """Return the path to the CSV file of papers."""
     return os.path.join(top_directory, 'data', 'countries.csv')
 
+
 def sitegen_people_csv(top_directory, cfg_data):
     """Return the path to the CSV file of papers."""
     return os.path.join(top_directory, 'data', 'people.csv')
+
 
 def sitegen_event_group(top_directory, cfg_data):
     """Return an EventGroup based on the static site data."""
@@ -103,6 +109,7 @@ def sitegen_event_group(top_directory, cfg_data):
     return EventGroup(CSVDataSource(cfg_data, events_data, papers_data,
                                     countries_data, people_data,
                                     top_directory))
+
 
 class SiteGenerator(object):
 

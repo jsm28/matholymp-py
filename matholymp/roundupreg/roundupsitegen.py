@@ -40,6 +40,7 @@ from matholymp.data import EventGroup
 from matholymp.roundupreg.roundupsource import RoundupDataSource
 from matholymp.regsitegen import RegSiteGenerator
 
+
 class RoundupSiteGenerator(RegSiteGenerator):
 
     """

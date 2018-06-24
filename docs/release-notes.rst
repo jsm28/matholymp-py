@@ -71,6 +71,9 @@ the registration system is not active.
   :file:`private_file.index.html` and :file:`private_file.item.html`
   are removed.
 
+* As part of cleanups to Python coding style, the example Python files
+  for the registration system have been changed.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

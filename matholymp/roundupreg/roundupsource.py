@@ -44,6 +44,7 @@ from matholymp.roundupreg.rounduputil import distinguish_official, \
 
 __all__ = ['RoundupDataSource']
 
+
 class RoundupDataSource(DataSource):
 
     """Subclass of DataSource providing information from Roundup."""

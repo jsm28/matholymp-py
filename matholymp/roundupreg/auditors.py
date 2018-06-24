@@ -48,6 +48,7 @@ from matholymp.roundupreg.staticsite import static_site_event_group, \
     static_site_file_data
 from matholymp.roundupreg.userauditor import audit_user_fields
 
+
 def audit_event_fields(db, cl, nodeid, newvalues):
     """Verify medal boundaries can be set and create RSS item for them."""
     gold = get_new_value(db, cl, nodeid, newvalues, 'gold')
@@ -80,6 +81,7 @@ def audit_event_fields(db, cl, nodeid, newvalues):
         medal_text = 'Medal boundaries: ' + ', '.join(medal_items)
         create_rss(db, 'Medal boundaries', medal_text)
 
+
 def audit_file_format(db, cls, id, desc1, desc2, fmts, fmtdesc):
     """Check for format of an uploaded file."""
     format_contents = db_file_format_contents(db, cls, id)
@@ -89,6 +91,7 @@ def audit_file_format(db, cls, id, desc1, desc2, fmts, fmtdesc):
     if format_ext != format_contents:
         raise ValueError('Filename extension for %s must match '
                          'contents (%s)' % (desc2, format_contents))
+
 
 def audit_country_fields(db, cl, nodeid, newvalues):
     """Make sure country properties are valid."""
@@ -148,6 +151,7 @@ def audit_country_fields(db, cl, nodeid, newvalues):
             raise ValueError(gudesc + ' for previous participation must'
                              ' be in the form ' + gubase + 'N/')
 
+
 def audit_person_arrdep(db, cl, nodeid, newvalues, kind):
     """
     Check arrival or departure details for a person.  Return the date
@@ -180,6 +184,7 @@ def audit_person_arrdep(db, cl, nodeid, newvalues, kind):
         if date > latest:
             raise ValueError('%s date too late' % kind)
     return date, time
+
 
 def audit_person_fields(db, cl, nodeid, newvalues):
     """Make sure person properties are valid, both individually and
@@ -420,6 +425,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         phone_number = ''
     if phone_number != '' and is_normal:
         raise ValueError('Phone numbers may only be entered for staff')
+
 
 def register_auditors(db):
     """Register the matholymp auditors with Roundup."""

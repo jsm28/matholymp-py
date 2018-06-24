@@ -35,6 +35,7 @@ from matholymp.test.testutil import MoScriptTestCase, load_script_tests
 
 __all__ = ['load_tests', 'MoStaticGenerateTestCase']
 
+
 class MoStaticGenerateTestCase(MoScriptTestCase):
 
     """
@@ -50,6 +51,7 @@ class MoStaticGenerateTestCase(MoScriptTestCase):
                                                        top_dir, dir)
         if dir is not None:
             assert self.check_dir
+
 
 def load_tests(loader, standard_tests, pattern):
     """Return a TestSuite for all the mo-static-generate tests."""

@@ -43,6 +43,7 @@ from matholymp.regdata import file_url_to_local
 
 __all__ = ['CSVDataSource']
 
+
 class CSVDataSource(DataSource):
 
     """Subclass of DataSource providing information from CSV files."""

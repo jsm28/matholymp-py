@@ -73,6 +73,7 @@ from matholymp.sitegen import read_sitegen_config, sitegen_events_csv, \
 
 __all__ = ['main']
 
+
 def _import_from_dir(top_directory, input_directory, temp_dir):
     cfg_data = read_sitegen_config(top_directory)
     events_csv = sitegen_events_csv(top_directory, cfg_data)
@@ -264,6 +265,7 @@ def _import_from_dir(top_directory, input_directory, temp_dir):
                           'event_active_number =', cfg_text,
                           flags=re.MULTILINE)
         write_text_to_file(cfg_text, static_cfg)
+
 
 def main():
     """Main program for mo-static-import."""

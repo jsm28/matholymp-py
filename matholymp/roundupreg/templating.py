@@ -65,6 +65,7 @@ from matholymp.roundupreg.rounduputil import distinguish_official, \
     scores_final, any_scores_missing, country_has_contestants, \
     valid_country_problem
 
+
 def people_from_country_internal(db, country):
     """
     Return a list of people from a given country, sorted first by role
@@ -83,6 +84,7 @@ def people_from_country_internal(db, country):
             db.matholymprole.get(db.person.get(x, 'primary_role'), 'name')))
     return sorted_list
 
+
 def people_from_country(db, country):
     """
     Return a list of people from a given country, sorted first by role
@@ -91,10 +93,12 @@ def people_from_country(db, country):
     sorted_list = people_from_country_internal(db._db, country)
     return [HTMLItem(db._client, 'person', i) for i in sorted_list]
 
+
 def show_country_people(db, country):
     """Return whether to show a table of people on a country's page."""
     return (db.country.get(country, 'participants_ok')
             and not db.country.is_retired(country))
+
 
 def country_people_table(db, country):
     """Show the table of people from a country on that country's page."""
@@ -102,11 +106,13 @@ def country_people_table(db, country):
     c = sitegen.event.country_map[int(country)]
     return sitegen.country_event_people_table(c, True)
 
+
 def all_people_table(db):
     """Show the table of all people."""
     sitegen = RoundupSiteGenerator(db)
     event = sitegen.event
     return sitegen.event_people_table(event)
+
 
 def person_scores_table(db, person):
     """Show the table of scores for a person on that person's page."""
@@ -117,25 +123,30 @@ def person_scores_table(db, person):
     return sitegen.person_event_scores_table(p, show_rank=False,
                                              show_code=False, show_name=False)
 
+
 def country_scores_table(db, country):
     """Show the table of scores for a country on that country's page."""
     sitegen = RoundupSiteGenerator(db)
     c = sitegen.event.country_map[int(country)]
     return sitegen.country_event_scores_table(c, show_rank=False)
 
+
 def scoreboard_gen(db):
     """Produce scoreboard page contents from the database."""
     sitegen = RoundupSiteGenerator(db)
     return sitegen.scoreboard_text(sitegen.event)
 
+
 def scoreboard(db, force_regen):
     """Produce scoreboard page contents, possibly cached."""
     return cached_text(db, 'scoreboard', force_regen, scoreboard_gen)
+
 
 def display_scoreboard(db, display_start):
     """Produce display scoreboard page contents."""
     sitegen = RoundupSiteGenerator(db)
     return sitegen.display_scoreboard_text(sitegen.event, display_start)
+
 
 def has_nonempty_travel(db, person):
     """Return whether a person has nonempty travel details."""
@@ -150,6 +161,7 @@ def has_nonempty_travel(db, person):
             or db.person.get(person, 'departure_time_minute') is not None
             or db.person.get(person, 'departure_flight') is not None)
 
+
 def show_travel_copy_options(db, userid, person):
     """Return whether to give options to copy travel details."""
     if normal_country_person(db, userid):
@@ -158,6 +170,7 @@ def show_travel_copy_options(db, userid, person):
         return False
     country = db.person.get(person, 'country')
     return db.country.get(country, 'is_normal')
+
 
 def country_travel_copy_options(db, country, person):
     """
@@ -210,6 +223,7 @@ def country_travel_copy_options(db, country, person):
         travel_list.append(prop_js_submit)
     return '\n'.join(travel_list)
 
+
 def person_case_warning(db, person):
     """Return an HTML warning about all-upper-case parts of a person's name."""
     given_name = db.person.get(person, 'given_name')
@@ -227,6 +241,7 @@ def person_case_warning(db, person):
         warn_text = '<strong>%s</strong>' % warn_text
     return warn_text
 
+
 def list_expected_roles(db):
     """List the roles expected to be present for a normal country."""
     main_role_list = ['Leader', 'Deputy Leader']
@@ -234,6 +249,7 @@ def list_expected_roles(db):
     main_role_list.extend([('Contestant %d' % (i + 1))
                            for i in range(cont_per_team)])
     return main_role_list
+
 
 def registration_status(db):
     """Produce registration status page contents for all countries."""
@@ -243,6 +259,7 @@ def registration_status(db):
     max_photo_size = int(db.config.ext['MATHOLYMP_PHOTO_MAX_SIZE'])
     return sitegen.registration_status_text(main_role_list, consent_forms_date,
                                             max_photo_size)
+
 
 def registration_status_country(db, userid):
     """Produce registration status page contents for one country."""
@@ -256,10 +273,12 @@ def registration_status_country(db, userid):
     return sitegen.registration_status_country_text(c, main_role_list,
                                                     consent_forms_date)
 
+
 def edit_rooms(db):
     """Produce contents of page for viewing and editing room numbers."""
     sitegen = RoundupSiteGenerator(db)
     return sitegen.edit_rooms_text()
+
 
 def show_consent_form_ui(db, person):
     """Return whether to show the interface to upload a consent form."""
@@ -274,6 +293,7 @@ def show_consent_form_ui(db, person):
         return True
     consent_forms_date = get_consent_forms_date(db)
     return date_of_birth >= consent_forms_date
+
 
 def string_select(name, default_label, entry_list, selected):
     """Return form content for selecting from a list of string choices."""
@@ -297,6 +317,7 @@ def string_select(name, default_label, entry_list, selected):
     return ('<select id="%s" name="%s">%s</select>'
             % (name, name, '\n'.join(option_list)))
 
+
 def date_of_birth_select(db, year, month, day):
     """Return form content for selecting a date of birth."""
     earliest_dob = get_earliest_date_of_birth(db)
@@ -317,6 +338,7 @@ def date_of_birth_select(db, year, month, day):
     day_select = string_select('date_of_birth_day', '(day)', day_list, day)
     return '%s\n%s\n%s' % (day_select, month_select, year_select)
 
+
 def arrdep_date_select(db, kind, date):
     """Return form content for selecting an arrival or departure date."""
     earliest, latest = get_arrdep_bounds(db, kind)
@@ -329,6 +351,7 @@ def arrdep_date_select(db, kind, date):
         d = d + datetime.timedelta(1)
     return string_select('%s_date' % kind, '(date)', date_list, date)
 
+
 def arrdep_time_select(db, kind, hour, minute):
     """Return form content for selecting an arrival or departure time."""
     hour_range = range(0, 24)
@@ -340,6 +363,7 @@ def arrdep_time_select(db, kind, hour, minute):
     minute_select = string_select('%s_time_minute' % kind, '(minute)',
                                   minute_list, minute)
     return '%s : %s' % (hour_select, minute_select)
+
 
 def required_person_fields(db):
     """Return the list of fields required for registered people."""
@@ -356,6 +380,7 @@ def required_person_fields(db):
     if require_diet(db):
         req.append('diet')
     return req
+
 
 def register_templating_utils(instance):
     """Register functions for use from page templates with Roundup."""

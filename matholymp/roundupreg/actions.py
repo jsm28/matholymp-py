@@ -47,6 +47,7 @@ from matholymp.roundupreg.rounduputil import get_marks_per_problem, \
     scores_from_str, person_is_contestant, contestant_code, scores_final, \
     valid_country_problem, valid_score, create_rss
 
+
 class ScoreAction(Action):
 
     """Action to enter scores."""
@@ -101,6 +102,7 @@ class ScoreAction(Action):
                                    % (country_node.name, problem))
         self.db.commit()
 
+
 class RetireCountryAction(Action):
 
     """Action to retire a country."""
@@ -133,6 +135,7 @@ class RetireCountryAction(Action):
             self.db.person.set(g, guide_for=guide_for)
         self.db.country.retire(self.nodeid)
         self.db.commit()
+
 
 class ScalePhotoAction(Action):
 
@@ -179,6 +182,7 @@ class ScalePhotoAction(Action):
             scale_factor *= 2
         raise ValueError('Could not make this photo small enough')
 
+
 class CountryCSVAction(Action):
 
     """Action to return a CSV file of countries."""
@@ -194,6 +198,7 @@ class CountryCSVAction(Action):
                               'attachment; filename=countries.csv')
         return RoundupSiteGenerator(self.db).countries_csv_bytes()
 
+
 class ScoresCSVAction(Action):
 
     """Action to return a CSV file of scores."""
@@ -208,6 +213,7 @@ class ScoresCSVAction(Action):
         self.client.setHeader('Content-Disposition',
                               'attachment; filename=scores.csv')
         return RoundupSiteGenerator(self.db).scores_csv_bytes()
+
 
 class PeopleCSVAction(Action):
 
@@ -225,6 +231,7 @@ class PeopleCSVAction(Action):
         show_all = self.hasPermission('Omnivident')
         return RoundupSiteGenerator(self.db).people_csv_bytes(show_all)
 
+
 class MedalBoundariesCSVAction(Action):
 
     """Action to return a CSV file of medal boundaries."""
@@ -239,6 +246,7 @@ class MedalBoundariesCSVAction(Action):
         self.client.setHeader('Content-Disposition',
                               'attachment; filename=medal-boundaries.csv')
         return RoundupSiteGenerator(self.db).medal_boundaries_csv_bytes()
+
 
 class FlagsZIPAction(Action):
 
@@ -255,6 +263,7 @@ class FlagsZIPAction(Action):
                               'attachment; filename=flags.zip')
         return RoundupSiteGenerator(self.db).flags_zip_bytes()
 
+
 class PhotosZIPAction(Action):
 
     """Action to return a ZIP file of photos."""
@@ -269,6 +278,7 @@ class PhotosZIPAction(Action):
         self.client.setHeader('Content-Disposition',
                               'attachment; filename=photos.zip')
         return RoundupSiteGenerator(self.db).photos_zip_bytes()
+
 
 class ConsentFormsZIPAction(Action):
 
@@ -287,6 +297,7 @@ class ConsentFormsZIPAction(Action):
         self.client.setHeader('Content-Disposition',
                               'attachment; filename=consent-forms.zip')
         return RoundupSiteGenerator(self.db).consent_forms_zip_bytes()
+
 
 class ScoresRSSAction(Action):
 
@@ -339,6 +350,7 @@ class ScoresRSSAction(Action):
 
         text += '\n  </channel>\n</rss>\n'
         return text
+
 
 def register_actions(instance):
     """Register the matholymp actions with Roundup."""

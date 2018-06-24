@@ -39,8 +39,10 @@ __all__ = ['mean_std_dev', 'corr_coeff']
 # division and square root, to reduce the chance of floating-point
 # rounding affecting the final textual output.
 
+
 def _sum_sq(data):
     return sum([x * x for x in data])
+
 
 def mean_std_dev(data):
     """
@@ -56,6 +58,7 @@ def mean_std_dev(data):
     mean = float(s) / float(n)
     std_dev =  math.sqrt(float(n * s2 - s * s) / float(n * n))
     return (mean, std_dev)
+
 
 def corr_coeff(data):
     """

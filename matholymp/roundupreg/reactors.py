@@ -42,6 +42,7 @@ from matholymp.fileutil import read_text_from_file
 from matholymp.roundupreg.cache import invalidate_cache
 from matholymp.roundupreg.rounduputil import have_consent_forms
 
+
 def country_react(db, cl, nodeid, oldvalues):
     """
     Mark the cached scoreboard invalid, and create an account for a
@@ -93,6 +94,7 @@ def country_react(db, cl, nodeid, oldvalues):
     except roundup.mailer.MessageSendError:
         pass
 
+
 def person_react(db, cl, nodeid, oldvalues):
     """
     Mark the cached scoreboard invalid, and set the country for a
@@ -111,9 +113,11 @@ def person_react(db, cl, nodeid, oldvalues):
     if file_country != person_country:
         db.consent_form.set(cf, country=person_country)
 
+
 def scoreboard_react(db, cl, nodeid, oldvalues):
     """Mark the cached scoreboard invalid."""
     invalidate_cache(db, 'scoreboard')
+
 
 def register_reactors(db):
     """Register the matholymp reactors with Roundup."""

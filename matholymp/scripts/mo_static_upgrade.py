@@ -45,10 +45,12 @@ from matholymp.sitegen import read_sitegen_config, sitegen_events_csv, \
 
 __all__ = ['main']
 
+
 def _convert_comma_separated(s):
     if s == '':
         return s
     return comma_join(s.split(','))
+
 
 def main():
     """Main program for mo-static-upgrade."""

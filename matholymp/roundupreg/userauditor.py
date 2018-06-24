@@ -64,9 +64,11 @@ from matholymp.roundupreg.auditorutil import require_value
 _email_regexp = (r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*", r"(localhost|(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9]))")
 _email_rfc = re.compile('^' + _email_regexp[0] + '@' + _email_regexp[1] + '$', re.IGNORECASE)
 
+
 def _valid_address(address):
     """Check validity of an email address."""
     return _email_rfc.match(address)
+
 
 def audit_user_fields(db, cl, nodeid, newvalues):
     """ Make sure user properties are valid.

@@ -35,6 +35,7 @@ Roundup registration system.
 
 __all__ = ['get_new_value', 'require_value']
 
+
 def get_new_value(db, cl, nodeid, newvalues, prop):
     """
     Return the new value of a property if one was specified, or the
@@ -46,6 +47,7 @@ def get_new_value(db, cl, nodeid, newvalues, prop):
     if nodeid is None:
         return None
     return cl.get(nodeid, prop)
+
 
 def require_value(db, cl, nodeid, newvalues, prop, error):
     """

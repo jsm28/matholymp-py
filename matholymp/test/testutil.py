@@ -44,6 +44,7 @@ from matholymp.fileutil import read_text_from_file
 
 __all__ = ['MoScriptTestCase', 'load_script_tests', 'load_tests']
 
+
 class MoScriptTestCase(unittest.TestCase):
 
     """
@@ -125,6 +126,7 @@ class MoScriptTestCase(unittest.TestCase):
         """
         raise NotImplementedError
 
+
 def load_script_tests(script, cl):
     """Load the tests for the given script."""
     suite = unittest.TestSuite()
@@ -135,6 +137,7 @@ def load_script_tests(script, cl):
         suite.addTest(cl(script_dir=top_dir, script=script,
                          top_dir=test_top_dir, dir=d))
     return suite
+
 
 def load_tests(loader, standard_tests, pattern):
     """Return an empty TestSuite."""

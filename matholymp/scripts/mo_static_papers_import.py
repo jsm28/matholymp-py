@@ -66,6 +66,7 @@ from matholymp.sitegen import read_sitegen_config, sitegen_papers_csv
 
 __all__ = ['main']
 
+
 def _import_paper(papers_data, cfg_data, docgen_config_data, top_directory,
                   input_papers_directory, day, language, description,
                   filename):
@@ -83,6 +84,7 @@ def _import_paper(papers_data, cfg_data, docgen_config_data, top_directory,
     shutil.copyfile(os.path.join(input_papers_directory, filename),
                     paper_dst_filename)
     papers_data.append(p)
+
 
 def main():
     """Main program for mo-static-papers-import."""

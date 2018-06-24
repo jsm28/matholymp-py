@@ -60,6 +60,7 @@ from matholymp.roundupreg.rounduputil import distinguish_official, \
 
 __all__ = ['init_schema']
 
+
 def init_schema(env):
     """
     Initialise the Roundup schema for the registration system.  The

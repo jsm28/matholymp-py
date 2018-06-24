@@ -51,6 +51,7 @@ from matholymp.regdata import lang_to_filename
 
 __all__ = ['read_docgen_config', 'DocumentGenerator']
 
+
 def read_docgen_config(top_directory):
     """Read the configuration file for document generation."""
     config_file_name = os.path.join(top_directory, 'documentgen.cfg')
@@ -70,6 +71,7 @@ def read_docgen_config(top_directory):
                               cfg_str_keys, cfg_int_keys,
                               cfg_int_none_keys, cfg_bool_keys)
     return config_data
+
 
 class DocumentGenerator(object):
 

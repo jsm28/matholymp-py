@@ -48,6 +48,7 @@ from matholymp.sitegen import read_sitegen_config, sitegen_event_group, \
 
 __all__ = ['main']
 
+
 def main():
     """Main program for mo-static-generate."""
 

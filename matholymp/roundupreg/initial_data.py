@@ -60,6 +60,7 @@ from matholymp.roundupreg.staticsite import static_site_event_group
 
 __all__ = ['init_data']
 
+
 def init_data(env):
     """
     Initialise the Roundup database contents for the registration

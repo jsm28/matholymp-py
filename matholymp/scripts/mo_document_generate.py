@@ -55,6 +55,7 @@ from matholymp.fileutil import read_utf8_csv
 
 __all__ = ['main']
 
+
 def main():
     """Main program for mo-document-generate."""
 

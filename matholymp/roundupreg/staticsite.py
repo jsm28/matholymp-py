@@ -39,6 +39,7 @@ from matholymp.sitegen import read_sitegen_config, sitegen_event_group
 
 __all__ = ['static_site_event_group', 'static_site_file_data']
 
+
 def static_site_event_group(db):
     """
     Return an EventGroup for the static site, or None if static site
@@ -50,6 +51,7 @@ def static_site_event_group(db):
     static_site_path = os.path.join(db.config.TRACKER_HOME, static_site_path)
     cfg_data = read_sitegen_config(static_site_path)
     return sitegen_event_group(static_site_path, cfg_data)
+
 
 def static_site_file_data(db, url):
     """

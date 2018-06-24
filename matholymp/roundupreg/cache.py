@@ -52,14 +52,17 @@ except ImportError:
 
 from matholymp.fileutil import write_text_to_file, read_text_from_file
 
+
 def _cache_path(db, name, suffix):
     """Return the path for a file used in implementing the cache."""
     db_path = db.config.DATABASE
     return os.path.join(db_path, 'cache-%s.%s' % (name, suffix))
 
+
 def _invalid_path(db, name):
     """Return the path for the file to mark the cache invalid."""
     return _cache_path(db, name, 'invalid')
+
 
 def cached_text(db, name, force_regen, gen_func):
     """Return text that can be cached, generating it if necessary."""
@@ -89,6 +92,7 @@ def cached_text(db, name, force_regen, gen_func):
         write_text_to_file(new_text, tmp_path)
         os.rename(tmp_path, file_path)
         return new_text
+
 
 def invalidate_cache(db, name):
     """Mark cached text invalid so it needs regenerating."""
