@@ -221,7 +221,8 @@ class CSVDataSource(DataSource):
                                    'family_name': 'Family Name',
                                    'award': 'Award',
                                    'photo_url': 'Photo URL',
-                                   'diet': 'Allergies and Dietary Requirements',
+                                   'diet': ('Allergies and '
+                                            'Dietary Requirements'),
                                    'room_number': 'Room Number',
                                    'phone_number': 'Phone Number',
                                    'gender': 'Gender',
@@ -327,7 +328,8 @@ class CSVDataSource(DataSource):
         if name == 'problem_scores':
             r = []
             for n in range(int(self._events[event_id]['Number of Problems'])):
-                s = self._people[event_id][person_id][country_id]['P%d' % (n+1)]
+                s = (self._people[event_id][person_id][country_id]
+                     ['P%d' % (n+1)])
                 if s == '':
                     s = None
                 else:

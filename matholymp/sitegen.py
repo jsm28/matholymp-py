@@ -853,9 +853,11 @@ class SiteGenerator(object):
             text += ('<p>Lists of currently registered %s and %s'
                      ' are available, as is the %s.</p>\n'
                      % (self.link_for_registration(e, 'country', 'countries'),
-                        self.link_for_registration(e, 'person', 'participants'),
+                        self.link_for_registration(e, 'person',
+                                                   'participants'),
                         self.link_for_registration(e,
-                                                   'person?@template=scoreboard',
+                                                   'person?'
+                                                   '@template=scoreboard',
                                                    'live scoreboard')))
         extra_dir = '/'.join(self.path_for_event(e))
         text += self._cfg['page_include_extra'] % { 'dir': extra_dir }

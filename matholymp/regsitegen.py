@@ -371,8 +371,8 @@ class RegSiteGenerator(SiteGenerator):
             text += self.html_table_thead_tbody_list(head_row_list,
                                                      body_row_list) + '\n'
 
-        head_row_list = [self.html_tr_th_list(['Country', 'Person', 'File size',
-                                               'Scale down'])]
+        head_row_list = [self.html_tr_th_list(['Country', 'Person',
+                                               'File size', 'Scale down'])]
         body_row_list = []
         for p in people:
             filename = p.photo_filename

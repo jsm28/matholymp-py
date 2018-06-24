@@ -69,7 +69,7 @@ class RoundupSiteGenerator(RegSiteGenerator):
                 'display_scoreboard_rows':
                     int(db.config.ext['MATHOLYMP_DISPLAY_SCOREBOARD_ROWS']),
                 'display_scoreboard_columns':
-                    int(db.config.ext['MATHOLYMP_DISPLAY_SCOREBOARD_COLUMNS']) }
+                    int(db.config.ext['MATHOLYMP_DISPLAY_SCOREBOARD_COLUMNS'])}
         event_group = EventGroup(RoundupDataSource(db))
         super(RoundupSiteGenerator, self).__init__(cfg, event_group)
 
