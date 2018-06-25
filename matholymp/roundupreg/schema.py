@@ -171,8 +171,7 @@ def init_schema(env):
                    # Comma-separated scores on each problem.
                    scores=String(),
                    extra_awards=String(),
-                   **person_extra
-    )
+                   **person_extra)
     person.setorderprop('primary_role')
 
     # The 'rss' class is used internally to store items in the RSS news
@@ -188,8 +187,7 @@ def init_schema(env):
                  address=String(),
                  realname=String(),
                  # Comma-separated string of Role names.
-                 roles=String()
-    )
+                 roles=String())
     user.setkey('username')
 
     flag = FileClass(db, 'flag',
