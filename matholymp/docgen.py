@@ -693,7 +693,7 @@ class DocumentGenerator(object):
             paper_list_text = '%\n'.join(paper_list)
             template_fields['papers'] = paper_list_text
             self.subst_and_pdflatex(template_file_base, output_file_base,
-                               template_fields, raw_fields)
+                                    template_fields, raw_fields)
             if id == 'all':
                 output_file_base = 'papers-leaders' + day_text
                 country_leader_counts = {}
@@ -790,7 +790,7 @@ class DocumentGenerator(object):
             template_fields['text_left'] = 'false'
         raw_fields = ['coord_forms']
         self.subst_and_pdflatex(template_file_base, output_file_base,
-                           template_fields, raw_fields)
+                                template_fields, raw_fields)
 
     def generate_scores_commands(self):
         """Generate commands to upload scores in bulk."""

@@ -140,37 +140,38 @@ def init_schema(env):
         person_extra['nationality'] = String()
     for i in get_language_numbers(db):
         person_extra['language_%d' % i] = Link('language')
-    person=Class(db, 'person',
-                 country=Link('country'),
-                 given_name=String(),
-                 family_name=String(),
-                 gender=Link('gender'),
-                 date_of_birth_year=String(),
-                 date_of_birth_month=String(),
-                 date_of_birth_day=String(),
-                 primary_role=Link('matholymprole'),
-                 other_roles=Multilink('matholymprole'),
-                 guide_for=Multilink('country'),
-                 diet=String(),
-                 tshirt=Link('tshirt'),
-                 arrival_place=Link('arrival'),
-                 arrival_date=String(),
-                 arrival_time_hour=String(),
-                 arrival_time_minute=String(),
-                 arrival_flight=String(),
-                 departure_place=Link('arrival'),
-                 departure_date=String(),
-                 departure_time_hour=String(),
-                 departure_time_minute=String(),
-                 departure_flight=String(),
-                 room_number=String(),
-                 phone_number=String(),
-                 generic_url=String(),
-                 reuse_photo=Boolean(),
-                 photo=Link('photo'),
-                 scores=String(), # comma-separated scores on each problem
-                 extra_awards=String(),
-                 **person_extra
+    person = Class(db, 'person',
+                   country=Link('country'),
+                   given_name=String(),
+                   family_name=String(),
+                   gender=Link('gender'),
+                   date_of_birth_year=String(),
+                   date_of_birth_month=String(),
+                   date_of_birth_day=String(),
+                   primary_role=Link('matholymprole'),
+                   other_roles=Multilink('matholymprole'),
+                   guide_for=Multilink('country'),
+                   diet=String(),
+                   tshirt=Link('tshirt'),
+                   arrival_place=Link('arrival'),
+                   arrival_date=String(),
+                   arrival_time_hour=String(),
+                   arrival_time_minute=String(),
+                   arrival_flight=String(),
+                   departure_place=Link('arrival'),
+                   departure_date=String(),
+                   departure_time_hour=String(),
+                   departure_time_minute=String(),
+                   departure_flight=String(),
+                   room_number=String(),
+                   phone_number=String(),
+                   generic_url=String(),
+                   reuse_photo=Boolean(),
+                   photo=Link('photo'),
+                   # Comma-separated scores on each problem.
+                   scores=String(),
+                   extra_awards=String(),
+                   **person_extra
     )
     person.setorderprop('primary_role')
 
@@ -186,12 +187,13 @@ def init_schema(env):
                  country=Link('country'),
                  address=String(),
                  realname=String(),
-                 roles=String()     # comma-separated string of Role names
+                 # Comma-separated string of Role names.
+                 roles=String()
     )
     user.setkey('username')
 
     flag = FileClass(db, 'flag',
-                    name=String())
+                     name=String())
 
     photo = FileClass(db, 'photo',
                       name=String())

@@ -56,7 +56,7 @@ def mean_std_dev(data):
     s = sum(data)
     s2 = _sum_sq(data)
     mean = float(s) / float(n)
-    std_dev =  math.sqrt(float(n * s2 - s * s) / float(n * n))
+    std_dev = math.sqrt(float(n * s2 - s * s) / float(n * n))
     return (mean, std_dev)
 
 

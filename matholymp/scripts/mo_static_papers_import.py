@@ -78,7 +78,7 @@ def _import_paper(papers_data, cfg_data, docgen_config_data, top_directory,
          'Day': day or '1',
          'Language': language,
          'Description': description,
-         'URL' : cfg_data['url_base'] + '/'.join(paper_dst_list)}
+         'URL': cfg_data['url_base'] + '/'.join(paper_dst_list)}
     paper_dst_filename = os.path.join(top_directory, *paper_dst_list)
     make_dirs_for_file(paper_dst_filename)
     shutil.copyfile(os.path.join(input_papers_directory, filename),

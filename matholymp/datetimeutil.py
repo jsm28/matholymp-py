@@ -99,7 +99,7 @@ def date_range_html(start_date, end_date, year):
     else:
         return ('%02d&nbsp;%s&ndash;%02d&nbsp;%s'
                 % (start_date.day, start_month_name,
-                 end_date.day, end_month_name))
+                   end_date.day, end_month_name))
 
 
 def date_to_ymd_iso(date):

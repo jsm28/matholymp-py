@@ -163,9 +163,9 @@ class CSVDataSource(DataSource):
                            'bronze_boundary': 'Bronze Boundary'}
 
     _event_attr_map_bool_maybe = {'distinguish_official':
-                                      'Distinguish Official Countries',
+                                  'Distinguish Official Countries',
                                   'honourable_mentions_available':
-                                      'Honourable Mentions Available'}
+                                  'Honourable Mentions Available'}
 
     def event_get_attr(self, id, name):
         if name in CSVDataSource._event_attr_map_str:
