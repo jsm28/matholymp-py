@@ -798,8 +798,8 @@ class Event(object):
     def _get_language_list(self):
         langs = set()
         for p in self.contestant_list:
-            for l in p.languages:
-                langs.add(l)
+            for lang in p.languages:
+                langs.add(lang)
         return list(langs)
 
     language_list = _PropertyCached(
@@ -1043,11 +1043,11 @@ class Person(object):
         self._cache = {}
 
     def _get_participation_list(self):
-        l = [e.person_map[self.id] for e in self.event_group.event_list
-             if self.id in e.person_map]
-        l = [p for pl in l for p in pl]
-        l = sorted(l, key=lambda p:p.sort_key)
-        return l
+        partl = [e.person_map[self.id] for e in self.event_group.event_list
+                 if self.id in e.person_map]
+        partl = [p for pl in partl for p in pl]
+        partl = sorted(partl, key=lambda p:p.sort_key)
+        return partl
 
     participation_list = _PropertyCached(
         'participation_list', _get_participation_list,
@@ -1764,11 +1764,11 @@ class CountryEvent(object):
                                       '_guide_ids'):
             ids = ds.country_event_get_attr(self.country.id, self.event.id,
                                             '_guide_ids')
-            l = [self.event.person_map[id] for id in ids]
-            for pl in l:
+            gl = [self.event.person_map[id] for id in ids]
+            for pl in gl:
                 if len(pl) != 1:
                     raise ValueError('Guide present more than once at Event')
-            return [p for pl in l for p in pl]
+            return [p for pl in gl for p in pl]
         else:
             return [p for p in self.event.person_list if self in p.guide_for]
 
