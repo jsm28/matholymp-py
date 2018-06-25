@@ -262,7 +262,7 @@ class RegSiteGenerator(SiteGenerator):
         else:
             have_roles = [p.primary_role for p in person_list]
             missing_roles = [r for r in expected_roles
-                             if not r in have_roles]
+                             if r not in have_roles]
             if missing_roles:
                 return ('<p>Not registered from <strong>%s</strong>:'
                         ' %s.</p>\n'
