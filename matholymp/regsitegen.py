@@ -320,8 +320,6 @@ class RegSiteGenerator(SiteGenerator):
         e = self.event
         normal_countries = sorted(e.normal_country_list,
                                   key=lambda x: x.sort_key)
-        staff_countries = sorted(e.staff_country_list,
-                                 key=lambda x: x.sort_key)
         people = sorted(e.person_list, key=lambda x: x.sort_key)
         normal_people = sorted(e.normal_person_list, key=lambda x: x.sort_key)
         staff = sorted(e.staff_list, key=lambda x: x.sort_key)

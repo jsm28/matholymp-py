@@ -68,8 +68,6 @@ def cached_text(db, name, force_regen, gen_func):
     """Return text that can be cached, generating it if necessary."""
     if not _can_cache:
         return gen_func(db)
-    db_path = db.config.DATABASE
-    file_base = 'cache-' + name
     file_path = _cache_path(db, name, 'current')
     tmp_path = _cache_path(db, name, 'tmp')
     invalid_path = _invalid_path(db, name)

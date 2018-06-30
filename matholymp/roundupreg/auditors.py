@@ -103,8 +103,8 @@ def audit_country_fields(db, cl, nodeid, newvalues):
         if c != nodeid:
             raise ValueError('A country with code %s already exists' % code)
 
-    name = require_value(db, cl, nodeid, newvalues, 'name',
-                         'No country name specified')
+    require_value(db, cl, nodeid, newvalues, 'name',
+                  'No country name specified')
     if nodeid is not None:
         if ('is_normal' in newvalues
             and newvalues['is_normal'] != db.country.get(nodeid, 'is_normal')):

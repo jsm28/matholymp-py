@@ -429,7 +429,6 @@ class DocumentGenerator(object):
                            if p.award == 'Honourable Mention']
             output_file_base = 'hm-certificates'
         else:
-            found_person = False
             p = self.get_contestant_by_id(id)
             if not p.award:
                 raise ValueError('Person %s not awarded' % id)

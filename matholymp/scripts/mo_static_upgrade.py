@@ -58,7 +58,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--version', action='version',
                         version='%(prog)s '+matholymp.__version__)
-    args = vars(parser.parse_args())
+    parser.parse_args()
 
     top_directory = os.getcwd()
 

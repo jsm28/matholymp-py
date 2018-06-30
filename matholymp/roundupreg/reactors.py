@@ -63,10 +63,10 @@ def country_react(db, cl, nodeid, oldvalues):
     if db.user.stringFind(realname=realname):
         return
     pw = roundup.password.generatePassword()
-    user_id = db.user.create(username=username, realname=realname,
-                             password=roundup.password.Password(pw),
-                             address=email_addr, country=nodeid,
-                             roles='User,Register')
+    db.user.create(username=username, realname=realname,
+                   password=roundup.password.Password(pw),
+                   address=email_addr, country=nodeid,
+                   roles='User,Register')
     template_path = os.path.join(db.config.TRACKER_HOME, 'extensions',
                                  'email-template-new-user')
     template_text = read_text_from_file(template_path)

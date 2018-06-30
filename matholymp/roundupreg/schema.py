@@ -81,12 +81,12 @@ def init_schema(env):
     # Create classes:
 
     # The 'event' class has only one instance, to store global information.
-    event = Class(db, 'event',
-                  year=String(),
-                  registration_enabled=Boolean(),
-                  gold=String(),
-                  silver=String(),
-                  bronze=String())
+    Class(db, 'event',
+          year=String(),
+          registration_enabled=Boolean(),
+          gold=String(),
+          silver=String(),
+          bronze=String())
 
     if distinguish_official(db):
         country_extra = {'official': Boolean()}
@@ -176,9 +176,9 @@ def init_schema(env):
 
     # The 'rss' class is used internally to store items in the RSS news
     # feeds for scores.
-    rss = Class(db, 'rss',
-                country=Link('country'),
-                text=String())
+    Class(db, 'rss',
+          country=Link('country'),
+          text=String())
 
     user = Class(db, 'user',
                  username=String(),
@@ -190,14 +190,14 @@ def init_schema(env):
                  roles=String())
     user.setkey('username')
 
-    flag = FileClass(db, 'flag',
-                     name=String())
+    FileClass(db, 'flag',
+              name=String())
 
-    photo = FileClass(db, 'photo',
-                      name=String())
+    FileClass(db, 'photo',
+              name=String())
 
-    consent_form = FileClass(db, 'consent_form',
-                             name=String(), country=Link('country'))
+    FileClass(db, 'consent_form',
+              name=String(), country=Link('country'))
 
     # Set up permissions:
 
