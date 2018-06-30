@@ -656,13 +656,13 @@ class SiteGenerator(object):
                  % (cgi.escape(self._data.short_name_plural),
                     self.link_for_data_countries('downloaded')))
         head_row_list = [self.html_tr_list(
-                [self.html_th('Code'),
-                 self.html_th('Name'),
-                 self.html_th('First'),
-                 self.html_th('Last'),
-                 self.html_th('#', title=('Number of %s'
-                                          % self._data.short_name_plural)),
-                 self.html_th('Host')])]
+            [self.html_th('Code'),
+             self.html_th('Name'),
+             self.html_th('First'),
+             self.html_th('Last'),
+             self.html_th('#', title=('Number of %s'
+                                      % self._data.short_name_plural)),
+             self.html_th('Host')])]
         body_row_list = []
         countries = sorted(self._data.country_list, key=lambda x: x.sort_key)
         for c in countries:
@@ -2013,9 +2013,9 @@ class SiteGenerator(object):
         """Generate the CSV file for all peoples."""
         people_sorted = sorted(self._data.person_event_list,
                                key=lambda x: x.sort_key)
-        people_data_output = [self.person_csv_data(
-                p, num_problems=self._data.max_num_problems)
-                              for p in people_sorted]
+        people_data_output = [
+            self.person_csv_data(p, num_problems=self._data.max_num_problems)
+            for p in people_sorted]
         people_columns = \
             self.people_csv_columns(self._data.max_num_problems)
         self.write_csv_to_file(self.path_for_data_people(),
