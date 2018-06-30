@@ -155,7 +155,7 @@ class SiteGenerator(object):
         nattrs = {}
         for k in attrs:
             if k.endswith('_'):
-                nk = k[0:len(k)-1]
+                nk = k[0:len(k) - 1]
             else:
                 nk = k
             nattrs[nk] = attrs[k]

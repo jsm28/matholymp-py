@@ -328,7 +328,7 @@ class CSVDataSource(DataSource):
             r = []
             for n in range(int(self._events[event_id]['Number of Problems'])):
                 s = (self._people[event_id][person_id][country_id]
-                     ['P%d' % (n+1)])
+                     ['P%d' % (n + 1)])
                 if s == '':
                     s = None
                 else:

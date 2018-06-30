@@ -74,7 +74,7 @@ class ScoreAction(Action):
         country_node = self.db.country.getnode(country)
         problem_number = int(problem)
         marks_per_problem = get_marks_per_problem(self.db)
-        max_this_problem = marks_per_problem[problem_number-1]
+        max_this_problem = marks_per_problem[problem_number - 1]
         results_list = []
         people = self.db.person.filter(None, {'country': country})
         for person in people:
@@ -87,7 +87,7 @@ class ScoreAction(Action):
                     raise ValueError('Invalid score specified for ' + code)
                 score_str = self.db.person.get(person, 'scores')
                 scores = scores_from_str(self.db, score_str)
-                scores[problem_number-1] = score
+                scores[problem_number - 1] = score
                 new_scores = ','.join(scores)
                 self.db.person.set(person, scores=new_scores)
                 results_text = code + ' = ' + score

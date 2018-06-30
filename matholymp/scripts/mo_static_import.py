@@ -239,7 +239,7 @@ def _import_from_dir(top_directory, input_directory, temp_dir):
     people_data.extend(new_people_data)
     for p in people_data:
         for i in range(max_num_problems):
-            pn = 'P%d' % (i+1)
+            pn = 'P%d' % (i + 1)
             if pn not in p:
                 p[pn] = ''
     people_header = [cfg_data['num_key'], 'Country Number', 'Person Number',
@@ -272,7 +272,7 @@ def main():
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--version', action='version',
-                        version='%(prog)s '+matholymp.__version__)
+                        version='%(prog)s ' + matholymp.__version__)
     parser.add_argument('input_directory', help='directory with input data')
     args = vars(parser.parse_args())
 

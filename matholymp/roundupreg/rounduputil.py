@@ -246,7 +246,7 @@ def pn_score(db, person, n):
     """Determine the score of a contestant on a given problem."""
     score_str = db.person.get(person, 'scores')
     scores = scores_from_str(db, score_str)
-    return scores[n-1]
+    return scores[n - 1]
 
 
 def scores_final(db):

@@ -91,7 +91,7 @@ def main():
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--version', action='version',
-                        version='%(prog)s '+matholymp.__version__)
+                        version='%(prog)s ' + matholymp.__version__)
     parser.add_argument('--background', action='store_true',
                         help='papers use preprinted backgrounds')
     parser.add_argument('--day', help='day for papers')

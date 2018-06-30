@@ -49,7 +49,7 @@ def main():
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--version', action='version',
-                        version='%(prog)s '+matholymp.__version__)
+                        version='%(prog)s ' + matholymp.__version__)
     parser.parse_args()
     subprocess.check_call(['sphinx-build', '-b', 'dirhtml',
                            os.path.join(sys.path[0], 'docs'), os.curdir])

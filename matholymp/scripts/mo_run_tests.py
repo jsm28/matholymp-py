@@ -45,7 +45,7 @@ def main():
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--version', action='version',
-                        version='%(prog)s '+matholymp.__version__)
+                        version='%(prog)s ' + matholymp.__version__)
     parser.parse_args()
     suite = unittest.defaultTestLoader.discover('matholymp.test',
                                                 top_level_dir=sys.path[0])

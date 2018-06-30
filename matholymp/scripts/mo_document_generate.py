@@ -61,7 +61,7 @@ def main():
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--version', action='version',
-                        version='%(prog)s '+matholymp.__version__)
+                        version='%(prog)s ' + matholymp.__version__)
     parser.add_argument('--background', action='store_true',
                         help='include background in output')
     parser.add_argument('--input-directory',
