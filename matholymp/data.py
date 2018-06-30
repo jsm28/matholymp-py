@@ -228,7 +228,7 @@ class EventGroup(object):
         """A list of ids for all events.""")
 
     def _get_event_list(self):
-        return sorted(self.event_map.values(), key=lambda e:e.sort_key)
+        return sorted(self.event_map.values(), key=lambda e: e.sort_key)
 
     event_list = _PropertyCached(
         'event_list', _get_event_list,
@@ -592,7 +592,7 @@ class Event(object):
         return r
 
     def _get_total_stats(self):
-        return self._get_total_stats_cond(lambda p:True)
+        return self._get_total_stats_cond(lambda p: True)
 
     total_stats = _PropertyCached(
         'total_stats', _get_total_stats,
@@ -602,7 +602,7 @@ class Event(object):
         """)
 
     def _get_total_stats_official(self):
-        return self._get_total_stats_cond(lambda p:p.country.is_official)
+        return self._get_total_stats_cond(lambda p: p.country.is_official)
 
     total_stats_official = _PropertyCached(
         'total_stats_official', _get_total_stats_official,
@@ -620,7 +620,7 @@ class Event(object):
         return r
 
     def _get_max_total_stats(self):
-        return self._get_max_total_stats_cond(lambda p:True)
+        return self._get_max_total_stats_cond(lambda p: True)
 
     max_total_stats = _PropertyCached(
         'max_total_stats', _get_max_total_stats,
@@ -631,7 +631,7 @@ class Event(object):
         """)
 
     def _get_max_total_stats_official(self):
-        return self._get_max_total_stats_cond(lambda p:p.country.is_official)
+        return self._get_max_total_stats_cond(lambda p: p.country.is_official)
 
     max_total_stats_official = _PropertyCached(
         'max_total_stats_official', _get_max_total_stats_official,
@@ -835,14 +835,14 @@ class Event(object):
         return d
 
     def _get_num_awards(self):
-        return self._get_num_awards_cond(lambda c:True)
+        return self._get_num_awards_cond(lambda c: True)
 
     num_awards = _PropertyCached(
         'num_awards', _get_num_awards,
         """The number of each award at this event.""")
 
     def _get_num_awards_official(self):
-        return self._get_num_awards_cond(lambda c:c.is_official)
+        return self._get_num_awards_cond(lambda c: c.is_official)
 
     num_awards_official = _PropertyCached(
         'num_awards_official', _get_num_awards_official,
@@ -1046,7 +1046,7 @@ class Person(object):
         partl = [e.person_map[self.id] for e in self.event_group.event_list
                  if self.id in e.person_map]
         partl = [p for pl in partl for p in pl]
-        partl = sorted(partl, key=lambda p:p.sort_key)
+        partl = sorted(partl, key=lambda p: p.sort_key)
         return partl
 
     participation_list = _PropertyCached(
@@ -1379,7 +1379,7 @@ class PersonEvent(object):
         nrank = 0
         last_score = -1
         for p in sorted(self.event.contestant_list,
-                        key=lambda x:x.total_score, reverse=True):
+                        key=lambda x: x.total_score, reverse=True):
             nrank += 1
             if p.total_score != last_score:
                 rank = nrank
@@ -1913,7 +1913,7 @@ class CountryEvent(object):
         nrank = 0
         last_score = -1
         for c in sorted(self.event.country_with_contestants_list,
-                        key=lambda x:x.total_score_for_rank, reverse=True):
+                        key=lambda x: x.total_score_for_rank, reverse=True):
             nrank += 1
             if c.total_score_for_rank != last_score:
                 rank = nrank

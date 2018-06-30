@@ -72,13 +72,13 @@ def people_from_country_internal(db, country):
     person_list = db.person.filter(None, {'country': country})
     sorted_list = sorted(
         person_list,
-        key=lambda x:coll_get_sort_key(db.person.get(x, 'given_name')))
+        key=lambda x: coll_get_sort_key(db.person.get(x, 'given_name')))
     sorted_list = sorted(
         sorted_list,
-        key=lambda x:coll_get_sort_key(db.person.get(x, 'family_name')))
+        key=lambda x: coll_get_sort_key(db.person.get(x, 'family_name')))
     sorted_list = sorted(
         sorted_list,
-        key=lambda x:coll_get_sort_key(
+        key=lambda x: coll_get_sort_key(
             db.matholymprole.get(db.person.get(x, 'primary_role'), 'name')))
     return sorted_list
 

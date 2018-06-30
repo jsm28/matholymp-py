@@ -340,7 +340,7 @@ class ScoresRSSAction(Action):
                                + '?@action=scores_rss'), quote=True))
 
         rss_list = self.db.rss.list()
-        rss_list = sorted(rss_list, key=lambda x:int(x), reverse=True)
+        rss_list = sorted(rss_list, key=int, reverse=True)
         rss_text_list = [self.db.rss.get(r, 'text')
                          for r in rss_list
                          if (self.nodeid is None

@@ -664,7 +664,7 @@ class SiteGenerator(object):
                                           % self._data.short_name_plural)),
                  self.html_th('Host')])]
         body_row_list = []
-        countries = sorted(self._data.country_list, key=lambda x:x.sort_key)
+        countries = sorted(self._data.country_list, key=lambda x: x.sort_key)
         for c in countries:
             first_c = c.participation_list[0]
             last_c = c.participation_list[-1]
@@ -698,7 +698,7 @@ class SiteGenerator(object):
                                                       'Participations'])]
         body_row_list = []
         for pd in sorted(self._data.person_list,
-                         key=lambda x:x.sort_key_alpha):
+                         key=lambda x: x.sort_key_alpha):
             pd_list = []
             for p in pd.participation_list:
                 e = p.event
@@ -712,7 +712,7 @@ class SiteGenerator(object):
                 if p.is_contestant and p.awards_str:
                     role_text += ': %s' % cgi.escape(p.awards_str)
                 if p.guide_for:
-                    glist = sorted(p.guide_for, key=lambda x:x.sort_key)
+                    glist = sorted(p.guide_for, key=lambda x: x.sort_key)
                     gtlist = []
                     for c in glist:
                         cl = self.link_for_country_at_event(c,
@@ -749,7 +749,7 @@ class SiteGenerator(object):
         head_row.extend([self.html_th_scores('Participations')])
         head_row_list = [self.html_tr_list(head_row)]
         contestants = sorted(self._data.contestant_list,
-                             key=lambda x:x.sort_key_hall_of_fame)
+                             key=lambda x: x.sort_key_hall_of_fame)
         body_row_list = []
         for p in contestants:
             row = [self.link_for_person(p, cgi.escape(p.given_name)),
@@ -900,7 +900,7 @@ class SiteGenerator(object):
             head_row.extend([cgi.escape(self._cfg['official_desc'])])
         head_row_list = [self.html_tr_th_list(head_row)]
         body_row_list = []
-        countries = sorted(e.country_list, key=lambda x:x.sort_key)
+        countries = sorted(e.country_list, key=lambda x: x.sort_key)
         for c in countries:
             row = [self.link_for_country_at_event(c, cgi.escape(c.code)),
                    self.link_for_country_at_event(c, cgi.escape(c.name))]
@@ -919,10 +919,10 @@ class SiteGenerator(object):
     def event_people_table(self, e):
         """Generate the table of people at one event."""
         ctext_list = []
-        countries = sorted(e.country_list, key=lambda x:x.sort_key)
+        countries = sorted(e.country_list, key=lambda x: x.sort_key)
         for c in countries:
             text = ''
-            people = sorted(c.person_list, key=lambda x:x.sort_key)
+            people = sorted(c.person_list, key=lambda x: x.sort_key)
             cl = self.link_for_country_at_event(c,
                                                 cgi.escape(c.name_with_code))
             text += '<h2>%s</h2>\n' % cl
@@ -1157,7 +1157,7 @@ class SiteGenerator(object):
         """Return the main text of the scoreboard for one event."""
         text = ''
         countries = e.country_with_contestants_list
-        contestants = sorted(e.contestant_list, key=lambda x:x.sort_key)
+        contestants = sorted(e.contestant_list, key=lambda x: x.sort_key)
         num_problems = e.num_problems
 
         text += '<h2>Scores by contestant code</h2>\n'
@@ -1170,7 +1170,7 @@ class SiteGenerator(object):
 
         text += '<h2>Ranked scores</h2>\n'
         body_row_list = []
-        rank_sorted_contestants = sorted(contestants, key=lambda x:x.rank)
+        rank_sorted_contestants = sorted(contestants, key=lambda x: x.rank)
         for p in rank_sorted_contestants:
             body_row_list.append(self.person_scoreboard_row(p))
         text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
@@ -1319,9 +1319,9 @@ class SiteGenerator(object):
 
         text += '<h2>Country results</h2>\n'
         head_row_list = [self.country_scoreboard_header(e, None)]
-        rank_sorted_countries = sorted(countries, key=lambda x:x.sort_key)
+        rank_sorted_countries = sorted(countries, key=lambda x: x.sort_key)
         rank_sorted_countries = sorted(rank_sorted_countries,
-                                       key=lambda x:x.rank)
+                                       key=lambda x: x.rank)
         body_row_list = []
         for c in rank_sorted_countries:
             body_row_list.append(self.country_scoreboard_row(e, c))
@@ -1393,8 +1393,8 @@ class SiteGenerator(object):
                                        'redirects-%d' % e.id)
         text = ''
         base_url = ''
-        countries = sorted(e.country_list, key=lambda x:x.sort_key)
-        people = sorted(e.person_list, key=lambda x:x.sort_key)
+        countries = sorted(e.country_list, key=lambda x: x.sort_key)
+        people = sorted(e.person_list, key=lambda x: x.sort_key)
         for c in countries:
             src_url = c.annual_url
             if src_url:
@@ -1461,7 +1461,7 @@ class SiteGenerator(object):
         Generate the table of contestant scores for one country at one
         event, given that this country has contestants.
         """
-        c_contestants = sorted(c.contestant_list, key=lambda x:x.sort_key)
+        c_contestants = sorted(c.contestant_list, key=lambda x: x.sort_key)
         head_row_list = [self.person_scoreboard_header(c.event,
                                                        show_rank=show_rank)]
         body_row_list = []
@@ -1474,8 +1474,8 @@ class SiteGenerator(object):
     def country_event_people_table(self, c, show_photos):
         """Generate the table of people for one country at one event."""
         text = ''
-        c_people = sorted(c.person_list, key=lambda x:x.sort_key)
-        c_guides = sorted(c.guide_list, key=lambda x:x.sort_key)
+        c_people = sorted(c.person_list, key=lambda x: x.sort_key)
+        c_guides = sorted(c.guide_list, key=lambda x: x.sort_key)
         c_people.extend(c_guides)
         hrow = ['Given Name', 'Family Name', 'Role']
         if show_photos:
@@ -1611,7 +1611,7 @@ class SiteGenerator(object):
                 rs = sorted(p.other_roles, key=coll_get_sort_key)
                 year_rows.append(['Other roles', cgi.escape(', '.join(rs))])
             if p.guide_for:
-                glist = sorted(p.guide_for, key=lambda x:x.sort_key)
+                glist = sorted(p.guide_for, key=lambda x: x.sort_key)
                 gtlist = []
                 for c in glist:
                     cl = self.link_for_country_at_event(c, cgi.escape(c.name))
@@ -1874,7 +1874,7 @@ class SiteGenerator(object):
     def generate_countries_csv(self):
         """Generate the CSV file for all countries."""
         countries_sorted = sorted(self._data.country_event_list,
-                                  key=lambda x:x.sort_key)
+                                  key=lambda x: x.sort_key)
         countries_data_output = [self.country_csv_data(c, None)
                                  for c in countries_sorted]
         countries_columns = self.countries_csv_columns(None)
@@ -1886,7 +1886,7 @@ class SiteGenerator(object):
         Return a tuple of the data and column headers for the CSV file
         for countries at one event.
         """
-        e_countries_sorted = sorted(e.country_list, key=lambda x:x.sort_key)
+        e_countries_sorted = sorted(e.country_list, key=lambda x: x.sort_key)
         e_countries_data_output = [self.country_csv_data(c, e,
                                                          reg_system=reg_system)
                                    for c in e_countries_sorted]
@@ -1942,7 +1942,7 @@ class SiteGenerator(object):
             csv_out['Primary Role'] = p.primary_role
             csv_out['Other Roles'] = comma_join(sorted(p.other_roles,
                                                        key=coll_get_sort_key))
-            guide_for = sorted(p.guide_for, key=lambda x:x.sort_key)
+            guide_for = sorted(p.guide_for, key=lambda x: x.sort_key)
             guide_for = [c.name for c in guide_for]
             csv_out['Guide For'] = comma_join(guide_for)
         csv_out['Given Name'] = p.given_name
@@ -2012,7 +2012,7 @@ class SiteGenerator(object):
     def generate_people_csv(self):
         """Generate the CSV file for all peoples."""
         people_sorted = sorted(self._data.person_event_list,
-                               key=lambda x:x.sort_key)
+                               key=lambda x: x.sort_key)
         people_data_output = [self.person_csv_data(
                 p, num_problems=self._data.max_num_problems)
                               for p in people_sorted]
@@ -2027,7 +2027,7 @@ class SiteGenerator(object):
         Return a tuple of the data and column headers for the CSV file
         for people at one event.
         """
-        e_people_sorted = sorted(e.person_list, key=lambda x:x.sort_key)
+        e_people_sorted = sorted(e.person_list, key=lambda x: x.sort_key)
         e_people_data_output = [self.person_csv_data(p, reg_system=reg_system,
                                                      private_data=private_data)
                                 for p in e_people_sorted]
@@ -2057,7 +2057,7 @@ class SiteGenerator(object):
         Return a tuple of the data and column headers for the CSV file
         for scores at one event.
         """
-        e_people_sorted = sorted(e.contestant_list, key=lambda x:x.sort_key)
+        e_people_sorted = sorted(e.contestant_list, key=lambda x: x.sort_key)
         e_scores_data_output = [self.person_csv_data(p, scores_only=True,
                                                      reg_system=reg_system)
                                 for p in e_people_sorted]

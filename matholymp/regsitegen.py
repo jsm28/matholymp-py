@@ -98,7 +98,7 @@ class RegSiteGenerator(SiteGenerator):
                      ' database identifier\nfor the country.\n')
 
         e = self.event
-        country_list = sorted(e.country_list, key=lambda x:x.sort_key)
+        country_list = sorted(e.country_list, key=lambda x: x.sort_key)
         for c in country_list:
             url = c.flag_url
             if url is not None:
@@ -121,7 +121,7 @@ class RegSiteGenerator(SiteGenerator):
                      ' database identifier\nfor the person.\n')
 
         e = self.event
-        person_list = sorted(e.person_list, key=lambda x:x.sort_key)
+        person_list = sorted(e.person_list, key=lambda x: x.sort_key)
         for p in person_list:
             url = p.photo_url
             if url is not None:
@@ -144,7 +144,7 @@ class RegSiteGenerator(SiteGenerator):
                      ' database identifier\nfor the person.\n')
 
         e = self.event
-        person_list = sorted(e.person_list, key=lambda x:x.sort_key)
+        person_list = sorted(e.person_list, key=lambda x: x.sort_key)
         for p in person_list:
             url = p.consent_form_url
             if url is not None:
@@ -166,7 +166,7 @@ class RegSiteGenerator(SiteGenerator):
         """
         text = ''
         countries = sorted(e.country_with_contestants_list,
-                           key=lambda x:x.sort_key)
+                           key=lambda x: x.sort_key)
         rows = self._cfg['display_scoreboard_rows']
         cols = self._cfg['display_scoreboard_columns']
         cell_width = 'width:%d%%' % (100 // cols)
@@ -185,7 +185,7 @@ class RegSiteGenerator(SiteGenerator):
             ctext = ''
             if i < len(countries):
                 contestants = sorted(countries[i].contestant_list,
-                                     key=lambda x:x.sort_key)
+                                     key=lambda x: x.sort_key)
                 body_row_list = []
                 for p in contestants:
                     body_row_list.append(
@@ -319,11 +319,12 @@ class RegSiteGenerator(SiteGenerator):
         """Return the text of the registration status page."""
         e = self.event
         normal_countries = sorted(e.normal_country_list,
-                                  key=lambda x:x.sort_key)
-        staff_countries = sorted(e.staff_country_list, key=lambda x:x.sort_key)
-        people = sorted(e.person_list, key=lambda x:x.sort_key)
-        normal_people = sorted(e.normal_person_list, key=lambda x:x.sort_key)
-        staff = sorted(e.staff_list, key=lambda x:x.sort_key)
+                                  key=lambda x: x.sort_key)
+        staff_countries = sorted(e.staff_country_list,
+                                 key=lambda x: x.sort_key)
+        people = sorted(e.person_list, key=lambda x: x.sort_key)
+        normal_people = sorted(e.normal_person_list, key=lambda x: x.sort_key)
+        staff = sorted(e.staff_list, key=lambda x: x.sort_key)
         text = ''
 
         text += '<h2>Action needed by participating countries</h2>\n'
@@ -408,7 +409,7 @@ class RegSiteGenerator(SiteGenerator):
     def registration_status_country_text(self, country, expected_roles,
                                          consent_forms_date):
         """Return the text of the registration status page for one country."""
-        people = sorted(country.person_list, key=lambda x:x.sort_key)
+        people = sorted(country.person_list, key=lambda x: x.sort_key)
         text = ''
         text += self.missing_roles_text(country, expected_roles)
         text += ('<p>The system cannot tell automatically if there are any'
@@ -438,7 +439,7 @@ class RegSiteGenerator(SiteGenerator):
             head_row_list = [self.html_tr_th_list(['Country', 'Person', 'Role',
                                                    'Gender', 'Room'])]
             body_row_list = []
-            for p in sorted(people_by_room[r], key=lambda x:x.sort_key):
+            for p in sorted(people_by_room[r], key=lambda x: x.sort_key):
                 row = [cgi.escape(p.country.name_with_code),
                        self.link_for_person(p.person, cgi.escape(p.name)),
                        cgi.escape(p.primary_role),

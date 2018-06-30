@@ -117,7 +117,7 @@ class DocumentGenerator(object):
                          '>': '$>$'}
         text = re.sub('[\\000-\\037]', ' ', text)
         text = re.sub('[\\\\#$%&~_^{}"|<>]',
-                      lambda x:special_chars[x.group(0)],
+                      lambda x: special_chars[x.group(0)],
                       text)
         return text
 
@@ -131,8 +131,8 @@ class DocumentGenerator(object):
     def subst_values_in_template_text(self, template_text, data, raw_fields):
         """Substitute values from a dictionary in a LaTeX template."""
         output_text = re.sub('@@([A-Za-z0-9_]+)@@',
-                             lambda x:self.field_to_latex(x.group(1), data,
-                                                          raw_fields),
+                             lambda x: self.field_to_latex(x.group(1), data,
+                                                           raw_fields),
                              template_text)
         return output_text
 
@@ -310,7 +310,7 @@ class DocumentGenerator(object):
                 and person.guide_for):
                 is_non_guide_staff = not self._cfg['show_rooms_for_guides']
                 country_list = sorted(person.guide_for,
-                                      key=lambda x:x.sort_key)
+                                      key=lambda x: x.sort_key)
             else:
                 is_non_guide_staff = True
                 country_list = []
@@ -365,7 +365,7 @@ class DocumentGenerator(object):
             template_fields['have_team_rooms'] = 'true'
             room_list = [self.room_list_text(p)
                          for p in sorted(person.event.person_list,
-                                         key=lambda x:x.sort_key)
+                                         key=lambda x: x.sort_key)
                          if p.country in country_list]
             template_fields['team_rooms'] = ' \\\\ '.join(room_list)
             if template_fields['team_rooms'] == '':
@@ -388,7 +388,7 @@ class DocumentGenerator(object):
         template_file_base = 'desk-label-template'
         if id == 'all':
             contestants = sorted(self._event.contestant_list,
-                                 key=lambda x:x.sort_key_exams)
+                                 key=lambda x: x.sort_key_exams)
             output_file_base = 'desk-labels'
         else:
             p = self.get_contestant_by_id(id)
@@ -414,7 +414,7 @@ class DocumentGenerator(object):
         """Generate all award certificates requested by the command line."""
         template_file_base = 'certificate-template'
         contestants = sorted(self._event.contestant_list,
-                             key=lambda x:x.sort_key)
+                             key=lambda x: x.sort_key)
         if id == 'gold':
             contestants = [p for p in contestants if p.award == 'Gold Medal']
             output_file_base = 'gold-certificates'
@@ -460,7 +460,7 @@ class DocumentGenerator(object):
         """
         template_file_base = 'certificate-template'
         if id == 'all':
-            people = sorted(self._event.person_list, key=lambda x:x.sort_key)
+            people = sorted(self._event.person_list, key=lambda x: x.sort_key)
             output_file_base = 'participation-certificates'
         else:
             p = self.get_person_by_id(id)
@@ -600,7 +600,7 @@ class DocumentGenerator(object):
         new_drafts_only = False
         if id == 'all':
             contestants = self._event.contestant_list
-            contestants = sorted(contestants, key=lambda x:x.sort_key_exams)
+            contestants = sorted(contestants, key=lambda x: x.sort_key_exams)
             languages = []
             output_file_base = 'papers' + day_text
         elif id == 'all-languages':
@@ -727,7 +727,7 @@ class DocumentGenerator(object):
 
         all_languages = {}
         one_language_contestants = []
-        for p in sorted(self._event.contestant_list, key=lambda x:x.sort_key):
+        for p in sorted(self._event.contestant_list, key=lambda x: x.sort_key):
             ccode = p.contestant_code
             for lang in p.languages:
                 if lang not in all_languages:
@@ -752,7 +752,8 @@ class DocumentGenerator(object):
         form_list = []
         output_file_base = 'coord-forms'
         for pn in range(1, self._event.num_problems + 1):
-            for c in sorted(self._event.country_list, key=lambda x:x.sort_key):
+            for c in sorted(self._event.country_list,
+                            key=lambda x: x.sort_key):
                 contestants = c.contestant_list
                 if contestants:
                     clist = []
