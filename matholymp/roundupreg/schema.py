@@ -258,11 +258,13 @@ def init_schema(env):
     # adminstrative users so not all relevant fields are accessible here.
     # All users can view certain person details, but not for retired people.
     db.security.addRole(name='Register', description='Registering people')
+
     def own_country_person(db, userid, itemid):
         """Determine whether the userid matches the country of the person
         being accessed."""
         return (db.user.get(userid, 'country')
                 == db.person.get(itemid, 'country'))
+
     p = db.security.addPermission(name='View', klass='person',
                                   check=own_country_person)
     db.security.addPermissionToRole('Register', p)
@@ -291,9 +293,11 @@ def init_schema(env):
     p = db.security.addPermission(name='Create', klass='person',
                                   properties=person_reg_props)
     db.security.addPermissionToRole('Register', p)
+
     def normal_can_view_person(db, userid, itemid):
         """Determine whether a normal user can view this person."""
         return not db.person.is_retired(itemid)
+
     p = db.security.addPermission(name='View', klass='person',
                                   check=normal_can_view_person,
                                   properties=('country', 'given_name',
@@ -311,6 +315,7 @@ def init_schema(env):
     # when from their own country or created by that user (the latter
     # as a case for access before the country is set).
     db.security.addPermissionToRole('Register', 'Create', 'consent_form')
+
     def own_country_consent_form(db, userid, itemid):
         """Determine whether the userid matches the country of the consent
         form being accessed."""
@@ -319,6 +324,7 @@ def init_schema(env):
         file_creator = db.consent_form.get(itemid, 'creator')
         return (user_country == file_country
                 or (file_country is None and userid == file_creator))
+
     p = db.security.addPermission(name='View', klass='consent_form',
                                   check=own_country_consent_form)
     db.security.addPermissionToRole('Register', p)
