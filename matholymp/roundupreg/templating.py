@@ -46,8 +46,6 @@ __all__ = ['people_from_country_internal', 'people_from_country',
 import cgi
 import datetime
 import json
-import os
-import re
 
 from roundup.cgi.templating import HTMLItem
 

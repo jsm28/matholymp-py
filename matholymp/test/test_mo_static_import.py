@@ -33,7 +33,6 @@ Tests for mo-static-import script.
 
 import os.path
 
-from matholymp.fileutil import read_text_from_file
 from matholymp.test.testutil import MoScriptTestCase, load_script_tests
 
 __all__ = ['load_tests', 'MoStaticImportTestCase']

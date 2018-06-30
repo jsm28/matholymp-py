@@ -39,7 +39,6 @@ import io
 import os
 import zipfile
 
-from matholymp.data import EventGroup
 from matholymp.fileutil import write_utf8_csv_bytes, file_extension
 from matholymp.sitegen import SiteGenerator
 

@@ -36,7 +36,6 @@ import re
 
 from matholymp.datetimeutil import date_from_ymd_str, date_from_ymd_iso, \
     time_from_hhmm_str
-from matholymp.fileutil import boolean_states
 from matholymp.roundupreg.auditorutil import get_new_value, require_value
 from matholymp.roundupreg.rounduputil import have_consent_forms, \
     have_passport_numbers, have_nationality, require_diet, require_dob, \
