@@ -444,7 +444,6 @@ class RegSiteGenerator(SiteGenerator):
                        cgi.escape(p.gender),
                        self.room_edit_field(p)]
                 body_row_list.append(self.html_tr_td_list(row))
-                pass
             rtext += self.html_table_thead_tbody_list(head_row_list,
                                                       body_row_list) + '\n'
             rlist.append(rtext)
