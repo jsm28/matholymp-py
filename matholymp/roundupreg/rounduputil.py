@@ -325,34 +325,35 @@ def create_rss(db, title, description, **args):
     db.rss.set(rss_id, text=rss_text)
 
 
-def db_file_format_contents(db, cls, id):
+def db_file_format_contents(db, cls, file_id):
     """
     Return the format (canonical filename extension) of an uploaded
     file based on its contents, or None if not a known format that
     might be valid for some uploads.
     """
-    filename = db.filename(cls, id)
+    filename = db.filename(cls, file_id)
     return file_format_contents(filename)
 
 
-def db_file_extension(db, cls, id):
+def db_file_extension(db, cls, file_id):
     """
     Return the format (canonical filename extension) of an uploaded
     file based on its filename extension, or None if not a known
     format that might be valid for some uploads.
     """
-    name = db.getclass(cls).get(id, 'name')
+    name = db.getclass(cls).get(file_id, 'name')
     return file_extension(name)
 
 
-def db_file_url(db, cls, kind, id):
+def db_file_url(db, cls, kind, file_id):
     """
     Return a download URL of an uploaded file.  If the specified id is
     None, return None.
     """
     url = None
-    if id is not None:
-        ext = db_file_extension(db, cls, id)
+    if file_id is not None:
+        ext = db_file_extension(db, cls, file_id)
         if ext is not None:
-            url = '%s%s%s/%s.%s' % (db.config.TRACKER_WEB, cls, id, kind, ext)
+            url = '%s%s%s/%s.%s' % (db.config.TRACKER_WEB, cls, file_id, kind,
+                                    ext)
     return url

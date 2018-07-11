@@ -101,18 +101,18 @@ def main():
                                cmdline_data['input_directory'],
                                cmdline_data['output_directory'])
 
-    id = cmdline_data['id']
+    gen_id = cmdline_data['id']
     bg = cmdline_data['background']
     if cmdline_data['type'] == 'badge':
-        docgen.generate_badges(id, bg)
+        docgen.generate_badges(gen_id, bg)
     elif cmdline_data['type'] == 'desk-label':
-        docgen.generate_desk_labels(id)
+        docgen.generate_desk_labels(gen_id)
     elif cmdline_data['type'] == 'award-certificate':
-        docgen.generate_award_certs(id, bg)
+        docgen.generate_award_certs(gen_id, bg)
     elif cmdline_data['type'] == 'participation-certificate':
-        docgen.generate_part_certs(id, bg)
+        docgen.generate_part_certs(gen_id, bg)
     elif cmdline_data['type'] == 'paper':
-        docgen.generate_papers(id, cmdline_data['day'], bg)
+        docgen.generate_papers(gen_id, cmdline_data['day'], bg)
     elif cmdline_data['type'] == 'language-list':
         docgen.generate_language_list()
     elif cmdline_data['type'] == 'coord-form':

@@ -157,9 +157,9 @@ def comma_split(val_text):
 
 def make_dirs_for_file(file_name):
     """Create directories needed to create a file."""
-    dir = os.path.dirname(file_name)
-    if not os.access(dir, os.F_OK):
-        os.makedirs(dir)
+    dir_name = os.path.dirname(file_name)
+    if not os.access(dir_name, os.F_OK):
+        os.makedirs(dir_name)
 
 
 def write_bytes_to_file(out_bytes, out_file_name):

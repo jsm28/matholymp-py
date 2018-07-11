@@ -43,13 +43,14 @@ _type_to_entity_type = {'flag': 'country',
                         'consent-form': 'person'}
 
 
-def file_url_to_local(url, local_dir, type, id):
+def file_url_to_local(url, local_dir, file_type, entity_id):
     """
     Convert a registration system download URL for a file to a local path.
     """
     ext = file_extension(url)
-    entity_type = _type_to_entity_type[type]
-    return os.path.join(local_dir, entity_type + str(id), type + '.' + ext)
+    entity_type = _type_to_entity_type[file_type]
+    return os.path.join(local_dir, entity_type + str(entity_id),
+                        file_type + '.' + ext)
 
 
 def lang_to_filename(lang):

@@ -177,30 +177,30 @@ class DocumentGenerator(object):
         self.pdflatex_file(output_file_name)
         self.pdflatex_cleanup(output_file_base)
 
-    def get_person_by_id(self, id):
+    def get_person_by_id(self, person_id):
         """
         Given that the selected id must represent a valid person, return
         that person.
         """
-        id_numeric = re.match('^[0-9]+\\Z', id)
-        if id == '':
+        id_numeric = re.match('^[0-9]+\\Z', person_id)
+        if person_id == '':
             raise ValueError('Empty person identifier')
-        elif id in self._event.contestant_map:
-            return self._event.contestant_map[id]
-        elif id_numeric and int(id) in self._event.person_map:
-            p = self._event.person_map[int(id)]
+        elif person_id in self._event.contestant_map:
+            return self._event.contestant_map[person_id]
+        elif id_numeric and int(person_id) in self._event.person_map:
+            p = self._event.person_map[int(person_id)]
             if len(p) != 1:
                 raise ValueError('Person %s present more than once')
             return p[0]
         else:
-            raise ValueError('Person %s not found' % id)
+            raise ValueError('Person %s not found' % person_id)
 
-    def get_contestant_by_id(self, id):
+    def get_contestant_by_id(self, person_id):
         """
         Given that the selected id must represent a valid contestant,
         return that person.
         """
-        p = self.get_person_by_id(id)
+        p = self.get_person_by_id(person_id)
         if not p.is_contestant:
             raise ValueError('Person %d not a contestant' % p.person.id)
         return p
@@ -250,9 +250,9 @@ class DocumentGenerator(object):
 
     def generate_badge(self, person, use_background):
         """Generate the badge for a particular person."""
-        id = person.person.id
+        person_id = person.person.id
         template_file_base = 'badge-template'
-        output_file_base = 'badge-person' + str(id)
+        output_file_base = 'badge-person' + str(person_id)
         template_fields = {}
         raw_fields = ['team_rooms', 'event_ordinal']
 
@@ -320,7 +320,7 @@ class DocumentGenerator(object):
             country_list = [country]
 
         if len(country_list) > 5:
-            raise ValueError('Too many countries for person ' + str(id))
+            raise ValueError('Too many countries for person ' + str(person_id))
         else:
             clnew = [None for i in range(5 - len(country_list))]
             clnew.extend(country_list)
@@ -374,26 +374,26 @@ class DocumentGenerator(object):
         self.subst_and_pdflatex(template_file_base, output_file_base,
                                 template_fields, raw_fields)
 
-    def generate_badges(self, id, use_background):
+    def generate_badges(self, person_id, use_background):
         """Generate all badges requested by the command line."""
-        if id == 'all':
+        if person_id == 'all':
             for p in self._event.person_list:
                 self.generate_badge(p, use_background)
         else:
-            p = self.get_person_by_id(id)
+            p = self.get_person_by_id(person_id)
             self.generate_badge(p, use_background)
 
-    def generate_desk_labels(self, id):
+    def generate_desk_labels(self, person_id):
         """Generate all desk labels requested by the command line."""
         template_file_base = 'desk-label-template'
-        if id == 'all':
+        if person_id == 'all':
             contestants = sorted(self._event.contestant_list,
                                  key=lambda x: x.sort_key_exams)
             output_file_base = 'desk-labels'
         else:
-            p = self.get_contestant_by_id(id)
+            p = self.get_contestant_by_id(person_id)
             contestants = [p]
-            output_file_base = 'desk-label-person' + id
+            output_file_base = 'desk-label-person' + person_id
         label_list = [('\\placecard{%s}{%s}{%s}{%s}'
                        % (self.text_to_latex(p.contestant_code),
                           self.text_to_latex(p.name),
@@ -410,30 +410,30 @@ class DocumentGenerator(object):
         self.subst_and_pdflatex(template_file_base, output_file_base,
                                 template_fields, raw_fields)
 
-    def generate_award_certs(self, id, use_background):
+    def generate_award_certs(self, person_id, use_background):
         """Generate all award certificates requested by the command line."""
         template_file_base = 'certificate-template'
         contestants = sorted(self._event.contestant_list,
                              key=lambda x: x.sort_key)
-        if id == 'gold':
+        if person_id == 'gold':
             contestants = [p for p in contestants if p.award == 'Gold Medal']
             output_file_base = 'gold-certificates'
-        elif id == 'silver':
+        elif person_id == 'silver':
             contestants = [p for p in contestants if p.award == 'Silver Medal']
             output_file_base = 'silver-certificates'
-        elif id == 'bronze':
+        elif person_id == 'bronze':
             contestants = [p for p in contestants if p.award == 'Bronze Medal']
             output_file_base = 'bronze-certificates'
-        elif id == 'hm':
+        elif person_id == 'hm':
             contestants = [p for p in contestants
                            if p.award == 'Honourable Mention']
             output_file_base = 'hm-certificates'
         else:
-            p = self.get_contestant_by_id(id)
+            p = self.get_contestant_by_id(person_id)
             if not p.award:
-                raise ValueError('Person %s not awarded' % id)
+                raise ValueError('Person %s not awarded' % person_id)
             contestants = [p]
-            output_file_base = 'certificate-person' + id
+            output_file_base = 'certificate-person' + person_id
         award_map = {'Gold Medal': 'gold',
                      'Silver Medal': 'silver',
                      'Bronze Medal': 'bronze',
@@ -453,18 +453,18 @@ class DocumentGenerator(object):
         self.subst_and_pdflatex(template_file_base, output_file_base,
                                 template_fields, raw_fields)
 
-    def generate_part_certs(self, id, use_background):
+    def generate_part_certs(self, person_id, use_background):
         """
         Generate all participation certificates requested by the command line.
         """
         template_file_base = 'certificate-template'
-        if id == 'all':
+        if person_id == 'all':
             people = sorted(self._event.person_list, key=lambda x: x.sort_key)
             output_file_base = 'participation-certificates'
         else:
-            p = self.get_person_by_id(id)
+            p = self.get_person_by_id(person_id)
             people = [p]
-            output_file_base = 'participation-certificate-person' + id
+            output_file_base = 'participation-certificate-person' + person_id
         cert_list = [('\\partcert{%s}{%s}{%s}'
                       % (self.text_to_latex(p.name),
                          self.text_to_latex(p.country.name),
@@ -558,7 +558,7 @@ class DocumentGenerator(object):
                 pages_list.append(paper)
             return '%\n'.join(pages_list)
 
-    def generate_papers(self, id, day_opt, use_background):
+    def generate_papers(self, person_id, day_opt, use_background):
         """Generate all papers requested by the command line."""
         template_file_base = 'paper-template'
 
@@ -597,32 +597,32 @@ class DocumentGenerator(object):
             lang_filenames[lang_to_filename(lang)] = lang
 
         new_drafts_only = False
-        if id == 'all':
+        if person_id == 'all':
             contestants = self._event.contestant_list
             contestants = sorted(contestants, key=lambda x: x.sort_key_exams)
             languages = []
             output_file_base = 'papers' + day_text
-        elif id == 'all-languages':
+        elif person_id == 'all-languages':
             contestants = []
             languages = all_languages
             paper_draft = ''
             draft_text = ''
-        elif id == 'new-drafts':
+        elif person_id == 'new-drafts':
             contestants = []
             languages = all_languages
             new_drafts_only = True
             paper_draft = 'Draft'
             draft_text = '-draft'
-        elif id in lang_filenames:
+        elif person_id in lang_filenames:
             contestants = []
-            languages = [lang_filenames[id]]
+            languages = [lang_filenames[person_id]]
             paper_draft = 'Draft'
             draft_text = '-draft'
         else:
-            p = self.get_contestant_by_id(id)
+            p = self.get_contestant_by_id(person_id)
             contestants = [p]
             languages = []
-            output_file_base = 'paper' + day_text + '-person' + id
+            output_file_base = 'paper' + day_text + '-person' + person_id
 
         if languages:
             for d in days:
@@ -659,7 +659,7 @@ class DocumentGenerator(object):
                         if new_paper_src is not None:
                             make_dirs_for_file(new_paper_dst)
                             shutil.copyfile(new_paper_src, new_paper_dst)
-                if id == 'all-languages':
+                if person_id == 'all-languages':
                     output_file_base = ('paper' + day_text + draft_text
                                         + bg_text + '-All')
                     paper_list_text = '%\n'.join(paper_list)
@@ -693,7 +693,7 @@ class DocumentGenerator(object):
             template_fields['papers'] = paper_list_text
             self.subst_and_pdflatex(template_file_base, output_file_base,
                                     template_fields, raw_fields)
-            if id == 'all':
+            if person_id == 'all':
                 output_file_base = 'papers-leaders' + day_text
                 country_leader_counts = {}
                 for p in self._event.person_list:
@@ -807,14 +807,14 @@ class DocumentGenerator(object):
         for p in scores_data:
             ccode = p['Contestant Code']
             if ccode:
-                id = self._event.contestant_map[ccode].person.id
+                person_id = self._event.contestant_map[ccode].person.id
                 scores = []
                 for pn in range(1, self._event.num_problems + 1):
                     pnstr = 'P%d' % pn
                     scores.append(p[pnstr])
                 scores_text = ','.join(scores)
                 cmd = ('$roundup_admin -i $instance set person%d scores=%s'
-                       % (id, scores_text))
+                       % (person_id, scores_text))
                 out_text_list.append(cmd)
         out_text += '\n'.join(out_text_list) + '\n'
         write_text_to_file(out_text, os.path.join(self._out_dir,

@@ -81,10 +81,10 @@ def audit_event_fields(db, cl, nodeid, newvalues):
         create_rss(db, 'Medal boundaries', medal_text)
 
 
-def audit_file_format(db, cls, id, desc1, desc2, fmts, fmtdesc):
+def audit_file_format(db, cls, file_id, desc1, desc2, fmts, fmtdesc):
     """Check for format of an uploaded file."""
-    format_contents = db_file_format_contents(db, cls, id)
-    format_ext = db_file_extension(db, cls, id)
+    format_contents = db_file_format_contents(db, cls, file_id)
+    format_ext = db_file_extension(db, cls, file_id)
     if format_contents not in fmts:
         raise ValueError('%s must be in %s format' % (desc1, fmtdesc))
     if format_ext != format_contents:

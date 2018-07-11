@@ -52,14 +52,14 @@ class MoScriptTestCase(unittest.TestCase):
     """
 
     def __init__(self, method_name='runTest', script_dir=None, script=None,
-                 top_dir=None, dir=None):
+                 top_dir=None, this_dir=None):
         """Initialise a MoScriptTestCase."""
         self.script = script
         if script_dir is not None:
             self.script_path = os.path.join(script_dir, script)
-        self.dir = dir
-        if dir is not None:
-            self.full_dir = os.path.join(top_dir, dir)
+        self.dir = this_dir
+        if this_dir is not None:
+            self.full_dir = os.path.join(top_dir, this_dir)
             self.in_dir = os.path.join(self.full_dir, 'in')
             expected_out_dir = os.path.join(self.full_dir, 'out')
             if os.access(expected_out_dir, os.F_OK):
@@ -135,7 +135,7 @@ def load_script_tests(script, cl):
     test_top_dir = os.path.join(top_dir, 'test-data', script)
     for d in sorted(os.listdir(test_top_dir)):
         suite.addTest(cl(script_dir=top_dir, script=script,
-                         top_dir=test_top_dir, dir=d))
+                         top_dir=test_top_dir, this_dir=d))
     return suite
 
 

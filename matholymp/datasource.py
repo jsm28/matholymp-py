@@ -55,15 +55,15 @@ class DataSource(object):
         """
         raise NotImplementedError
 
-    def event_exists(self, id):
+    def event_exists(self, event_id):
         """Return whether an event exists with the given id."""
         raise NotImplementedError
 
-    def person_exists(self, id):
+    def person_exists(self, person_id):
         """Return whether a person exists with the given id."""
         raise NotImplementedError
 
-    def country_exists(self, id):
+    def country_exists(self, country_id):
         """Return whether a country exists with the given id."""
         raise NotImplementedError
 
@@ -81,7 +81,7 @@ class DataSource(object):
         """
         raise NotImplementedError
 
-    def event_get_attr(self, id, name):
+    def event_get_attr(self, event_id, name):
         """
         Return the value of an attribute for an Event.  Possible names
         are: short_name, long_name, year, _host_country_id,
@@ -95,7 +95,7 @@ class DataSource(object):
         """
         raise NotImplementedError
 
-    def event_have_attr(self, id, name):
+    def event_have_attr(self, event_id, name):
         """
         Return whether this DataSource provides a value of an
         attribute for an Event, or whether it should be inherited from

@@ -46,12 +46,12 @@ class MoStaticPapersImportTestCase(MoScriptTestCase):
     """
 
     def __init__(self, method_name='runTest', script_dir=None, script=None,
-                 top_dir=None, dir=None):
+                 top_dir=None, this_dir=None):
         """Initialise a MoStaticPapersImportTestCase."""
         super(MoStaticPapersImportTestCase, self).__init__(method_name,
                                                            script_dir, script,
-                                                           top_dir, dir)
-        if dir is not None:
+                                                           top_dir, this_dir)
+        if this_dir is not None:
             assert self.check_dir
             in_doc_dir = os.path.join(self.full_dir, 'in-doc')
             self.args.append(in_doc_dir)

@@ -92,10 +92,10 @@ class RegSiteGenerator(SiteGenerator):
     def flags_zip_bytes(self):
         """Return the byte contents of the ZIP of flags."""
         output = io.BytesIO()
-        zip = zipfile.ZipFile(output, 'w', zipfile.ZIP_STORED)
-        zip.writestr('flags/README.txt',
-                     'The flags in this file are arranged by internal'
-                     ' database identifier\nfor the country.\n')
+        zip_file = zipfile.ZipFile(output, 'w', zipfile.ZIP_STORED)
+        zip_file.writestr('flags/README.txt',
+                          'The flags in this file are arranged by internal'
+                          ' database identifier\nfor the country.\n')
 
         e = self.event
         country_list = sorted(e.country_list, key=lambda x: x.sort_key)
@@ -105,9 +105,9 @@ class RegSiteGenerator(SiteGenerator):
                 ext = file_extension(url)
                 filename = c.flag_filename
                 zip_filename = 'flags/country%d/flag.%s' % (c.country.id, ext)
-                zip.write(filename, zip_filename)
+                zip_file.write(filename, zip_filename)
 
-        zip.close()
+        zip_file.close()
         zip_bytes = output.getvalue()
         output.close()
         return zip_bytes
@@ -115,10 +115,10 @@ class RegSiteGenerator(SiteGenerator):
     def photos_zip_bytes(self):
         """Return the byte contents of the ZIP of photos."""
         output = io.BytesIO()
-        zip = zipfile.ZipFile(output, 'w', zipfile.ZIP_STORED)
-        zip.writestr('photos/README.txt',
-                     'The photos in this file are arranged by internal'
-                     ' database identifier\nfor the person.\n')
+        zip_file = zipfile.ZipFile(output, 'w', zipfile.ZIP_STORED)
+        zip_file.writestr('photos/README.txt',
+                          'The photos in this file are arranged by internal'
+                          ' database identifier\nfor the person.\n')
 
         e = self.event
         person_list = sorted(e.person_list, key=lambda x: x.sort_key)
@@ -128,9 +128,9 @@ class RegSiteGenerator(SiteGenerator):
                 ext = file_extension(url)
                 filename = p.photo_filename
                 zip_filename = 'photos/person%d/photo.%s' % (p.person.id, ext)
-                zip.write(filename, zip_filename)
+                zip_file.write(filename, zip_filename)
 
-        zip.close()
+        zip_file.close()
         zip_bytes = output.getvalue()
         output.close()
         return zip_bytes
@@ -138,10 +138,10 @@ class RegSiteGenerator(SiteGenerator):
     def consent_forms_zip_bytes(self):
         """Return the byte contents of the ZIP of consent_forms."""
         output = io.BytesIO()
-        zip = zipfile.ZipFile(output, 'w', zipfile.ZIP_STORED)
-        zip.writestr('consent-forms/README.txt',
-                     'The consent forms in this file are arranged by internal'
-                     ' database identifier\nfor the person.\n')
+        zip_file = zipfile.ZipFile(output, 'w', zipfile.ZIP_STORED)
+        zip_file.writestr('consent-forms/README.txt',
+                          'The consent forms in this file are arranged by'
+                          ' internal database identifier\nfor the person.\n')
 
         e = self.event
         person_list = sorted(e.person_list, key=lambda x: x.sort_key)
@@ -152,9 +152,9 @@ class RegSiteGenerator(SiteGenerator):
                 filename = p.consent_form_filename
                 zip_filename = ('consent-forms/person%d/consent-form.%s'
                                 % (p.person.id, ext))
-                zip.write(filename, zip_filename)
+                zip_file.write(filename, zip_filename)
 
-        zip.close()
+        zip_file.close()
         zip_bytes = output.getvalue()
         output.close()
         return zip_bytes

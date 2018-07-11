@@ -129,14 +129,14 @@ class CSVDataSource(DataSource):
             return list(self._country_ids)
         raise KeyError(name)
 
-    def event_exists(self, id):
-        return id in self._events
+    def event_exists(self, event_id):
+        return event_id in self._events
 
-    def person_exists(self, id):
-        return id in self._person_ids
+    def person_exists(self, person_id):
+        return person_id in self._person_ids
 
-    def country_exists(self, id):
-        return id in self._country_ids
+    def country_exists(self, country_id):
+        return country_id in self._country_ids
 
     def person_event_exists(self, person_id, event_id):
         return person_id in self._people[event_id]
@@ -167,51 +167,51 @@ class CSVDataSource(DataSource):
                                   'honourable_mentions_available':
                                   'Honourable Mentions Available'}
 
-    def event_get_attr(self, id, name):
+    def event_get_attr(self, event_id, name):
         if name in CSVDataSource._event_attr_map_str:
-            s = self._events[id][CSVDataSource._event_attr_map_str[name]]
+            s = self._events[event_id][CSVDataSource._event_attr_map_str[name]]
             if s == '':
                 s = None
             return s
         if name in CSVDataSource._event_attr_map_date:
             k = CSVDataSource._event_attr_map_date[name]
-            s = self._events[id][k]
+            s = self._events[event_id][k]
             if s == '':
                 return None
             else:
                 return date_from_ymd_iso(k, s)
         if name in CSVDataSource._event_attr_map_int:
-            s = self._events[id][CSVDataSource._event_attr_map_int[name]]
+            s = self._events[event_id][CSVDataSource._event_attr_map_int[name]]
             if s == '':
                 return None
             else:
                 return int(s)
         if name in CSVDataSource._event_attr_map_bool_maybe:
             k = CSVDataSource._event_attr_map_bool_maybe[name]
-            s = self._events[id][k]
+            s = self._events[event_id][k]
             return boolean_states[s.lower()]
         if name == 'marks_per_problem':
-            np = int(self._events[id]['Number of Problems'])
-            return [int(self._events[id]['P%d Max' % (n + 1)])
+            np = int(self._events[event_id]['Number of Problems'])
+            return [int(self._events[event_id]['P%d Max' % (n + 1)])
                     for n in range(np)]
         if name == 'registration_active':
-            return id == self._cfg['event_active_number']
+            return event_id == self._cfg['event_active_number']
         if name == 'paper_list':
-            return self._papers[id]
+            return self._papers[event_id]
         if name == '_person_ids':
-            return list(self._people[id].keys())
+            return list(self._people[event_id].keys())
         if name == '_country_ids':
-            return list(self._countries[id].keys())
+            return list(self._countries[event_id].keys())
         if name == 'age_day_desc':
-            if 'Age Day Description' in self._events[id]:
-                return self._events[id]['Age Day Description']
+            if 'Age Day Description' in self._events[event_id]:
+                return self._events[event_id]['Age Day Description']
             return self._cfg['age_day_desc']
         raise KeyError(name)
 
-    def event_have_attr(self, id, name):
+    def event_have_attr(self, event_id, name):
         if name in CSVDataSource._event_attr_map_bool_maybe:
             k = CSVDataSource._event_attr_map_bool_maybe[name]
-            if k in self._events[id]:
+            if k in self._events[event_id]:
                 return True
         return False
 

@@ -81,19 +81,19 @@ class RoundupDataSource(DataSource):
                     if self._db.country.get(c, 'participants_ok')]
         raise KeyError(name)
 
-    def event_exists(self, id):
-        return self._db.config.ext['MATHOLYMP_EVENT_NUMBER'] == str(id)
+    def event_exists(self, event_id):
+        return self._db.config.ext['MATHOLYMP_EVENT_NUMBER'] == str(event_id)
 
-    def person_exists(self, id):
-        id = str(id)
-        return (self._db.person.hasnode(id)
-                and not self._db.person.is_retired(id))
+    def person_exists(self, person_id):
+        person_id = str(person_id)
+        return (self._db.person.hasnode(person_id)
+                and not self._db.person.is_retired(person_id))
 
-    def country_exists(self, id):
-        id = str(id)
-        return (self._db.country.hasnode(id)
-                and not self._db.country.is_retired(id)
-                and self._db.country.get(id, 'participants_ok'))
+    def country_exists(self, country_id):
+        country_id = str(country_id)
+        return (self._db.country.hasnode(country_id)
+                and not self._db.country.is_retired(country_id)
+                and self._db.country.get(country_id, 'participants_ok'))
 
     def person_event_exists(self, person_id, event_id):
         return self.person_exists(person_id)
@@ -101,7 +101,7 @@ class RoundupDataSource(DataSource):
     def country_event_exists(self, country_id, event_id):
         return self.country_exists(country_id)
 
-    def event_get_attr(self, id, name):
+    def event_get_attr(self, event_id, name):
         if name == 'num_problems':
             return get_num_problems(self._db)
         elif name == 'marks_per_problem':
@@ -131,36 +131,36 @@ class RoundupDataSource(DataSource):
         raise KeyError(name)
 
     def person_event_get_attr(self, person_id, country_id, event_id, name):
-        id = str(person_id)
+        person_id = str(person_id)
         if name == '_country_ids':
             assert country_id is None
-            return [int(self._db.person.get(id, 'country'))]
+            return [int(self._db.person.get(person_id, 'country'))]
         assert country_id is not None
         if name == 'annual_url':
-            return self._db.config.TRACKER_WEB + 'person' + id
+            return self._db.config.TRACKER_WEB + 'person' + person_id
         elif name == 'primary_role':
-            primary_role = self._db.person.get(id, 'primary_role')
+            primary_role = self._db.person.get(person_id, 'primary_role')
             return self._db.matholymprole.get(primary_role, 'name')
         elif name == 'other_roles':
-            other_roles = self._db.person.get(id, 'other_roles')
+            other_roles = self._db.person.get(person_id, 'other_roles')
             if other_roles is None:
                 other_roles = []
-            primary_role = self._db.person.get(id, 'primary_role')
+            primary_role = self._db.person.get(person_id, 'primary_role')
             other_roles = [i for i in other_roles if i != primary_role]
             return [self._db.matholymprole.get(i, 'name') for i in other_roles]
         elif name == '_guide_for_ids':
-            guide_for = self._db.person.get(id, 'guide_for')
+            guide_for = self._db.person.get(person_id, 'guide_for')
             if guide_for is None:
                 guide_for = []
             return [int(c) for c in guide_for]
         elif name == 'contestant_age':
-            return contestant_age(self._db, id)
+            return contestant_age(self._db, person_id)
         elif name == 'given_name':
-            return self._db.person.get(id, 'given_name')
+            return self._db.person.get(person_id, 'given_name')
         elif name == 'family_name':
-            return self._db.person.get(id, 'family_name')
+            return self._db.person.get(person_id, 'family_name')
         elif name == 'problem_scores':
-            score_str = self._db.person.get(id, 'scores')
+            score_str = self._db.person.get(person_id, 'scores')
             scores = scores_from_str(self._db, score_str)
             r = []
             for s in scores:
@@ -171,15 +171,15 @@ class RoundupDataSource(DataSource):
                 r.append(s)
             return r
         elif name == 'extra_awards':
-            extra_awards_str = self._db.person.get(id, 'extra_awards')
+            extra_awards_str = self._db.person.get(person_id, 'extra_awards')
             if extra_awards_str is None:
                 return []
             return comma_split(extra_awards_str)
         elif name == 'photo_url':
-            photo_id = self._db.person.get(id, 'photo')
+            photo_id = self._db.person.get(person_id, 'photo')
             return db_file_url(self._db, 'photo', 'photo', photo_id)
         elif name == 'photo_filename':
-            photo_id = self._db.person.get(id, 'photo')
+            photo_id = self._db.person.get(person_id, 'photo')
             photo_filename = None
             if photo_id is not None:
                 photo_filename = self._db.filename('photo', photo_id)
@@ -187,13 +187,13 @@ class RoundupDataSource(DataSource):
         elif name == 'consent_form_url':
             if not have_consent_forms(self._db):
                 return None
-            consent_form_id = self._db.person.get(id, 'consent_form')
+            consent_form_id = self._db.person.get(person_id, 'consent_form')
             return db_file_url(self._db, 'consent_form', 'consent-form',
                                consent_form_id)
         elif name == 'consent_form_filename':
             if not have_consent_forms(self._db):
                 return None
-            consent_form_id = self._db.person.get(id, 'consent_form')
+            consent_form_id = self._db.person.get(person_id, 'consent_form')
             consent_form_filename = None
             if consent_form_id is not None:
                 consent_form_filename = self._db.filename('consent_form',
@@ -203,20 +203,20 @@ class RoundupDataSource(DataSource):
             ret = []
             langs = set()
             for i in get_language_numbers(self._db):
-                lang = self._db.person.get(id, 'language_%d' % i)
+                lang = self._db.person.get(person_id, 'language_%d' % i)
                 if lang is not None and lang not in langs:
                     langs.add(lang)
                     lang_name = self._db.language.get(lang, 'name')
                     ret.append(lang_name)
             return ret
         elif name == 'diet':
-            return self._db.person.get(id, 'diet') or None
+            return self._db.person.get(person_id, 'diet') or None
         elif name == 'room_number':
-            return self._db.person.get(id, 'room_number') or None
+            return self._db.person.get(person_id, 'room_number') or None
         elif name == 'phone_number':
-            return self._db.person.get(id, 'phone_number') or None
+            return self._db.person.get(person_id, 'phone_number') or None
         elif name == 'generic_id':
-            generic_url = self._db.person.get(id, 'generic_url')
+            generic_url = self._db.person.get(person_id, 'generic_url')
             gubase = (self._db.config.ext['MATHOLYMP_GENERIC_URL_BASE']
                       + 'people/person')
             if (generic_url is None or not generic_url.startswith(gubase)
@@ -226,106 +226,107 @@ class RoundupDataSource(DataSource):
                 generic_id = int(generic_url[len(gubase):-1])
             return generic_id
         elif name == 'gender':
-            gender = self._db.person.get(id, 'gender')
+            gender = self._db.person.get(person_id, 'gender')
             return self._db.gender.get(gender, 'name')
         elif name == 'date_of_birth':
-            return person_date_of_birth(self._db, id)
+            return person_date_of_birth(self._db, person_id)
         elif name == 'passport_number':
             if not have_passport_numbers(self._db):
                 return None
-            return self._db.person.get(id, 'passport_number') or None
+            return self._db.person.get(person_id, 'passport_number') or None
         elif name == 'nationality':
             if not have_nationality(self._db):
                 return None
-            return self._db.person.get(id, 'nationality') or None
+            return self._db.person.get(person_id, 'nationality') or None
         elif name == 'tshirt':
-            tshirt = self._db.person.get(id, 'tshirt')
+            tshirt = self._db.person.get(person_id, 'tshirt')
             return self._db.tshirt.get(tshirt, 'name')
         elif name == 'arrival_place':
-            arrival_place = self._db.person.get(id, 'arrival_place')
+            arrival_place = self._db.person.get(person_id, 'arrival_place')
             if arrival_place is None:
                 return None
             else:
                 return self._db.arrival.get(arrival_place, 'name')
         elif name == 'arrival_is_airport':
-            arrival_place = self._db.person.get(id, 'arrival_place')
+            arrival_place = self._db.person.get(person_id, 'arrival_place')
             if arrival_place is None:
                 return False
             else:
                 return self._db.arrival.get(arrival_place, 'isairport')
         elif name == 'arrival_date':
-            date = self._db.person.get(id, 'arrival_date')
+            date = self._db.person.get(person_id, 'arrival_date')
             if date is None:
                 return None
             else:
                 return date_from_ymd_iso('arrival date', date)
         elif name == 'arrival_time':
-            hour = self._db.person.get(id, 'arrival_time_hour')
-            minute = self._db.person.get(id, 'arrival_time_minute')
+            hour = self._db.person.get(person_id, 'arrival_time_hour')
+            minute = self._db.person.get(person_id, 'arrival_time_minute')
             if hour is None or minute is None:
                 return None
             else:
                 return time_from_hhmm_str('arrival time', hour, minute)
         elif name == 'arrival_flight':
-            return self._db.person.get(id, 'arrival_flight') or None
+            return self._db.person.get(person_id, 'arrival_flight') or None
         elif name == 'departure_place':
-            departure_place = self._db.person.get(id, 'departure_place')
+            departure_place = self._db.person.get(person_id, 'departure_place')
             if departure_place is None:
                 return None
             else:
                 return self._db.arrival.get(departure_place, 'name')
         elif name == 'departure_is_airport':
-            departure_place = self._db.person.get(id, 'departure_place')
+            departure_place = self._db.person.get(person_id, 'departure_place')
             if departure_place is None:
                 return False
             else:
                 return self._db.arrival.get(departure_place, 'isairport')
         elif name == 'departure_date':
-            date = self._db.person.get(id, 'departure_date')
+            date = self._db.person.get(person_id, 'departure_date')
             if date is None:
                 return None
             else:
                 return date_from_ymd_iso('departure date', date)
         elif name == 'departure_time':
-            hour = self._db.person.get(id, 'departure_time_hour')
-            minute = self._db.person.get(id, 'departure_time_minute')
+            hour = self._db.person.get(person_id, 'departure_time_hour')
+            minute = self._db.person.get(person_id, 'departure_time_minute')
             if hour is None or minute is None:
                 return None
             else:
                 return time_from_hhmm_str('departure time', hour, minute)
         elif name == 'departure_flight':
-            return self._db.person.get(id, 'departure_flight') or None
+            return self._db.person.get(person_id, 'departure_flight') or None
         raise KeyError(name)
 
     def country_event_get_attr(self, country_id, event_id, name):
-        id = str(country_id)
+        country_id = str(country_id)
         if name == 'annual_url':
-            return self._db.config.TRACKER_WEB + 'country' + id
+            return self._db.config.TRACKER_WEB + 'country' + country_id
         elif name == 'code':
-            return self._db.country.get(id, 'code')
+            return self._db.country.get(country_id, 'code')
         elif name == 'name':
-            return self._db.country.get(id, 'name')
+            return self._db.country.get(country_id, 'name')
         elif name == 'flag_url':
-            flag_id = self._db.country.get(id, 'flag')
+            flag_id = self._db.country.get(country_id, 'flag')
             return db_file_url(self._db, 'flag', 'flag', flag_id)
         elif name == 'flag_filename':
-            flag_id = self._db.country.get(id, 'flag')
+            flag_id = self._db.country.get(country_id, 'flag')
             flag_filename = None
             if flag_id is not None:
                 flag_filename = self._db.filename('flag', flag_id)
             return flag_filename
         elif name == 'is_official':
-            return self._db.country.get(id, 'official')
+            return self._db.country.get(country_id, 'official')
         elif name == 'is_normal':
-            return self._db.country.get(id, 'is_normal')
+            return self._db.country.get(country_id, 'is_normal')
         elif name == '_person_ids':
-            person_list = self._db.person.filter(None, {'country': id})
+            person_list = self._db.person.filter(None, {'country': country_id})
             return [int(p) for p in person_list]
         elif name == '_guide_ids':
-            guide_list = self._db.person.filter(None, {'guide_for': id})
+            guide_list = self._db.person.filter(None,
+                                                {'guide_for': country_id})
             return [int(p) for p in guide_list]
         elif name == 'generic_id':
-            generic_url = self._db.country.get(id, 'generic_url')
+            generic_url = self._db.country.get(country_id, 'generic_url')
             gubase = (self._db.config.ext['MATHOLYMP_GENERIC_URL_BASE']
                       + 'countries/country')
             if (generic_url is None or not generic_url.startswith(gubase)

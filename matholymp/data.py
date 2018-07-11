@@ -234,11 +234,11 @@ class EventGroup(object):
         'event_list', _get_event_list,
         """A list of all events (Event objects), in chronological order.""")
 
-    def _event_id_test(self, id):
-        return self._ds.event_exists(id)
+    def _event_id_test(self, event_id):
+        return self._ds.event_exists(event_id)
 
-    def _event_id_get(self, id):
-        return Event(self, id)
+    def _event_id_get(self, event_id):
+        return Event(self, event_id)
 
     def _event_id_list(self):
         return self._event_ids
@@ -254,11 +254,11 @@ class EventGroup(object):
         'person_list', _get_person_list,
         """A list of all people (Person objects).""")
 
-    def _person_id_test(self, id):
-        return self._ds.person_exists(id)
+    def _person_id_test(self, person_id):
+        return self._ds.person_exists(person_id)
 
-    def _person_id_get(self, id):
-        return Person(self, id)
+    def _person_id_get(self, person_id):
+        return Person(self, person_id)
 
     def _person_id_list(self):
         return self._person_ids
@@ -296,11 +296,11 @@ class EventGroup(object):
         'country_list', _get_country_list,
         """A list of all countries (Country objects).""")
 
-    def _country_id_test(self, id):
-        return self._ds.country_exists(id)
+    def _country_id_test(self, country_id):
+        return self._ds.country_exists(country_id)
 
-    def _country_id_get(self, id):
-        return Country(self, id)
+    def _country_id_get(self, country_id):
+        return Country(self, country_id)
 
     def _country_id_list(self):
         return self._country_ids
@@ -344,7 +344,7 @@ class Event(object):
     this particular event, are None.
     """
 
-    def __init__(self, event_group, id):
+    def __init__(self, event_group, event_id):
         """
         Initialise an Event from the given EventGroup.  Normally users
         should access EventGroup attributes that implicitly create
@@ -352,7 +352,7 @@ class Event(object):
         """
         self.event_group = event_group
         """The EventGroup object for this event."""
-        self.id = id
+        self.id = event_id
         """The id of this event."""
         self._cache = {}
         self.person_map = _LazyMap(self._person_id_test,
@@ -709,14 +709,14 @@ class Event(object):
         'person_list', _get_person_list,
         """A list of all people (PersonEvent objects) at this event.""")
 
-    def _person_id_test(self, id):
-        return self.event_group._ds.person_event_exists(id, self.id)
+    def _person_id_test(self, person_id):
+        return self.event_group._ds.person_event_exists(person_id, self.id)
 
-    def _person_id_get(self, id):
+    def _person_id_get(self, person_id):
         ds = self.event_group._ds
-        return [PersonEvent(self.event_group.person_map[id],
+        return [PersonEvent(self.event_group.person_map[person_id],
                             self.country_map[cid], self)
-                for cid in ds.person_event_get_attr(id, None, self.id,
+                for cid in ds.person_event_get_attr(person_id, None, self.id,
                                                     '_country_ids')]
 
     def _person_id_list(self):
@@ -862,11 +862,11 @@ class Event(object):
         'country_list', _get_country_list,
         """A list of all countries (CountryEvent objects) at this event.""")
 
-    def _country_id_test(self, id):
-        return self.event_group._ds.country_event_exists(id, self.id)
+    def _country_id_test(self, country_id):
+        return self.event_group._ds.country_event_exists(country_id, self.id)
 
-    def _country_id_get(self, id):
-        return CountryEvent(self.event_group.country_map[id], self)
+    def _country_id_get(self, country_id):
+        return CountryEvent(self.event_group.country_map[country_id], self)
 
     def _country_id_list(self):
         return self._country_ids
@@ -1029,7 +1029,7 @@ class Person(object):
     within an EventGroup.
     """
 
-    def __init__(self, event_group, id):
+    def __init__(self, event_group, person_id):
         """
         Initialise a Person from the given EventGroup.  Normally users
         should access EventGroup attributes that implicitly create
@@ -1038,7 +1038,7 @@ class Person(object):
         """
         self.event_group = event_group
         """The EventGroup object for this person."""
-        self.id = id
+        self.id = person_id
         """The id of this person."""
         self._cache = {}
 
@@ -1226,7 +1226,7 @@ class PersonEvent(object):
         """)
 
     def _get_guide_for(self):
-        return [self.event.country_map[id] for id in self._guide_for_ids]
+        return [self.event.country_map[cid] for cid in self._guide_for_ids]
 
     guide_for = _PropertyCached(
         'guide_for', _get_guide_for,
@@ -1537,7 +1537,7 @@ class Country(object):
     all).
     """
 
-    def __init__(self, event_group, id):
+    def __init__(self, event_group, country_id):
         """
         Initialise a Country from the given EventGroup.  Normally
         users should access EventGroup attributes that implicitly
@@ -1546,7 +1546,7 @@ class Country(object):
         """
         self.event_group = event_group
         """The EventGroup object for this country."""
-        self.id = id
+        self.id = country_id
         """The id of this country."""
         self._cache = {}
 
@@ -1729,7 +1729,7 @@ class CountryEvent(object):
                                       '_person_ids'):
             ids = ds.country_event_get_attr(self.country.id, self.event.id,
                                             '_person_ids')
-            return [p for id in ids for p in self.event.person_map[id]
+            return [p for pid in ids for p in self.event.person_map[pid]
                     if p.country.country.id == self.country.id]
         else:
             return [p for p in self.event.person_list if self is p.country]
@@ -1764,7 +1764,7 @@ class CountryEvent(object):
                                       '_guide_ids'):
             ids = ds.country_event_get_attr(self.country.id, self.event.id,
                                             '_guide_ids')
-            gl = [self.event.person_map[id] for id in ids]
+            gl = [self.event.person_map[pid] for pid in ids]
             for pl in gl:
                 if len(pl) != 1:
                     raise ValueError('Guide present more than once at Event')
