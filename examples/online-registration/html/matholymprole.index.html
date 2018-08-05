@@ -21,7 +21,7 @@
  <th i18n:translate="">Can guide countries?</th>
 </tr>
 <tal:block repeat="matholymprole context/list">
-<tr tal:attributes="class python:['normal', 'alt'][repeat['matholymprole'].index%6/3]">
+<tr tal:attributes="class python:['normal', 'alt'][repeat['matholymprole'].index%6//3]">
  <td>
   <a tal:attributes="href string:matholymprole${matholymprole/id}"
      tal:content="matholymprole/name">name</a>

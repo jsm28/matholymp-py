@@ -90,6 +90,17 @@ the registration system is not active.
   <http://issues.roundup-tracker.org/issue2550722>`_ has been extended
   to fix further internal errors.
 
+* Various HTML templates for the registration system have been updated
+  in preparation for Python 3 support with a future version of
+  Roundup.  The modified templates are
+  :file:`_generic.help-submit.html`, :file:`_generic.help.html`,
+  :file:`_generic.index.html`, :file:`_generic.item.html`,
+  :file:`arrival.index.html`, :file:`country.index.html`,
+  :file:`event.index.html`, :file:`gender.index.html`,
+  :file:`language.index.html`, :file:`matholymprole.index.html`,
+  :file:`rss.index.html`, :file:`tshirt.index.html`,
+  :file:`user.help.html` and :file:`user.index.html`.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

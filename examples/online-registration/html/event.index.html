@@ -21,7 +21,7 @@
  <th i18n:translate="">Bronze</th>
 </tr>
 <tal:block repeat="event context/list">
-<tr tal:attributes="class python:['normal', 'alt'][repeat['event'].index%6/3]">
+<tr tal:attributes="class python:['normal', 'alt'][repeat['event'].index%6//3]">
  <td>
   <a tal:attributes="href string:event${event/id}"
      tal:content="event/year">year</a>

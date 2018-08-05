@@ -19,7 +19,7 @@
  <th i18n:translate="">Text</th>
 </tr>
 <tal:block repeat="rss context/list">
-<tr tal:attributes="class python:['normal', 'alt'][repeat['rss'].index%6/3]">
+<tr tal:attributes="class python:['normal', 'alt'][repeat['rss'].index%6//3]">
  <td tal:content="rss/country"></td>
  <td>
   <a tal:attributes="href string:rss${rss/id}"

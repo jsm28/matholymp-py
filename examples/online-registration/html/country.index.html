@@ -32,7 +32,7 @@
  <th i18n:translate="" tal:condition="python:utils.distinguish_official(db._db)"><tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_OFFICIAL_DESC']" /></th>
 </tr>
 <tal:block repeat="country context/list">
-<tr tal:attributes="class python:['normal', 'alt'][repeat['country'].index%6/3]">
+<tr tal:attributes="class python:['normal', 'alt'][repeat['country'].index%6//3]">
  <td>
   <a tal:attributes="href string:country${country/id}"
      tal:content="country/code">code</a>

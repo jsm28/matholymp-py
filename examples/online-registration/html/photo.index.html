@@ -11,7 +11,7 @@
      <th style="padding-right: 10" i18n:translate="">Uploaded By</th>
      <th style="padding-right: 10" i18n:translate="">Date</th>
  </tr>
- <tr tal:repeat="photo batch" tal:attributes="class python:['normal', 'alt'][repeat['photo'].index%6/3]">
+ <tr tal:repeat="photo batch" tal:attributes="class python:['normal', 'alt'][repeat['photo'].index%6//3]">
   <td>
    <a tal:attributes="href string:photo${photo/id}/${photo/name}"
       tal:content="photo/name">dld link</a>

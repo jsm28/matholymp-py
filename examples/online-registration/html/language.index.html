@@ -18,7 +18,7 @@
  <th i18n:translate="">Name</th>
 </tr>
 <tal:block repeat="language context/list">
-<tr tal:attributes="class python:['normal', 'alt'][repeat['language'].index%6/3]">
+<tr tal:attributes="class python:['normal', 'alt'][repeat['language'].index%6//3]">
  <td>
   <a tal:attributes="href string:language${language/id}"
      tal:content="language/name">name</a>

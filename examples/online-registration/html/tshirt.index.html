@@ -19,7 +19,7 @@
  <th i18n:translate="">Order</th>
 </tr>
 <tal:block repeat="tshirt context/list">
-<tr tal:attributes="class python:['normal', 'alt'][repeat['tshirt'].index%6/3]">
+<tr tal:attributes="class python:['normal', 'alt'][repeat['tshirt'].index%6//3]">
  <td>
   <a tal:attributes="href string:tshirt${tshirt/id}"
      tal:content="tshirt/name">name</a>
