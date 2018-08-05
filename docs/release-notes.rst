@@ -86,6 +86,10 @@ the registration system is not active.
   :file:`person.status.html`, :file:`user.forgotten.html` and
   :file:`user.register.html`.
 
+* The included patch for `Roundup issue 2550722
+  <http://issues.roundup-tracker.org/issue2550722>`_ has been extended
+  to fix further internal errors.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

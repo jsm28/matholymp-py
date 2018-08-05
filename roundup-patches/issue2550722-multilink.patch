@@ -1,6 +1,20 @@
+diff -rupN roundup-1.6.0.orig/roundup/cgi/templating.py roundup-1.6.0/roundup/cgi/templating.py
+--- roundup-1.6.0.orig/roundup/cgi/templating.py	2018-07-08 15:35:39.000000000 +0000
++++ roundup-1.6.0/roundup/cgi/templating.py	2018-08-05 22:17:39.677868670 +0000
+@@ -2387,6 +2387,10 @@ class MultilinkHTMLProperty(HTMLProperty
+ 
+         if value is None:
+             value = self._value
++        # When rendering from form contents, 'value' may contain
++        # elements starting '-' from '- no selection -' having been
++        # selected on a previous form submission.
++        value = [v for v in value if not v.startswith('-')]
+ 
+         linkcl = self._db.getclass(self._prop.classname)
+ 
 diff -rupN roundup-1.6.0.orig/roundup/hyperdb.py roundup-1.6.0/roundup/hyperdb.py
 --- roundup-1.6.0.orig/roundup/hyperdb.py	2018-07-04 23:49:25.000000000 +0000
-+++ roundup-1.6.0/roundup/hyperdb.py	2018-08-05 18:19:22.708231467 +0000
++++ roundup-1.6.0/roundup/hyperdb.py	2018-08-05 22:17:39.665869183 +0000
 @@ -257,8 +257,11 @@ class Multilink(_Pointer):
                  try:
                      curvalue.remove(itemid)
