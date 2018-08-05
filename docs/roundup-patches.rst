@@ -39,31 +39,9 @@ installing Roundup.  All these patches can be applied with
 :command:`patch -p1 -N -E` from within the Roundup source directory.
 
 These are located in the :file:`roundup-patches/` directory of the
-source distribution, and are relative to Roundup version 1.5.1 (so may
+source distribution, and are relative to Roundup version 1.6.0 (so may
 require changes to apply cleanly to later versions).  Details of the
 individual patches are:
-
-* :download:`issue2086536-back_postgresql.patch
-  <../roundup-patches/issue2086536-back_postgresql.patch>` is an
-  updated version of a patch originally provided by someone else in
-  `Roundup issue 2086536
-  <http://issues.roundup-tracker.org/issue2086536>`_ for issues with
-  the PostgreSQL back end.
-
-* :download:`back_postgresql-retry-more.patch
-  <../roundup-patches/back_postgresql-retry-more.patch>` is a patch
-  that works around some problems with simultaneous accesses to the
-  database by increasing the number of retries.  The `underlying
-  problem
-  <http://article.gmane.org/gmane.comp.bug-tracking.roundup.devel/4812>`_
-  being worked around by this patch, and possibly to some extent by
-  the previous patch, is that database updates for session cookies
-  (where concurrent updates are extremely likely, if someone accesses
-  a page on which multiple images, scripts or other files are served
-  through Roundup, and each access updates the session information)
-  use the same database cursor as for database content (where
-  concurrent updates are extremely unlikely and not a significant
-  concern in the matholymp context).
 
 * :download:`issue2550750-no-timeout-mail.patch
   <../roundup-patches/issue2550750-no-timeout-mail.patch>` is a patch

@@ -249,14 +249,14 @@ def list_expected_roles(db):
     return main_role_list
 
 
-def registration_status(db):
+def registration_status(db, nonce):
     """Produce registration status page contents for all countries."""
     sitegen = RoundupSiteGenerator(db)
     main_role_list = list_expected_roles(db)
     consent_forms_date = get_consent_forms_date(db)
     max_photo_size = int(db.config.ext['MATHOLYMP_PHOTO_MAX_SIZE'])
     return sitegen.registration_status_text(main_role_list, consent_forms_date,
-                                            max_photo_size)
+                                            max_photo_size, nonce)
 
 
 def registration_status_country(db, userid):

@@ -86,11 +86,6 @@ files:
   <https://www.egmo.org/egmo-scoredisplay.css>`_ may give useful
   ideas, or indeed be usable more or less as-is.
 
-* In addition, you need to create a directory :file:`db/`, containing
-  a file :file:`db/backend_name`, whose contents name the Roundup back
-  end to use (most likely ``mysql`` or ``postgresql`` for production
-  use, possibly ``anydbm`` for testing).
-
 You may wish to customise other page templates to fine-tune them for
 your event (for example, if this is the first event of this kind, to
 hide the interface for entering URLs for previous participation by

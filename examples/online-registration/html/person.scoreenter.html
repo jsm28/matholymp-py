@@ -64,6 +64,8 @@
 <input type="hidden" name="@action" value="score">
 </td>
 <td>
+<input name="@csrf" type="hidden"
+       tal:attributes="value python:utils.anti_csrf_nonce()">
 <input type="submit" value="Save these scores">
 </td>
 </tr>

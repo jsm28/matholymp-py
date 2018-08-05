@@ -1,7 +1,7 @@
-diff -rupN roundup-1.5.1.orig/roundup/scripts/roundup_server.py roundup-1.5.1/roundup/scripts/roundup_server.py
---- roundup-1.5.1.orig/roundup/scripts/roundup_server.py	2016-01-11 14:53:59.000000000 +0000
-+++ roundup-1.5.1/roundup/scripts/roundup_server.py	2016-05-01 10:51:44.584915651 +0000
-@@ -635,7 +635,7 @@ class ServerConfig(configuration.Config)
+diff -rupN roundup-1.6.0.orig/roundup/scripts/roundup_server.py roundup-1.6.0/roundup/scripts/roundup_server.py
+--- roundup-1.6.0.orig/roundup/scripts/roundup_server.py	2018-07-08 15:35:39.000000000 +0000
++++ roundup-1.6.0/roundup/scripts/roundup_server.py	2018-08-05 18:18:53.625470061 +0000
+@@ -692,7 +692,7 @@ class ServerConfig(configuration.Config)
              # This sets the socket to non-blocking. SSL needs a blocking
              # socket, so we do this only for non-SSL connections.
              if hasattr(socket, 'setdefaulttimeout'):

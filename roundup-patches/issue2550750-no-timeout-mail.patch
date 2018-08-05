@@ -1,12 +1,12 @@
-diff -rupN roundup-1.5.1.orig/roundup/cgi/client.py roundup-1.5.1/roundup/cgi/client.py
---- roundup-1.5.1.orig/roundup/cgi/client.py	2016-01-11 14:53:59.000000000 +0000
-+++ roundup-1.5.1/roundup/cgi/client.py	2016-05-01 10:52:53.725784130 +0000
-@@ -1302,6 +1302,8 @@ class Client:
+diff -rupN roundup-1.6.0.orig/roundup/cgi/client.py roundup-1.6.0/roundup/cgi/client.py
+--- roundup-1.6.0.orig/roundup/cgi/client.py	2018-07-08 15:35:39.000000000 +0000
++++ roundup-1.6.0/roundup/cgi/client.py	2018-08-05 18:20:34.369179491 +0000
+@@ -1769,6 +1769,8 @@ class Client:
          """
          try:
              call(*args, **kwargs)
 +        except socket.timeout:
 +            pass
-         except socket.error, err:
+         except socket.error as err:
              err_errno = getattr (err, 'errno', None)
              if err_errno is None:

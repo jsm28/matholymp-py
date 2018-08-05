@@ -74,6 +74,18 @@ the registration system is not active.
 * As part of cleanups to Python coding style, the example Python files
   for the registration system have been changed.
 
+* The registration system code and associated Roundup patches have
+  been updated for Roundup 1.6.0, as have many HTML templates for the
+  registration system and the example :file:`config.ini`.  Because of
+  Roundup API changes, the code will no longer work with older Roundup
+  versions.  The modified templates are :file:`_generic.404.html`,
+  :file:`_generic.help-submit.html`, :file:`_generic.index.html`,
+  :file:`country.retireconfirm.html`, :file:`help_controls.js`,
+  :file:`page.html`, :file:`person.retireconfirm.html`,
+  :file:`person.rooms.html`, :file:`person.scoreenter.html`,
+  :file:`person.status.html`, :file:`user.forgotten.html` and
+  :file:`user.register.html`.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

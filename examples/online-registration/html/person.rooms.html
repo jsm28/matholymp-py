@@ -29,6 +29,8 @@ sorted by room number.</p>
 
 <input type="hidden" name="@action" value="edit">
 <input type="hidden" name="@template" value="rooms">
+<input name="@csrf" type="hidden"
+       tal:attributes="value python:utils.anti_csrf_nonce()">
 <input type="submit" value="Save changes to room numbers">
 </form>
 

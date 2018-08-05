@@ -22,6 +22,8 @@
 <td>
 <input type="hidden" name="@template" value="item">
 <input type="hidden" name="@action" value="retirecountry">
+<input name="@csrf" type="hidden"
+       tal:attributes="value python:utils.anti_csrf_nonce()">
 <input type="submit" value="Confirm removal of this country">
 </td>
 </tr>

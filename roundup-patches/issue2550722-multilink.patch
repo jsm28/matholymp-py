@@ -1,7 +1,7 @@
-diff -rupN roundup-1.5.1.orig/roundup/hyperdb.py roundup-1.5.1/roundup/hyperdb.py
---- roundup-1.5.1.orig/roundup/hyperdb.py	2016-01-11 14:53:59.000000000 +0000
-+++ roundup-1.5.1/roundup/hyperdb.py	2016-05-01 10:52:18.395384323 +0000
-@@ -232,8 +232,11 @@ class Multilink(_Pointer):
+diff -rupN roundup-1.6.0.orig/roundup/hyperdb.py roundup-1.6.0/roundup/hyperdb.py
+--- roundup-1.6.0.orig/roundup/hyperdb.py	2018-07-04 23:49:25.000000000 +0000
++++ roundup-1.6.0/roundup/hyperdb.py	2018-08-05 18:19:22.708231467 +0000
+@@ -257,8 +257,11 @@ class Multilink(_Pointer):
                  try:
                      curvalue.remove(itemid)
                  except ValueError:

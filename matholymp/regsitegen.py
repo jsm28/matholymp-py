@@ -310,12 +310,12 @@ class RegSiteGenerator(SiteGenerator):
                      ' as missing phone numbers, not other staff.</p>\n')
         return text
 
-    def photo_scale_form(self, p):
+    def photo_scale_form(self, p, nonce):
         """Return a form to scale down a person's photo."""
         raise NotImplementedError
 
     def registration_status_text(self, expected_roles, consent_forms_date,
-                                 max_photo_size):
+                                 max_photo_size, nonce):
         """Return the text of the registration status page."""
         e = self.event
         normal_countries = sorted(e.normal_country_list,
@@ -380,7 +380,7 @@ class RegSiteGenerator(SiteGenerator):
                     row = [cgi.escape(p.country.name_with_code),
                            self.link_for_person(p.person, cgi.escape(p.name)),
                            str(photo_size),
-                           self.photo_scale_form(p.person)]
+                           self.photo_scale_form(p.person, nonce)]
                     body_row_list.append(self.html_tr_td_list(row))
         if body_row_list:
             text += '<h2>Photos with large file size</h2>\n'
