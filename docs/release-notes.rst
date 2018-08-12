@@ -101,6 +101,10 @@ the registration system is not active.
   :file:`rss.index.html`, :file:`tshirt.index.html`,
   :file:`user.help.html` and :file:`user.index.html`.
 
+* A patch has been added for `Roundup issue 2550992
+  <http://issues.roundup-tracker.org/issue2550992>`_ to fix further
+  internal errors.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

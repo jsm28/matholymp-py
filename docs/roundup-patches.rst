@@ -68,3 +68,10 @@ individual patches are:
   registration of ordinary participants.  However, when they do arise,
   it may be necessary to restart the process of registering the person
   for which the mistake was made.)
+
+* :download:`issue2550992-auth.patch
+  <../roundup-patches/issue2550992-auth.patch>` is a patch for
+  `Roundup issue 2550992
+  <http://issues.roundup-tracker.org/issue2550992>`_ that avoids
+  internal errors in Roundup in certain cases of clients sending
+  invalid HTTP Authorization headers.
