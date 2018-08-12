@@ -105,6 +105,10 @@ the registration system is not active.
   <http://issues.roundup-tracker.org/issue2550992>`_ to fix further
   internal errors.
 
+* The example :file:`extensions/email-template-new-user` for the
+  registration system has been extended to discuss more cases of which
+  organizers should be contacted for certain issues.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 
