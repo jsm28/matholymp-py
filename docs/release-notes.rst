@@ -109,6 +109,10 @@ the registration system is not active.
   registration system has been extended to discuss more cases of which
   organizers should be contacted for certain issues.
 
+* :file:`person.item.html` now says explicitly that names should be
+  entered in the form they should appear on the website and name
+  badges, rather than entering full legal names as on a passport.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 
