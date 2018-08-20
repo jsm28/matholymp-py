@@ -75,3 +75,10 @@ individual patches are:
   <http://issues.roundup-tracker.org/issue2550992>`_ that avoids
   internal errors in Roundup in certain cases of clients sending
   invalid HTTP Authorization headers.
+
+* :download:`issue2550994-configparser.patch
+  <../roundup-patches/issue2550994-configparser.patch>` is a patch for
+  `Roundup issue 2550994
+  <http://issues.roundup-tracker.org/issue2550994>`_ that avoids
+  problems if a Python 2 backport of the Python 3
+  :py:mod:`configparser` module is installed.

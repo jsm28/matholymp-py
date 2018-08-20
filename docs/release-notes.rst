@@ -113,6 +113,11 @@ the registration system is not active.
   entered in the form they should appear on the website and name
   badges, rather than entering full legal names as on a passport.
 
+* A patch has been added for `Roundup issue 2550994
+  <http://issues.roundup-tracker.org/issue2550994>`_ to fix problems
+  if a Python 2 backport of the Python 3 :py:mod:`configparser` module
+  is installed.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 
