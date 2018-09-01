@@ -342,6 +342,10 @@ def db_file_extension(db, cls, file_id):
     format that might be valid for some uploads.
     """
     name = db.getclass(cls).get(file_id, 'name')
+    # If a file somehow has an empty filename, that will be returned
+    # as None, but file_extension expects a string.
+    if name is None:
+        return None
     return file_extension(name)
 
 
