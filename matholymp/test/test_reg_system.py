@@ -447,3 +447,14 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country_generic()
         session = self.get_session('ABC_reg')
         self.all_templates_test(session, can_score=False, scoring_user=False)
+
+    def test_bad_login(self):
+        """
+        Test login failure with an incorrect password.
+        """
+        session = self.get_session()
+        session.b.select_form(session.get_sidebar().find('form'))
+        session.b['__login_name'] = 'admin'
+        session.b['__login_password'] = (session.instance.passwords['admin']
+                                         + 'x')
+        session.check_submit_selected(error=True)
