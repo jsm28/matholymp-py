@@ -269,6 +269,89 @@ class RoundupTestSession(object):
         self.b['__login_password'] = self.instance.passwords[username]
         self.check_submit_selected()
 
+    def select_main_form(self):
+        """Get the main form from the current page."""
+        self.b.select_form(self.get_main().find('form'))
+
+    def set(self, data):
+        """Set the contents of fields in the selected form.
+
+        Unlike the MechanicalSoup interfaces, 'select' fields are set
+        by the labels on those fields, not their values.
+
+        """
+        form = self.b.get_current_form().form
+        for key in data:
+            value = data[key]
+            select = form.find('select', attrs={'name': key})
+            if select:
+                if not (isinstance(value, list) or isinstance(value, tuple)):
+                    value = (value,)
+                new_value = []
+                for v in value:
+                    option = select.find('option', string=v)
+                    new_value.append(option['value'])
+                if len(new_value) == 1:
+                    new_value = new_value[0]
+                value = new_value
+            self.b[key] = value
+
+    def create(self, cls, data, error=False, mail=False):
+        """Create some kind of entity through the corresponding form."""
+        self.check_open_relative('%s?@template=item' % cls)
+        self.select_main_form()
+        self.set(data)
+        self.check_submit_selected(error=error, mail=mail)
+
+    def create_defaults(self, cls, data, defaults, error=False, mail=False):
+        """Create some kind of entity with default settings for some fields.
+
+        Where a default setting is specified, it is used if no
+        explicit setting is specified in data.  If None is specified
+        in data, that setting is removed but the default is not
+        applied.
+
+        """
+        new_data = dict(data)
+        for key in defaults:
+            if key in data:
+                if data[key] is None:
+                    del new_data[key]
+            else:
+                new_data[key] = defaults[key]
+        self.create(cls, new_data, error=error, mail=mail)
+
+    def create_user(self, username, country, roles, other=None):
+        """Create a new user account."""
+        password = roundup.password.generatePassword()
+        data = {'username': username,
+                'password': password,
+                '@confirm@password': password,
+                'country': country,
+                'roles': roles}
+        if other is not None:
+            data.update(other)
+        defaults = {'realname': username, 'address': 'test@example.invalid'}
+        self.create_defaults('user', data, defaults)
+        self.instance.passwords[username] = password
+
+    def create_scoring_user(self):
+        """Create a scoring user."""
+        self.create_user('scoring', 'XMO 2015 Staff', 'User,Score')
+
+    def create_country(self, code, name, other=None):
+        """Create a country and corresponding user account."""
+        data = {'code': code, 'name': name}
+        if other is not None:
+            data.update(other)
+        # Currently only supports separate user account creation.
+        self.create('country', data)
+        self.create_user('%s_reg' % code, name, 'User,Register')
+
+    def create_country_generic(self):
+        """Create a generic country for testing."""
+        self.create_country('ABC', 'Test First Country')
+
 
 @unittest.skipIf(_skip_test, 'required modules not installed')
 class RegSystemTestCase(unittest.TestCase):
@@ -310,10 +393,17 @@ class RegSystemTestCase(unittest.TestCase):
         self.sessions.append(session)
         return session
 
-    def all_templates_test(self, session, can_score):
+    def all_templates_test(self, session, can_score, scoring_user):
         """Test that all page templates load without errors."""
         for t in sorted(os.listdir(self.instance.html_dir)):
             if t.startswith('_generic') or not t.endswith('.html'):
+                continue
+            if scoring_user and t == 'person.item.html':
+                # Because scoring users have Create permission for the
+                # person class, country property only, in order to
+                # allow a menu of countries to be displayed properly,
+                # this template (not actually useful for such users)
+                # displays some [hidden] text for them.
                 continue
             m = re.match(r'([a-z_]+)\.([a-z_]+)\.html\Z', t)
             if not m:
@@ -330,11 +420,30 @@ class RegSystemTestCase(unittest.TestCase):
         Test that all page templates load without errors, for the admin user.
         """
         session = self.get_session('admin')
-        self.all_templates_test(session, can_score=True)
+        self.all_templates_test(session, can_score=True, scoring_user=False)
 
     def test_all_templates_anon(self):
         """
         Test that all page templates load without errors, not logged in.
         """
         session = self.get_session()
-        self.all_templates_test(session, can_score=False)
+        self.all_templates_test(session, can_score=False, scoring_user=False)
+
+    def test_all_templates_score(self):
+        """
+        Test that all page templates load without errors, for a scoring user.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_scoring_user()
+        session = self.get_session('scoring')
+        self.all_templates_test(session, can_score=True, scoring_user=True)
+
+    def test_all_templates_register(self):
+        """
+        Test that all page templates load without errors, for a
+        registering user.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        session = self.get_session('ABC_reg')
+        self.all_templates_test(session, can_score=False, scoring_user=False)
