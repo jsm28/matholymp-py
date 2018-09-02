@@ -79,12 +79,11 @@ the registration system is not active.
   registration system and the example :file:`config.ini`.  Because of
   Roundup API changes, the code will no longer work with older Roundup
   versions.  The modified templates are :file:`_generic.404.html`,
-  :file:`_generic.help-submit.html`, :file:`_generic.index.html`,
-  :file:`country.retireconfirm.html`, :file:`help_controls.js`,
-  :file:`page.html`, :file:`person.retireconfirm.html`,
-  :file:`person.rooms.html`, :file:`person.scoreenter.html`,
-  :file:`person.status.html`, :file:`user.forgotten.html` and
-  :file:`user.register.html`.
+  :file:`_generic.index.html`, :file:`country.retireconfirm.html`,
+  :file:`help_controls.js`, :file:`page.html`,
+  :file:`person.retireconfirm.html`, :file:`person.rooms.html`,
+  :file:`person.scoreenter.html`, :file:`person.status.html`,
+  :file:`user.forgotten.html` and :file:`user.register.html`.
 
 * The included patch for `Roundup issue 2550722
   <http://issues.roundup-tracker.org/issue2550722>`_ has been extended
@@ -92,14 +91,12 @@ the registration system is not active.
 
 * Various HTML templates for the registration system have been updated
   in preparation for Python 3 support with a future version of
-  Roundup.  The modified templates are
-  :file:`_generic.help-submit.html`, :file:`_generic.help.html`,
-  :file:`_generic.index.html`, :file:`_generic.item.html`,
-  :file:`arrival.index.html`, :file:`country.index.html`,
-  :file:`event.index.html`, :file:`gender.index.html`,
-  :file:`language.index.html`, :file:`matholymprole.index.html`,
-  :file:`rss.index.html`, :file:`tshirt.index.html`,
-  :file:`user.help.html` and :file:`user.index.html`.
+  Roundup.  The modified templates are :file:`_generic.index.html`,
+  :file:`_generic.item.html`, :file:`arrival.index.html`,
+  :file:`country.index.html`, :file:`event.index.html`,
+  :file:`gender.index.html`, :file:`language.index.html`,
+  :file:`matholymprole.index.html`, :file:`rss.index.html`,
+  :file:`tshirt.index.html` and :file:`user.index.html`.
 
 * A patch has been added for `Roundup issue 2550992
   <http://issues.roundup-tracker.org/issue2550992>`_ to fix further
@@ -123,6 +120,19 @@ the registration system is not active.
   <https://mechanicalsoup.readthedocs.io/>`_ are available.  These
   tests are very preliminary and much of the registration system
   functionality is not covered by them.
+
+* Various HTML templates for the registration system have been
+  removed, as templates that originally came from Roundup but are not
+  relevant, or are no longer relevant, in the registration system
+  context.  The removed templates are :file:`_generic.calendar.html`,
+  :file:`_generic.help-empty.html`, :file:`_generic.help-list.html`,
+  :file:`_generic.help-search.html`,
+  :file:`_generic.help-submit.html`, :file:`_generic.help.html`,
+  :file:`help.html`, :file:`user.help-search.html` and
+  :file:`user.help.html`.  The templates :file:`dpage.html` and
+  :file:`page.html` are modified to remove content from them that is
+  irrelevant in the registration system context and that references
+  removed files.
 
 Version 2018.02.0 (11 February 2018)
 ------------------------------------

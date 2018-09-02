@@ -318,8 +318,6 @@ class RegSystemTestCase(unittest.TestCase):
             m = re.match(r'([a-z_]+)\.([a-z_]+)\.html\Z', t)
             if not m:
                 continue
-            if m.group(2) == 'help':
-                continue
             # This template should give an error unless country and
             # problem are specified.
             error = t == 'person.scoreenter.html'
