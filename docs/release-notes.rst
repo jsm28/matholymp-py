@@ -82,8 +82,8 @@ the registration system is not active.
   :file:`_generic.index.html`, :file:`country.retireconfirm.html`,
   :file:`help_controls.js`, :file:`page.html`,
   :file:`person.retireconfirm.html`, :file:`person.rooms.html`,
-  :file:`person.scoreenter.html`, :file:`person.status.html`,
-  :file:`user.forgotten.html` and :file:`user.register.html`.
+  :file:`person.scoreenter.html`, :file:`person.status.html` and
+  :file:`user.forgotten.html`.
 
 * The included patch for `Roundup issue 2550722
   <http://issues.roundup-tracker.org/issue2550722>`_ has been extended
@@ -128,10 +128,11 @@ the registration system is not active.
   :file:`_generic.help-empty.html`, :file:`_generic.help-list.html`,
   :file:`_generic.help-search.html`,
   :file:`_generic.help-submit.html`, :file:`_generic.help.html`,
-  :file:`help.html`, :file:`user.help-search.html` and
-  :file:`user.help.html`.  The templates :file:`dpage.html` and
-  :file:`page.html` are modified to remove content from them that is
-  irrelevant in the registration system context and that references
+  :file:`help.html`, :file:`user.help-search.html`,
+  :file:`user.help.html`, :file:`user.register.html` and
+  :file:`user.rego_progress.html`.  The templates :file:`dpage.html`
+  and :file:`page.html` are modified to remove content from them that
+  is irrelevant in the registration system context and that references
   removed files.
 
 Version 2018.02.0 (11 February 2018)

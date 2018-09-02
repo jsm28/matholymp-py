@@ -310,7 +310,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.sessions.append(session)
         return session
 
-    def all_templates_test(self, session):
+    def all_templates_test(self, session, can_score):
         """Test that all page templates load without errors."""
         for t in sorted(os.listdir(self.instance.html_dir)):
             if t.startswith('_generic') or not t.endswith('.html'):
@@ -318,9 +318,9 @@ class RegSystemTestCase(unittest.TestCase):
             m = re.match(r'([a-z_]+)\.([a-z_]+)\.html\Z', t)
             if not m:
                 continue
-            # This template should give an error unless country and
-            # problem are specified.
-            error = t == 'person.scoreenter.html'
+            # This template should give an error, if able to enter
+            # scores, unless country and problem are specified.
+            error = can_score and t == 'person.scoreenter.html'
             session.check_open_relative('%s?@template=%s'
                                         % (m.group(1), m.group(2)),
                                         error=error)
@@ -330,4 +330,11 @@ class RegSystemTestCase(unittest.TestCase):
         Test that all page templates load without errors, for the admin user.
         """
         session = self.get_session('admin')
-        self.all_templates_test(session)
+        self.all_templates_test(session, can_score=True)
+
+    def test_all_templates_anon(self):
+        """
+        Test that all page templates load without errors, not logged in.
+        """
+        session = self.get_session()
+        self.all_templates_test(session, can_score=False)

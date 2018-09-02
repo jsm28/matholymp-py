@@ -129,9 +129,7 @@ columns string:id;
     tal:condition="not:exists:request/env/QUERY_STRING"
     tal:attributes="value string:${request/base}${request/env/PATH_INFO}">
     <span tal:replace="structure request/indexargs_form" />
-    <a href="user?@template=register"
-       tal:condition="python:request.user.hasPermission('Register', 'user')"
-     i18n:translate="">Register</a><br>
+    <br>
     <a href="user?@template=forgotten" i18n:translate="">Lost&nbsp;your&nbsp;login?</a><br>
     This site uses cookies to track logged-in users.  Please log out
     when you have finished registering people.<br>
