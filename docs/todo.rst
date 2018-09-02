@@ -102,9 +102,6 @@ General and global changes
 
 * Don't hardcode ``en_GB`` as locale for collation.
 
-* Add Python 3 support in Sphinx document generation (may work, not
-  tested).
-
 * Include Python API documentation in generated documentation.
 
 * Add automated testing for error cases in scripts.

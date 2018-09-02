@@ -36,8 +36,9 @@ expected that the script is located in the matholymp source directory.
 import argparse
 import os
 import os.path
-import subprocess
 import sys
+
+import sphinx
 
 import matholymp
 
@@ -51,5 +52,5 @@ def main():
     parser.add_argument('--version', action='version',
                         version='%(prog)s ' + matholymp.__version__)
     parser.parse_args()
-    subprocess.check_call(['sphinx-build', '-b', 'dirhtml',
-                           os.path.join(sys.path[0], 'docs'), os.curdir])
+    sys.exit(sphinx.main(['sphinx-build', '-b', 'dirhtml',
+                          os.path.join(sys.path[0], 'docs'), os.curdir]))
