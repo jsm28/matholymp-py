@@ -344,9 +344,25 @@ class RoundupTestSession(object):
         data = {'code': code, 'name': name}
         if other is not None:
             data.update(other)
-        # Currently only supports separate user account creation.
-        self.create('country', data)
-        self.create_user('%s_reg' % code, name, 'User,Register')
+        auto_user = 'contact_email' in data
+        self.create('country', data, mail=auto_user)
+        if auto_user:
+            with open(self.instance.mail_file, 'rb') as f:
+                mail_bin = f.read()
+            username_idx = mail_bin.rindex(b'Username: ')
+            mail_bin = mail_bin[username_idx:]
+            mail_data = mail_bin.split(b'\n')
+            username_str = mail_data[0][len(b'Username: '):]
+            password_str = mail_data[1]
+            if not password_str.startswith(b'Password: '):
+                raise ValueError('unexpected password line: %s'
+                                 % str(password_str))
+            password_str = password_str[len(b'Password: '):]
+            username = username_str.decode()
+            password = password_str.decode()
+            self.instance.passwords[username] = password
+        else:
+            self.create_user('%s_reg' % code, name, 'User,Register')
 
     def create_country_generic(self):
         """Create a generic country for testing."""
@@ -458,3 +474,13 @@ class RegSystemTestCase(unittest.TestCase):
         session.b['__login_password'] = (session.instance.passwords['admin']
                                          + 'x')
         session.check_submit_selected(error=True)
+
+    def test_country_create_auto_user(self):
+        """
+        Test automatic user creation when creating a country.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'contact_email': 'ABC@example.invalid'})
+        # Test login with the new user works.
+        self.get_session('ABC_reg')
