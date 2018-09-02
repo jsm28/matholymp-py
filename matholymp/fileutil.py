@@ -49,8 +49,9 @@ import string
 __all__ = ['read_utf8_csv', 'write_utf8_csv_bytes', 'write_utf8_csv',
            'comma_join', 'comma_split', 'make_dirs_for_file',
            'write_bytes_to_file', 'write_text_to_file', 'read_text_from_file',
-           'replace_text_in_file', 'read_config', 'boolean_states',
-           'remove_if_exists', 'file_format_contents', 'file_extension']
+           'replace_text_in_file', 'read_config_raw', 'read_config',
+           'write_config_raw', 'boolean_states', 'remove_if_exists',
+           'file_format_contents', 'file_extension']
 
 if _py3:
     _text_open_args = {'encoding': 'utf-8'}
@@ -196,6 +197,17 @@ def replace_text_in_file(file_name, old, new):
     write_text_to_file(text.replace(old, new), file_name)
 
 
+def read_config_raw(file_name):
+    """
+    Read a (UTF-8, no BOM) configuration file and return the
+    RawConfigParser object.
+    """
+    cfg = configparser.RawConfigParser()
+    with open(file_name, 'r', **_text_open_args) as cfg_file:
+        cfg.readfp(cfg_file)
+    return cfg
+
+
 def read_config(file_name, section, str_keys, int_keys, int_none_keys,
                 bool_keys):
     """
@@ -204,9 +216,7 @@ def read_config(file_name, section, str_keys, int_keys, int_none_keys,
     indicating strings, integers, integers where None should be
     returned for an empty string, and booleans.
     """
-    cfg = configparser.RawConfigParser()
-    with open(file_name, 'r', **_text_open_args) as cfg_file:
-        cfg.readfp(cfg_file)
+    cfg = read_config_raw(file_name)
     ret = {}
     for k in str_keys:
         ret[k] = cfg.get(section, k)
@@ -221,6 +231,12 @@ def read_config(file_name, section, str_keys, int_keys, int_none_keys,
     for k in bool_keys:
         ret[k] = cfg.getboolean(section, k)
     return ret
+
+
+def write_config_raw(cfg, file_name):
+    """Write a RawConfigParser to a file."""
+    with open(file_name, 'w', **_text_open_args) as cfg_file:
+        cfg.write(cfg_file)
 
 
 if _py3:

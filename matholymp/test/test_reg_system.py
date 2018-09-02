@@ -56,7 +56,8 @@ except ImportError:
     _skip_test = True
 
 from matholymp.fileutil import read_utf8_csv, write_text_to_file, \
-    read_text_from_file, replace_text_in_file
+    read_text_from_file, replace_text_in_file, read_config_raw, \
+    write_config_raw
 
 __all__ = ['RoundupTestInstance', 'RoundupTestSession', 'RegSystemTestCase']
 
@@ -68,7 +69,7 @@ class RoundupTestInstance(object):
     used for testing.
     """
 
-    def __init__(self, top_dir, temp_dir):
+    def __init__(self, top_dir, temp_dir, config):
         """Initialise a RoundupTestInstance."""
         self.pid = None
         self.port = None
@@ -103,6 +104,11 @@ class RoundupTestInstance(object):
                              '\nmatholymp_static_site_directory = '
                              '/some/where\n',
                              '\nmatholymp_static_site_directory =\n')
+        if config:
+            cfg = read_config_raw(self.ext_config_ini)
+            for key, value in config.items():
+                cfg.set('main', 'matholymp_%s' % key, value)
+            write_config_raw(cfg, self.ext_config_ini)
         instance = roundup.instance.open(self.instance_dir)
         instance.init(roundup.password.Password(self.passwords['admin']))
         # Start up a server in a forked child, which reports back the
@@ -425,6 +431,16 @@ class RoundupTestSession(object):
         self.create_country('ABC', 'Test First Country')
 
 
+def _with_config(**kwargs):
+    """A decorator to add a config attribute to a test method."""
+
+    def decorator(test_fn):
+        test_fn.config = kwargs
+        return test_fn
+
+    return decorator
+
+
 @unittest.skipIf(_skip_test, 'required modules not installed')
 class RegSystemTestCase(unittest.TestCase):
 
@@ -438,6 +454,8 @@ class RegSystemTestCase(unittest.TestCase):
         # Save the method name for use in __str__ without relying on
         # unittest internals of how it stores the method name.
         self.method_name = method_name
+        method = getattr(self, method_name)
+        self.config = getattr(method, 'config', {})
         super(RegSystemTestCase, self).__init__(method_name)        
 
     def __str__(self):
@@ -451,7 +469,8 @@ class RegSystemTestCase(unittest.TestCase):
     def setUp(self):
         self.sessions = []
         self.temp_dir = tempfile.mkdtemp()
-        self.instance = RoundupTestInstance(sys.path[0], self.temp_dir)
+        self.instance = RoundupTestInstance(sys.path[0], self.temp_dir,
+                                            self.config)
 
     def tearDown(self):
         for s in self.sessions:
@@ -601,3 +620,48 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc, expected_staff])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
+
+    @_with_config(distinguish_official='Yes')
+    def test_country_csv_official(self):
+        """
+        Test CSV file of countries, official / unofficial distinction.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '',
+                          'Official Example': 'No', 'Normal': 'No'}
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '', 'Generic Number': '',
+                        'Official Example': 'Yes', 'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        admin_session.create_country('DEF', 'Test Second Country',
+                                     {'official': 'no'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_def = {'XMO Number': '2', 'Country Number': '4',
+                        'Annual URL': self.instance.url + 'country4',
+                        'Code': 'DEF', 'Name': 'Test Second Country',
+                        'Flag URL': '', 'Generic Number': '',
+                        'Official Example': 'No', 'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_def,
+                                    expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_def,
+                                     expected_staff])
+        self.assertEqual(reg_csv, [expected_abc, expected_def, expected_staff])
