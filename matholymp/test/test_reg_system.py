@@ -55,8 +55,8 @@ try:
 except ImportError:
     _skip_test = True
 
-from matholymp.fileutil import write_text_to_file, read_text_from_file, \
-    replace_text_in_file
+from matholymp.fileutil import read_utf8_csv, write_text_to_file, \
+    read_text_from_file, replace_text_in_file
 
 __all__ = ['RoundupTestInstance', 'RoundupTestSession', 'RegSystemTestCase']
 
@@ -218,6 +218,10 @@ class RoundupTestSession(object):
                 if 'error' in kwargs:
                     error = kwargs['error']
                     del kwargs['error']
+                html = True
+                if 'html' in kwargs:
+                    html = kwargs['html']
+                    del kwargs['html']
                 response = sb_method(*args, **kwargs)
                 response.raise_for_status()
                 mail_size = os.stat(self.instance.mail_file).st_size
@@ -229,7 +233,7 @@ class RoundupTestSession(object):
                         mail_bin = f.read()[old_mail_size:]
                     raise ValueError('request generated mail: %s'
                                      % str(mail_bin))
-                if hasattr(response, 'soup'):
+                if hasattr(response, 'soup') and html:
                     soup = response.soup
                     error_generated = soup.find('p', class_='error-message')
                     if error and error_generated is None:
@@ -249,6 +253,7 @@ class RoundupTestSession(object):
                     if soup.find(string=re.compile(r'\[hidden\]')):
                         raise ValueError('request produced [hidden] text: %s'
                                          % str(soup))
+                return response
 
             return fn
         else:
@@ -261,6 +266,42 @@ class RoundupTestSession(object):
     def get_main(self):
         """Get the main contents from the current page."""
         return self.b.get_current_page().find(id='xmo-main')
+
+    def get_download(self, url, content_type, filename):
+        """Get a downloadable file and verify its content-type and filename."""
+        response = self.check_get(self.instance.url + url, html=False)
+        if response.headers['content-type'] != content_type:
+            raise ValueError('request for %s produced content type %s, not %s'
+                             % (url, response.headers['content-type'],
+                                content_type))
+        expected_disposition = 'attachment; filename=%s' % filename
+        if response.headers['content-disposition'] != expected_disposition:
+            raise ValueError('request for %s produced content disposition '
+                             '%s, not %s'
+                             % (response.headers['content-disposition'],
+                                expected_disposition))
+        return response.content
+
+    def get_download_file(self, url, content_type, filename):
+        """Get a download in a temporary file."""
+        content = self.get_download(url, content_type, filename)
+        temp_file = tempfile.NamedTemporaryFile(dir=self.instance.temp_dir,
+                                                delete=False)
+        temp_file.write(content)
+        name = temp_file.name
+        temp_file.close()
+        return name
+
+    def get_download_csv(self, url, filename):
+        """Get the contents of a CSV download."""
+        temp_name = self.get_download_file(url, 'text/csv; charset=UTF-8',
+                                           filename)
+        return read_utf8_csv(temp_name)
+
+    def get_countries_csv(self):
+        """Get the CSV file of countries."""
+        return self.get_download_csv('country?@action=country_csv',
+                                     'countries.csv')
 
     def login(self, username):
         """Log in as the specified user."""
@@ -484,3 +525,27 @@ class RegSystemTestCase(unittest.TestCase):
                                      {'contact_email': 'ABC@example.invalid'})
         # Test login with the new user works.
         self.get_session('ABC_reg')
+
+    def test_country_csv(self):
+        """
+        Test CSV file of countries.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
