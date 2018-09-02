@@ -549,3 +549,6 @@ class RegSystemTestCase(unittest.TestCase):
                         'Annual URL': self.instance.url + 'country3',
                         'Code': 'ABC', 'Name': 'Test First Country',
                         'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
