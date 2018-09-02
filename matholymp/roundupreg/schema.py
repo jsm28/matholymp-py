@@ -208,10 +208,8 @@ def init_schema(env):
     db.security.addPermissionToRole('User', 'Web Access')
     db.security.addPermissionToRole('Anonymous', 'Web Access')
 
-    for cl in ('flag', 'photo', 'matholymprole', 'gender', 'tshirt',
-               'language', 'arrival'):
-        db.security.addPermissionToRole('User', 'View', cl)
     for cl in 'flag', 'photo', 'matholymprole':
+        db.security.addPermissionToRole('User', 'View', cl)
         db.security.addPermissionToRole('Anonymous', 'View', cl)
 
     # Users should be able to edit their own details; this permission
@@ -258,6 +256,9 @@ def init_schema(env):
     # adminstrative users so not all relevant fields are accessible here.
     # All users can view certain person details, but not for retired people.
     db.security.addRole(name='Register', description='Registering people')
+
+    for cl in ('gender', 'tshirt', 'language', 'arrival'):
+        db.security.addPermissionToRole('Register', 'View', cl)
 
     def own_country_person(db, userid, itemid):
         """Determine whether the userid matches the country of the person

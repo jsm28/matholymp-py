@@ -218,6 +218,10 @@ class RoundupTestSession(object):
                 if 'error' in kwargs:
                     error = kwargs['error']
                     del kwargs['error']
+                login = False
+                if 'login' in kwargs:
+                    login = kwargs['login']
+                    del kwargs['login']
                 html = True
                 if 'html' in kwargs:
                     html = kwargs['html']
@@ -236,10 +240,11 @@ class RoundupTestSession(object):
                 if hasattr(response, 'soup') and html:
                     soup = response.soup
                     error_generated = soup.find('p', class_='error-message')
-                    if error and error_generated is None:
+                    error_generated = error_generated is not None
+                    if error and not error_generated:
                         raise ValueError('request did not produce error: %s'
                                          % str(soup))
-                    elif error_generated is not None and not error:
+                    elif error_generated and not error:
                         raise ValueError('request produced error: %s'
                                          % str(soup))
                     if soup.find('title',
@@ -252,6 +257,16 @@ class RoundupTestSession(object):
                     # appear in the output.
                     if soup.find(string=re.compile(r'\[hidden\]')):
                         raise ValueError('request produced [hidden] text: %s'
+                                         % str(soup))
+                    wants_login = soup.find(string=re.compile(
+                        'You are not allowed to view this page'
+                        '|Please login with your username and password'))
+                    wants_login = wants_login is not None
+                    if login and not wants_login:
+                        raise ValueError('request did not ask for login: %s'
+                                         % str(soup))
+                    elif wants_login and not login:
+                        raise ValueError('request asked for login: %s'
                                          % str(soup))
                 return response
 
@@ -450,7 +465,8 @@ class RegSystemTestCase(unittest.TestCase):
         self.sessions.append(session)
         return session
 
-    def all_templates_test(self, session, can_score, scoring_user):
+    def all_templates_test(self, session, forbid_classes, forbid_templates,
+                           allow_templates, can_score, scoring_user):
         """Test that all page templates load without errors."""
         for t in sorted(os.listdir(self.instance.html_dir)):
             if t.startswith('_generic') or not t.endswith('.html'):
@@ -468,23 +484,38 @@ class RegSystemTestCase(unittest.TestCase):
             # This template should give an error, if able to enter
             # scores, unless country and problem are specified.
             error = can_score and t == 'person.scoreenter.html'
+            login = ((m.group(1) in forbid_classes or t in forbid_templates)
+                     and t not in allow_templates)
             session.check_open_relative('%s?@template=%s'
                                         % (m.group(1), m.group(2)),
-                                        error=error)
+                                        error=error, login=login)
 
     def test_all_templates_admin(self):
         """
         Test that all page templates load without errors, for the admin user.
         """
         session = self.get_session('admin')
-        self.all_templates_test(session, can_score=True, scoring_user=False)
+        self.all_templates_test(session, forbid_classes=set(),
+                                forbid_templates=set(), allow_templates=set(),
+                                can_score=True, scoring_user=False)
 
     def test_all_templates_anon(self):
         """
         Test that all page templates load without errors, not logged in.
         """
         session = self.get_session()
-        self.all_templates_test(session, can_score=False, scoring_user=False)
+        forbid_classes = {'event', 'rss', 'arrival', 'consent_form', 'gender',
+                          'language', 'tshirt', 'user'}
+        forbid_templates = {'country.retireconfirm.html',
+                            'person.retireconfirm.html',
+                            'person.rooms.html',
+                            'person.scoreenter.html',
+                            'person.scoreselect.html',
+                            'person.status.html'}
+        self.all_templates_test(session, forbid_classes=forbid_classes,
+                                forbid_templates=forbid_templates,
+                                allow_templates={'user.forgotten.html'},
+                                can_score=False, scoring_user=False)
 
     def test_all_templates_score(self):
         """
@@ -493,7 +524,16 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session = self.get_session('admin')
         admin_session.create_scoring_user()
         session = self.get_session('scoring')
-        self.all_templates_test(session, can_score=True, scoring_user=True)
+        forbid_classes = {'event', 'rss', 'arrival', 'consent_form', 'gender',
+                          'language', 'tshirt'}
+        forbid_templates = {'country.retireconfirm.html',
+                            'person.retireconfirm.html',
+                            'person.rooms.html',
+                            'person.status.html'}
+        self.all_templates_test(session, forbid_classes=forbid_classes,
+                                forbid_templates=forbid_templates,
+                                allow_templates=set(),
+                                can_score=True, scoring_user=True)
 
     def test_all_templates_register(self):
         """
@@ -503,7 +543,16 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session = self.get_session('admin')
         admin_session.create_country_generic()
         session = self.get_session('ABC_reg')
-        self.all_templates_test(session, can_score=False, scoring_user=False)
+        forbid_classes = {'event', 'rss'}
+        forbid_templates = {'country.retireconfirm.html',
+                            'person.retireconfirm.html',
+                            'person.rooms.html',
+                            'person.scoreenter.html',
+                            'person.scoreselect.html'}
+        self.all_templates_test(session, forbid_classes=forbid_classes,
+                                forbid_templates=forbid_templates,
+                                allow_templates=set(),
+                                can_score=False, scoring_user=False)
 
     def test_bad_login(self):
         """
