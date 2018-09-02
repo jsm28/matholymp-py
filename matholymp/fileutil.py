@@ -49,8 +49,8 @@ import string
 __all__ = ['read_utf8_csv', 'write_utf8_csv_bytes', 'write_utf8_csv',
            'comma_join', 'comma_split', 'make_dirs_for_file',
            'write_bytes_to_file', 'write_text_to_file', 'read_text_from_file',
-           'read_config', 'boolean_states', 'remove_if_exists',
-           'file_format_contents', 'file_extension']
+           'replace_text_in_file', 'read_config', 'boolean_states',
+           'remove_if_exists', 'file_format_contents', 'file_extension']
 
 if _py3:
     _text_open_args = {'encoding': 'utf-8'}
@@ -188,6 +188,12 @@ def read_text_from_file(file_name):
     with open(file_name, 'r', **_text_open_args) as in_file:
         text = in_file.read()
     return text
+
+
+def replace_text_in_file(file_name, old, new):
+    """Replace some text in a UTF-8 file."""
+    text = read_text_from_file(file_name)
+    write_text_to_file(text.replace(old, new), file_name)
 
 
 def read_config(file_name, section, str_keys, int_keys, int_none_keys,

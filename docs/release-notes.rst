@@ -118,6 +118,12 @@ the registration system is not active.
   if a Python 2 backport of the Python 3 :py:mod:`configparser` module
   is installed.
 
+* The automated tests run by :command:`mo-run-tests` now include some
+  tests of the registration system, if Roundup and `MechanicalSoup
+  <https://mechanicalsoup.readthedocs.io/>`_ are available.  These
+  tests are very preliminary and much of the registration system
+  functionality is not covered by them.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

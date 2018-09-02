@@ -273,6 +273,8 @@ Registration system
   information provided about how close those boundaries are to ideal
   on various metrics.
 
+* Add more automated testing for registration system code.
+
 The following ideas are more speculative.
 
 * Reduce the differences between static site and registration system
@@ -293,8 +295,6 @@ The following ideas are more speculative.
   participant details (old versions of changed data maybe shouldn't be
   public, but could still indicate that something has changed or is
   new).
-
-* Add automated testing for registration system code.
 
 * Add Python 3 support in registration system code (not very useful
   until Roundup supports Python 3, and may already be ready for Python

@@ -101,6 +101,11 @@ matholymp:
   (Run :command:`mo-sphinx-build` with an empty working directory; it
   generates its output in the current directory.)
 
+* To run automated tests of the registration system, `MechanicalSoup
+  <https://mechanicalsoup.readthedocs.io/>`_ (which in turn has some
+  other dependencies) is needed.  Those tests are only expected to
+  work on Unix-like operating systems.
+
 The matholymp code is intended to be independent of the operating
 system used.  However, it has only been tested on GNU/Linux
 (specifically, various versions of Ubuntu) and so it is likely you
