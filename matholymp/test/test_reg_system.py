@@ -278,6 +278,21 @@ class RegSystemTestCase(unittest.TestCase):
     registration system.
     """
 
+    def __init__(self, method_name='runTest'):
+        """Initialise a RegSystemTestCase."""
+        # Save the method name for use in __str__ without relying on
+        # unittest internals of how it stores the method name.
+        self.method_name = method_name
+        super(RegSystemTestCase, self).__init__(method_name)        
+
+    def __str__(self):
+        # Generate test names similar to those for script tests.
+        test_name = self.method_name
+        if test_name.startswith('test_'):
+            test_name = test_name[len('test_'):]
+        test_name = test_name.replace('_', '-')
+        return 'registration-system ' + test_name
+
     def setUp(self):
         self.sessions = []
         self.temp_dir = tempfile.mkdtemp()
