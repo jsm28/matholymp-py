@@ -39,6 +39,7 @@ import shutil
 import signal
 import socket
 import sys
+_py3 = sys.version_info.major >= 3
 import tempfile
 import traceback
 import unittest
@@ -192,6 +193,7 @@ class RoundupTestSession(object):
         """Initialise a RoundupTestSession."""
         self.instance = instance
         self.b = mechanicalsoup.StatefulBrowser(raise_on_404=True)
+        self.last_mail_bin = None
         self.check_open(self.instance.url)
         if username is not None:
             self.login(username)
@@ -236,13 +238,14 @@ class RoundupTestSession(object):
                 response.raise_for_status()
                 mail_size = os.stat(self.instance.mail_file).st_size
                 mail_generated = mail_size > old_mail_size
+                if mail_generated:
+                    with open(self.instance.mail_file, 'rb') as f:
+                        self.last_mail_bin = f.read()[old_mail_size:]
                 if mail and not mail_generated:
                     raise ValueError('request failed to generate mail')
                 elif mail_generated and not mail:
-                    with open(self.instance.mail_file, 'rb') as f:
-                        mail_bin = f.read()[old_mail_size:]
                     raise ValueError('request generated mail: %s'
-                                     % str(mail_bin))
+                                     % str(self.last_mail_bin))
                 if hasattr(response, 'soup') and html:
                     soup = response.soup
                     error_generated = soup.find('p', class_='error-message')
@@ -409,8 +412,7 @@ class RoundupTestSession(object):
         auto_user = 'contact_email' in data
         self.create('country', data, mail=auto_user)
         if auto_user:
-            with open(self.instance.mail_file, 'rb') as f:
-                mail_bin = f.read()
+            mail_bin = self.last_mail_bin
             username_idx = mail_bin.rindex(b'Username: ')
             mail_bin = mail_bin[username_idx:]
             mail_data = mail_bin.split(b'\n')
@@ -420,8 +422,12 @@ class RoundupTestSession(object):
                 raise ValueError('unexpected password line: %s'
                                  % str(password_str))
             password_str = password_str[len(b'Password: '):]
-            username = username_str.decode()
-            password = password_str.decode()
+            if _py3:
+                username = username_str.decode()
+                password = password_str.decode()
+            else:
+                username = username_str
+                password = password_str
             self.instance.passwords[username] = password
         else:
             self.create_user('%s_reg' % code, name, 'User,Register')
