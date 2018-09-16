@@ -135,6 +135,10 @@ the registration system is not active.
   is irrelevant in the registration system context and that references
   removed files.
 
+* :file:`country.item.html` and :file:`person.item.html` have been
+  changed so that the page title just shows a blank for the name of a
+  removed country or person, instead of showing ``[hidden]``.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 
