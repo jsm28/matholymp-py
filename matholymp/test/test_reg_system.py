@@ -476,6 +476,13 @@ class RoundupTestSession(object):
         """Create a generic country for testing."""
         self.create_country('ABC', 'Test First Country')
 
+    def edit(self, cls, entity_id, data, error=False, mail=False):
+        """Edit some kind of entity through the corresponding form."""
+        self.check_open_relative('%s%s' % (cls, entity_id))
+        self.select_main_form()
+        self.set(data)
+        self.check_submit_selected(error=error, mail=mail)
+
 
 def _with_config(**kwargs):
     """A decorator to add a config attribute to a test method."""
@@ -752,6 +759,52 @@ class RegSystemTestCase(unittest.TestCase):
                         'Code': 'ABC', 'Name': 'Test First Country',
                         'Flag URL': img_url_csv,
                         'Generic Number': '', 'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, flag_bytes)
+        self.assertEqual(admin_bytes, flag_bytes)
+        self.assertEqual(reg_bytes, flag_bytes)
+
+    def test_country_flag_edit(self):
+        """
+        Test flags uploaded after country creation time.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.png', 'PNG')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '',
+                        'Generic Number': '', 'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        admin_session.edit('country', '3', {'flag-1@content': flag_filename})
+        img_url_csv = self.instance.url + 'flag1/flag.png'
+        # Check the image inline on the country page.
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, flag_bytes)
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        img_url_csv = self.instance.url + 'flag1/flag.png'
+        expected_abc['Flag URL'] = img_url_csv
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc, expected_staff])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
