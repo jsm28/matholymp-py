@@ -221,6 +221,7 @@ class RoundupTestSession(object):
         self.instance = instance
         self.b = mechanicalsoup.StatefulBrowser(raise_on_404=True)
         self.last_mail_bin = None
+        self.num_people = 0
         self.check_open(self.instance.url)
         if username is not None:
             self.login(username)
@@ -354,6 +355,11 @@ class RoundupTestSession(object):
         return self.get_download_csv('country?@action=country_csv',
                                      'countries.csv')
 
+    def get_people_csv(self):
+        """Get the CSV file of people."""
+        return self.get_download_csv('person?@action=people_csv',
+                                     'people.csv')
+
     def get_download_zip(self, url, filename):
         """Get the contents of a ZIP download."""
         temp_name = self.get_download_file(url, 'application/zip', filename)
@@ -485,6 +491,22 @@ class RoundupTestSession(object):
     def create_country_generic(self):
         """Create a generic country for testing."""
         self.create_country('ABC', 'Test First Country')
+
+    def create_person(self, country, role, other=None):
+        """Create a person."""
+        data = {'country': country, 'primary_role': role}
+        if other is not None:
+            data.update(other)
+        self.num_people += 1
+        defaults = {'given_name': 'Given %d' % self.num_people,
+                    'family_name': 'Family %d' % self.num_people,
+                    'gender': 'Female',
+                    'date_of_birth_year': '2000',
+                    'date_of_birth_month': 'January',
+                    'date_of_birth_day': '1',
+                    'language_1': 'English',
+                    'tshirt': 'S'}
+        self.create_defaults('person', data, defaults)
 
     def edit(self, cls, entity_id, data, error=False, mail=False):
         """Edit some kind of entity through the corresponding form."""
@@ -895,3 +917,81 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_zip.read('flags/country3/flag.png'), flag_bytes)
         anon_zip.close()
         admin_zip.close()
+
+    def test_country_retire(self):
+        """
+        Test retiring countries.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        admin_session.create_country('DEF', 'Test Second Country')
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1')
+        admin_session.create_person('XMO 2015 Staff', 'Guide',
+                                    {'guide_for': ['Test First Country',
+                                                   'Test Second Country']})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 2)
+        self.assertEqual(anon_csv[0]['Given Name'], 'Given 1')
+        self.assertEqual(anon_csv[0]['Country Name'], 'Test First Country')
+        self.assertEqual(anon_csv[1]['Family Name'], 'Family 2')
+        self.assertEqual(anon_csv[1]['Primary Role'], 'Guide')
+        self.assertEqual(anon_csv[1]['Guide For'],
+                         'Test First Country,Test Second Country')
+        self.assertEqual(anon_csv, reg_csv)
+        self.assertEqual(len(admin_csv), 2)
+        self.assertEqual(admin_csv[0]['Given Name'], 'Given 1')
+        self.assertEqual(admin_csv[0]['Country Name'], 'Test First Country')
+        self.assertEqual(admin_csv[1]['Family Name'], 'Family 2')
+        self.assertEqual(admin_csv[1]['Primary Role'], 'Guide')
+        self.assertEqual(admin_csv[1]['Guide For'],
+                         'Test First Country,Test Second Country')
+        admin_session.check_open_relative('country3')
+        admin_session.b.select_form(
+            admin_session.get_main().find_all('form')[1])
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.check_submit_selected()
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        expected_def = {'XMO Number': '2', 'Country Number': '4',
+                        'Annual URL': self.instance.url + 'country4',
+                        'Code': 'DEF', 'Name': 'Test Second Country',
+                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        self.assertEqual(anon_csv, [expected_def, expected_staff])
+        self.assertEqual(admin_csv, [expected_def, expected_staff])
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(anon_csv[0]['Family Name'], 'Family 2')
+        self.assertEqual(anon_csv[0]['Primary Role'], 'Guide')
+        self.assertEqual(anon_csv[0]['Guide For'], 'Test Second Country')
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(admin_csv[0]['Family Name'], 'Family 2')
+        self.assertEqual(admin_csv[0]['Primary Role'], 'Guide')
+        self.assertEqual(admin_csv[0]['Guide For'], 'Test Second Country')
+        # Test lack of anonymous access to the retired country and
+        # person pages.
+        session.check_open_relative('country3', login=True)
+        session.check_open_relative('person1', login=True)
+        session.check_open_relative('person2')
+        # The registration user for the retired country should no
+        # longer be able to log in.
+        nreg_session = self.get_session()
+        nreg_session.b.select_form(session.get_sidebar().find('form'))
+        nreg_session.b['__login_name'] = 'ABC_reg'
+        nreg_session.b['__login_password'] \
+            = session.instance.passwords['ABC_reg']
+        nreg_session.check_submit_selected(error=True)
+        # The existing session for that user should no longer be
+        # active.
+        reg_session.check_open_relative('country')
+        reg_login = reg_session.get_sidebar().find('form')
+        self.assertIsNotNone(reg_login)
