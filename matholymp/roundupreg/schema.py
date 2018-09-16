@@ -191,12 +191,15 @@ def init_schema(env):
     user.setkey('username')
 
     FileClass(db, 'flag',
+              content=String(indexme='no'),
               name=String())
 
     FileClass(db, 'photo',
+              content=String(indexme='no'),
               name=String())
 
     FileClass(db, 'consent_form',
+              content=String(indexme='no'),
               name=String(), country=Link('country'))
 
     # Set up permissions:
