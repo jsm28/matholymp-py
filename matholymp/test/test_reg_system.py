@@ -43,6 +43,7 @@ _py3 = sys.version_info.major >= 3
 import tempfile
 import traceback
 import unittest
+import zipfile
 
 try:
     import mechanicalsoup
@@ -352,6 +353,15 @@ class RoundupTestSession(object):
         """Get the CSV file of countries."""
         return self.get_download_csv('country?@action=country_csv',
                                      'countries.csv')
+
+    def get_download_zip(self, url, filename):
+        """Get the contents of a ZIP download."""
+        temp_name = self.get_download_file(url, 'application/zip', filename)
+        return zipfile.ZipFile(temp_name, 'r')
+
+    def get_flags_zip(self):
+        """Get the ZIP file of flags."""
+        return self.get_download_zip('country?@action=flags_zip', 'flags.zip')
 
     def get_bytes(self, url):
         """Get the bytes contents of a non-HTML URL."""
@@ -855,3 +865,33 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_bytes, flag_bytes)
         self.assertEqual(admin_bytes, flag_bytes)
         self.assertEqual(reg_bytes, flag_bytes)
+
+    def test_country_flag_zip(self):
+        """
+        Test ZIP file of flags.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        anon_zip_empty = session.get_flags_zip()
+        admin_zip_empty = admin_session.get_flags_zip()
+        anon_contents = [f.filename for f in anon_zip_empty.infolist()]
+        admin_contents = [f.filename for f in admin_zip_empty.infolist()]
+        expected_contents = ['flags/README.txt']
+        self.assertEqual(anon_contents, expected_contents)
+        self.assertEqual(admin_contents, expected_contents)
+        anon_zip_empty.close()
+        admin_zip_empty.close()
+        flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.png', 'PNG')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'flag-1@content': flag_filename})
+        anon_zip = session.get_flags_zip()
+        admin_zip = admin_session.get_flags_zip()
+        anon_contents = [f.filename for f in anon_zip.infolist()]
+        admin_contents = [f.filename for f in admin_zip.infolist()]
+        expected_contents = ['flags/README.txt', 'flags/country3/flag.png']
+        self.assertEqual(anon_contents, expected_contents)
+        self.assertEqual(admin_contents, expected_contents)
+        self.assertEqual(anon_zip.read('flags/country3/flag.png'), flag_bytes)
+        self.assertEqual(admin_zip.read('flags/country3/flag.png'), flag_bytes)
+        anon_zip.close()
+        admin_zip.close()
