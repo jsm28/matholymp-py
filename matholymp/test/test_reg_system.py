@@ -46,6 +46,7 @@ import unittest
 
 try:
     import mechanicalsoup
+    from PIL import Image
     import roundup.instance
     import roundup.password
     # roundup_server modifies sys.path on import, so save and restore it.
@@ -60,7 +61,32 @@ from matholymp.fileutil import read_utf8_csv, write_text_to_file, \
     read_text_from_file, replace_text_in_file, read_config_raw, \
     write_config_raw
 
-__all__ = ['RoundupTestInstance', 'RoundupTestSession', 'RegSystemTestCase']
+__all__ = ['gen_image', 'gen_image_file', 'RoundupTestInstance',
+           'RoundupTestSession', 'RegSystemTestCase']
+
+
+def gen_image(size_x, size_y, scale):
+    """Generate an image with random blocks scale by scale of pixels."""
+    data = bytearray(size_x * size_y * scale * scale * 3)
+    line_size = size_x * scale * 3
+    for y in range(size_y):
+        for x in range(size_x):
+            for color in range(3):
+                pixel = random.randint(0, 255)
+                for y_sub in range(scale):
+                    for x_sub in range(scale):
+                        x_pos = color + 3 * (x_sub + scale * x)
+                        y_pos = y_sub + scale * y
+                        pos = x_pos + line_size * y_pos
+                        data[pos] = pixel
+    data = memoryview(data).tobytes()
+    return Image.frombytes('RGB', (size_x * scale, size_y * scale), data)
+
+
+def gen_image_file(size_x, size_y, scale, filename, format, **kwargs):
+    """Generate an image, in a file."""
+    image = gen_image(size_x, size_y, scale)
+    image.save(filename, format, **kwargs)
 
 
 class RoundupTestInstance(object):
@@ -327,6 +353,20 @@ class RoundupTestSession(object):
         return self.get_download_csv('country?@action=country_csv',
                                      'countries.csv')
 
+    def get_bytes(self, url):
+        """Get the bytes contents of a non-HTML URL."""
+        return self.check_get(url, html=False).content
+
+    def get_img(self):
+        """Get the (first) img tag from the current page."""
+        return self.get_main().find('img')
+
+    def get_img_contents(self):
+        """Get the contents of the (first) img tag from the current page."""
+        img_src = self.get_img()['src']
+        img_src = self.b.absolute_url(img_src)
+        return self.check_get(img_src, html=False).content
+
     def login(self, username):
         """Log in as the specified user."""
         self.b.select_form(self.get_sidebar().find('form'))
@@ -489,6 +529,19 @@ class RegSystemTestCase(unittest.TestCase):
         session = RoundupTestSession(self.instance, username)
         self.sessions.append(session)
         return session
+
+    def gen_test_image(self, size_x, size_y, scale, suffix, format):
+        """Generate a test image and return a tuple of the filename and the
+        contents."""
+        temp_file = tempfile.NamedTemporaryFile(suffix=suffix,
+                                                dir=self.temp_dir,
+                                                delete=False)
+        filename = temp_file.name
+        temp_file.close()
+        gen_image_file(size_x, size_y, scale, filename, format)
+        with open(filename, 'rb') as f:
+            contents = f.read()
+        return filename, contents
 
     def all_templates_test(self, session, forbid_classes, forbid_templates,
                            allow_templates, can_score, scoring_user):
@@ -671,3 +724,41 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv, [expected_abc, expected_def,
                                      expected_staff])
         self.assertEqual(reg_csv, [expected_abc, expected_def, expected_staff])
+
+    def test_country_flag_create(self):
+        """
+        Test flags uploaded at country creation time.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.png', 'PNG')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'flag-1@content': flag_filename})
+        # Check the image inline on the country page.
+        admin_session.check_open_relative('country3')
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, flag_bytes)
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        img_url_csv = self.instance.url + 'flag1/flag.png'
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': img_url_csv,
+                        'Generic Number': '', 'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, flag_bytes)
+        self.assertEqual(admin_bytes, flag_bytes)
+        self.assertEqual(reg_bytes, flag_bytes)
