@@ -104,7 +104,9 @@ matholymp:
 * To run automated tests of the registration system, `MechanicalSoup
   <https://mechanicalsoup.readthedocs.io/>`_ (which in turn has some
   other dependencies) is needed.  Those tests are only expected to
-  work on Unix-like operating systems.
+  work on Unix-like operating systems, and some of them depend on the
+  provided patch for `Roundup issue 2550722
+  <http://issues.roundup-tracker.org/issue2550722>`_.
 
 The matholymp code is intended to be independent of the operating
 system used.  However, it has only been tested on GNU/Linux

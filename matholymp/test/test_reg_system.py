@@ -276,14 +276,20 @@ class RoundupTestSession(object):
                                      % str(self.last_mail_bin))
                 if hasattr(response, 'soup') and html:
                     soup = response.soup
-                    error_generated = soup.find('p', class_='error-message')
-                    error_generated = error_generated is not None
+                    error_p = soup.find('p', class_='error-message')
+                    error_generated = error_p is not None
                     if error and not error_generated:
                         raise ValueError('request did not produce error: %s'
                                          % str(soup))
                     elif error_generated and not error:
                         raise ValueError('request produced error: %s'
                                          % str(soup))
+                    elif error and error_generated:
+                        if isinstance(error, str):
+                            if not error_p.find(string=re.compile(error)):
+                                raise ValueError('request did not produce '
+                                                 'expected error: %s'
+                                                 % str(soup))
                     if soup.find('title',
                                  string=re.compile('An error has occurred')):
                         raise ValueError('request produced internal error: %s'
@@ -492,7 +498,8 @@ class RoundupTestSession(object):
         """Create a generic country for testing."""
         self.create_country('ABC', 'Test First Country')
 
-    def create_person(self, country, role, other=None):
+    def create_person(self, country, role, other=None, error=False,
+                      mail=False):
         """Create a person."""
         data = {'country': country, 'primary_role': role}
         if other is not None:
@@ -506,7 +513,7 @@ class RoundupTestSession(object):
                     'date_of_birth_day': '1',
                     'language_1': 'English',
                     'tshirt': 'S'}
-        self.create_defaults('person', data, defaults)
+        self.create_defaults('person', data, defaults, error=error, mail=mail)
 
     def edit(self, cls, entity_id, data, error=False, mail=False):
         """Edit some kind of entity through the corresponding form."""
@@ -995,3 +1002,65 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session.check_open_relative('country')
         reg_login = reg_session.get_sidebar().find('form')
         self.assertIsNotNone(reg_login)
+
+    def test_person_multilink_null_edit(self):
+        """
+        Test null edits on multilinks involving "no selection".
+
+        First case of Roundup issue 2550722.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        admin_session.create_person('Test First Country', 'Contestant 1')
+        admin_csv = admin_session.get_people_csv()
+        admin_session.edit('person', '1',
+                           {'guide_for': ['Test First Country']},
+                           error='People with this role may not '
+                           'guide a country')
+        admin_session.select_main_form()
+        admin_session.set({'guide_for': ['- no selection -']})
+        admin_session.check_submit_selected()
+        admin_csv_2 = admin_session.get_people_csv()
+        self.assertEqual(admin_csv, admin_csv_2)
+
+    def test_person_multilink_create_corrected(self):
+        """
+        Test corrections to multilinks involving "no selection" when
+        creating people.
+
+        Second case of Roundup issue 2550722.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'guide_for': ['Test First Country']},
+                                    error='People with this role may not '
+                                    'guide a country')
+        admin_session.select_main_form()
+        admin_session.set({'guide_for': ['- no selection -']})
+        admin_session.check_submit_selected()
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(admin_csv[0]['Primary Role'], 'Contestant 1')
+        self.assertEqual(admin_csv[0]['Guide For'], '')
+
+    def test_person_multilink_create_error(self):
+        """
+        Test errors with multilinks involving "no selection" when
+        creating people.
+
+        Third case of Roundup issue 2550722.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'guide_for': ['Test First Country']},
+                                    error='People with this role may not '
+                                    'guide a country')
+        admin_session.select_main_form()
+        admin_session.set({'primary_role': 'Coordinator',
+                           'guide_for': ['- no selection -']})
+        admin_session.check_submit_selected(error='Invalid role for '
+                                            'participant')
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(len(admin_csv), 0)
