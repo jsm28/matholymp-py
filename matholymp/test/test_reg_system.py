@@ -771,6 +771,25 @@ class RegSystemTestCase(unittest.TestCase):
                                      expected_staff])
         self.assertEqual(reg_csv, [expected_abc, expected_def, expected_staff])
 
+    def test_country_csv_errors(self):
+        """
+        Test errors from country_csv action.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        session.check_open_relative('person?@action=country_csv',
+                                    error='This action only applies '
+                                    'to countries')
+        session.check_open_relative('country1?@action=country_csv',
+                                    error='Node id specified for CSV '
+                                    'generation')
+        admin_session.check_open_relative('person?@action=country_csv',
+                                          error='This action only applies '
+                                          'to countries')
+        admin_session.check_open_relative('country1?@action=country_csv',
+                                          error='Node id specified for CSV '
+                                          'generation')
+
     def test_country_flag_create(self):
         """
         Test flags uploaded at country creation time.
