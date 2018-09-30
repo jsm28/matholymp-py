@@ -575,13 +575,13 @@ class RoundupTestSession(object):
         """Create a scoring user."""
         self.create_user('scoring', 'XMO 2015 Staff', 'User,Score')
 
-    def create_country(self, code, name, other=None):
+    def create_country(self, code, name, other=None, error=False):
         """Create a country and corresponding user account."""
         data = {'code': code, 'name': name}
         if other is not None:
             data.update(other)
         auto_user = 'contact_email' in data
-        self.create('country', data, mail=auto_user)
+        self.create('country', data, error=error, mail=auto_user)
         if auto_user:
             mail_bin = self.last_mail_bin
             username_idx = mail_bin.rindex(b'Username: ')
@@ -602,7 +602,7 @@ class RoundupTestSession(object):
             self.instance.passwords[username] = password
             self.instance.num_users += 1
             self.instance.userids[username] = str(self.instance.num_users)
-        else:
+        elif not error:
             self.create_user('%s_reg' % code, name, 'User,Register')
 
     def create_country_generic(self):
@@ -1437,6 +1437,127 @@ class RegSystemTestCase(unittest.TestCase):
                            {'roles': 'User,Register'})
         reg_session.check_submit_selected(error='You do not have '
                                           'permission to retire', status=403)
+
+    def test_country_create_audit_errors(self):
+        """
+        Test errors from country creation auditor.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        admin_session.create_country('Abc', 'Test First Country',
+                                     error='Country codes must be all '
+                                     'capital letters')
+        admin_session.create_country('ZZA', 'Test First Country',
+                                     error='A country with code ZZA already '
+                                     'exists')
+        flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                        'JPEG')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'flag-1@content': flag_filename},
+                                     error='Flags must be in PNG format')
+        flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                        'PNG')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'flag-1@content': flag_filename},
+                                     error=r'Filename extension for flag '
+                                     'must match contents \(png\)')
+        admin_session.create_country(
+            'ABC', 'Test First Country',
+            {'generic_url': 'https://www.example.invalid/test'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/countries/countryN/')
+        admin_session.create_country(
+            'ABC', 'Test First Country',
+            {'generic_url': 'https://www.example.invalid/countries/country0/'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/countries/countryN/')
+        admin_session.create_country(
+            'ABC', 'Test First Country',
+            {'generic_url': 'https://www.example.invalid/countries/country1'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/countries/countryN/')
+        admin_session.create_country(
+            'ABC', 'Test First Country',
+            {'generic_url':
+             'https://www.example.invalid/countries/country1N/'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/countries/countryN/')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
+        # Without static site data available, any country number is
+        # OK.
+        admin_session.create_country(
+            'ABC', 'Test First Country',
+            {'generic_url':
+             'https://www.example.invalid/countries/country12345/'})
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '',
+                        'Generic Number': '12345', 'Normal': 'Yes'}
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+
+    @_with_config(static_site_directory='static-site')
+    def test_country_create_audit_errors_static(self):
+        """
+        Test errors from country creation auditor, static site checks.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        admin_session.create_country(
+            'ABC', 'Test First Country',
+            {'generic_url':
+             'https://www.example.invalid/countries/country12345/'},
+            error=r'example\.invalid URL for previous participation not valid')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
+
+    def test_country_create_audit_errors_missing(self):
+        """
+        Test errors from country creation auditor, missing required data.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        admin_session.create_country('', 'Test First Country',
+                                     error='Required country property code '
+                                     'not supplied')
+        admin_session.create_country('ABC', '',
+                                     error='Required country property name '
+                                     'not supplied')
+        # The above errors are generic Roundup ones that rely on
+        # @required being sent by the browser, so must not be relied
+        # upon to maintain required properties of data since the
+        # browser should not be trusted; also verify the checks from
+        # the auditor in case @required is not sent.
+        admin_session.create_country('', 'Test First Country',
+                                     {'@required': ''},
+                                     error='No country code specified')
+        admin_session.create_country('ABC', '',
+                                     {'@required': ''},
+                                     error='No country name specified')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
 
     def test_person_multilink_null_edit(self):
         """
