@@ -42,7 +42,8 @@ import unittest
 
 from matholymp.fileutil import read_text_from_file
 
-__all__ = ['MoScriptTestCase', 'load_script_tests', 'load_tests']
+__all__ = ['MoScriptTestCase', 'MoTestLoader', 'load_script_tests',
+           'load_tests']
 
 
 class MoScriptTestCase(unittest.TestCase):
@@ -52,9 +53,10 @@ class MoScriptTestCase(unittest.TestCase):
     """
 
     def __init__(self, method_name='runTest', script_dir=None, script=None,
-                 top_dir=None, this_dir=None):
+                 top_dir=None, this_dir=None, coverage=False):
         """Initialise a MoScriptTestCase."""
         self.script = script
+        self.coverage = coverage
         if script_dir is not None:
             self.script_path = os.path.join(script_dir, script)
         self.dir = this_dir
@@ -85,11 +87,22 @@ class MoScriptTestCase(unittest.TestCase):
 
     def runTest(self):
         returncode = 0
+        if self.coverage:
+            cov_dir = os.path.dirname(self.script_path)
+            cov_file = '.coverage.%s.%s' % (self.script, self.dir)
+            env = dict(os.environ)
+            env['COVERAGE_FILE'] = os.path.join(cov_dir, cov_file)
+        else:
+            env = None
         try:
-            args = [sys.executable, self.script_path]
+            args = [sys.executable]
+            if self.coverage:
+                args.extend(['-m', 'coverage', 'run'])
+            args.append(self.script_path)
             args.extend(self.args)
             output = subprocess.check_output(args,
                                              cwd=self.out_dir,
+                                             env=env,
                                              stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as e:
             returncode = e.returncode
@@ -127,7 +140,20 @@ class MoScriptTestCase(unittest.TestCase):
         raise NotImplementedError
 
 
-def load_script_tests(script, cl):
+class MoTestLoader(unittest.TestLoader):
+
+    """
+    A MoTestLoader loads tests, recording whether coverage information
+    is required.
+    """
+
+    def __init__(self, coverage):
+        """Initialise a MoTestLoader."""
+        super(MoTestLoader, self).__init__()
+        self.coverage = coverage
+
+
+def load_script_tests(script, cl, coverage):
     """Load the tests for the given script."""
     suite = unittest.TestSuite()
     mod_dir = os.path.dirname(os.path.abspath(__file__))
@@ -135,7 +161,7 @@ def load_script_tests(script, cl):
     test_top_dir = os.path.join(top_dir, 'test-data', script)
     for d in sorted(os.listdir(test_top_dir)):
         suite.addTest(cl(script_dir=top_dir, script=script,
-                         top_dir=test_top_dir, this_dir=d))
+                         top_dir=test_top_dir, this_dir=d, coverage=coverage))
     return suite
 
 

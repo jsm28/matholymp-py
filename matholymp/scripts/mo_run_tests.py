@@ -36,6 +36,7 @@ import unittest
 import sys
 
 import matholymp
+from matholymp.test.testutil import MoTestLoader
 
 __all__ = ['main']
 
@@ -46,11 +47,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--version', action='version',
                         version='%(prog)s ' + matholymp.__version__)
+    parser.add_argument('--coverage', action='store_true',
+                        help='measure code coverage of tests')
     parser.add_argument('--pattern', default='test*.py',
                         help='pattern for test modules to use '
                         '(default test*.py)')
     args = parser.parse_args()
-    suite = unittest.defaultTestLoader.discover('matholymp.test',
-                                                pattern=args.pattern,
-                                                top_level_dir=sys.path[0])
+    loader = MoTestLoader(args.coverage)
+    suite = loader.discover('matholymp.test',
+                            pattern=args.pattern,
+                            top_level_dir=sys.path[0])
     unittest.TextTestRunner(verbosity=2).run(suite)

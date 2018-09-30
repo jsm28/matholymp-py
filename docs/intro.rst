@@ -108,6 +108,12 @@ matholymp:
   provided patch for `Roundup issue 2550722
   <http://issues.roundup-tracker.org/issue2550722>`_.
 
+* To measure the code coverage of the automated tests, `Coverage.py
+  <https://coverage.readthedocs.io/en/latest/>`_ is needed.  This is
+  only relevant for developing matholymp, not for using it.  The
+  ``--coverage`` option to :command:`mo-run-tests` is used for
+  measuring coverage.
+
 The matholymp code is intended to be independent of the operating
 system used.  However, it has only been tested on GNU/Linux
 (specifically, various versions of Ubuntu) and so it is likely you

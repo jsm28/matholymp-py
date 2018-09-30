@@ -46,11 +46,12 @@ class MoStaticImportTestCase(MoScriptTestCase):
     """
 
     def __init__(self, method_name='runTest', script_dir=None, script=None,
-                 top_dir=None, this_dir=None):
+                 top_dir=None, this_dir=None, coverage=False):
         """Initialise a MoStaticImportTestCase."""
         super(MoStaticImportTestCase, self).__init__(method_name,
                                                      script_dir, script,
-                                                     top_dir, this_dir)
+                                                     top_dir, this_dir,
+                                                     coverage)
         if this_dir is not None:
             assert self.check_dir
             in_data_dir = os.path.join(self.full_dir, 'in-data')
@@ -59,4 +60,5 @@ class MoStaticImportTestCase(MoScriptTestCase):
 
 def load_tests(loader, standard_tests, pattern):
     """Return a TestSuite for all the mo-static-import tests."""
-    return load_script_tests('mo-static-import', MoStaticImportTestCase)
+    return load_script_tests('mo-static-import', MoStaticImportTestCase,
+                             loader.coverage)

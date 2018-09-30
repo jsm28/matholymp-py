@@ -44,15 +44,17 @@ class MoStaticGenerateTestCase(MoScriptTestCase):
     """
 
     def __init__(self, method_name='runTest', script_dir=None, script=None,
-                 top_dir=None, this_dir=None):
+                 top_dir=None, this_dir=None, coverage=False):
         """Initialise a MoStaticGenerateTestCase."""
         super(MoStaticGenerateTestCase, self).__init__(method_name,
                                                        script_dir, script,
-                                                       top_dir, this_dir)
+                                                       top_dir, this_dir,
+                                                       coverage)
         if this_dir is not None:
             assert self.check_dir
 
 
 def load_tests(loader, standard_tests, pattern):
     """Return a TestSuite for all the mo-static-generate tests."""
-    return load_script_tests('mo-static-generate', MoStaticGenerateTestCase)
+    return load_script_tests('mo-static-generate', MoStaticGenerateTestCase,
+                             loader.coverage)

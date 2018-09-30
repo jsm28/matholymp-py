@@ -145,6 +145,11 @@ the registration system is not active.
   security, but given the CSRF protection which does not apply to GET
   requests, it is now desirable).
 
+* :command:`mo-run-tests` now supports a ``--coverage`` option to
+  measure code coverage, using `Coverage.py
+  <https://coverage.readthedocs.io/en/latest/>`_.  This is only
+  relevant for developing matholymp, not for using it.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 
