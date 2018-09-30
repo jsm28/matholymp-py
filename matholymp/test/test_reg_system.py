@@ -113,10 +113,6 @@ class RoundupTestInstance(object):
         self.log_file = os.path.join(self.temp_dir, 'log')
         self.html_dir = os.path.join(self.instance_dir, 'html')
         shutil.copytree(self.example_dir, self.instance_dir)
-        os.makedirs(os.path.join(self.instance_dir, 'db'))
-        self.passwords = {'admin': roundup.password.generatePassword()}
-        self.userids = {'admin': '1'}
-        self.num_users = 2
         self.config_ini = os.path.join(self.instance_dir, 'config.ini')
         self.ext_config_ini = os.path.join(self.instance_dir, 'extensions',
                                            'config.ini')
@@ -124,9 +120,52 @@ class RoundupTestInstance(object):
         # network access attempts during testing, if anything
         # mistakenly tries to send email or access CSS / favicon
         # links.
-        for f in (self.config_ini, self.ext_config_ini,
-                  os.path.join(self.html_dir, 'page.html'),
-                  os.path.join(self.html_dir, 'dpage.html')):
+        subst_files = [self.config_ini, self.ext_config_ini,
+                       os.path.join(self.html_dir, 'page.html'),
+                       os.path.join(self.html_dir, 'dpage.html')]
+        if config and 'static_site_directory' in config:
+            # Construct a static site directory.  We assume it is to
+            # be called 'static-site' relative to the Roundup
+            # instance.
+            self.static_example_dir = os.path.join(top_dir, 'test-data',
+                                                   'mo-static-generate',
+                                                   'basic', 'in')
+            self.static_site_dir = os.path.join(self.instance_dir,
+                                                'static-site')
+            shutil.copytree(self.static_example_dir, self.static_site_dir)
+            # Ensure the static site directory has a country without a
+            # flag.  Ensure flags and photos listed in the .csv files
+            # are present.
+            countries_csv = os.path.join(self.static_site_dir, 'data',
+                                         'countries.csv')
+            replace_text_in_file(
+                countries_csv,
+                'https://www.example.org/countries/country3/flag1.png', '')
+            static_base = 'https://www.example.org/'
+            for country in read_utf8_csv(countries_csv):
+                url = country['Flag URL']
+                if url.startswith(static_base):
+                    url_rest = url[len(static_base):]
+                    url_dirs = url_rest.split('/')
+                    image_file = os.path.join(self.static_site_dir, *url_dirs)
+                    os.makedirs(os.path.dirname(image_file))
+                    gen_image_file(2, 2, 2, image_file, 'PNG')
+            people_csv = os.path.join(self.static_site_dir, 'data',
+                                      'people.csv')
+            for person in read_utf8_csv(people_csv):
+                url = person['Photo URL']
+                if url.startswith(static_base):
+                    url_rest = url[len(static_base):]
+                    url_dirs = url_rest.split('/')
+                    image_file = os.path.join(self.static_site_dir, *url_dirs)
+                    os.makedirs(os.path.dirname(image_file))
+                    gen_image_file(2, 2, 2, image_file, 'JPEG')
+            subst_files.extend([countries_csv, people_csv])
+        os.makedirs(os.path.join(self.instance_dir, 'db'))
+        self.passwords = {'admin': roundup.password.generatePassword()}
+        self.userids = {'admin': '1'}
+        self.num_users = 2
+        for f in subst_files:
             replace_text_in_file(f, 'example.org', 'example.invalid')
         replace_text_in_file(self.config_ini, '\nbackend = postgresql\n',
                              '\nbackend = anydbm\n')
@@ -249,6 +288,12 @@ class RoundupTestInstance(object):
         if self.pid:
             os.kill(self.pid, signal.SIGINT)
             os.waitpid(self.pid, 0)
+
+    def static_site_bytes(self, filename):
+        """Return the byte content of a file in the static site."""
+        with open(os.path.join(self.static_site_dir, filename),
+                  'rb') as in_file:
+            return in_file.read()
 
 
 class RoundupTestSession(object):
@@ -901,6 +946,89 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_bytes, flag_bytes)
         self.assertEqual(reg_bytes, flag_bytes)
 
+    @_with_config(static_site_directory='static-site')
+    def test_country_flag_create_static(self):
+        """
+        Test flags copied from static site at country creation time.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        flag_bytes = self.instance.static_site_bytes(
+            'countries/country1/flag1.png')
+        admin_session.create_country(
+            'ABC', 'Test First Country',
+            {'generic_url': 'https://www.example.invalid/countries/country1/'})
+        # Check the image inline on the country page.
+        admin_session.check_open_relative('country3')
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, flag_bytes)
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        img_url_csv = self.instance.url + 'flag1/flag.png'
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': img_url_csv,
+                        'Generic Number': '1', 'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, flag_bytes)
+        self.assertEqual(admin_bytes, flag_bytes)
+        self.assertEqual(reg_bytes, flag_bytes)
+
+    @_with_config(static_site_directory='static-site')
+    def test_country_flag_create_static_priority(self):
+        """
+        Test flags uploaded at country creation time take priority
+        over those from static site.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.png', 'PNG')
+        admin_session.create_country(
+            'ABC', 'Test First Country',
+            {'flag-1@content': flag_filename,
+             'generic_url': 'https://www.example.invalid/countries/country1/'})
+        # Check the image inline on the country page.
+        admin_session.check_open_relative('country3')
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, flag_bytes)
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        img_url_csv = self.instance.url + 'flag1/flag.png'
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': img_url_csv,
+                        'Generic Number': '1', 'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, flag_bytes)
+        self.assertEqual(admin_bytes, flag_bytes)
+        self.assertEqual(reg_bytes, flag_bytes)
+
     def test_country_flag_edit(self):
         """
         Test flags uploaded after country creation time.
@@ -947,6 +1075,109 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_bytes, flag_bytes)
         self.assertEqual(reg_bytes, flag_bytes)
 
+    @_with_config(static_site_directory='static-site')
+    def test_country_flag_edit_static(self):
+        """
+        Test flags copied from static site after country creation time.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '',
+                        'Generic Number': '', 'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        flag_bytes = self.instance.static_site_bytes(
+            'countries/country1/flag1.png')
+        admin_session.edit(
+            'country', '3',
+            {'generic_url': 'https://www.example.invalid/countries/country1/'})
+        img_url_csv = self.instance.url + 'flag1/flag.png'
+        # Check the image inline on the country page.
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, flag_bytes)
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        img_url_csv = self.instance.url + 'flag1/flag.png'
+        expected_abc['Generic Number'] = '1'
+        expected_abc['Flag URL'] = img_url_csv
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, flag_bytes)
+        self.assertEqual(admin_bytes, flag_bytes)
+        self.assertEqual(reg_bytes, flag_bytes)
+
+    @_with_config(static_site_directory='static-site')
+    def test_country_flag_edit_static_priority(self):
+        """
+        Test flags uploaded after country creation time take priority
+        over those from static site.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.png', 'PNG')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '',
+                        'Generic Number': '', 'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        admin_session.edit(
+            'country', '3',
+            {'flag-1@content': flag_filename,
+             'generic_url': 'https://www.example.invalid/countries/country1/'})
+        img_url_csv = self.instance.url + 'flag1/flag.png'
+        # Check the image inline on the country page.
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, flag_bytes)
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        img_url_csv = self.instance.url + 'flag1/flag.png'
+        expected_abc['Generic Number'] = '1'
+        expected_abc['Flag URL'] = img_url_csv
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, flag_bytes)
+        self.assertEqual(admin_bytes, flag_bytes)
+        self.assertEqual(reg_bytes, flag_bytes)
+
     def test_country_flag_replace(self):
         """
         Test replacing previously uploaded flag.
@@ -976,6 +1207,48 @@ class RegSystemTestCase(unittest.TestCase):
                         'Code': 'ABC', 'Name': 'Test First Country',
                         'Flag URL': img_url_csv,
                         'Generic Number': '', 'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, flag_bytes)
+        self.assertEqual(admin_bytes, flag_bytes)
+        self.assertEqual(reg_bytes, flag_bytes)
+
+    @_with_config(static_site_directory='static-site')
+    def test_country_flag_replace_static(self):
+        """
+        Test setting generic_url after flag uploaded does not change flag.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.png', 'PNG')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'flag-1@content': flag_filename})
+        admin_session.edit(
+            'country', '3',
+            {'generic_url': 'https://www.example.invalid/countries/country1/'})
+        # Check the image inline on the country page.
+        admin_session.check_open_relative('country3')
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, flag_bytes)
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        img_url_csv = self.instance.url + 'flag1/flag.png'
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': img_url_csv,
+                        'Generic Number': '1', 'Normal': 'Yes'}
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc, expected_staff])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
