@@ -148,7 +148,9 @@ the registration system is not active.
 * :command:`mo-run-tests` now supports a ``--coverage`` option to
   measure code coverage, using `Coverage.py
   <https://coverage.readthedocs.io/en/latest/>`_.  This is only
-  relevant for developing matholymp, not for using it.
+  relevant for developing matholymp, not for using it, and only
+  applies to the tests of scripts, not to those of the registration
+  system.
 
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
