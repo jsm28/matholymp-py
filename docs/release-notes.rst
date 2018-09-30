@@ -139,6 +139,12 @@ the registration system is not active.
   changed so that the page title just shows a blank for the name of a
   removed country or person, instead of showing ``[hidden]``.
 
+* Actions modifying registration system data are now required to be
+  submitted via HTTP POST requests (before the CSRF protection added
+  in Roundup 1.6.0, such a restriction would not have added any
+  security, but given the CSRF protection which does not apply to GET
+  requests, it is now desirable).
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

@@ -1055,6 +1055,9 @@ class RegSystemTestCase(unittest.TestCase):
         """
         admin_session = self.get_session('admin')
         admin_session.create_country_generic()
+        # Error trying to retire country via GET request.
+        admin_session.check_open_relative('country3?@action=retirecountry',
+                                          error='Invalid request')
         # Errors applying action to bad class or without id specified
         # (requires modifying the form to exercise).
         admin_session.check_open_relative('country3')

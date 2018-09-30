@@ -41,6 +41,7 @@ import os
 from PIL import Image
 from roundup.cgi.actions import Action
 from roundup.cgi.exceptions import Unauthorised
+from roundup.exceptions import Reject
 
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import get_marks_per_problem, \
@@ -57,6 +58,8 @@ class ScoreAction(Action):
 
     def handle(self):
         """Set the scores for a given country and problem."""
+        if self.client.env['REQUEST_METHOD'] != 'POST':
+            raise Reject(self._('Invalid request'))
         if scores_final(self.db):
             raise Unauthorised('Scores cannot be entered after'
                                ' medal boundaries are set')
@@ -112,6 +115,8 @@ class RetireCountryAction(Action):
 
     def handle(self):
         """Retire a country, making other consequent changes."""
+        if self.client.env['REQUEST_METHOD'] != 'POST':
+            raise Reject(self._('Invalid request'))
         if self.nodeid is None:
             raise ValueError('No id specified to retire')
         if self.classname != 'country':
@@ -146,6 +151,8 @@ class ScalePhotoAction(Action):
 
     def handle(self):
         """Scale a person's photo."""
+        if self.client.env['REQUEST_METHOD'] != 'POST':
+            raise Reject(self._('Invalid request'))
         if self.nodeid is None:
             raise ValueError('No id specified to scale photo for')
         if self.classname != 'person':
