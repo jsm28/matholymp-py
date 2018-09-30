@@ -115,6 +115,8 @@ class RoundupTestInstance(object):
         shutil.copytree(self.example_dir, self.instance_dir)
         os.makedirs(os.path.join(self.instance_dir, 'db'))
         self.passwords = {'admin': roundup.password.generatePassword()}
+        self.userids = {'admin': '1'}
+        self.num_users = 2
         self.config_ini = os.path.join(self.instance_dir, 'config.ini')
         self.ext_config_ini = os.path.join(self.instance_dir, 'extensions',
                                            'config.ini')
@@ -254,6 +256,10 @@ class RoundupTestSession(object):
                 if 'error' in kwargs:
                     error = kwargs['error']
                     del kwargs['error']
+                status = None
+                if 'status' in kwargs:
+                    status = kwargs['status']
+                    del kwargs['status']
                 login = False
                 if 'login' in kwargs:
                     login = kwargs['login']
@@ -263,7 +269,13 @@ class RoundupTestSession(object):
                     html = kwargs['html']
                     del kwargs['html']
                 response = sb_method(*args, **kwargs)
-                response.raise_for_status()
+                if status is None:
+                    response.raise_for_status()
+                else:
+                    if response.status_code != status:
+                        raise ValueError('request generated status %d '
+                                         'instead of %d'
+                                         % (response.status_code, status))
                 mail_size = os.stat(self.instance.mail_file).st_size
                 mail_generated = mail_size > old_mail_size
                 if mail_generated:
@@ -396,9 +408,13 @@ class RoundupTestSession(object):
         self.b['__login_password'] = self.instance.passwords[username]
         self.check_submit_selected()
 
+    def get_main_form(self):
+        """Select the main form from the current page."""
+        return self.get_main().find('form')
+
     def select_main_form(self):
-        """Get the main form from the current page."""
-        self.b.select_form(self.get_main().find('form'))
+        """Select the main form from the current page."""
+        self.b.select_form(self.get_main_form())
 
     def set(self, data):
         """Set the contents of fields in the selected form.
@@ -461,6 +477,15 @@ class RoundupTestSession(object):
         defaults = {'realname': username, 'address': 'test@example.invalid'}
         self.create_defaults('user', data, defaults)
         self.instance.passwords[username] = password
+        self.instance.num_users += 1
+        self.instance.userids[username] = str(self.instance.num_users)
+        # Verify the id is as expected.
+        expected_url = '%suser%s' % (self.instance.url,
+                                     self.instance.userids[username])
+        url = self.b.get_url().split('?')[0]
+        if url != expected_url:
+            raise ValueError('expected user URL %s, got %s'
+                             % (expected_url, url))
 
     def create_scoring_user(self):
         """Create a scoring user."""
@@ -491,6 +516,8 @@ class RoundupTestSession(object):
                 username = username_str
                 password = password_str
             self.instance.passwords[username] = password
+            self.instance.num_users += 1
+            self.instance.userids[username] = str(self.instance.num_users)
         else:
             self.create_user('%s_reg' % code, name, 'User,Register')
 
@@ -1021,6 +1048,73 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session.check_open_relative('country')
         reg_login = reg_session.get_sidebar().find('form')
         self.assertIsNotNone(reg_login)
+
+    def test_country_retire_errors(self):
+        """
+        Test errors retiring countries.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        # Errors applying action to bad class or without id specified
+        # (requires modifying the form to exercise).
+        admin_session.check_open_relative('country3')
+        admin_session.b.select_form(
+            admin_session.get_main().find_all('form')[1])
+        admin_session.check_submit_selected()
+        form = admin_session.get_main_form()
+        form['action'] = 'country'
+        admin_session.b.select_form(form)
+        admin_session.check_submit_selected(error='No id specified to retire')
+        admin_session.check_open_relative('country3')
+        admin_session.b.select_form(
+            admin_session.get_main().find_all('form')[1])
+        admin_session.check_submit_selected()
+        form = admin_session.get_main_form()
+        form['action'] = 'gender1'
+        admin_session.b.select_form(form)
+        admin_session.check_submit_selected(error='This action only applies '
+                                            'to countries')
+        # Errors retiring special countries.
+        admin_session.check_open_relative('country1')
+        admin_session.b.select_form(
+            admin_session.get_main().find_all('form')[1])
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.check_submit_selected(error='Special countries cannot '
+                                            'be retired', status=403)
+        admin_session.check_open_relative('country2')
+        admin_session.b.select_form(
+            admin_session.get_main().find_all('form')[1])
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.check_submit_selected(error='Special countries cannot '
+                                            'be retired', status=403)
+        # Permission error (requires user to have valid form, then
+        # have permissions removed, then try submitting it).
+        admin_session.create_user('admin2', 'XMO 2015 Staff', 'Admin')
+        admin2_session = self.get_session('admin2')
+        admin2_session.check_open_relative('country3')
+        admin2_session.b.select_form(
+            admin2_session.get_main().find_all('form')[1])
+        admin2_session.check_submit_selected()
+        admin2_session.select_main_form()
+        admin_session.edit('user', self.instance.userids['admin2'],
+                           {'roles': 'User,Score'})
+        admin2_session.check_submit_selected(error='You do not have '
+                                             'permission to retire',
+                                             status=403)
+        admin_session.edit('user', self.instance.userids['ABC_reg'],
+                           {'roles': 'Admin'})
+        reg_session = self.get_session('ABC_reg')
+        reg_session.check_open_relative('country3')
+        reg_session.b.select_form(
+            reg_session.get_main().find_all('form')[1])
+        reg_session.check_submit_selected()
+        reg_session.select_main_form()
+        admin_session.edit('user', self.instance.userids['ABC_reg'],
+                           {'roles': 'User,Register'})
+        reg_session.check_submit_selected(error='You do not have '
+                                          'permission to retire', status=403)
 
     def test_person_multilink_null_edit(self):
         """
