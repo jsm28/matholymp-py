@@ -110,10 +110,9 @@ matholymp:
 
 * To measure the code coverage of the automated tests, `Coverage.py
   <https://coverage.readthedocs.io/en/latest/>`_ is needed.  This is
-  only relevant for developing matholymp, not for using it, and only
-  applies to the tests of scripts, not to those of the registration
-  system.  The ``--coverage`` option to :command:`mo-run-tests` is
-  used for measuring coverage.
+  only relevant for developing matholymp, not for using it.  The
+  ``--coverage`` option to :command:`mo-run-tests` is used for
+  measuring coverage.
 
 The matholymp code is intended to be independent of the operating
 system used.  However, it has only been tested on GNU/Linux

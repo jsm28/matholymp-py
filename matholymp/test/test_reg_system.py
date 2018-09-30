@@ -97,7 +97,7 @@ class RoundupTestInstance(object):
     used for testing.
     """
 
-    def __init__(self, top_dir, temp_dir, config):
+    def __init__(self, top_dir, temp_dir, config, coverage):
         """Initialise a RoundupTestInstance."""
         self.pid = None
         self.port = None
@@ -139,6 +139,37 @@ class RoundupTestInstance(object):
             for key, value in config.items():
                 cfg.set('main', 'matholymp_%s' % key, value)
             write_config_raw(cfg, self.ext_config_ini)
+        if coverage:
+            # Record code coverage; arrange for the data to be saved
+            # on exit.  Exit occurs both from this code and from
+            # forked children handling requests, so _exit and fork
+            # need to be wrapped.
+            from coverage import Coverage
+            cov_base = os.path.join(self.temp_dir, '.coverage.reg-system')
+            self.cov = Coverage(data_file=cov_base, data_suffix=True)
+            self.cov.start()
+
+            orig_exit = os._exit
+            orig_fork = os.fork
+
+            def wrap_fork():
+                self.cov.stop()
+                pid = orig_fork()
+                if pid == 0:
+                    self.cov = Coverage(data_file=cov_base, data_suffix=True)
+                self.cov.start()
+                return pid
+
+            def wrap_exit(status):
+                os._exit = orig_exit
+                try:
+                    self.cov.stop()
+                    self.cov.save()
+                finally:
+                    os._exit(status)
+
+            os.fork = wrap_fork
+            os._exit = wrap_exit
         instance = roundup.instance.open(self.instance_dir)
         instance.init(roundup.password.Password(self.passwords['admin']))
         # Start up a server in a forked child, which reports back the
@@ -200,6 +231,14 @@ class RoundupTestInstance(object):
                 os._exit(1)
         else:
             # Parent.
+            if coverage:
+                # Code coverage in the parent, beyond the code read at
+                # Roundup instance initialisation before forking, is
+                # not of interest.
+                self.cov.stop()
+                self.cov.save()
+                os._exit = orig_exit
+                os.fork = orig_fork
             os.close(write_fd)
             self.port = int(os.read(read_fd, 5))
             os.close(read_fd)
@@ -589,12 +628,19 @@ class RegSystemTestCase(unittest.TestCase):
         self.sessions = []
         self.temp_dir = tempfile.mkdtemp()
         self.instance = RoundupTestInstance(sys.path[0], self.temp_dir,
-                                            self.config)
+                                            self.config, self.coverage)
 
     def tearDown(self):
         for s in self.sessions:
             s.close()
         self.instance.stop_server()
+        if self.coverage:
+            from coverage import Coverage
+            cov_base = os.path.join(sys.path[0], '.coverage.reg-system')
+            cov = Coverage(data_file=cov_base)
+            cov.load()
+            cov.combine(data_paths=[self.temp_dir])
+            cov.save()
         shutil.rmtree(self.temp_dir)
 
     def get_session(self, username=None):
@@ -1180,3 +1226,18 @@ class RegSystemTestCase(unittest.TestCase):
                                             'participant')
         admin_csv = admin_session.get_people_csv()
         self.assertEqual(len(admin_csv), 0)
+
+
+def _set_coverage(tests, coverage):
+    """Set the coverage attribute on a test or the tests in an iterable."""
+    if isinstance(tests, unittest.TestCase):
+        tests.coverage = coverage
+    else:
+        for subtest in tests:
+            _set_coverage(subtest, coverage)
+
+
+def load_tests(loader, standard_tests, pattern):
+    """Return a TestSuite for all the registration system tests."""
+    _set_coverage(standard_tests, loader.coverage)
+    return unittest.TestSuite(standard_tests)
