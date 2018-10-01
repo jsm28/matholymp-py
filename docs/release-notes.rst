@@ -150,6 +150,11 @@ the registration system is not active.
   <https://coverage.readthedocs.io/en/latest/>`_.  This is only
   relevant for developing matholymp, not for using it.
 
+* A bug has been fixed that produced internal errors when registering
+  a person with an arrival or departure time hour specified without a
+  date, or an arrival or departure time minute specified without a
+  date or an hour.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

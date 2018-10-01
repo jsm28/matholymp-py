@@ -163,12 +163,24 @@ def audit_person_arrdep(db, cl, nodeid, newvalues, kind):
         if hour is not None:
             hour = None
             newvalues['%s_time_hour' % kind] = None
+            # On node creation, unset string fields are omitted from
+            # newvalues by the form parsing code, and must be omitted
+            # in newvalues in the form in which it is passed to the
+            # database back end or internal errors will occur.  On
+            # node edit, such a field being changed to unset is
+            # represented as None by the form parsing code so it is
+            # appropriate for the auditor to represent it that way as
+            # well.
+            if nodeid is None:
+                del newvalues['%s_time_hour' % kind]
     else:
         date = date_from_ymd_iso('%s date' % kind, date)
     if hour is None:
         if minute is not None:
             minute = None
             newvalues['%s_time_minute' % kind] = None
+            if nodeid is None:
+                del newvalues['%s_time_minute' % kind]
         time = None
     else:
         if minute is None:

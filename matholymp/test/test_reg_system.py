@@ -1621,6 +1621,76 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         self.assertEqual(len(admin_csv), 0)
 
+    def test_person_date_time_partial(self):
+        """
+        Test creating people with partial arrival / departure times.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_person('XMO 2015 Staff', 'Chief Coordinator',
+                                    {'arrival_time_hour': '00',
+                                     'departure_time_minute': '01'})
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(admin_csv[0]['Arrival Date'], '')
+        self.assertEqual(admin_csv[0]['Arrival Time'], '')
+        self.assertEqual(admin_csv[0]['Departure Date'], '')
+        self.assertEqual(admin_csv[0]['Departure Time'], '')
+        admin_session.create_person('XMO 2015 Staff', 'Chief Guide',
+                                    {'arrival_date': '1 April 2015',
+                                     'arrival_time_minute': '59',
+                                     'departure_date': '2 April 2015',
+                                     'departure_time_minute': '01'})
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(len(admin_csv), 2)
+        self.assertEqual(admin_csv[0]['Arrival Date'], '')
+        self.assertEqual(admin_csv[0]['Arrival Time'], '')
+        self.assertEqual(admin_csv[0]['Departure Date'], '')
+        self.assertEqual(admin_csv[0]['Departure Time'], '')
+        self.assertEqual(admin_csv[1]['Arrival Date'], '2015-04-01')
+        self.assertEqual(admin_csv[1]['Arrival Time'], '')
+        self.assertEqual(admin_csv[1]['Departure Date'], '2015-04-02')
+        self.assertEqual(admin_csv[1]['Departure Time'], '')
+        # Verify setting and then partially unsetting details.
+        admin_session.select_main_form()
+        admin_session.set({'arrival_time_hour': '23',
+                           'arrival_time_minute': '30',
+                           'departure_time_hour': '09',
+                           'departure_time_minute': '45'})
+        admin_session.check_submit_selected()
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(len(admin_csv), 2)
+        self.assertEqual(admin_csv[0]['Arrival Date'], '')
+        self.assertEqual(admin_csv[0]['Arrival Time'], '')
+        self.assertEqual(admin_csv[0]['Departure Date'], '')
+        self.assertEqual(admin_csv[0]['Departure Time'], '')
+        self.assertEqual(admin_csv[1]['Arrival Date'], '2015-04-01')
+        self.assertEqual(admin_csv[1]['Arrival Time'], '23:30')
+        self.assertEqual(admin_csv[1]['Departure Date'], '2015-04-02')
+        self.assertEqual(admin_csv[1]['Departure Time'], '09:45')
+        admin_session.select_main_form()
+        # It should not be necessary to upload a photo here, but
+        # MechanicalSoup ignores the specified enctype, resulting in
+        # an application/x-www-form-urlencoded submission, and
+        # Python's cgi module defaults to ignoring blank fields in
+        # such submissions, whereas the blank fields are required here
+        # for the correct semantics.
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                         'JPEG')
+        admin_session.set({'arrival_time_hour': '(hour)',
+                           'departure_date': '(date)',
+                           'photo-1@content': photo_filename})
+        admin_session.check_submit_selected()
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(len(admin_csv), 2)
+        self.assertEqual(admin_csv[0]['Arrival Date'], '')
+        self.assertEqual(admin_csv[0]['Arrival Time'], '')
+        self.assertEqual(admin_csv[0]['Departure Date'], '')
+        self.assertEqual(admin_csv[0]['Departure Time'], '')
+        self.assertEqual(admin_csv[1]['Arrival Date'], '2015-04-01')
+        self.assertEqual(admin_csv[1]['Arrival Time'], '')
+        self.assertEqual(admin_csv[1]['Departure Date'], '')
+        self.assertEqual(admin_csv[1]['Departure Time'], '')
+
 
 def _set_coverage(tests, coverage):
     """Set the coverage attribute on a test or the tests in an iterable."""
