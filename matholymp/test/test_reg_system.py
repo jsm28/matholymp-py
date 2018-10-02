@@ -1085,7 +1085,6 @@ class RegSystemTestCase(unittest.TestCase):
         # Check the image inline on the country page.
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, flag_bytes)
-        reg_session = self.get_session('ABC_reg')
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv()
         reg_csv = reg_session.get_countries_csv()
@@ -1135,7 +1134,6 @@ class RegSystemTestCase(unittest.TestCase):
         # Check the image inline on the country page.
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, flag_bytes)
-        reg_session = self.get_session('ABC_reg')
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv()
         reg_csv = reg_session.get_countries_csv()
@@ -1223,7 +1221,6 @@ class RegSystemTestCase(unittest.TestCase):
         # Check the image inline on the country page.
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, flag_bytes)
-        reg_session = self.get_session('ABC_reg')
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv()
         reg_csv = reg_session.get_countries_csv()
