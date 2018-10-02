@@ -988,6 +988,33 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(reg_bytes, flag_bytes)
 
     @_with_config(static_site_directory='static-site')
+    def test_country_flag_create_static_none(self):
+        """
+        Test flags not present on static site at country creation time.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        admin_session.create_country(
+            'ABC', 'Test First Country',
+            {'generic_url': 'https://www.example.invalid/countries/country3/'})
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '',
+                        'Generic Number': '3', 'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+
+    @_with_config(static_site_directory='static-site')
     def test_country_flag_create_static_priority(self):
         """
         Test flags uploaded at country creation time take priority
@@ -1125,6 +1152,42 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_bytes, flag_bytes)
         self.assertEqual(admin_bytes, flag_bytes)
         self.assertEqual(reg_bytes, flag_bytes)
+
+    @_with_config(static_site_directory='static-site')
+    def test_country_flag_edit_static_none(self):
+        """
+        Test flags not present on static site when generic_url set
+        after country creation time.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '',
+                        'Generic Number': '', 'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        admin_session.edit(
+            'country', '3',
+            {'generic_url': 'https://www.example.invalid/countries/country3/'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc['Generic Number'] = '3'
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
 
     @_with_config(static_site_directory='static-site')
     def test_country_flag_edit_static_priority(self):
