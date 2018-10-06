@@ -1350,6 +1350,25 @@ class RegSystemTestCase(unittest.TestCase):
         anon_zip.close()
         admin_zip.close()
 
+    def test_country_flag_zip_errors(self):
+        """
+        Test errors from flags_zip action.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        session.check_open_relative('person?@action=flags_zip',
+                                    error='This action only applies '
+                                    'to countries')
+        session.check_open_relative('country1?@action=flags_zip',
+                                    error='Node id specified for ZIP '
+                                    'generation')
+        admin_session.check_open_relative('person?@action=flags_zip',
+                                          error='This action only applies '
+                                          'to countries')
+        admin_session.check_open_relative('country1?@action=flags_zip',
+                                          error='Node id specified for ZIP '
+                                          'generation')
+
     def test_country_retire(self):
         """
         Test retiring countries.
