@@ -1556,6 +1556,12 @@ class RegSystemTestCase(unittest.TestCase):
             'in the form https://www\.example\.invalid/countries/countryN/')
         admin_session.create_country(
             'ABC', 'Test First Country',
+            {'generic_url':
+             'https://www.example.invalid/countries/country01/'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/countries/countryN/')
+        admin_session.create_country(
+            'ABC', 'Test First Country',
             {'generic_url': 'https://www.example.invalid/countries/country1'},
             error=r'example.invalid URLs for previous participation must be '
             'in the form https://www\.example\.invalid/countries/countryN/')
