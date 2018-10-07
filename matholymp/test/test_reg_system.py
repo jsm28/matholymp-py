@@ -1644,6 +1644,142 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff])
 
+    def test_country_edit_audit_errors(self):
+        """
+        Test errors from country edit auditor.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        admin_session.create_country_generic()
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        admin_session.edit('country', '1', {'code': 'Zza'},
+                           error='Country codes must be all capital letters')
+        admin_session.edit('country', '1', {'code': 'ABC'},
+                           error='A country with code ABC already exists')
+        admin_session.edit('country', '1', {'is_normal': 'yes'},
+                           error='Cannot change whether a country is normal')
+        admin_session.edit('country', '3', {'is_normal': 'no'},
+                           error='Cannot change whether a country is normal')
+        admin_session.edit('country', '1', {'participants_ok': 'no'},
+                           error='Cannot change whether a country can have '
+                           'participants')
+        admin_session.edit('country', '2', {'participants_ok': 'yes'},
+                           error='Cannot change whether a country can have '
+                           'participants')
+        admin_session.edit('country', '3', {'participants_ok': 'no'},
+                           error='Cannot change whether a country can have '
+                           'participants')
+        flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                        'JPEG')
+        admin_session.edit('country', '3',
+                           {'flag-1@content': flag_filename},
+                           error='Flags must be in PNG format')
+        flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                        'PNG')
+        admin_session.edit('country', '3',
+                           {'flag-1@content': flag_filename},
+                           error=r'Filename extension for flag must match '
+                           'contents \(png\)')
+        admin_session.edit(
+            'country', '3',
+            {'generic_url': 'https://www.example.invalid/test'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/countries/countryN/')
+        admin_session.edit(
+            'country', '3',
+            {'generic_url': 'https://www.example.invalid/countries/country0/'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/countries/countryN/')
+        admin_session.edit(
+            'country', '3',
+            {'generic_url':
+             'https://www.example.invalid/countries/country01/'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/countries/countryN/')
+        admin_session.edit(
+            'country', '3',
+            {'generic_url': 'https://www.example.invalid/countries/country1'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/countries/countryN/')
+        admin_session.edit(
+            'country', '3',
+            {'generic_url':
+             'https://www.example.invalid/countries/country1N/'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/countries/countryN/')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        # Without static site data available, any country number is
+        # OK.
+        admin_session.edit(
+            'country', '3',
+            {'generic_url':
+             'https://www.example.invalid/countries/country12345/'})
+        expected_abc['Generic Number'] = '12345'
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+
+    @_with_config(static_site_directory='static-site')
+    def test_country_edit_audit_errors_static(self):
+        """
+        Test errors from country edit auditor, static site checks.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        admin_session.create_country_generic()
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        admin_session.edit(
+            'country', '3',
+            {'generic_url':
+             'https://www.example.invalid/countries/country12345/'},
+            error=r'example\.invalid URL for previous participation not valid')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+
+    def test_country_edit_audit_errors_missing(self):
+        """
+        Test errors from country edit auditor, missing required data.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        admin_session.edit('country', '1', {'code': ''},
+                           error='Required country property code not supplied')
+        admin_session.edit('country', '1', {'name': ''},
+                           error='Required country property name not supplied')
+        # With @required not sent, the auditor restores the previous
+        # values.
+        admin_session.edit('country', '1', {'@required': '',
+                                            'code': '',
+                                            'name': ''})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
+
     def test_person_multilink_null_edit(self):
         """
         Test null edits on multilinks involving "no selection".
