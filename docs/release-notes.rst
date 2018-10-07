@@ -155,6 +155,14 @@ the registration system is not active.
   date, or an arrival or departure time minute specified without a
   date or an hour.
 
+* A possible race condition has been fixed in the handling of consent
+  form uploads.  That race condition could have allowed a malicious
+  user with access to register participants for one country to cause a
+  consent form uploaded for another country to be linked to a
+  participant from the malicious user's country, if they acted at
+  exactly the right time while the upload of the consent form was
+  being processed.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

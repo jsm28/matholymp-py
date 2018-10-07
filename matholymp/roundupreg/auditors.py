@@ -353,6 +353,14 @@ def audit_person_fields(db, cl, nodeid, newvalues):
                 file_country = db.consent_form.get(file_id, 'country')
                 if file_country is not None and file_country != user_country:
                     raise ValueError('Consent form from another country')
+                if file_country is None:
+                    # Ensure a race cannot occur linking to a consent
+                    # form uploaded by another user before the person
+                    # reactor runs to set the country for that consent
+                    # form.
+                    file_creator = db.consent_form.get(file_id, 'creator')
+                    if file_creator != userid:
+                        raise ValueError('Consent form from another user')
 
     generic_url = get_new_value(db, cl, nodeid, newvalues, 'generic_url')
     if generic_url is not None and generic_url != '':
