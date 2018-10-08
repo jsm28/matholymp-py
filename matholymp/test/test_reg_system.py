@@ -1780,6 +1780,23 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff])
 
+    def test_country_no_participants_access(self):
+        """
+        Test access to no-participants countries.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        session.check_open_relative('country2', login=True)
+        reg_session.check_open_relative('country2', login=True)
+        admin_session.check_open_relative('country2')
+        admin_session.create_country('ZZZ', 'None 2',
+                                     {'participants_ok': 'no'})
+        session.check_open_relative('country4', login=True)
+        reg_session.check_open_relative('country4', login=True)
+        admin_session.check_open_relative('country4')
+
     def test_person_multilink_null_edit(self):
         """
         Test null edits on multilinks involving "no selection".
