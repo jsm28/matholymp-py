@@ -1797,6 +1797,107 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session.check_open_relative('country4', login=True)
         admin_session.check_open_relative('country4')
 
+    def test_country_scores_rss_errors(self):
+        """
+        Test errors from scores_rss action.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        session.check_open_relative('person?@action=scores_rss',
+                                    error='This action only applies '
+                                    'to countries')
+        admin_session.check_open_relative('person?@action=scores_rss',
+                                          error='This action only applies '
+                                          'to countries')
+
+    def test_person_csv_errors(self):
+        """
+        Test errors from people_csv action.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        session.check_open_relative('country?@action=people_csv',
+                                    error='This action only applies '
+                                    'to people')
+        session.check_open_relative('person1?@action=people_csv',
+                                    error='Node id specified for CSV '
+                                    'generation')
+        admin_session.check_open_relative('country?@action=people_csv',
+                                          error='This action only applies '
+                                          'to people')
+        admin_session.check_open_relative('person1?@action=people_csv',
+                                          error='Node id specified for CSV '
+                                          'generation')
+
+    def test_person_scores_csv_errors(self):
+        """
+        Test errors from scores_csv action.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        session.check_open_relative('country?@action=scores_csv',
+                                    error='This action only applies '
+                                    'to people')
+        session.check_open_relative('person1?@action=scores_csv',
+                                    error='Node id specified for CSV '
+                                    'generation')
+        admin_session.check_open_relative('country?@action=scores_csv',
+                                          error='This action only applies '
+                                          'to people')
+        admin_session.check_open_relative('person1?@action=scores_csv',
+                                          error='Node id specified for CSV '
+                                          'generation')
+
+    def test_person_photo_zip_errors(self):
+        """
+        Test errors from photos_zip action.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        session.check_open_relative('country?@action=photos_zip',
+                                    error='This action only applies '
+                                    'to people')
+        session.check_open_relative('person1?@action=photos_zip',
+                                    error='Node id specified for ZIP '
+                                    'generation')
+        admin_session.check_open_relative('country?@action=photos_zip',
+                                          error='This action only applies '
+                                          'to people')
+        admin_session.check_open_relative('person1?@action=photos_zip',
+                                          error='Node id specified for ZIP '
+                                          'generation')
+
+    def test_person_consent_form_zip_errors(self):
+        """
+        Test errors from consent_forms_zip action.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        session.check_open_relative('country?@action=consent_forms_zip',
+                                    error='This action only applies '
+                                    'to people')
+        session.check_open_relative('person1?@action=consent_forms_zip',
+                                    error='Node id specified for ZIP '
+                                    'generation')
+        admin_session.check_open_relative('country?@action=consent_forms_zip',
+                                          error='This action only applies '
+                                          'to people')
+        admin_session.check_open_relative('person1?@action=consent_forms_zip',
+                                          error='Node id specified for ZIP '
+                                          'generation')
+        session.check_open_relative('person?@action=consent_forms_zip',
+                                    error='You do not have permission to '
+                                    'access consent forms', status=403)
+        reg_session.check_open_relative('person?@action=consent_forms_zip',
+                                        error='You do not have permission to '
+                                        'access consent forms', status=403)
+
     def test_person_multilink_null_edit(self):
         """
         Test null edits on multilinks involving "no selection".
