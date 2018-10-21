@@ -2132,6 +2132,30 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv[1]['Departure Date'], '')
         self.assertEqual(admin_csv[1]['Departure Time'], '')
 
+    def test_event_medal_boundaries_csv_errors(self):
+        """
+        Test errors from medal_boundaries_csv action.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        session.check_open_relative('country?@action=medal_boundaries_csv',
+                                    error='This action only applies '
+                                    'to events')
+        # Because no general permissions are granted on the event
+        # class, this page asks for login as well as giving the error
+        # message.
+        session.check_open_relative('event1?@action=medal_boundaries_csv',
+                                    error='Node id specified for CSV '
+                                    'generation', login=True)
+        admin_session.check_open_relative('country?@action='
+                                          'medal_boundaries_csv',
+                                          error='This action only applies '
+                                          'to events')
+        admin_session.check_open_relative('event1?@action='
+                                          'medal_boundaries_csv',
+                                          error='Node id specified for CSV '
+                                          'generation')
+
 
 def _set_coverage(tests, coverage):
     """Set the coverage attribute on a test or the tests in an iterable."""
