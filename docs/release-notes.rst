@@ -168,6 +168,13 @@ the registration system is not active.
   exactly the right time while the upload of the consent form was
   being processed.
 
+* Flags for removed countries, replaced flags for current countries,
+  photos for removed people and replaced photos for current people are
+  no longer public in the registration system.  (There were no public
+  links to such files, but previously they could still be accessed
+  under the URLs under which they were public when they were the
+  current flag or photo for a non-removed country or person.)
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

@@ -46,11 +46,16 @@ from matholymp.roundupreg.rounduputil import have_consent_forms
 def country_react(db, cl, nodeid, oldvalues):
     """
     Mark the cached scoreboard invalid, and create an account for a
-    country if required.
+    country if required, and set the country for the flag if required.
     """
     scoreboard_react(db, cl, nodeid, oldvalues)
     if db.country.is_retired(nodeid):
         return
+    flag_id = db.country.get(nodeid, 'flag')
+    if flag_id:
+        flag_country = db.flag.get(flag_id, 'country')
+        if nodeid != flag_country:
+            db.flag.set(flag_id, country=nodeid)
     email_addr = db.country.get(nodeid, 'contact_email')
     if not email_addr:
         return
@@ -100,21 +105,23 @@ def country_react(db, cl, nodeid, oldvalues):
 
 def person_react(db, cl, nodeid, oldvalues):
     """
-    Mark the cached scoreboard invalid, and set the country for a
-    person's consent form if required.
+    Mark the cached scoreboard invalid, and set the person for a
+    person's photo and consent form if required.
     """
     scoreboard_react(db, cl, nodeid, oldvalues)
     if db.person.is_retired(nodeid):
         return
-    if not have_consent_forms(db):
-        return
-    cf = db.person.get(nodeid, 'consent_form')
-    if not cf:
-        return
-    person_country = db.person.get(nodeid, 'country')
-    file_country = db.consent_form.get(cf, 'country')
-    if file_country != person_country:
-        db.consent_form.set(cf, country=person_country)
+    photo_id = db.person.get(nodeid, 'photo')
+    if photo_id:
+        photo_person = db.photo.get(photo_id, 'person')
+        if nodeid != photo_person:
+            db.photo.set(photo_id, person=nodeid)
+    if have_consent_forms(db):
+        cf_id = db.person.get(nodeid, 'consent_form')
+        if cf_id:
+            cf_person = db.consent_form.get(cf_id, 'person')
+            if nodeid != cf_person:
+                db.consent_form.set(cf_id, person=nodeid)
 
 
 def scoreboard_react(db, cl, nodeid, oldvalues):

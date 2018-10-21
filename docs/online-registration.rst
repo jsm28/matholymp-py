@@ -316,23 +316,8 @@ concerned objects to it being there, it can be removed with:
 
    roundup-admin -i *instance-directory* set personN files=
 
-To complete the removal you should also retire the ``file`` object:
-
-.. parsed-literal::
-
-   roundup-admin -i *instance-directory* retire fileM
-
-You should also rename or remove the file itself under the :file:`db/`
-directory, or truncate it, or change its permissions, so that it
-becomes unavailable over the web (this step, and retiring the ``file``
-object, applies to all photos for that person, if more than one was
-uploaded).  (Note that that this may break :command:`roundup-admin
-export` if it cannot find or read the file.  As explained in the
-`Roundup administration documentation
-<http://roundup-tracker.org/docs/admin_guide.html#tracker-backup>`_,
-use of :command:`roundup-admin export` is not a recommended backup
-approach, but if you are using it then you should consider the effects
-of removing files.)
+A photo is no longer available over the web to the public when it is
+no longer the current photo uploaded for that person.
 
 Scoring
 ^^^^^^^

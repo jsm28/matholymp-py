@@ -192,15 +192,15 @@ def init_schema(env):
 
     FileClass(db, 'flag',
               content=String(indexme='no'),
-              name=String())
+              name=String(), country=Link('country'))
 
     FileClass(db, 'photo',
               content=String(indexme='no'),
-              name=String())
+              name=String(), person=Link('person'))
 
     FileClass(db, 'consent_form',
               content=String(indexme='no'),
-              name=String(), country=Link('country'))
+              name=String(), person=Link('person'))
 
     # Set up permissions:
 
@@ -211,7 +211,7 @@ def init_schema(env):
     db.security.addPermissionToRole('User', 'Web Access')
     db.security.addPermissionToRole('Anonymous', 'Web Access')
 
-    for cl in 'flag', 'photo', 'matholymprole':
+    for cl in 'matholymprole',:
         db.security.addPermissionToRole('User', 'View', cl)
         db.security.addPermissionToRole('Anonymous', 'View', cl)
 
@@ -251,6 +251,22 @@ def init_schema(env):
     p = db.security.addPermission(
         name='Search', klass='country', properties=country_public_props,
         description='User is allowed to search country details')
+    db.security.addPermissionToRole('User', p)
+    db.security.addPermissionToRole('Anonymous', p)
+
+    # Only current flags are public.
+    def can_view_flag(db, userid, itemid):
+        """Determine whether a normal user can view this flag."""
+        flag_country = db.flag.get(itemid, 'country')
+        if flag_country is None:
+            return False
+        if not can_view_country(db, userid, flag_country):
+            return False
+        country_flag = db.country.get(flag_country, 'flag')
+        return country_flag == itemid
+
+    p = db.security.addPermission(name='View', klass='flag',
+                                  check=can_view_flag)
     db.security.addPermissionToRole('User', p)
     db.security.addPermissionToRole('Anonymous', p)
 
@@ -302,6 +318,17 @@ def init_schema(env):
         """Determine whether a normal user can view this person."""
         return not db.person.is_retired(itemid)
 
+    # Only current photos are public.
+    def normal_can_view_photo(db, userid, itemid):
+        """Determine whether a normal user can view this photo."""
+        photo_person = db.photo.get(itemid, 'person')
+        if photo_person is None:
+            return False
+        if not normal_can_view_person(db, userid, photo_person):
+            return False
+        person_photo = db.person.get(photo_person, 'photo')
+        return person_photo == itemid
+
     p = db.security.addPermission(name='View', klass='person',
                                   check=normal_can_view_person,
                                   properties=('country', 'given_name',
@@ -311,20 +338,45 @@ def init_schema(env):
                                               'extra_awards', 'generic_url'))
     db.security.addPermissionToRole('User', p)
     db.security.addPermissionToRole('Anonymous', p)
+    p = db.security.addPermission(name='View', klass='photo',
+                                  check=normal_can_view_photo)
+    db.security.addPermissionToRole('User', p)
+    db.security.addPermissionToRole('Anonymous', p)
 
-    # Register users can create photos.
+    # Registering users can create photos, and can view the photos
+    # they just uploaded and ones for people from their country (even
+    # the old ones).
     db.security.addPermissionToRole('Register', 'Create', 'photo')
+
+    def own_country_photo(db, userid, itemid):
+        """Determine whether the userid matches the country of the photo being
+        accessed."""
+        user_country = db.user.get(userid, 'country')
+        file_person = db.photo.get(itemid, 'person')
+        file_country = None
+        if file_person:
+            file_country = db.person.get(file_person, 'country')
+        file_creator = db.photo.get(itemid, 'creator')
+        return (user_country == file_country
+                or (file_country is None and userid == file_creator))
+
+    p = db.security.addPermission(name='View', klass='photo',
+                                  check=own_country_photo)
+    db.security.addPermissionToRole('Register', p)
 
     # Registering users can create consent forms, and view them only
     # when from their own country or created by that user (the latter
-    # as a case for access before the country is set).
+    # as a case for access before the person is set).
     db.security.addPermissionToRole('Register', 'Create', 'consent_form')
 
     def own_country_consent_form(db, userid, itemid):
         """Determine whether the userid matches the country of the consent
         form being accessed."""
         user_country = db.user.get(userid, 'country')
-        file_country = db.consent_form.get(itemid, 'country')
+        file_person = db.consent_form.get(itemid, 'person')
+        file_country = None
+        if file_person:
+            file_country = db.person.get(file_person, 'country')
         file_creator = db.consent_form.get(itemid, 'creator')
         return (user_country == file_country
                 or (file_country is None and userid == file_creator))

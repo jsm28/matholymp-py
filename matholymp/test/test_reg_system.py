@@ -1422,6 +1422,53 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_bytes, flag_bytes)
         self.assertEqual(reg_bytes, flag_bytes)
 
+    def test_country_flag_replace_access(self):
+        """
+        Test replaced flag is not public.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.png', 'PNG')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'flag-1@content': flag_filename})
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        img_url_csv = self.instance.url + 'flag1/flag.png'
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': img_url_csv,
+                        'Generic Number': '', 'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, flag_bytes)
+        self.assertEqual(admin_bytes, flag_bytes)
+        self.assertEqual(reg_bytes, flag_bytes)
+        # Replace the image.
+        old_flag_bytes = flag_bytes
+        flag_filename, flag_bytes = self.gen_test_image(3, 3, 3, '.png', 'PNG')
+        admin_session.edit('country', '3', {'flag-1@content': flag_filename})
+        # Check the old flag image is no longer public, but is still
+        # accessible to admin.
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        self.assertEqual(admin_bytes, old_flag_bytes)
+        session.check_open(img_url_csv,
+                           error='You are not allowed to view this file',
+                           status=403)
+        reg_session.check_open(img_url_csv,
+                               error='You are not allowed to view this file',
+                               status=403)
+
     def test_country_flag_zip(self):
         """
         Test ZIP file of flags.
@@ -1548,6 +1595,56 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session.check_open_relative('country')
         reg_login = reg_session.get_sidebar().find('form')
         self.assertIsNotNone(reg_login)
+
+    def test_country_retire_flag_access(self):
+        """
+        Test flag of retired country is not public.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.png', 'PNG')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'flag-1@content': flag_filename})
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        img_url_csv = self.instance.url + 'flag1/flag.png'
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': img_url_csv,
+                        'Generic Number': '', 'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, flag_bytes)
+        self.assertEqual(admin_bytes, flag_bytes)
+        self.assertEqual(reg_bytes, flag_bytes)
+        admin_session.check_open_relative('country3')
+        admin_session.b.select_form(
+            admin_session.get_main().find_all('form')[1])
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.check_submit_selected()
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
+        # Check the old flag image is no longer public, but is still
+        # accessible to admin.
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        self.assertEqual(admin_bytes, flag_bytes)
+        session.check_open(img_url_csv,
+                           error='You are not allowed to view this file',
+                           status=403)
 
     def test_country_retire_errors(self):
         """
