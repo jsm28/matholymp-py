@@ -38,6 +38,7 @@ import re
 import shutil
 import signal
 import socket
+import subprocess
 import sys
 _py3 = sys.version_info.major >= 3
 import tempfile
@@ -62,8 +63,8 @@ from matholymp.fileutil import read_utf8_csv, write_text_to_file, \
     read_text_from_file, replace_text_in_file, read_config_raw, \
     write_config_raw
 
-__all__ = ['gen_image', 'gen_image_file', 'RoundupTestInstance',
-           'RoundupTestSession', 'RegSystemTestCase']
+__all__ = ['gen_image', 'gen_image_file', 'gen_pdf_file',
+           'RoundupTestInstance', 'RoundupTestSession', 'RegSystemTestCase']
 
 
 def gen_image(size_x, size_y, scale):
@@ -88,6 +89,23 @@ def gen_image_file(size_x, size_y, scale, filename, format, **kwargs):
     """Generate an image, in a file."""
     image = gen_image(size_x, size_y, scale)
     image.save(filename, format, **kwargs)
+
+
+def gen_pdf_file(dirname):
+    """Generate a PDF file in the given empty directory and return its name."""
+    tex_file = os.path.join(dirname, 'test.tex')
+    rand_nums = [random.randint(0, 9) for n in range(20)]
+    rand_text = ''.join([str(n) for n in rand_nums])
+    tex_text = ('\\documentclass[a4paper]{article}\n'
+                '\\begin{document}\n'
+                '%s\n'
+                '\\end{document}\n'
+                % rand_text)
+    write_text_to_file(tex_text, tex_file)
+    with open(os.devnull, 'w+') as devnull:
+        subprocess.check_call(['pdflatex', tex_file], cwd=dirname,
+                              stdin=devnull, stdout=devnull, stderr=devnull)
+    return os.path.join(dirname, 'test.pdf')
 
 
 class RoundupTestInstance(object):
@@ -707,6 +725,15 @@ class RegSystemTestCase(unittest.TestCase):
             contents = f.read()
         return filename, contents
 
+    def gen_test_pdf(self):
+        """Generate a test PDF and return a tuple of the filename and the
+        contents."""
+        temp_dir = tempfile.mkdtemp(dir=self.temp_dir)
+        filename = gen_pdf_file(temp_dir)
+        with open(filename, 'rb') as f:
+            contents = f.read()
+        return filename, contents
+
     def all_templates_test(self, session, forbid_classes, forbid_templates,
                            allow_templates, can_score, scoring_user):
         """Test that all page templates load without errors."""
@@ -795,6 +822,81 @@ class RegSystemTestCase(unittest.TestCase):
                                 forbid_templates=forbid_templates,
                                 allow_templates=set(),
                                 can_score=False, scoring_user=False)
+
+    def all_templates_item_test(self, admin_session, session, forbid_classes):
+        """Test that all page templates for existing items load without
+        errors."""
+        admin_session.create('arrival', {'name': 'Example Airport'})
+        flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.png', 'PNG')
+        admin_session.create_country('DEF', 'Test Second Country',
+                                     {'flag-1@content': flag_filename})
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                         'JPEG')
+        pdf_filename, pdf_bytes = self.gen_test_pdf()
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                    {'photo-1@content': photo_filename,
+                                     'consent_form-1@content': pdf_filename})
+        # Set medal boundaries to create an rss item.
+        admin_session.edit('event', '1',
+                           {'registration_enabled': 'no',
+                            'gold': '40', 'silver': '30', 'bronze': '20'})
+        for t in sorted(os.listdir(self.instance.html_dir)):
+            if t.startswith('_generic') or not t.endswith('.item.html'):
+                continue
+            m = re.match(r'([a-z_]+)\.([a-z_]+)\.html\Z', t)
+            if not m:
+                continue
+            login = m.group(1) in forbid_classes
+            session.check_open_relative('%s1' % m.group(1),
+                                        login=login)
+
+    def test_all_templates_item_admin(self):
+        """
+        Test that all page templates for existing items load without
+        errors, for the admin user.
+        """
+        session = self.get_session('admin')
+        self.all_templates_item_test(session, session, forbid_classes=set())
+
+    def test_all_templates_item_anon(self):
+        """
+        Test that all page templates for existing items load without
+        errors, not logged in.
+        """
+        admin_session = self.get_session('admin')
+        session = self.get_session()
+        forbid_classes = {'event', 'rss', 'arrival', 'consent_form', 'gender',
+                          'language', 'tshirt', 'user'}
+        self.all_templates_item_test(admin_session, session,
+                                     forbid_classes=forbid_classes)
+
+    def test_all_templates_item_score(self):
+        """
+        Test that all page templates for existing items load without
+        errors, for a scoring user.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_scoring_user()
+        session = self.get_session('scoring')
+        # user1 is another user, so gives an error.
+        forbid_classes = {'event', 'rss', 'arrival', 'consent_form', 'gender',
+                          'language', 'tshirt', 'user'}
+        self.all_templates_item_test(admin_session, session,
+                                     forbid_classes=forbid_classes)
+
+    def test_all_templates_item_register(self):
+        """
+        Test that all page templates for existing items load without
+        errors, for a registering user.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        session = self.get_session('ABC_reg')
+        # consent_form1 is for another country, so gives an error.
+        # user1 is another user, so gives an error.
+        forbid_classes = {'consent_form', 'event', 'rss', 'user'}
+        self.all_templates_item_test(admin_session, session,
+                                     forbid_classes=forbid_classes)
 
     def test_bad_login(self):
         """

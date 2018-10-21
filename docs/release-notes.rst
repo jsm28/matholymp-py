@@ -137,7 +137,12 @@ the registration system is not active.
 
 * :file:`country.item.html` and :file:`person.item.html` have been
   changed so that the page title just shows a blank for the name of a
-  removed country or person, instead of showing ``[hidden]``.
+  removed country or person, instead of showing ``[hidden]``.  Other
+  templates for data only visible to some users have been similarly
+  changed to avoid showing ``[hidden]``; this affects the following
+  templates: :file:`arrival.item.html`, :file:`event.item.html`,
+  :file:`gender.item.html`, :file:`language.item.html`,
+  :file:`tshirt.item.html`, :file:`user.item.html`.
 
 * Actions modifying registration system data are now required to be
   submitted via HTTP POST requests (before the CSRF protection added
