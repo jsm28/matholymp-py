@@ -175,6 +175,15 @@ the registration system is not active.
   under the URLs under which they were public when they were the
   current flag or photo for a non-removed country or person.)
 
+* The new configuration variable ``matholymp_data_protection_url``
+  must be specified in :file:`extensions/config.ini` for the
+  registration system.  This gives the URL of a page with information
+  about how personal data of participants is used.
+  :file:`person.item.html` has been updated to link to that page.  The
+  example :file:`extensions/email-template-new-user` for the
+  registration system has also been updated to reference such
+  information.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

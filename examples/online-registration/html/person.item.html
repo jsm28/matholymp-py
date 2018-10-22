@@ -49,6 +49,12 @@ define="edit_ok context/is_edit_ok"
 		  disabled, please contact the event organisers to change
 		  details of registered participants.</p>
 
+<p tal:condition="context/is_edit_ok">
+Information about <a tal:attributes="href python:db._db.config.ext['MATHOLYMP_DATA_PROTECTION_URL']" target="_blank">how
+personal data of registered participants is used</a> is available;
+please inform the people you register of this information.
+</p>
+
 <tal:block tal:condition="not:context/id" i18n:translate="">
 <table class="form">
 <tr>
