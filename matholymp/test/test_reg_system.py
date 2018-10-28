@@ -2009,6 +2009,443 @@ class RegSystemTestCase(unittest.TestCase):
                                           error='This action only applies '
                                           'to countries')
 
+    def test_person_csv(self):
+        """
+        Test CSV file of people.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create('arrival', {'name': 'Example Airport'})
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'arrival_place': 'Example Airport',
+             'arrival_date': '2 April 2015',
+             'arrival_time_hour': '13',
+             'arrival_time_minute': '30',
+             'arrival_flight': 'ABC123',
+             'room_number': '987'})
+        admin_session.create_person(
+            'Test First Country', 'Leader',
+            {'gender': 'Male',
+             'date_of_birth_year': None,
+             'date_of_birth_month': None,
+             'date_of_birth_day': None,
+             'language_2': 'French',
+             'tshirt': 'M',
+             'departure_place': 'Example Airport',
+             'departure_date': '3 April 2015',
+             'departure_time_hour': '14',
+             'departure_time_minute': '50',
+             'departure_flight': 'ABC987'})
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Guide',
+            {'guide_for': ['Test First Country'],
+             'diet': 'Vegetarian',
+             'other_roles': ['Logistics', 'Jury Chair'],
+             'phone_number': '9876543210'})
+        expected_cont = {'XMO Number': '2', 'Country Number': '3',
+                         'Person Number': '1',
+                         'Annual URL': self.instance.url + 'person1',
+                         'Country Name': 'Test First Country',
+                         'Country Code': 'ABC', 'Primary Role': 'Contestant 1',
+                         'Other Roles': '', 'Guide For': '',
+                         'Contestant Code': 'ABC1', 'Contestant Age': '15',
+                         'Given Name': 'Given 1', 'Family Name': 'Family 1',
+                         'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                         'P6': '', 'Total': '0', 'Award': '',
+                         'Extra Awards': '', 'Photo URL': '',
+                         'Generic Number': ''}
+        expected_leader = {'XMO Number': '2', 'Country Number': '3',
+                           'Person Number': '2',
+                           'Annual URL': self.instance.url + 'person2',
+                           'Country Name': 'Test First Country',
+                           'Country Code': 'ABC', 'Primary Role': 'Leader',
+                           'Other Roles': '', 'Guide For': '',
+                           'Contestant Code': '', 'Contestant Age': '',
+                           'Given Name': 'Given 2', 'Family Name': 'Family 2',
+                           'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                           'P6': '', 'Total': '', 'Award': '',
+                           'Extra Awards': '', 'Photo URL': '',
+                           'Generic Number': ''}
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Person Number': '3',
+                          'Annual URL': self.instance.url + 'person3',
+                          'Country Name': 'XMO 2015 Staff',
+                          'Country Code': 'ZZA', 'Primary Role': 'Guide',
+                          'Other Roles': 'Jury Chair,Logistics',
+                          'Guide For': 'Test First Country',
+                          'Contestant Code': '', 'Contestant Age': '',
+                          'Given Name': 'Given 3', 'Family Name': 'Family 3',
+                          'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                          'P6': '', 'Total': '', 'Award': '',
+                          'Extra Awards': '', 'Photo URL': '',
+                          'Generic Number': ''}
+        expected_cont_admin = expected_cont.copy()
+        expected_leader_admin = expected_leader.copy()
+        expected_staff_admin = expected_staff.copy()
+        expected_cont_admin.update(
+            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
+             'Languages': 'English',
+             'Allergies and Dietary Requirements': '', 'T-Shirt Size': 'S',
+             'Arrival Place': 'Example Airport', 'Arrival Date': '2015-04-02',
+             'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
+             'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
+             'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': ''})
+        expected_leader_admin.update(
+            {'Gender': 'Male', 'Date of Birth': '',
+             'Languages': 'English,French',
+             'Allergies and Dietary Requirements': '', 'T-Shirt Size': 'M',
+             'Arrival Place': '', 'Arrival Date': '', 'Arrival Time': '',
+             'Arrival Flight': '', 'Departure Place': 'Example Airport',
+             'Departure Date': '2015-04-03', 'Departure Time': '14:50',
+             'Departure Flight': 'ABC987', 'Room Number': '',
+             'Phone Number': '', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': ''})
+        expected_staff_admin.update(
+            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
+             'Languages': 'English',
+             'Allergies and Dietary Requirements': 'Vegetarian',
+             'T-Shirt Size': 'S', 'Arrival Place': '', 'Arrival Date': '',
+             'Arrival Time': '', 'Arrival Flight': '', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Number': '',
+             'Phone Number': '9876543210', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': ''})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv,
+                         [expected_cont, expected_leader, expected_staff])
+        self.assertEqual(admin_csv,
+                         [expected_cont_admin, expected_leader_admin,
+                          expected_staff_admin])
+        self.assertEqual(reg_csv,
+                         [expected_cont, expected_leader, expected_staff])
+
+    @_with_config(consent_forms_date='', consent_forms_url='')
+    def test_person_csv_no_consent_forms(self):
+        """
+        Test CSV file of people, no consent forms in database schema.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create('arrival', {'name': 'Example Airport'})
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'arrival_place': 'Example Airport',
+             'arrival_date': '2 April 2015',
+             'arrival_time_hour': '13',
+             'arrival_time_minute': '30',
+             'arrival_flight': 'ABC123',
+             'room_number': '987'})
+        expected_cont = {'XMO Number': '2', 'Country Number': '3',
+                         'Person Number': '1',
+                         'Annual URL': self.instance.url + 'person1',
+                         'Country Name': 'Test First Country',
+                         'Country Code': 'ABC', 'Primary Role': 'Contestant 1',
+                         'Other Roles': '', 'Guide For': '',
+                         'Contestant Code': 'ABC1', 'Contestant Age': '15',
+                         'Given Name': 'Given 1', 'Family Name': 'Family 1',
+                         'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                         'P6': '', 'Total': '0', 'Award': '',
+                         'Extra Awards': '', 'Photo URL': '',
+                         'Generic Number': ''}
+        expected_cont_admin = expected_cont.copy()
+        expected_cont_admin.update(
+            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
+             'Languages': 'English',
+             'Allergies and Dietary Requirements': '', 'T-Shirt Size': 'S',
+             'Arrival Place': 'Example Airport', 'Arrival Date': '2015-04-02',
+             'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
+             'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
+             'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': ''})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [expected_cont])
+        self.assertEqual(admin_csv, [expected_cont_admin])
+        self.assertEqual(reg_csv, [expected_cont])
+
+    @_with_config(require_passport_number='Yes')
+    def test_person_csv_passport_number(self):
+        """
+        Test CSV file of people, passport numbers collected.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create('arrival', {'name': 'Example Airport'})
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'arrival_place': 'Example Airport',
+             'arrival_date': '2 April 2015',
+             'arrival_time_hour': '13',
+             'arrival_time_minute': '30',
+             'arrival_flight': 'ABC123',
+             'room_number': '987',
+             'passport_number': '123456789'})
+        expected_cont = {'XMO Number': '2', 'Country Number': '3',
+                         'Person Number': '1',
+                         'Annual URL': self.instance.url + 'person1',
+                         'Country Name': 'Test First Country',
+                         'Country Code': 'ABC', 'Primary Role': 'Contestant 1',
+                         'Other Roles': '', 'Guide For': '',
+                         'Contestant Code': 'ABC1', 'Contestant Age': '15',
+                         'Given Name': 'Given 1', 'Family Name': 'Family 1',
+                         'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                         'P6': '', 'Total': '0', 'Award': '',
+                         'Extra Awards': '', 'Photo URL': '',
+                         'Generic Number': ''}
+        expected_cont_admin = expected_cont.copy()
+        expected_cont_admin.update(
+            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
+             'Languages': 'English',
+             'Allergies and Dietary Requirements': '', 'T-Shirt Size': 'S',
+             'Arrival Place': 'Example Airport', 'Arrival Date': '2015-04-02',
+             'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
+             'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
+             'Consent Form URL': '',
+             'Passport or Identity Card Number': '123456789',
+             'Nationality': ''})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [expected_cont])
+        self.assertEqual(admin_csv, [expected_cont_admin])
+        self.assertEqual(reg_csv, [expected_cont])
+
+    @_with_config(require_nationality='Yes')
+    def test_person_csv_nationality(self):
+        """
+        Test CSV file of people, nationalities collected.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create('arrival', {'name': 'Example Airport'})
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'arrival_place': 'Example Airport',
+             'arrival_date': '2 April 2015',
+             'arrival_time_hour': '13',
+             'arrival_time_minute': '30',
+             'arrival_flight': 'ABC123',
+             'room_number': '987',
+             'nationality': 'Matholympian'})
+        expected_cont = {'XMO Number': '2', 'Country Number': '3',
+                         'Person Number': '1',
+                         'Annual URL': self.instance.url + 'person1',
+                         'Country Name': 'Test First Country',
+                         'Country Code': 'ABC', 'Primary Role': 'Contestant 1',
+                         'Other Roles': '', 'Guide For': '',
+                         'Contestant Code': 'ABC1', 'Contestant Age': '15',
+                         'Given Name': 'Given 1', 'Family Name': 'Family 1',
+                         'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                         'P6': '', 'Total': '0', 'Award': '',
+                         'Extra Awards': '', 'Photo URL': '',
+                         'Generic Number': ''}
+        expected_cont_admin = expected_cont.copy()
+        expected_cont_admin.update(
+            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
+             'Languages': 'English',
+             'Allergies and Dietary Requirements': '', 'T-Shirt Size': 'S',
+             'Arrival Place': 'Example Airport', 'Arrival Date': '2015-04-02',
+             'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
+             'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
+             'Consent Form URL': '',
+             'Passport or Identity Card Number': '',
+             'Nationality': 'Matholympian'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [expected_cont])
+        self.assertEqual(admin_csv, [expected_cont_admin])
+        self.assertEqual(reg_csv, [expected_cont])
+
+    @_with_config(age_day_date='2015-04-02')
+    def test_person_csv_age(self):
+        """
+        Test ages in CSV file of people in more detail.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'date_of_birth_year': '2000',
+             'date_of_birth_month': 'March',
+             'date_of_birth_day': '31'})
+        admin_session.create_person(
+            'Test First Country', 'Contestant 2',
+            {'date_of_birth_year': '2000',
+             'date_of_birth_month': 'April',
+             'date_of_birth_day': '1'})
+        admin_session.create_person(
+            'Test First Country', 'Contestant 3',
+            {'date_of_birth_year': '2000',
+             'date_of_birth_month': 'April',
+             'date_of_birth_day': '2'})
+        admin_session.create_person(
+            'Test First Country', 'Contestant 4',
+            {'date_of_birth_year': '2000',
+             'date_of_birth_month': 'April',
+             'date_of_birth_day': '3'})
+        expected_cont1 = {'XMO Number': '2', 'Country Number': '3',
+                          'Person Number': '1',
+                          'Annual URL': self.instance.url + 'person1',
+                          'Country Name': 'Test First Country',
+                          'Country Code': 'ABC',
+                          'Primary Role': 'Contestant 1', 'Other Roles': '',
+                          'Guide For': '', 'Contestant Code': 'ABC1',
+                          'Contestant Age': '15', 'Given Name': 'Given 1',
+                          'Family Name': 'Family 1', 'P1': '', 'P2': '',
+                          'P3': '', 'P4': '', 'P5': '', 'P6': '', 'Total': '0',
+                          'Award': '', 'Extra Awards': '', 'Photo URL': '',
+                          'Generic Number': ''}
+        expected_cont1_admin = expected_cont1.copy()
+        expected_cont1_admin.update(
+            {'Gender': 'Female', 'Date of Birth': '2000-03-31',
+             'Languages': 'English',
+             'Allergies and Dietary Requirements': '', 'T-Shirt Size': 'S',
+             'Arrival Place': '', 'Arrival Date': '', 'Arrival Time': '',
+             'Arrival Flight': '', 'Departure Place': '', 'Departure Date': '',
+             'Departure Time': '', 'Departure Flight': '', 'Room Number': '',
+             'Phone Number': '', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': ''})
+        expected_cont2 = expected_cont1.copy()
+        expected_cont2_admin = expected_cont1_admin.copy()
+        expected_cont2.update(
+            {'Person Number': '2', 'Annual URL': self.instance.url + 'person2',
+             'Primary Role': 'Contestant 2', 'Contestant Code': 'ABC2',
+             'Given Name': 'Given 2', 'Family Name': 'Family 2'})
+        expected_cont2_admin.update(expected_cont2)
+        expected_cont2_admin['Date of Birth'] = '2000-04-01'
+        expected_cont3 = expected_cont1.copy()
+        expected_cont3_admin = expected_cont1_admin.copy()
+        expected_cont3.update(
+            {'Person Number': '3', 'Annual URL': self.instance.url + 'person3',
+             'Primary Role': 'Contestant 3', 'Contestant Code': 'ABC3',
+             'Given Name': 'Given 3', 'Family Name': 'Family 3'})
+        expected_cont3_admin.update(expected_cont3)
+        expected_cont3_admin['Date of Birth'] = '2000-04-02'
+        expected_cont4 = expected_cont1.copy()
+        expected_cont4_admin = expected_cont1_admin.copy()
+        expected_cont4.update(
+            {'Person Number': '4', 'Annual URL': self.instance.url + 'person4',
+             'Primary Role': 'Contestant 4', 'Contestant Code': 'ABC4',
+             'Contestant Age': '14', 'Given Name': 'Given 4',
+             'Family Name': 'Family 4'})
+        expected_cont4_admin.update(expected_cont4)
+        expected_cont4_admin['Date of Birth'] = '2000-04-03'
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv,
+                         [expected_cont1, expected_cont2, expected_cont3,
+                          expected_cont4])
+        self.assertEqual(admin_csv,
+                         [expected_cont1_admin, expected_cont2_admin,
+                          expected_cont3_admin, expected_cont4_admin])
+        self.assertEqual(reg_csv,
+                         [expected_cont1, expected_cont2, expected_cont3,
+                          expected_cont4])
+
+    def test_person_csv_multilink_comma(self):
+        """
+        Test CSV file of people with commas in multilink values.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        admin_session.create_country('DEF', 'Second,Country')
+        admin_session.create('matholymprole', {'name': 'Extra,Role'})
+        admin_session.create('language', {'name': 'Another,Language'})
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Guide',
+            {'guide_for': ['Test First Country', 'Second,Country'],
+             'other_roles': ['Logistics', 'Extra,Role'],
+             'language_2': 'Another,Language'})
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Person Number': '1',
+                          'Annual URL': self.instance.url + 'person1',
+                          'Country Name': 'XMO 2015 Staff',
+                          'Country Code': 'ZZA', 'Primary Role': 'Guide',
+                          'Other Roles': '"Extra,Role",Logistics',
+                          'Guide For': 'Test First Country,"Second,Country"',
+                          'Contestant Code': '', 'Contestant Age': '',
+                          'Given Name': 'Given 1', 'Family Name': 'Family 1',
+                          'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                          'P6': '', 'Total': '', 'Award': '',
+                          'Extra Awards': '', 'Photo URL': '',
+                          'Generic Number': ''}
+        expected_staff_admin = expected_staff.copy()
+        expected_staff_admin.update(
+            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
+             'Languages': 'English,"Another,Language"',
+             'Allergies and Dietary Requirements': '',
+             'T-Shirt Size': 'S', 'Arrival Place': '', 'Arrival Date': '',
+             'Arrival Time': '', 'Arrival Flight': '', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Number': '', 'Phone Number': '',
+             'Consent Form URL': '', 'Passport or Identity Card Number': '',
+             'Nationality': ''})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_staff])
+
     def test_person_csv_errors(self):
         """
         Test errors from people_csv action.
