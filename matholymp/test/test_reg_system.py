@@ -2486,6 +2486,485 @@ class RegSystemTestCase(unittest.TestCase):
                                           error='Node id specified for CSV '
                                           'generation')
 
+    def test_person_photo_create(self):
+        """
+        Test photos uploaded at person creation time.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'JPEG')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                     {'photo-1@content': photo_filename})
+        # Check the image inline on the person page.
+        admin_session.check_open_relative('person1')
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, photo_bytes)
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': img_url_csv, 'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(reg_csv, [expected])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, photo_bytes)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(reg_bytes, photo_bytes)
+
+    @_with_config(static_site_directory='static-site')
+    def test_person_photo_create_static(self):
+        """
+        Test photos copied from static site at person creation time.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_bytes = self.instance.static_site_bytes(
+            'people/person1/photo1.jpg')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Coordinator',
+            {'generic_url': 'https://www.example.invalid/people/person1/'})
+        # Check the image inline on the person page.
+        admin_session.check_open_relative('person1')
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, photo_bytes)
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': img_url_csv, 'Generic Number': '1'}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(reg_csv, [expected])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, photo_bytes)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(reg_bytes, photo_bytes)
+
+    @_with_config(static_site_directory='static-site')
+    def test_person_photo_create_static_none(self):
+        """
+        Test photos not present on static site at person creation time.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Coordinator',
+            {'generic_url': 'https://www.example.invalid/people/person3/'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        expected = {'Photo URL': '', 'Generic Number': '3'}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(reg_csv, [expected])
+
+    @_with_config(static_site_directory='static-site')
+    def test_person_photo_create_static_priority(self):
+        """
+        Test photos uploaded at person creation time take priority
+        over those from static site.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'JPEG')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Coordinator',
+            {'photo-1@content': photo_filename,
+             'generic_url': 'https://www.example.invalid/people/person1/'})
+        # Check the image inline on the person page.
+        admin_session.check_open_relative('person1')
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, photo_bytes)
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': img_url_csv, 'Generic Number': '1'}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(reg_csv, [expected])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, photo_bytes)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(reg_bytes, photo_bytes)
+
+    def test_person_photo_edit(self):
+        """
+        Test photos uploaded after person creation time.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'JPEG')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        expected = {'Photo URL': '', 'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(reg_csv, [expected])
+        admin_session.edit('person', '1', {'photo-1@content': photo_filename})
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        # Check the image inline on the person page.
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, photo_bytes)
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': img_url_csv, 'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(reg_csv, [expected])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, photo_bytes)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(reg_bytes, photo_bytes)
+
+    @_with_config(static_site_directory='static-site')
+    def test_person_photo_edit_static(self):
+        """
+        Test photos copied from static site after person creation time.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        expected = {'Photo URL': '', 'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(reg_csv, [expected])
+        photo_bytes = self.instance.static_site_bytes(
+            'people/person1/photo1.jpg')
+        admin_session.edit(
+            'person', '1',
+            {'generic_url': 'https://www.example.invalid/people/person1/'})
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        # Check the image inline on the person page.
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, photo_bytes)
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': img_url_csv, 'Generic Number': '1'}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(reg_csv, [expected])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, photo_bytes)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(reg_bytes, photo_bytes)
+
+    @_with_config(static_site_directory='static-site')
+    def test_person_photo_edit_static_none(self):
+        """
+        Test photos not present on static site when generic_url set
+        after person creation time.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        expected = {'Photo URL': '', 'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(reg_csv, [expected])
+        admin_session.edit(
+            'person', '1',
+            {'generic_url': 'https://www.example.invalid/people/person3/'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        expected = {'Photo URL': '', 'Generic Number': '3'}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(reg_csv, [expected])
+
+    @_with_config(static_site_directory='static-site')
+    def test_person_photo_edit_static_priority(self):
+        """
+        Test photos uploaded after person creation time take priority
+        over those from static site.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'JPEG')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        expected = {'Photo URL': '', 'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(reg_csv, [expected])
+        admin_session.edit(
+            'person', '1',
+            {'photo-1@content': photo_filename,
+             'generic_url': 'https://www.example.invalid/people/person1/'})
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        # Check the image inline on the person page.
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, photo_bytes)
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': img_url_csv, 'Generic Number': '1'}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(reg_csv, [expected])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, photo_bytes)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(reg_bytes, photo_bytes)
+
+    def test_person_photo_replace(self):
+        """
+        Test replacing previously uploaded photo.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'JPEG')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                     {'photo-1@content': photo_filename})
+        # Replace the image.
+        photo_filename, photo_bytes = self.gen_test_image(3, 3, 3, '.jpg',
+                                                          'JPEG')
+        admin_session.edit('person', '1', {'photo-1@content': photo_filename})
+        # Check the image inline on the person page.
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, photo_bytes)
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo2/photo.jpg'
+        expected = {'Photo URL': img_url_csv, 'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(reg_csv, [expected])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, photo_bytes)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(reg_bytes, photo_bytes)
+
+    @_with_config(static_site_directory='static-site')
+    def test_person_photo_replace_static(self):
+        """
+        Test setting generic_url after photo uploaded does not change photo.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'JPEG')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                     {'photo-1@content': photo_filename})
+        admin_session.edit(
+            'person', '1',
+            {'generic_url': 'https://www.example.invalid/people/person1/'})
+        # Check the image inline on the person page.
+        admin_session.check_open_relative('person1')
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, photo_bytes)
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': img_url_csv, 'Generic Number': '1'}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(reg_csv, [expected])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, photo_bytes)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(reg_bytes, photo_bytes)
+
+    def test_person_photo_replace_access(self):
+        """
+        Test replaced photo is not public.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'JPEG')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                     {'photo-1@content': photo_filename})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': img_url_csv, 'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(reg_csv, [expected])
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, photo_bytes)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(reg_bytes, photo_bytes)
+        # Replace the image.
+        old_photo_bytes = photo_bytes
+        photo_filename, photo_bytes = self.gen_test_image(3, 3, 3, '.jpg',
+                                                          'JPEG')
+        admin_session.edit('person', '1', {'photo-1@content': photo_filename})
+        # Check the old photo image is no longer public, but is still
+        # accessible to admin.
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        self.assertEqual(admin_bytes, old_photo_bytes)
+        session.check_open(img_url_csv,
+                           error='You are not allowed to view this file',
+                           status=403)
+        reg_session.check_open(img_url_csv,
+                               error='You are not allowed to view this file',
+                               status=403)
+
     def test_person_photo_zip_errors(self):
         """
         Test errors from photos_zip action.
