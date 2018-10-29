@@ -1048,6 +1048,44 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_bytes, flag_bytes)
         self.assertEqual(reg_bytes, flag_bytes)
 
+    def test_country_flag_create_upper(self):
+        """
+        Test flags uploaded at country creation time, uppercase .PNG suffix.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.PNG', 'PNG')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'flag-1@content': flag_filename})
+        # Check the image inline on the country page.
+        admin_session.check_open_relative('country3')
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, flag_bytes)
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        img_url_csv = self.instance.url + 'flag1/flag.png'
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': img_url_csv,
+                        'Generic Number': '', 'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, flag_bytes)
+        self.assertEqual(admin_bytes, flag_bytes)
+        self.assertEqual(reg_bytes, flag_bytes)
+
     @_with_config(static_site_directory='static-site')
     def test_country_flag_create_static(self):
         """
@@ -2493,6 +2531,44 @@ class RegSystemTestCase(unittest.TestCase):
         session = self.get_session()
         admin_session = self.get_session('admin')
         photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'JPEG')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                     {'photo-1@content': photo_filename})
+        # Check the image inline on the person page.
+        admin_session.check_open_relative('person1')
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, photo_bytes)
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': img_url_csv, 'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(reg_csv, [expected])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, photo_bytes)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(reg_bytes, photo_bytes)
+
+    def test_person_photo_create_upper(self):
+        """
+        Test photos uploaded at person creation time, uppercase .JPG suffix.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.JPG',
                                                           'JPEG')
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
