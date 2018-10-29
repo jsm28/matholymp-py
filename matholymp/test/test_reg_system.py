@@ -489,6 +489,10 @@ class RoundupTestSession(object):
         """Get the ZIP file of flags."""
         return self.get_download_zip('country?@action=flags_zip', 'flags.zip')
 
+    def get_photos_zip(self):
+        """Get the ZIP file of photos."""
+        return self.get_download_zip('person?@action=photos_zip', 'photos.zip')
+
     def get_bytes(self, url):
         """Get the bytes contents of a non-HTML URL."""
         return self.check_get(url, html=False).content
@@ -3116,6 +3120,39 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session.check_open(img_url_csv,
                                error='You are not allowed to view this file',
                                status=403)
+
+    def test_person_photo_zip(self):
+        """
+        Test ZIP file of photos.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        anon_zip_empty = session.get_photos_zip()
+        admin_zip_empty = admin_session.get_photos_zip()
+        anon_contents = [f.filename for f in anon_zip_empty.infolist()]
+        admin_contents = [f.filename for f in admin_zip_empty.infolist()]
+        expected_contents = ['photos/README.txt']
+        self.assertEqual(anon_contents, expected_contents)
+        self.assertEqual(admin_contents, expected_contents)
+        anon_zip_empty.close()
+        admin_zip_empty.close()
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'JPEG')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                     {'photo-1@content': photo_filename})
+        anon_zip = session.get_photos_zip()
+        admin_zip = admin_session.get_photos_zip()
+        anon_contents = [f.filename for f in anon_zip.infolist()]
+        admin_contents = [f.filename for f in admin_zip.infolist()]
+        expected_contents = ['photos/README.txt', 'photos/person1/photo.jpg']
+        self.assertEqual(anon_contents, expected_contents)
+        self.assertEqual(admin_contents, expected_contents)
+        self.assertEqual(anon_zip.read('photos/person1/photo.jpg'),
+                         photo_bytes)
+        self.assertEqual(admin_zip.read('photos/person1/photo.jpg'),
+                         photo_bytes)
+        anon_zip.close()
+        admin_zip.close()
 
     def test_person_photo_zip_errors(self):
         """
