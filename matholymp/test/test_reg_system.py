@@ -91,7 +91,7 @@ def gen_image_file(size_x, size_y, scale, filename, format, **kwargs):
     image.save(filename, format, **kwargs)
 
 
-def gen_pdf_file(dirname):
+def gen_pdf_file(dirname, suffix):
     """Generate a PDF file in the given empty directory and return its name."""
     tex_file = os.path.join(dirname, 'test.tex')
     rand_nums = [random.randint(0, 9) for n in range(20)]
@@ -105,7 +105,11 @@ def gen_pdf_file(dirname):
     with open(os.devnull, 'w+') as devnull:
         subprocess.check_call(['pdflatex', tex_file], cwd=dirname,
                               stdin=devnull, stdout=devnull, stderr=devnull)
-    return os.path.join(dirname, 'test.pdf')
+    pdf_file = os.path.join(dirname, 'test.pdf')
+    ret_file = os.path.join(dirname, 'test%s' % suffix)
+    if ret_file != pdf_file:
+        os.rename(pdf_file, ret_file)
+    return ret_file
 
 
 class RoundupTestInstance(object):
@@ -493,6 +497,11 @@ class RoundupTestSession(object):
         """Get the ZIP file of photos."""
         return self.get_download_zip('person?@action=photos_zip', 'photos.zip')
 
+    def get_consent_forms_zip(self):
+        """Get the ZIP file of consent forms."""
+        return self.get_download_zip('person?@action=consent_forms_zip',
+                                     'consent-forms.zip')
+
     def get_bytes(self, url):
         """Get the bytes contents of a non-HTML URL."""
         return self.check_get(url, html=False).content
@@ -506,6 +515,17 @@ class RoundupTestSession(object):
         img_src = self.get_img()['src']
         img_src = self.b.absolute_url(img_src)
         return self.check_get(img_src, html=False).content
+
+    def get_link(self, text):
+        """Get the (first) link from the current page with given text."""
+        return self.get_main().find('a', string=re.compile(text))
+
+    def get_link_contents(self, text):
+        """Get the target of the (first) link from the current page with the
+        given text."""
+        url = self.get_link(text)['href']
+        url = self.b.absolute_url(url)
+        return self.check_get(url, html=False).content
 
     def login(self, username):
         """Log in as the specified user."""
@@ -729,11 +749,11 @@ class RegSystemTestCase(unittest.TestCase):
             contents = f.read()
         return filename, contents
 
-    def gen_test_pdf(self):
+    def gen_test_pdf(self, suffix='.pdf'):
         """Generate a test PDF and return a tuple of the filename and the
         contents."""
         temp_dir = tempfile.mkdtemp(dir=self.temp_dir)
-        filename = gen_pdf_file(temp_dir)
+        filename = gen_pdf_file(temp_dir, suffix)
         with open(filename, 'rb') as f:
             contents = f.read()
         return filename, contents
@@ -3173,6 +3193,151 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.check_open_relative('person1?@action=photos_zip',
                                           error='Node id specified for ZIP '
                                           'generation')
+
+    def test_person_consent_form_create(self):
+        """
+        Test consent forms uploaded at person creation time.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        cf_filename, cf_bytes = self.gen_test_pdf()
+        admin_session.create_country_generic()
+        admin_session.create_country('DEF', 'Test Second Country')
+        reg_session = self.get_session('ABC_reg')
+        reg2_session = self.get_session('DEF_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'consent_form-1@content': cf_filename})
+        # Check the consent form linked from the person page.
+        admin_session.check_open_relative('person1')
+        got_bytes = admin_session.get_link_contents(
+            'consent form for this person')
+        self.assertEqual(got_bytes, cf_bytes)
+        admin_csv = admin_session.get_people_csv()
+        admin_csv[0] = {'Consent Form URL': admin_csv[0]['Consent Form URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        cf_url_csv = self.instance.url + 'consent_form1/consent-form.pdf'
+        expected = {'Consent Form URL': cf_url_csv, 'Generic Number': ''}
+        self.assertEqual(admin_csv, [expected])
+        # Check the consent form from the URL in the .csv file.
+        admin_bytes = admin_session.get_bytes(cf_url_csv)
+        reg_bytes = reg_session.get_bytes(cf_url_csv)
+        self.assertEqual(admin_bytes, cf_bytes)
+        self.assertEqual(reg_bytes, cf_bytes)
+        # Check the form is not accessible anonymously or by
+        # registering users from other countries.
+        session.check_open(cf_url_csv,
+                           error='You are not allowed to view this file',
+                           status=403)
+        reg2_session.check_open(cf_url_csv,
+                                error='You are not allowed to view this file',
+                                status=403)
+
+    def test_person_consent_form_create_upper(self):
+        """
+        Test consent forms uploaded at person creation time, uppercase
+        .PDF suffix.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        cf_filename, cf_bytes = self.gen_test_pdf('.PDF')
+        admin_session.create_country_generic()
+        admin_session.create_country('DEF', 'Test Second Country')
+        reg_session = self.get_session('ABC_reg')
+        reg2_session = self.get_session('DEF_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'consent_form-1@content': cf_filename})
+        # Check the consent form linked from the person page.
+        admin_session.check_open_relative('person1')
+        got_bytes = admin_session.get_link_contents(
+            'consent form for this person')
+        self.assertEqual(got_bytes, cf_bytes)
+        admin_csv = admin_session.get_people_csv()
+        admin_csv[0] = {'Consent Form URL': admin_csv[0]['Consent Form URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        cf_url_csv = self.instance.url + 'consent_form1/consent-form.pdf'
+        expected = {'Consent Form URL': cf_url_csv, 'Generic Number': ''}
+        self.assertEqual(admin_csv, [expected])
+        # Check the consent form from the URL in the .csv file.
+        admin_bytes = admin_session.get_bytes(cf_url_csv)
+        reg_bytes = reg_session.get_bytes(cf_url_csv)
+        self.assertEqual(admin_bytes, cf_bytes)
+        self.assertEqual(reg_bytes, cf_bytes)
+        # Check the form is not accessible anonymously or by
+        # registering users from other countries.
+        session.check_open(cf_url_csv,
+                           error='You are not allowed to view this file',
+                           status=403)
+        reg2_session.check_open(cf_url_csv,
+                                error='You are not allowed to view this file',
+                                status=403)
+
+    def test_person_consent_form_edit(self):
+        """
+        Test consent forms uploaded after person creation time.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        cf_filename, cf_bytes = self.gen_test_pdf()
+        admin_session.create_country_generic()
+        admin_session.create_country('DEF', 'Test Second Country')
+        reg_session = self.get_session('ABC_reg')
+        reg2_session = self.get_session('DEF_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1')
+        admin_csv = admin_session.get_people_csv()
+        admin_csv[0] = {'Consent Form URL': admin_csv[0]['Consent Form URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        expected = {'Consent Form URL': '', 'Generic Number': ''}
+        self.assertEqual(admin_csv, [expected])
+        admin_session.edit('person', '1',
+                           {'consent_form-1@content': cf_filename})
+        cf_url_csv = self.instance.url + 'consent_form1/consent-form.jpg'
+        # Check the consent form linked from the person page.
+        admin_session.check_open_relative('person1')
+        got_bytes = admin_session.get_link_contents(
+            'consent form for this person')
+        self.assertEqual(got_bytes, cf_bytes)
+        admin_csv = admin_session.get_people_csv()
+        admin_csv[0] = {'Consent Form URL': admin_csv[0]['Consent Form URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        cf_url_csv = self.instance.url + 'consent_form1/consent-form.pdf'
+        expected = {'Consent Form URL': cf_url_csv, 'Generic Number': ''}
+        self.assertEqual(admin_csv, [expected])
+        # Check the consent form from the URL in the .csv file.
+        admin_bytes = admin_session.get_bytes(cf_url_csv)
+        reg_bytes = reg_session.get_bytes(cf_url_csv)
+        self.assertEqual(admin_bytes, cf_bytes)
+        self.assertEqual(reg_bytes, cf_bytes)
+        # Check the form is not accessible anonymously or by
+        # registering users from other countries.
+        session.check_open(cf_url_csv,
+                           error='You are not allowed to view this file',
+                           status=403)
+        reg2_session.check_open(cf_url_csv,
+                                error='You are not allowed to view this file',
+                                status=403)
+
+    def test_person_consent_form_zip(self):
+        """
+        Test ZIP file of consent forms.
+        """
+        admin_session = self.get_session('admin')
+        admin_zip_empty = admin_session.get_consent_forms_zip()
+        admin_contents = [f.filename for f in admin_zip_empty.infolist()]
+        expected_contents = ['consent-forms/README.txt']
+        self.assertEqual(admin_contents, expected_contents)
+        admin_zip_empty.close()
+        cf_filename, cf_bytes = self.gen_test_pdf()
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                     {'consent_form-1@content': cf_filename})
+        admin_zip = admin_session.get_consent_forms_zip()
+        admin_contents = [f.filename for f in admin_zip.infolist()]
+        expected_contents = ['consent-forms/README.txt',
+                             'consent-forms/person1/consent-form.pdf']
+        self.assertEqual(admin_contents, expected_contents)
+        self.assertEqual(
+            admin_zip.read('consent-forms/person1/consent-form.pdf'),
+            cf_bytes)
+        admin_zip.close()
 
     def test_person_consent_form_zip_errors(self):
         """
