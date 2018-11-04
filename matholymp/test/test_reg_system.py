@@ -3141,6 +3141,60 @@ class RegSystemTestCase(unittest.TestCase):
                                error='You are not allowed to view this file',
                                status=403)
 
+    def test_person_photo_replace_access_reg(self):
+        """
+        Test replaced photo is not accessible to registering users
+        from other countries.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'JPEG')
+        admin_session.create_country_generic()
+        admin_session.create_country('DEF', 'Test Second Country')
+        reg_session = self.get_session('ABC_reg')
+        reg2_session = self.get_session('DEF_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                     {'photo-1@content': photo_filename})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': img_url_csv, 'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(reg_csv, [expected])
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, photo_bytes)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(reg_bytes, photo_bytes)
+        # Replace the image.
+        old_photo_bytes = photo_bytes
+        photo_filename, photo_bytes = self.gen_test_image(3, 3, 3, '.jpg',
+                                                          'JPEG')
+        admin_session.edit('person', '1', {'photo-1@content': photo_filename})
+        # Check the old photo image is no longer public, but is still
+        # accessible to admin and registering users from that person's
+        # country.
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        self.assertEqual(admin_bytes, old_photo_bytes)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(reg_bytes, old_photo_bytes)
+        session.check_open(img_url_csv,
+                           error='You are not allowed to view this file',
+                           status=403)
+        reg2_session.check_open(img_url_csv,
+                                error='You are not allowed to view this file',
+                                status=403)
+
     def test_person_photo_zip(self):
         """
         Test ZIP file of photos.
