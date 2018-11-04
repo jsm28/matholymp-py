@@ -175,10 +175,10 @@ class RoundupDataSource(DataSource):
             if extra_awards_str is None:
                 return []
             return comma_split(extra_awards_str)
-        elif name == 'photo_url':
+        elif name in ('photo_url', 'badge_photo_url'):
             photo_id = self._db.person.get(person_id, 'photo')
             return db_file_url(self._db, 'photo', 'photo', photo_id)
-        elif name == 'photo_filename':
+        elif name in ('photo_filename', 'badge_photo_filename'):
             photo_id = self._db.person.get(person_id, 'photo')
             photo_filename = None
             if photo_id is not None:

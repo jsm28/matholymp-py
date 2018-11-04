@@ -2161,7 +2161,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
-             'Consent Form URL': '',
+             'Badge Photo URL': '', 'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': ''})
         expected_leader_admin.update(
             {'Gender': 'Male', 'Date of Birth': '',
@@ -2171,7 +2171,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Flight': '', 'Departure Place': 'Example Airport',
              'Departure Date': '2015-04-03', 'Departure Time': '14:50',
              'Departure Flight': 'ABC987', 'Room Number': '',
-             'Phone Number': '', 'Consent Form URL': '',
+             'Phone Number': '', 'Badge Photo URL': '', 'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': ''})
         expected_staff_admin.update(
             {'Gender': 'Female', 'Date of Birth': '2000-01-01',
@@ -2181,8 +2181,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Time': '', 'Arrival Flight': '', 'Departure Place': '',
              'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Number': '',
-             'Phone Number': '9876543210', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '', 'Nationality': ''})
+             'Phone Number': '9876543210', 'Badge Photo URL': '',
+             'Consent Form URL': '', 'Passport or Identity Card Number': '',
+             'Nationality': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -2239,7 +2240,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
-             'Consent Form URL': '',
+             'Badge Photo URL': '', 'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
@@ -2294,7 +2295,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
-             'Consent Form URL': '',
+             'Badge Photo URL': '', 'Consent Form URL': '',
              'Passport or Identity Card Number': '123456789',
              'Nationality': ''})
         anon_csv = session.get_people_csv()
@@ -2350,7 +2351,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
-             'Consent Form URL': '',
+             'Badge Photo URL': '', 'Consent Form URL': '',
              'Passport or Identity Card Number': '',
              'Nationality': 'Matholympian'})
         anon_csv = session.get_people_csv()
@@ -2415,7 +2416,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Place': '', 'Arrival Date': '', 'Arrival Time': '',
              'Arrival Flight': '', 'Departure Place': '', 'Departure Date': '',
              'Departure Time': '', 'Departure Flight': '', 'Room Number': '',
-             'Phone Number': '', 'Consent Form URL': '',
+             'Phone Number': '', 'Badge Photo URL': '', 'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': ''})
         expected_cont2 = expected_cont1.copy()
         expected_cont2_admin = expected_cont1_admin.copy()
@@ -2499,8 +2500,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Time': '', 'Arrival Flight': '', 'Departure Place': '',
              'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Number': '', 'Phone Number': '',
-             'Consent Form URL': '', 'Passport or Identity Card Number': '',
-             'Nationality': ''})
+             'Badge Photo URL': '', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -2568,15 +2569,21 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
                         'Generic Number': admin_csv[0]['Generic Number']}
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
         img_url_csv = self.instance.url + 'photo1/photo.jpg'
-        expected = {'Photo URL': img_url_csv, 'Generic Number': ''}
+        expected = {'Photo URL': img_url_csv, 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': img_url_csv,
+                          'Badge Photo URL': img_url_csv, 'Generic Number': ''}
         self.assertEqual(anon_csv, [expected])
-        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
         self.assertEqual(reg_csv, [expected])
         # Check the image from the URL in the .csv file.
         anon_bytes = session.get_bytes(img_url_csv)
@@ -2606,15 +2613,21 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
                         'Generic Number': admin_csv[0]['Generic Number']}
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
         img_url_csv = self.instance.url + 'photo1/photo.jpg'
-        expected = {'Photo URL': img_url_csv, 'Generic Number': ''}
+        expected = {'Photo URL': img_url_csv, 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': img_url_csv,
+                          'Badge Photo URL': img_url_csv, 'Generic Number': ''}
         self.assertEqual(anon_csv, [expected])
-        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
         self.assertEqual(reg_csv, [expected])
         # Check the image from the URL in the .csv file.
         anon_bytes = session.get_bytes(img_url_csv)
@@ -2644,15 +2657,21 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
                         'Generic Number': admin_csv[0]['Generic Number']}
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
         img_url_csv = self.instance.url + 'photo1/photo.png'
-        expected = {'Photo URL': img_url_csv, 'Generic Number': ''}
+        expected = {'Photo URL': img_url_csv, 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': img_url_csv,
+                          'Badge Photo URL': img_url_csv, 'Generic Number': ''}
         self.assertEqual(anon_csv, [expected])
-        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
         self.assertEqual(reg_csv, [expected])
         # Check the image from the URL in the .csv file.
         anon_bytes = session.get_bytes(img_url_csv)
@@ -2682,15 +2701,21 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
                         'Generic Number': admin_csv[0]['Generic Number']}
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
         img_url_csv = self.instance.url + 'photo1/photo.jpg'
-        expected = {'Photo URL': img_url_csv, 'Generic Number': ''}
+        expected = {'Photo URL': img_url_csv, 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': img_url_csv,
+                          'Badge Photo URL': img_url_csv, 'Generic Number': ''}
         self.assertEqual(anon_csv, [expected])
-        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
         self.assertEqual(reg_csv, [expected])
         # Check the image from the URL in the .csv file.
         anon_bytes = session.get_bytes(img_url_csv)
@@ -2722,15 +2747,22 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
                         'Generic Number': admin_csv[0]['Generic Number']}
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
         img_url_csv = self.instance.url + 'photo1/photo.jpg'
-        expected = {'Photo URL': img_url_csv, 'Generic Number': '1'}
+        expected = {'Photo URL': img_url_csv, 'Badge Photo URL': None,
+                    'Generic Number': '1'}
+        expected_admin = {'Photo URL': img_url_csv,
+                          'Badge Photo URL': img_url_csv,
+                          'Generic Number': '1'}
         self.assertEqual(anon_csv, [expected])
-        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
         self.assertEqual(reg_csv, [expected])
         # Check the image from the URL in the .csv file.
         anon_bytes = session.get_bytes(img_url_csv)
@@ -2756,14 +2788,20 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
                         'Generic Number': admin_csv[0]['Generic Number']}
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
-        expected = {'Photo URL': '', 'Generic Number': '3'}
+        expected = {'Photo URL': '', 'Badge Photo URL': None,
+                    'Generic Number': '3'}
+        expected_admin = {'Photo URL': '', 'Badge Photo URL': '',
+                          'Generic Number': '3'}
         self.assertEqual(anon_csv, [expected])
-        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
         self.assertEqual(reg_csv, [expected])
 
     @_with_config(static_site_directory='static-site')
@@ -2790,15 +2828,22 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
                         'Generic Number': admin_csv[0]['Generic Number']}
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
         img_url_csv = self.instance.url + 'photo1/photo.jpg'
-        expected = {'Photo URL': img_url_csv, 'Generic Number': '1'}
+        expected = {'Photo URL': img_url_csv, 'Badge Photo URL': None,
+                    'Generic Number': '1'}
+        expected_admin = {'Photo URL': img_url_csv,
+                          'Badge Photo URL': img_url_csv,
+                          'Generic Number': '1'}
         self.assertEqual(anon_csv, [expected])
-        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
         self.assertEqual(reg_csv, [expected])
         # Check the image from the URL in the .csv file.
         anon_bytes = session.get_bytes(img_url_csv)
@@ -2823,14 +2868,20 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
                         'Generic Number': admin_csv[0]['Generic Number']}
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
-        expected = {'Photo URL': '', 'Generic Number': ''}
+        expected = {'Photo URL': '', 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': '', 'Badge Photo URL': '',
+                          'Generic Number': ''}
         self.assertEqual(anon_csv, [expected])
-        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
         self.assertEqual(reg_csv, [expected])
         admin_session.edit('person', '1', {'photo-1@content': photo_filename})
         img_url_csv = self.instance.url + 'photo1/photo.jpg'
@@ -2841,15 +2892,21 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
                         'Generic Number': admin_csv[0]['Generic Number']}
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
         img_url_csv = self.instance.url + 'photo1/photo.jpg'
-        expected = {'Photo URL': img_url_csv, 'Generic Number': ''}
+        expected = {'Photo URL': img_url_csv, 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': img_url_csv,
+                          'Badge Photo URL': img_url_csv, 'Generic Number': ''}
         self.assertEqual(anon_csv, [expected])
-        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
         self.assertEqual(reg_csv, [expected])
         # Check the image from the URL in the .csv file.
         anon_bytes = session.get_bytes(img_url_csv)
@@ -2873,14 +2930,20 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
                         'Generic Number': admin_csv[0]['Generic Number']}
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
-        expected = {'Photo URL': '', 'Generic Number': ''}
+        expected = {'Photo URL': '', 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': '', 'Badge Photo URL': '',
+                          'Generic Number': ''}
         self.assertEqual(anon_csv, [expected])
-        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
         self.assertEqual(reg_csv, [expected])
         photo_bytes = self.instance.static_site_bytes(
             'people/person1/photo1.jpg')
@@ -2895,15 +2958,22 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
                         'Generic Number': admin_csv[0]['Generic Number']}
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
         img_url_csv = self.instance.url + 'photo1/photo.jpg'
-        expected = {'Photo URL': img_url_csv, 'Generic Number': '1'}
+        expected = {'Photo URL': img_url_csv, 'Badge Photo URL': None,
+                    'Generic Number': '1'}
+        expected_admin = {'Photo URL': img_url_csv,
+                          'Badge Photo URL': img_url_csv,
+                          'Generic Number': '1'}
         self.assertEqual(anon_csv, [expected])
-        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
         self.assertEqual(reg_csv, [expected])
         # Check the image from the URL in the .csv file.
         anon_bytes = session.get_bytes(img_url_csv)
@@ -2928,14 +2998,20 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
                         'Generic Number': admin_csv[0]['Generic Number']}
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
-        expected = {'Photo URL': '', 'Generic Number': ''}
+        expected = {'Photo URL': '', 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': '', 'Badge Photo URL': '',
+                          'Generic Number': ''}
         self.assertEqual(anon_csv, [expected])
-        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
         self.assertEqual(reg_csv, [expected])
         admin_session.edit(
             'person', '1',
@@ -2944,14 +3020,20 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
                         'Generic Number': admin_csv[0]['Generic Number']}
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
-        expected = {'Photo URL': '', 'Generic Number': '3'}
+        expected = {'Photo URL': '', 'Badge Photo URL': None,
+                    'Generic Number': '3'}
+        expected_admin = {'Photo URL': '', 'Badge Photo URL': '',
+                          'Generic Number': '3'}
         self.assertEqual(anon_csv, [expected])
-        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
         self.assertEqual(reg_csv, [expected])
 
     @_with_config(static_site_directory='static-site')
@@ -2971,14 +3053,20 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
                         'Generic Number': admin_csv[0]['Generic Number']}
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
-        expected = {'Photo URL': '', 'Generic Number': ''}
+        expected = {'Photo URL': '', 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': '', 'Badge Photo URL': '',
+                          'Generic Number': ''}
         self.assertEqual(anon_csv, [expected])
-        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
         self.assertEqual(reg_csv, [expected])
         admin_session.edit(
             'person', '1',
@@ -2992,15 +3080,22 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
                         'Generic Number': admin_csv[0]['Generic Number']}
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
         img_url_csv = self.instance.url + 'photo1/photo.jpg'
-        expected = {'Photo URL': img_url_csv, 'Generic Number': '1'}
+        expected = {'Photo URL': img_url_csv, 'Badge Photo URL': None,
+                    'Generic Number': '1'}
+        expected_admin = {'Photo URL': img_url_csv,
+                          'Badge Photo URL': img_url_csv,
+                          'Generic Number': '1'}
         self.assertEqual(anon_csv, [expected])
-        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
         self.assertEqual(reg_csv, [expected])
         # Check the image from the URL in the .csv file.
         anon_bytes = session.get_bytes(img_url_csv)
@@ -3033,15 +3128,21 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
                         'Generic Number': admin_csv[0]['Generic Number']}
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
         img_url_csv = self.instance.url + 'photo2/photo.jpg'
-        expected = {'Photo URL': img_url_csv, 'Generic Number': ''}
+        expected = {'Photo URL': img_url_csv, 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': img_url_csv,
+                          'Badge Photo URL': img_url_csv, 'Generic Number': ''}
         self.assertEqual(anon_csv, [expected])
-        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
         self.assertEqual(reg_csv, [expected])
         # Check the image from the URL in the .csv file.
         anon_bytes = session.get_bytes(img_url_csv)
@@ -3075,15 +3176,22 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
                         'Generic Number': admin_csv[0]['Generic Number']}
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
         img_url_csv = self.instance.url + 'photo1/photo.jpg'
-        expected = {'Photo URL': img_url_csv, 'Generic Number': '1'}
+        expected = {'Photo URL': img_url_csv, 'Badge Photo URL': None,
+                    'Generic Number': '1'}
+        expected_admin = {'Photo URL': img_url_csv,
+                          'Badge Photo URL': img_url_csv,
+                          'Generic Number': '1'}
         self.assertEqual(anon_csv, [expected])
-        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
         self.assertEqual(reg_csv, [expected])
         # Check the image from the URL in the .csv file.
         anon_bytes = session.get_bytes(img_url_csv)
@@ -3109,15 +3217,21 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
                         'Generic Number': admin_csv[0]['Generic Number']}
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
         img_url_csv = self.instance.url + 'photo1/photo.jpg'
-        expected = {'Photo URL': img_url_csv, 'Generic Number': ''}
+        expected = {'Photo URL': img_url_csv, 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': img_url_csv,
+                          'Badge Photo URL': img_url_csv, 'Generic Number': ''}
         self.assertEqual(anon_csv, [expected])
-        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
         self.assertEqual(reg_csv, [expected])
         anon_bytes = session.get_bytes(img_url_csv)
         admin_bytes = admin_session.get_bytes(img_url_csv)
@@ -3160,15 +3274,21 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
                         'Generic Number': admin_csv[0]['Generic Number']}
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
         img_url_csv = self.instance.url + 'photo1/photo.jpg'
-        expected = {'Photo URL': img_url_csv, 'Generic Number': ''}
+        expected = {'Photo URL': img_url_csv, 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': img_url_csv,
+                          'Badge Photo URL': img_url_csv, 'Generic Number': ''}
         self.assertEqual(anon_csv, [expected])
-        self.assertEqual(admin_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
         self.assertEqual(reg_csv, [expected])
         anon_bytes = session.get_bytes(img_url_csv)
         admin_bytes = admin_session.get_bytes(img_url_csv)

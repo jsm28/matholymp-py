@@ -112,7 +112,7 @@ class RegSiteGenerator(SiteGenerator):
         output.close()
         return zip_bytes
 
-    def photos_zip_bytes(self):
+    def photos_zip_bytes(self, for_badges):
         """Return the byte contents of the ZIP of photos."""
         output = io.BytesIO()
         zip_file = zipfile.ZipFile(output, 'w', zipfile.ZIP_STORED)
@@ -123,10 +123,12 @@ class RegSiteGenerator(SiteGenerator):
         e = self.event
         person_list = sorted(e.person_list, key=lambda x: x.sort_key)
         for p in person_list:
-            url = p.photo_url
+            url = p.badge_photo_url if for_badges else p.photo_url
             if url is not None:
                 ext = file_extension(url)
-                filename = p.photo_filename
+                filename = (p.badge_photo_filename
+                            if for_badges
+                            else p.photo_filename)
                 zip_filename = 'photos/person%d/photo.%s' % (p.person.id, ext)
                 zip_file.write(filename, zip_filename)
 
@@ -224,7 +226,7 @@ class RegSiteGenerator(SiteGenerator):
                 if p.date_of_birth >= consent_forms_date:
                     missing_list.append('consent form')
 
-        if p.photo_url is None:
+        if p.badge_photo_url is None:
             missing_list.append('photo')
 
         have_travel_details = True
@@ -373,7 +375,7 @@ class RegSiteGenerator(SiteGenerator):
                                                'File size', 'Scale down'])]
         body_row_list = []
         for p in people:
-            filename = p.photo_filename
+            filename = p.badge_photo_filename
             if filename is not None:
                 photo_size = os.stat(filename).st_size
                 if photo_size > max_photo_size:

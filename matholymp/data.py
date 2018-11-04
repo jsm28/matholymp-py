@@ -1393,13 +1393,30 @@ class PersonEvent(object):
 
     photo_url = _PersonEventPropertyDS(
         'photo_url',
-        """The URL of the registration photo of this person at this event.""")
+        """
+        The URL of the registration photo of this person (for the
+        website) at this event.
+        """)
 
     photo_filename = _PersonEventPropertyDS(
         'photo_filename',
         """
-        The local filename of the registration photo of this person at
-        this event.
+        The local filename of the registration photo of this person
+        (for the website) at this event.
+        """)
+
+    badge_photo_url = _PersonEventPropertyDS(
+        'badge_photo_url',
+        """
+        The URL of the registration photo of this person (for the name
+        badge) at this event.
+        """)
+
+    badge_photo_filename = _PersonEventPropertyDS(
+        'badge_photo_filename',
+        """
+        The local filename of the registration photo of this person
+        (for the name badge) at this event.
         """)
 
     consent_form_url = _PersonEventPropertyDS(

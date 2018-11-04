@@ -295,7 +295,7 @@ class DocumentGenerator(object):
             background_type = 'organiser'
         template_fields['background_type'] = background_type
 
-        photo_filename = person.photo_filename
+        photo_filename = person.badge_photo_filename
         if photo_filename is None:
             template_fields['photo'] = ''
         else:

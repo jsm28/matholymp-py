@@ -221,6 +221,7 @@ class CSVDataSource(DataSource):
                                   'family_name': 'Family Name',
                                   'award': 'Award',
                                   'photo_url': 'Photo URL',
+                                  'badge_photo_url': 'Badge Photo URL',
                                   'diet': 'Allergies and Dietary Requirements',
                                   'room_number': 'Room Number',
                                   'phone_number': 'Phone Number',
@@ -287,6 +288,20 @@ class CSVDataSource(DataSource):
                                                            'photos'),
                                          'photo', person_id)
             else:
+                url_path = url[len(self._cfg['url_base']):]
+                url_dirs = url_path.split('/')
+                return os.path.join(self._local_dir, *url_dirs)
+        if name == 'badge_photo_filename':
+            url = self._people[event_id][person_id][country_id][
+                'Badge Photo URL']
+            if url == '':
+                return None
+            if self._reg_system:
+                return file_url_to_local(url, os.path.join(self._local_dir,
+                                                           'photos'),
+                                         'photo', person_id)
+            else:
+                # Not actually a possible case.
                 url_path = url[len(self._cfg['url_base']):]
                 url_dirs = url_path.split('/')
                 return os.path.join(self._local_dir, *url_dirs)

@@ -284,7 +284,8 @@ class PhotosZIPAction(Action):
         self.client.setHeader('Content-Type', 'application/zip')
         self.client.setHeader('Content-Disposition',
                               'attachment; filename=photos.zip')
-        return RoundupSiteGenerator(self.db).photos_zip_bytes()
+        badge_photos = self.hasPermission('Omnivident')
+        return RoundupSiteGenerator(self.db).photos_zip_bytes(badge_photos)
 
 
 class ConsentFormsZIPAction(Action):
