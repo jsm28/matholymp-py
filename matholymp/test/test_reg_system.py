@@ -3541,6 +3541,135 @@ class RegSystemTestCase(unittest.TestCase):
                                         error='You do not have permission to '
                                         'access consent forms', status=403)
 
+    def test_person_retire(self):
+        """
+        Test retiring people.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        admin_session.create_country('DEF', 'Test Second Country')
+        reg_session = self.get_session('ABC_reg')
+        reg2_session = self.get_session('DEF_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1')
+        admin_session.check_open_relative('person1')
+        admin_session.b.select_form(
+            admin_session.get_main().find_all('form')[1])
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.check_submit_selected()
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        # Test lack of anonymous access to the retired person page
+        # (but a registering user for that country should still be
+        # able to view it).
+        session.check_open_relative('person1', login=True)
+        reg_session.check_open_relative('person1')
+        reg2_session.check_open_relative('person1', login=True)
+        admin_session.check_open_relative('person1')
+
+    def test_person_retire_photo_access(self):
+        """
+        Test photo of retired person is not public.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'JPEG')
+        admin_session.create_country_generic()
+        admin_session.create_country('DEF', 'Test Second Country')
+        reg_session = self.get_session('ABC_reg')
+        reg2_session = self.get_session('DEF_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'photo-1@content': photo_filename})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': img_url_csv, 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': img_url_csv,
+                          'Badge Photo URL': img_url_csv, 'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
+        self.assertEqual(reg_csv, [expected])
+        admin_session.check_open_relative('person1')
+        admin_session.b.select_form(
+            admin_session.get_main().find_all('form')[1])
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.check_submit_selected()
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        # Check the old photo image is no longer public, but is still
+        # accessible to admin and to a registering user from that
+        # country.
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        self.assertEqual(admin_bytes, photo_bytes)
+        reg_bytes = admin_session.get_bytes(img_url_csv)
+        self.assertEqual(reg_bytes, photo_bytes)
+        session.check_open(img_url_csv,
+                           error='You are not allowed to view this file',
+                           status=403)
+        reg2_session.check_open(img_url_csv,
+                                error='You are not allowed to view this file',
+                                status=403)
+
+    def test_person_retire_errors(self):
+        """
+        Test errors retiring people.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1')
+        # Error trying to retire person via GET request.
+        admin_session.check_open_relative('person1?@action=retire',
+                                          error='Invalid request')
+        # Permission error (requires user to have valid form, then
+        # have permissions removed, then try submitting it).
+        admin_session.create_user('admin2', 'XMO 2015 Staff', 'Admin')
+        admin2_session = self.get_session('admin2')
+        admin2_session.check_open_relative('person1')
+        admin2_session.b.select_form(
+            admin2_session.get_main().find_all('form')[1])
+        admin2_session.check_submit_selected()
+        admin2_session.select_main_form()
+        admin_session.edit('user', self.instance.userids['admin2'],
+                           {'roles': 'User,Score'})
+        admin2_session.check_submit_selected(error='You do not have '
+                                             'permission to retire',
+                                             status=403)
+        admin_session.edit('user', self.instance.userids['ABC_reg'],
+                           {'roles': 'Admin'})
+        reg_session = self.get_session('ABC_reg')
+        reg_session.check_open_relative('person1')
+        reg_session.b.select_form(
+            reg_session.get_main().find_all('form')[1])
+        reg_session.check_submit_selected()
+        reg_session.select_main_form()
+        admin_session.edit('user', self.instance.userids['ABC_reg'],
+                           {'roles': 'User,Register'})
+        reg_session.check_submit_selected(error='You do not have '
+                                          'permission to retire', status=403)
+
     def test_person_multilink_null_edit(self):
         """
         Test null edits on multilinks involving "no selection".
