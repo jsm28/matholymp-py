@@ -2389,7 +2389,8 @@ class RegSystemTestCase(unittest.TestCase):
              'arrival_time_minute': '30',
              'arrival_flight': 'ABC123',
              'room_number': '987',
-             'event_photos_consent': 'yes'})
+             'diet': 'Vegetarian',
+             'event_photos_consent': 'yes', 'diet_consent': 'yes'})
         expected_cont = {'XMO Number': '2', 'Country Number': '3',
                          'Person Number': '1',
                          'Annual URL': self.instance.url + 'person1',
@@ -2406,10 +2407,11 @@ class RegSystemTestCase(unittest.TestCase):
         expected_cont_admin.update(
             {'Gender': 'Female', 'Date of Birth': '2000-01-01',
              'Languages': 'English',
-             'Allergies and Dietary Requirements': '', 'T-Shirt Size': 'S',
-             'Arrival Place': 'Example Airport', 'Arrival Date': '2015-04-02',
-             'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
-             'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
+             'Allergies and Dietary Requirements': 'Vegetarian',
+             'T-Shirt Size': 'S', 'Arrival Place': 'Example Airport',
+             'Arrival Date': '2015-04-02', 'Arrival Time': '13:30',
+             'Arrival Flight': 'ABC123', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
              'Badge Photo URL': '', 'Consent Form URL': '',
              'Passport or Identity Card Number': '',
@@ -2428,6 +2430,59 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv, [expected_cont])
         self.assertEqual(admin_csv, [expected_cont_admin])
         self.assertEqual(reg_csv, [expected_cont])
+        # Test removing previously given consent for diet information
+        # sets that information to "Unknown".
+        admin_session.edit('person', '1', {'diet_consent': 'no'})
+        expected_cont_admin['Allergies and Dietary Requirements'] = 'Unknown'
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [expected_cont])
+        self.assertEqual(admin_csv, [expected_cont_admin])
+        self.assertEqual(reg_csv, [expected_cont])
+        # Test diet information specified without consent is discarded.
+        admin_session.create_person(
+            'Test First Country', 'Contestant 2',
+            {'arrival_place': 'Example Airport',
+             'arrival_date': '2 April 2015',
+             'arrival_time_hour': '13',
+             'arrival_time_minute': '30',
+             'arrival_flight': 'ABC123',
+             'room_number': '987',
+             'diet': 'Vegetarian',
+             'event_photos_consent': 'no', 'diet_consent': 'no'})
+        expected_cont2 = {'XMO Number': '2', 'Country Number': '3',
+                          'Person Number': '2',
+                          'Annual URL': self.instance.url + 'person2',
+                          'Country Name': 'Test First Country',
+                          'Country Code': 'ABC',
+                          'Primary Role': 'Contestant 2', 'Other Roles': '',
+                          'Guide For': '', 'Contestant Code': 'ABC2',
+                          'Contestant Age': '15', 'Given Name': 'Given 2',
+                          'Family Name': 'Family 2', 'P1': '', 'P2': '',
+                          'P3': '', 'P4': '', 'P5': '', 'P6': '', 'Total': '0',
+                          'Award': '', 'Extra Awards': '', 'Photo URL': '',
+                          'Generic Number': ''}
+        expected_cont2_admin = expected_cont2.copy()
+        expected_cont2_admin.update(
+            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
+             'Languages': 'English',
+             'Allergies and Dietary Requirements': 'Unknown',
+             'T-Shirt Size': 'S', 'Arrival Place': 'Example Airport',
+             'Arrival Date': '2015-04-02', 'Arrival Time': '13:30',
+             'Arrival Flight': 'ABC123', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
+             'Badge Photo URL': '', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '',
+             'Nationality': '', 'Event Photos Consent': 'No'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [expected_cont, expected_cont2])
+        self.assertEqual(admin_csv, [expected_cont_admin,
+                                     expected_cont2_admin])
+        self.assertEqual(reg_csv, [expected_cont, expected_cont2])
 
     @_with_config(age_day_date='2015-04-02')
     def test_person_csv_age(self):
@@ -3750,7 +3805,17 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session = self.get_session('admin')
         admin_session.create_person(
             'XMO 2015 Staff', 'Coordinator',
+            {'diet_consent': 'yes'},
             error='No choice of consent for photos specified')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Coordinator',
+            {'event_photos_consent': 'yes'},
+            error='No choice of consent for allergies and dietary '
+            'requirements information specified')
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         self.assertEqual(anon_csv, [])

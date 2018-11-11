@@ -371,11 +371,11 @@ def required_person_fields(db):
         req.append('date_of_birth_year')
         req.append('date_of_birth_month')
         req.append('date_of_birth_day')
-    # event_photos_consent not listed here because the JavaScript
-    # support for checking required fields are set (taken unmodified
-    # from Roundup) does not support radio-button fields (it requires
-    # a single <input> with an appropriate id, which must have a
-    # value).
+    # event_photos_consent and diet_consent not listed here because
+    # the JavaScript support for checking required fields are set
+    # (taken unmodified from Roundup) does not support radio-button
+    # fields (it requires a single <input> with an appropriate id,
+    # which must have a value).
     if have_passport_numbers(db):
         req.append('passport_number')
     if have_nationality(db):

@@ -309,6 +309,15 @@ def audit_person_fields(db, cl, nodeid, newvalues):
                                              'event_photos_consent')
         if event_photos_consent is None:
             raise ValueError('No choice of consent for photos specified')
+        diet_consent = get_new_value(db, cl, nodeid, newvalues,
+                                     'diet_consent')
+        if diet_consent is None:
+            raise ValueError('No choice of consent for allergies and dietary '
+                             'requirements information specified')
+        if not diet_consent:
+            # Remove any dietary requirements information specified,
+            # now or previously.
+            newvalues['diet'] = 'Unknown'
 
     # If passport numbers are collected, they are required.
     if have_passport_numbers(db):

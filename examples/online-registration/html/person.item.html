@@ -206,6 +206,14 @@ please inform the people you register of this information.
   entered so that appropriate food can be arranged.
  <tal:block tal:condition="python:utils.require_diet(db._db)">
   If none, please enter &lsquo;None&rsquo;.
+ </tal:block>
+ <tal:block tal:condition="python:utils.have_consent_ui(db._db)">
+ <strong>You must have permission from the participant (and their
+ parents, if aged under 16) to enter this information, and must
+ confirm that permission below.  If you do not have that permission,
+ enter &ldquo;Unknown&rdquo; here and &ldquo;No&rdquo; below.
+ Allergies and dietary requirements information entered without
+ confirming permission below will be discarded.</strong>
  </tal:block></td>
  </tr>
 
@@ -416,6 +424,24 @@ select the appropriate options.  You must select &ldquo;Yes&rdquo; or
   </tal:if>
   <tal:if condition="not:context/id">
    <td><input type="radio" name="event_photos_consent" value="yes">Yes<input type="radio" name="event_photos_consent" value="no">No</td>
+  </tal:if>
+ </tr>
+ <tr>
+  <td colspan="2">2. <strong>This participant has given permission for
+  processing information provided on their allergies and dietary
+  requirements as needed for the purposes of running the
+  event.</strong>  (In the case of a participant younger than 16, the
+  parents have given permission.)  If you select &ldquo;No&rdquo;, any
+  such information provided will be replaced by
+  &ldquo;Unknown&rdquo;.</td>
+ </tr>
+ <tr tal:define="name string:diet_consent; label string:Permission for this information?; value context/diet_consent; edit_ok edit_ok">
+  <th class="required" metal:use-macro="th_label">Permission for this information?</th>
+  <tal:if condition="context/id">
+   <td tal:content="structure context/diet_consent/field">diet_consent</td>
+  </tal:if>
+  <tal:if condition="not:context/id">
+   <td><input type="radio" name="diet_consent" value="yes">Yes<input type="radio" name="diet_consent" value="no">No</td>
   </tal:if>
  </tr>
 </tal:block>

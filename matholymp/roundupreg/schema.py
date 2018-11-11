@@ -136,6 +136,7 @@ def init_schema(env):
         person_extra['consent_form'] = Link('consent_form')
     if have_consent_ui(db):
         person_extra['event_photos_consent'] = Boolean()
+        person_extra['diet_consent'] = Boolean()
     if have_passport_numbers(db):
         person_extra['passport_number'] = String()
     if have_nationality(db):
