@@ -184,6 +184,16 @@ the registration system is not active.
   registration system has also been updated to reference such
   information.
 
+* The registration system now supports collecting information about
+  participant consent for certain uses of personal data.  The new
+  configuration variable ``matholymp_consent_ui`` must be specified in
+  :file:`extensions/config.ini` for the registration system.  If
+  ``Yes``, this information is collected by the registration system;
+  if ``No``, it is not, as before.  The example
+  :file:`extensions/email-template-new-user` for the registration
+  system references this information.  :file:`person.item.html` has
+  been updated accordingly.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

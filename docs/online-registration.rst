@@ -72,7 +72,11 @@ files:
   accounts for registering participants, if a contact email address is
   specified when registering a country; Python formats such as
   ``%(username)s`` in this template are substituted with the relevant
-  details of the country and the automatically created account).
+  details of the country and the automatically created account).  The
+  example version of this file is written for the case where
+  ``matholymp_consent_ui`` is ``Yes``; if it is ``No``, the text about
+  collecting information about consent for certain uses of personal
+  data should be removed.
 
 * :file:`html/page.html` (you may wish to make this file match the
   overall page style used for the static site, although this is not

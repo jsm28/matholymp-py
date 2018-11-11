@@ -43,7 +43,7 @@ from matholymp.fileutil import boolean_states, file_format_contents, \
     file_extension
 
 __all__ = ['distinguish_official', 'get_consent_forms_date_str',
-           'get_consent_forms_date', 'have_consent_forms',
+           'get_consent_forms_date', 'have_consent_forms', 'have_consent_ui',
            'have_passport_numbers', 'have_nationality', 'require_diet',
            'require_dob', 'get_num_problems', 'get_marks_per_problem',
            'scores_from_str', 'get_num_languages', 'get_language_numbers',
@@ -86,6 +86,12 @@ def get_consent_forms_date(db):
 def have_consent_forms(db):
     """Return whether this event has consent forms."""
     return get_consent_forms_date_str(db) != ''
+
+
+def have_consent_ui(db):
+    """Return whether this event collects additional consent information."""
+    consent_ui = db.config.ext['MATHOLYMP_CONSENT_UI']
+    return boolean_states[consent_ui.lower()]
 
 
 def have_passport_numbers(db):

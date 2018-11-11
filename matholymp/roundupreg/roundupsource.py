@@ -37,10 +37,10 @@ from matholymp.datasource import DataSource
 from matholymp.datetimeutil import date_from_ymd_iso, time_from_hhmm_str
 from matholymp.fileutil import comma_split, boolean_states
 from matholymp.roundupreg.rounduputil import distinguish_official, \
-    have_consent_forms, have_passport_numbers, have_nationality, \
-    get_num_problems, get_marks_per_problem, scores_from_str, \
-    get_language_numbers, person_date_of_birth, contestant_age, \
-    db_file_url
+    have_consent_forms, have_consent_ui, have_passport_numbers, \
+    have_nationality, get_num_problems, get_marks_per_problem, \
+    scores_from_str, get_language_numbers, person_date_of_birth, \
+    contestant_age, db_file_url
 
 __all__ = ['RoundupDataSource']
 
@@ -199,6 +199,10 @@ class RoundupDataSource(DataSource):
                 consent_form_filename = self._db.filename('consent_form',
                                                           consent_form_id)
             return consent_form_filename
+        elif name == 'event_photos_consent':
+            if not have_consent_ui(self._db):
+                return None
+            return self._db.person.get(person_id, 'event_photos_consent')
         elif name == 'languages':
             ret = []
             langs = set()

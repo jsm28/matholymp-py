@@ -1520,6 +1520,14 @@ class PersonEvent(object):
         'departure_flight',
         """The departure flight of this person at this event.""")
 
+    event_photos_consent = _PersonEventPropertyDS(
+        'event_photos_consent',
+        """
+        Whether permission has been given for publication of photos of
+        this person taken at this event.  None if that information is
+        not collected.
+        """)
+
     def _get_sort_key(self):
         return (self.event.id,
                 coll_get_sort_key(self.country.code),

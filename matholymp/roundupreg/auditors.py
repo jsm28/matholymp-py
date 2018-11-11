@@ -38,11 +38,12 @@ from matholymp.datetimeutil import date_from_ymd_str, date_from_ymd_iso, \
     time_from_hhmm_str
 from matholymp.roundupreg.auditorutil import get_new_value, require_value
 from matholymp.roundupreg.rounduputil import have_consent_forms, \
-    have_passport_numbers, have_nationality, require_diet, require_dob, \
-    get_num_problems, get_marks_per_problem, get_earliest_date_of_birth, \
-    get_sanity_date_of_birth, get_earliest_date_of_birth_contestant, \
-    get_arrdep_bounds, any_scores_missing, valid_score, create_rss, \
-    db_file_format_contents, db_file_extension
+    have_consent_ui, have_passport_numbers, have_nationality, require_diet, \
+    require_dob, get_num_problems, get_marks_per_problem, \
+    get_earliest_date_of_birth, get_sanity_date_of_birth, \
+    get_earliest_date_of_birth_contestant, get_arrdep_bounds, \
+    any_scores_missing, valid_score, create_rss, db_file_format_contents, \
+    db_file_extension
 from matholymp.roundupreg.staticsite import static_site_event_group, \
     static_site_file_data
 from matholymp.roundupreg.userauditor import audit_user_fields
@@ -301,6 +302,13 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     if is_contestant:
         if date_of_birth < get_earliest_date_of_birth_contestant(db):
             raise ValueError('Contestant too old')
+
+    # If consent information is collected, it is required.
+    if have_consent_ui(db):
+        event_photos_consent = get_new_value(db, cl, nodeid, newvalues,
+                                             'event_photos_consent')
+        if event_photos_consent is None:
+            raise ValueError('No choice of consent for photos specified')
 
     # If passport numbers are collected, they are required.
     if have_passport_numbers(db):

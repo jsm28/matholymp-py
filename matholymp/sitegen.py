@@ -1922,7 +1922,8 @@ class SiteGenerator(object):
                          'Departure Date', 'Departure Time',
                          'Departure Flight', 'Room Number', 'Phone Number',
                          'Badge Photo URL', 'Consent Form URL',
-                         'Passport or Identity Card Number', 'Nationality'])
+                         'Passport or Identity Card Number', 'Nationality',
+                         'Event Photos Consent'])
         return cols
 
     def person_csv_data(self, p, num_problems=None, scores_only=False,
@@ -2008,6 +2009,12 @@ class SiteGenerator(object):
             csv_out['Passport or Identity Card Number'] = (p.passport_number
                                                            or '')
             csv_out['Nationality'] = p.nationality or ''
+            if p.event_photos_consent is None:
+                csv_out['Event Photos Consent'] = ''
+            else:
+                csv_out['Event Photos Consent'] = ('Yes'
+                                                   if p.event_photos_consent
+                                                   else 'No')
         return csv_out
 
     def generate_people_csv(self):

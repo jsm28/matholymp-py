@@ -247,6 +247,9 @@ class CSVDataSource(DataSource):
                                   'total_score': 'Total',
                                   'generic_id': 'Generic Number'}
 
+    _person_event_attr_map_bool_none = {'event_photos_consent':
+                                        'Event Photos Consent'}
+
     def person_event_get_attr(self, person_id, country_id, event_id, name):
         if name == '_country_ids':
             assert country_id is None
@@ -279,6 +282,13 @@ class CSVDataSource(DataSource):
                 return None
             else:
                 return int(s)
+        if name in CSVDataSource._person_event_attr_map_bool_none:
+            k = CSVDataSource._person_event_attr_map_bool_none[name]
+            s = self._people[event_id][person_id][k]
+            if s == '':
+                return None
+            else:
+                return boolean_states[s.lower()]
         if name == 'photo_filename':
             url = self._people[event_id][person_id][country_id]['Photo URL']
             if url == '':

@@ -55,8 +55,8 @@
 """This module provides the Roundup registration schema."""
 
 from matholymp.roundupreg.rounduputil import distinguish_official, \
-    have_consent_forms, have_passport_numbers, have_nationality, \
-    get_language_numbers
+    have_consent_forms, have_consent_ui, have_passport_numbers, \
+    have_nationality, get_language_numbers
 
 __all__ = ['init_schema']
 
@@ -134,6 +134,8 @@ def init_schema(env):
     person_extra = {}
     if have_consent_forms(db):
         person_extra['consent_form'] = Link('consent_form')
+    if have_consent_ui(db):
+        person_extra['event_photos_consent'] = Boolean()
     if have_passport_numbers(db):
         person_extra['passport_number'] = String()
     if have_nationality(db):

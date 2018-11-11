@@ -393,6 +393,34 @@ please inform the people you register of this information.
 </tal:block>
 </tal:block>
 
+<tal:block tal:condition="context/is_edit_ok">
+<tal:block tal:condition="python:utils.have_consent_ui(db._db)">
+ <tr>
+  <td colspan="2">Processing some personal data requires permission
+from the participant (and their parents, if aged under 16) under the
+laws of some countries.  Please read the following carefully and
+select the appropriate options.  You must select &ldquo;Yes&rdquo; or
+&ldquo;No&rdquo; for each of these questions.</td>
+ </tr>
+ <tr>
+  <td colspan="2">1. <strong>This participant has given permission for
+  publishing online of photos that are taken during the event and in
+  which this participant is recognisable.</strong>  (In the case of a
+  participant younger than 16, the parents have given
+  permission.)</td>
+ </tr>
+ <tr tal:define="name string:event_photos_consent; label string:Permission for photos during event?; value context/event_photos_consent; edit_ok edit_ok">
+  <th class="required" metal:use-macro="th_label">Permission for photos during event?</th>
+  <tal:if condition="context/id">
+   <td tal:content="structure context/event_photos_consent/field">event_photos_consent</td>
+  </tal:if>
+  <tal:if condition="not:context/id">
+   <td><input type="radio" name="event_photos_consent" value="yes">Yes<input type="radio" name="event_photos_consent" value="no">No</td>
+  </tal:if>
+ </tr>
+</tal:block>
+</tal:block>
+
  <tr tal:condition="edit_ok">
   <td>
    &nbsp;

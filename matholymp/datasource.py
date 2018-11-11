@@ -119,7 +119,7 @@ class DataSource(object):
         gender, date_of_birth, passport_number, nationality, tshirt,
         arrival_place, arrival_date, arrival_time, arrival_flight,
         departure_place, departure_date, departure_time,
-        departure_flight.
+        departure_flight, event_photos_consent.
         """
         raise NotImplementedError
 

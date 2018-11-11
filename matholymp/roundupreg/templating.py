@@ -55,13 +55,13 @@ from matholymp.datetimeutil import month_name, date_to_ymd_iso, date_to_name
 from matholymp.roundupreg.cache import cached_text
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import distinguish_official, \
-    get_consent_forms_date, have_consent_forms, have_passport_numbers, \
-    have_nationality, require_diet, require_dob, get_language_numbers, \
-    get_earliest_date_of_birth, get_sanity_date_of_birth, \
-    person_date_of_birth, contestant_age, get_arrdep_bounds, \
-    normal_country_person, person_is_contestant, contestant_code, pn_score, \
-    scores_final, any_scores_missing, country_has_contestants, \
-    valid_country_problem
+    get_consent_forms_date, have_consent_forms, have_consent_ui, \
+    have_passport_numbers, have_nationality, require_diet, require_dob, \
+    get_language_numbers, get_earliest_date_of_birth, \
+    get_sanity_date_of_birth, person_date_of_birth, contestant_age, \
+    get_arrdep_bounds, normal_country_person, person_is_contestant, \
+    contestant_code, pn_score, scores_final, any_scores_missing, \
+    country_has_contestants, valid_country_problem
 
 
 def people_from_country_internal(db, country):
@@ -371,6 +371,11 @@ def required_person_fields(db):
         req.append('date_of_birth_year')
         req.append('date_of_birth_month')
         req.append('date_of_birth_day')
+    # event_photos_consent not listed here because the JavaScript
+    # support for checking required fields are set (taken unmodified
+    # from Roundup) does not support radio-button fields (it requires
+    # a single <input> with an appropriate id, which must have a
+    # value).
     if have_passport_numbers(db):
         req.append('passport_number')
     if have_nationality(db):
@@ -384,6 +389,7 @@ def register_templating_utils(instance):
     """Register functions for use from page templates with Roundup."""
     instance.registerUtil('distinguish_official', distinguish_official)
     instance.registerUtil('have_consent_forms', have_consent_forms)
+    instance.registerUtil('have_consent_ui', have_consent_ui)
     instance.registerUtil('have_passport_numbers', have_passport_numbers)
     instance.registerUtil('have_nationality', have_nationality)
     instance.registerUtil('require_diet', require_diet)

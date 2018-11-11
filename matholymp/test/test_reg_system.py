@@ -2162,7 +2162,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
              'Badge Photo URL': '', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '', 'Nationality': ''})
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Event Photos Consent': ''})
         expected_leader_admin.update(
             {'Gender': 'Male', 'Date of Birth': '',
              'Languages': 'English,French',
@@ -2172,7 +2173,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Date': '2015-04-03', 'Departure Time': '14:50',
              'Departure Flight': 'ABC987', 'Room Number': '',
              'Phone Number': '', 'Badge Photo URL': '', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '', 'Nationality': ''})
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Event Photos Consent': ''})
         expected_staff_admin.update(
             {'Gender': 'Female', 'Date of Birth': '2000-01-01',
              'Languages': 'English',
@@ -2183,7 +2185,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Flight': '', 'Room Number': '',
              'Phone Number': '9876543210', 'Badge Photo URL': '',
              'Consent Form URL': '', 'Passport or Identity Card Number': '',
-             'Nationality': ''})
+             'Nationality': '',
+             'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -2241,7 +2244,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
              'Badge Photo URL': '', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '', 'Nationality': ''})
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -2297,7 +2301,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
              'Badge Photo URL': '', 'Consent Form URL': '',
              'Passport or Identity Card Number': '123456789',
-             'Nationality': ''})
+             'Nationality': '', 'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -2353,7 +2357,71 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
              'Badge Photo URL': '', 'Consent Form URL': '',
              'Passport or Identity Card Number': '',
-             'Nationality': 'Matholympian'})
+             'Nationality': 'Matholympian', 'Event Photos Consent': ''})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [expected_cont])
+        self.assertEqual(admin_csv, [expected_cont_admin])
+        self.assertEqual(reg_csv, [expected_cont])
+
+    @_with_config(consent_ui='Yes')
+    def test_person_csv_consent_ui(self):
+        """
+        Test CSV file of people, consent information collected.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create('arrival', {'name': 'Example Airport'})
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'arrival_place': 'Example Airport',
+             'arrival_date': '2 April 2015',
+             'arrival_time_hour': '13',
+             'arrival_time_minute': '30',
+             'arrival_flight': 'ABC123',
+             'room_number': '987',
+             'event_photos_consent': 'yes'})
+        expected_cont = {'XMO Number': '2', 'Country Number': '3',
+                         'Person Number': '1',
+                         'Annual URL': self.instance.url + 'person1',
+                         'Country Name': 'Test First Country',
+                         'Country Code': 'ABC', 'Primary Role': 'Contestant 1',
+                         'Other Roles': '', 'Guide For': '',
+                         'Contestant Code': 'ABC1', 'Contestant Age': '15',
+                         'Given Name': 'Given 1', 'Family Name': 'Family 1',
+                         'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                         'P6': '', 'Total': '0', 'Award': '',
+                         'Extra Awards': '', 'Photo URL': '',
+                         'Generic Number': ''}
+        expected_cont_admin = expected_cont.copy()
+        expected_cont_admin.update(
+            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
+             'Languages': 'English',
+             'Allergies and Dietary Requirements': '', 'T-Shirt Size': 'S',
+             'Arrival Place': 'Example Airport', 'Arrival Date': '2015-04-02',
+             'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
+             'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
+             'Badge Photo URL': '', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '',
+             'Nationality': '', 'Event Photos Consent': 'Yes'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [expected_cont])
+        self.assertEqual(admin_csv, [expected_cont_admin])
+        self.assertEqual(reg_csv, [expected_cont])
+        admin_session.edit('person', '1', {'event_photos_consent': 'no'})
+        expected_cont_admin['Event Photos Consent'] = 'No'
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -2417,7 +2485,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Flight': '', 'Departure Place': '', 'Departure Date': '',
              'Departure Time': '', 'Departure Flight': '', 'Room Number': '',
              'Phone Number': '', 'Badge Photo URL': '', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '', 'Nationality': ''})
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Event Photos Consent': ''})
         expected_cont2 = expected_cont1.copy()
         expected_cont2_admin = expected_cont1_admin.copy()
         expected_cont2.update(
@@ -2501,7 +2570,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Number': '', 'Phone Number': '',
              'Badge Photo URL': '', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '', 'Nationality': ''})
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -3669,6 +3739,22 @@ class RegSystemTestCase(unittest.TestCase):
                            {'roles': 'User,Register'})
         reg_session.check_submit_selected(error='You do not have '
                                           'permission to retire', status=403)
+
+    @_with_config(consent_ui='Yes')
+    def test_person_create_audit_errors_missing_consent(self):
+        """
+        Test errors from person creation auditor, missing required
+        consent information.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Coordinator',
+            error='No choice of consent for photos specified')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
 
     def test_person_multilink_null_edit(self):
         """
