@@ -303,6 +303,9 @@ def init_schema(env):
                         'photo']
     if have_consent_forms(db):
         person_reg_props.append('consent_form')
+    if have_consent_ui(db):
+        person_reg_props.append('event_photos_consent')
+        person_reg_props.append('diet_consent')
     if have_passport_numbers(db):
         person_reg_props.append('passport_number')
     if have_nationality(db):
