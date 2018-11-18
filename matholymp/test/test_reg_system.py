@@ -2685,7 +2685,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
-                                     {'photo-1@content': photo_filename})
+                                    {'photo-1@content': photo_filename})
         # Check the image inline on the person page.
         admin_session.check_open_relative('person1')
         got_bytes = admin_session.get_img_contents()
@@ -2729,7 +2729,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
-                                     {'photo-1@content': photo_filename})
+                                    {'photo-1@content': photo_filename})
         # Check the image inline on the person page.
         admin_session.check_open_relative('person1')
         got_bytes = admin_session.get_img_contents()
@@ -2773,7 +2773,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
-                                     {'photo-1@content': photo_filename})
+                                    {'photo-1@content': photo_filename})
         # Check the image inline on the person page.
         admin_session.check_open_relative('person1')
         got_bytes = admin_session.get_img_contents()
@@ -2817,7 +2817,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
-                                     {'photo-1@content': photo_filename})
+                                    {'photo-1@content': photo_filename})
         # Check the image inline on the person page.
         admin_session.check_open_relative('person1')
         got_bytes = admin_session.get_img_contents()
@@ -3241,7 +3241,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
-                                     {'photo-1@content': photo_filename})
+                                    {'photo-1@content': photo_filename})
         # Replace the image.
         photo_filename, photo_bytes = self.gen_test_image(3, 3, 3, '.jpg',
                                                           'JPEG')
@@ -3289,7 +3289,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
-                                     {'photo-1@content': photo_filename})
+                                    {'photo-1@content': photo_filename})
         admin_session.edit(
             'person', '1',
             {'generic_url': 'https://www.example.invalid/people/person1/'})
@@ -3337,7 +3337,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
-                                     {'photo-1@content': photo_filename})
+                                    {'photo-1@content': photo_filename})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -3394,7 +3394,7 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session = self.get_session('ABC_reg')
         reg2_session = self.get_session('DEF_reg')
         admin_session.create_person('Test First Country', 'Contestant 1',
-                                     {'photo-1@content': photo_filename})
+                                    {'photo-1@content': photo_filename})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -3458,7 +3458,7 @@ class RegSystemTestCase(unittest.TestCase):
         photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
                                                           'JPEG')
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
-                                     {'photo-1@content': photo_filename})
+                                    {'photo-1@content': photo_filename})
         anon_zip = session.get_photos_zip()
         admin_zip = admin_session.get_photos_zip()
         anon_contents = [f.filename for f in anon_zip.infolist()]
@@ -3627,7 +3627,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_zip_empty.close()
         cf_filename, cf_bytes = self.gen_test_pdf()
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
-                                     {'consent_form-1@content': cf_filename})
+                                    {'consent_form-1@content': cf_filename})
         admin_zip = admin_session.get_consent_forms_zip()
         admin_contents = [f.filename for f in admin_zip.infolist()]
         expected_contents = ['consent-forms/README.txt',
