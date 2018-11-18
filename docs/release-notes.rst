@@ -189,7 +189,9 @@ the registration system is not active.
   configuration variable ``matholymp_consent_ui`` must be specified in
   :file:`extensions/config.ini` for the registration system.  If
   ``Yes``, this information is collected by the registration system;
-  if ``No``, it is not, as before.  The example
+  if ``No``, it is not, as before.  When this information is
+  collected, photos may be uploaded that can be used on name badges
+  but are not public on the website.  The example
   :file:`extensions/email-template-new-user` for the registration
   system references this information.  :file:`person.item.html` has
   been updated accordingly.

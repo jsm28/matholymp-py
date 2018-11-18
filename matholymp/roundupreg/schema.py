@@ -136,6 +136,8 @@ def init_schema(env):
         person_extra['consent_form'] = Link('consent_form')
     if have_consent_ui(db):
         person_extra['event_photos_consent'] = Boolean()
+        # not_applicable, no, badge_only, yes.
+        person_extra['photo_consent'] = String()
         person_extra['diet_consent'] = Boolean()
     if have_passport_numbers(db):
         person_extra['passport_number'] = String()
@@ -305,6 +307,7 @@ def init_schema(env):
         person_reg_props.append('consent_form')
     if have_consent_ui(db):
         person_reg_props.append('event_photos_consent')
+        person_reg_props.append('photo_consent')
         person_reg_props.append('diet_consent')
     if have_passport_numbers(db):
         person_reg_props.append('passport_number')
@@ -332,6 +335,9 @@ def init_schema(env):
             return False
         if not normal_can_view_person(db, userid, photo_person):
             return False
+        if have_consent_ui(db):
+            if db.person.get(photo_person, 'photo_consent') != 'yes':
+                return False
         person_photo = db.person.get(photo_person, 'photo')
         return person_photo == itemid
 

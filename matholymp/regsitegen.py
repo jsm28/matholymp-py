@@ -273,7 +273,7 @@ class RegSiteGenerator(SiteGenerator):
                 return ''
 
     def missing_person_details_text(self, people, consent_forms_date,
-                                    show_country):
+                                    have_consent_ui, show_country):
         """Return a table of missing details for people."""
         text = ''
         if show_country:
@@ -304,7 +304,9 @@ class RegSiteGenerator(SiteGenerator):
                                                      body_row_list) + '\n'
         if missing_photo:
             text += ('<p>Photos are optional but recommended; they appear'
-                     ' on the website and may appear on name badges.</p>\n')
+                     ' on the website%s and may appear on name badges.</p>\n'
+                     % (', if permission is given for that use,'
+                        if have_consent_ui else ''))
         if missing_phone:
             text += ('<p>Phone numbers (for Guides) need only be entered'
                      ' if they will appear on name badges or will be'
@@ -317,7 +319,7 @@ class RegSiteGenerator(SiteGenerator):
         raise NotImplementedError
 
     def registration_status_text(self, expected_roles, consent_forms_date,
-                                 max_photo_size, nonce):
+                                 have_consent_ui, max_photo_size, nonce):
         """Return the text of the registration status page."""
         e = self.event
         normal_countries = sorted(e.normal_country_list,
@@ -335,7 +337,8 @@ class RegSiteGenerator(SiteGenerator):
                  ' but not have registered them all.</p>\n')
 
         text += self.missing_person_details_text(normal_people,
-                                                 consent_forms_date, True)
+                                                 consent_forms_date,
+                                                 have_consent_ui, True)
 
         text += '<h2>Action needed by the organisers</h2>\n'
 
@@ -348,7 +351,7 @@ class RegSiteGenerator(SiteGenerator):
                  ' staff have been registered.</p>\n')
 
         text += self.missing_person_details_text(staff, consent_forms_date,
-                                                 False)
+                                                 have_consent_ui, False)
 
         head_row_list = [self.html_tr_th_list(['Country', 'Person', 'Role'])]
         body_row_list = []
@@ -407,7 +410,7 @@ class RegSiteGenerator(SiteGenerator):
         return text
 
     def registration_status_country_text(self, country, expected_roles,
-                                         consent_forms_date):
+                                         consent_forms_date, have_consent_ui):
         """Return the text of the registration status page for one country."""
         people = sorted(country.person_list, key=lambda x: x.sort_key)
         text = ''
@@ -416,7 +419,7 @@ class RegSiteGenerator(SiteGenerator):
                  ' Observers you have not yet registered.</p>\n')
 
         text += self.missing_person_details_text(people, consent_forms_date,
-                                                 False)
+                                                 have_consent_ui, False)
 
         return text
 

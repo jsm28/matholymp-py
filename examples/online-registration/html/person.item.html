@@ -317,9 +317,12 @@ please inform the people you register of this information.
 <tal:block tal:condition="not:context/id">
  <tr>
   <td colspan="2">If a URL for previous participation is given, any
-  photo provided for the most recent previous event at which this
-  person participated will be reused unless you select
-  &lsquo;No&rsquo; here or upload a new photo.</td>
+  photo provided and on the website for the most recent previous event
+  at which this person participated will be reused unless you select
+  &lsquo;No&rsquo;
+  here<tal:block tal:condition="python:utils.have_consent_ui(db._db)">,
+  do not confirm permission to use a photo below,</tal:block> or
+  upload a new photo.</td>
  </tr>
  <tr tal:define="name string:reuse_photo; label string:Reuse previous photo (if available); value context/reuse_photo; edit_ok edit_ok">
   <th metal:use-macro="th_label">Reuse previous photo (if available)</th>
@@ -335,7 +338,16 @@ please inform the people you register of this information.
  </tr>
 
  <tr tal:condition="context/is_edit_ok">
-  <td colspan="2">Photos should be uploaded as JPEG or PNG files.</td>
+  <td colspan="2">Photos should be uploaded as JPEG or PNG files.
+  <tal:block tal:condition="python:utils.have_consent_ui(db._db)">
+ <strong>You must have permission from the participant (and their
+ parents, if aged under 16) to provide a photo, and must confirm that
+ permission below.  If you do not have that permission, do not upload
+ a photo; any photo provided will not be used if you select
+ &ldquo;No&rdquo; below.  Photos may be used on the website and name
+ badges, or only on name badges, depending on the permissions you
+ select below.</strong>
+ </tal:block></td>
  </tr>
 
 <tal:block tal:condition="context/is_edit_ok">
@@ -427,7 +439,29 @@ select the appropriate options.  You must select &ldquo;Yes&rdquo; or
   </tal:if>
  </tr>
  <tr>
-  <td colspan="2">2. <strong>This participant has given permission for
+  <td colspan="2">2. <strong>This participant has given permission to
+  use the uploaded photo on the
+  <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_SHORT_NAME']" />
+  website and on their name badge during the event.</strong>  (In the
+  case of a participant younger than 16, the parents have given
+  permission.)  If you select &ldquo;No&rdquo;, any uploaded photo
+  will not be used.  This does not affect any photos on the website
+  for previous events; see
+  <a tal:attributes="href python:db._db.config.ext['MATHOLYMP_DATA_PROTECTION_URL']" target="_blank">data
+  protection information</a> if you wish to request removal of such a
+  photo.</td>
+ </tr>
+ <tr tal:define="name string:photo_consent; label string:Permission for uploaded photos?; value context/photo_consent; edit_ok edit_ok">
+  <th class="required" metal:use-macro="th_label">Permission for uploaded photos?</th>
+  <tal:if condition="context/id">
+   <td tal:content="structure python:utils.photo_consent_select(context.photo_consent.plain())"></td>
+  </tal:if>
+  <tal:if condition="not:context/id">
+   <td tal:content="structure python:utils.photo_consent_select('not_applicable')"></td>
+  </tal:if>
+ </tr>
+ <tr>
+  <td colspan="2">3. <strong>This participant has given permission for
   processing information provided on their allergies and dietary
   requirements as needed for the purposes of running the
   event.</strong>  (In the case of a participant younger than 16, the
@@ -485,11 +519,14 @@ select the appropriate options.  You must select &ldquo;Yes&rdquo; or
 </tal:block>
 
 <tal:block tal:condition="context/photo">
+<tal:block tal:condition="python:not utils.have_consent_ui(db._db) or context.photo_consent.plain() == 'yes' or (context.is_edit_ok() and context.photo_consent.plain() == 'badge_only')">
+<p tal:condition="python:utils.have_consent_ui(db._db) and context.photo_consent.plain() == 'badge_only'">The following photo is for use on name badges and is not public on the website.</p>
 <table>
 <tr>
   <td><img width="200" alt="" tal:attributes="src context/photo/download_url"></td>
 </tr>
 </table>
+</tal:block>
 </tal:block>
 
 <tal:block tal:condition="context/id">

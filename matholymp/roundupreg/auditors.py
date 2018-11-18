@@ -309,6 +309,21 @@ def audit_person_fields(db, cl, nodeid, newvalues):
                                              'event_photos_consent')
         if event_photos_consent is None:
             raise ValueError('No choice of consent for photos specified')
+        photo_consent = get_new_value(db, cl, nodeid, newvalues,
+                                      'photo_consent')
+        if photo_consent not in ('not_applicable', 'no', 'badge_only', 'yes'):
+            raise ValueError('No choice of consent for registration photo '
+                             'specified')
+        photo = get_new_value(db, cl, nodeid, newvalues, 'photo')
+        if photo_consent == 'not_applicable':
+            if photo is not None:
+                raise ValueError('No choice of consent for registration photo '
+                                 'specified')
+        if photo_consent == 'no' and photo is not None:
+            # Remove any photo uploaded, now or previously.
+            newvalues['photo'] = None
+            if nodeid is None:
+                del newvalues['photo']
         diet_consent = get_new_value(db, cl, nodeid, newvalues,
                                      'diet_consent')
         if diet_consent is None:
@@ -410,7 +425,10 @@ def audit_person_fields(db, cl, nodeid, newvalues):
                                          ' participation not valid')
                     if (get_new_value(db, cl, nodeid, newvalues, 'reuse_photo')
                         and not get_new_value(db, cl, nodeid, newvalues,
-                                              'photo')):
+                                              'photo')
+                        and not (have_consent_ui(db)
+                                 and photo_consent in ('not_applicable',
+                                                       'no'))):
                         photo_url = sdata.person_map[pno].photo_url
                         photo_data = static_site_file_data(db, photo_url)
                         if photo_data:

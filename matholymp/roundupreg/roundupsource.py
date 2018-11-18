@@ -176,9 +176,15 @@ class RoundupDataSource(DataSource):
                 return []
             return comma_split(extra_awards_str)
         elif name in ('photo_url', 'badge_photo_url'):
+            if name == 'photo_url' and have_consent_ui(self._db):
+                if self._db.person.get(person_id, 'photo_consent') != 'yes':
+                    return None
             photo_id = self._db.person.get(person_id, 'photo')
             return db_file_url(self._db, 'photo', 'photo', photo_id)
         elif name in ('photo_filename', 'badge_photo_filename'):
+            if name == 'photo_filename' and have_consent_ui(self._db):
+                if self._db.person.get(person_id, 'photo_consent') != 'yes':
+                    return None
             photo_id = self._db.person.get(person_id, 'photo')
             photo_filename = None
             if photo_id is not None:

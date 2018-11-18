@@ -2718,6 +2718,165 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_bytes, photo_bytes)
         self.assertEqual(reg_bytes, photo_bytes)
 
+    @_with_config(consent_ui='Yes')
+    def test_person_photo_create_consent(self):
+        """
+        Test photos uploaded at person creation time, with consent
+        information handling.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'JPEG')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Coordinator',
+            {'event_photos_consent': 'yes',
+             'photo-1@content': photo_filename,
+             'photo_consent': 'Yes, for website and name badge',
+             'diet_consent': 'yes'})
+        # Check the image inline on the person page.
+        admin_session.check_open_relative('person1')
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, photo_bytes)
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': img_url_csv, 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': img_url_csv,
+                          'Badge Photo URL': img_url_csv, 'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
+        self.assertEqual(reg_csv, [expected])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, photo_bytes)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(reg_bytes, photo_bytes)
+
+    @_with_config(consent_ui='Yes')
+    def test_person_photo_create_consent_badge_only(self):
+        """
+        Test photos uploaded at person creation time, with consent
+        information handling, badge-only photo.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'JPEG')
+        admin_session.create_country_generic()
+        admin_session.create_country('DEF', 'Test Second Country')
+        reg_session = self.get_session('ABC_reg')
+        reg2_session = self.get_session('DEF_reg')
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'event_photos_consent': 'yes',
+             'photo-1@content': photo_filename,
+             'photo_consent': 'Yes, for name badge only',
+             'diet_consent': 'yes'})
+        # Check the image inline on the person page.
+        admin_session.check_open_relative('person1')
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, photo_bytes)
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': '', 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': '', 'Badge Photo URL': img_url_csv,
+                          'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
+        self.assertEqual(reg_csv, [expected])
+        # Check the image from the URL in the .csv file.
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(reg_bytes, photo_bytes)
+        # Check the photo is not accessible anonymously or by
+        # registering users from other countries.
+        session.check_open(img_url_csv,
+                           error='You are not allowed to view this file',
+                           status=403)
+        reg2_session.check_open(img_url_csv,
+                                error='You are not allowed to view this file',
+                                status=403)
+
+    @_with_config(consent_ui='Yes')
+    def test_person_photo_create_consent_no(self):
+        """
+        Test photos uploaded at person creation time, with consent
+        information handling, no consent given.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'JPEG')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'event_photos_consent': 'yes',
+             'photo-1@content': photo_filename,
+             'photo_consent': 'No',
+             'diet_consent': 'yes'})
+        # Check no image inline on the person page.
+        admin_session.check_open_relative('person1')
+        self.assertIsNone(admin_session.get_img())
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_none = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': '', 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': '', 'Badge Photo URL': '',
+                          'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
+        self.assertEqual(reg_csv, [expected])
+        # A photo was in fact uploaded (nothing in the auditors
+        # prevents the creation of the photo item); check it is not
+        # accessible anonymously or by registering users.
+        session.check_open(img_url_none,
+                           error='You are not allowed to view this file',
+                           status=403)
+        reg_session.check_open(img_url_none,
+                               error='You are not allowed to view this file',
+                               status=403)
+
     def test_person_photo_create_upper(self):
         """
         Test photos uploaded at person creation time, uppercase .JPG suffix.
@@ -2978,6 +3137,199 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_bytes, photo_bytes)
         self.assertEqual(reg_bytes, photo_bytes)
 
+    @_with_config(static_site_directory='static-site', consent_ui='Yes')
+    def test_person_photo_create_static_consent(self):
+        """
+        Test photos copied from static site at person creation time,
+        with consent information handling.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_bytes = self.instance.static_site_bytes(
+            'people/person1/photo1.jpg')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Coordinator',
+            {'generic_url': 'https://www.example.invalid/people/person1/',
+             'event_photos_consent': 'yes',
+             'photo_consent': 'Yes, for website and name badge',
+             'diet_consent': 'yes'})
+        # Check the image inline on the person page.
+        admin_session.check_open_relative('person1')
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, photo_bytes)
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': img_url_csv, 'Badge Photo URL': None,
+                    'Generic Number': '1'}
+        expected_admin = {'Photo URL': img_url_csv,
+                          'Badge Photo URL': img_url_csv,
+                          'Generic Number': '1'}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
+        self.assertEqual(reg_csv, [expected])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, photo_bytes)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(reg_bytes, photo_bytes)
+
+    @_with_config(static_site_directory='static-site', consent_ui='Yes')
+    def test_person_photo_create_static_consent_badge_only(self):
+        """
+        Test photos copied from static site at person creation time,
+        with consent information handling, badge-only photo.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_bytes = self.instance.static_site_bytes(
+            'people/person1/photo1.jpg')
+        admin_session.create_country_generic()
+        admin_session.create_country('DEF', 'Test Second Country')
+        reg_session = self.get_session('ABC_reg')
+        reg2_session = self.get_session('DEF_reg')
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'generic_url': 'https://www.example.invalid/people/person1/',
+             'event_photos_consent': 'yes',
+             'photo_consent': 'Yes, for name badge only',
+             'diet_consent': 'yes'})
+        # Check the image inline on the person page.
+        admin_session.check_open_relative('person1')
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, photo_bytes)
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': '', 'Badge Photo URL': None,
+                    'Generic Number': '1'}
+        expected_admin = {'Photo URL': '', 'Badge Photo URL': img_url_csv,
+                          'Generic Number': '1'}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
+        self.assertEqual(reg_csv, [expected])
+        # Check the image from the URL in the .csv file.
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(reg_bytes, photo_bytes)
+        # Check the photo is not accessible anonymously or by
+        # registering users from other countries.
+        session.check_open(img_url_csv,
+                           error='You are not allowed to view this file',
+                           status=403)
+        reg2_session.check_open(img_url_csv,
+                                error='You are not allowed to view this file',
+                                status=403)
+
+    @_with_config(static_site_directory='static-site', consent_ui='Yes')
+    def test_person_photo_create_static_consent_no(self):
+        """
+        Test photos copied from static site at person creation time,
+        with consent information handling, no consent given so not
+        copied.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_bytes = self.instance.static_site_bytes(
+            'people/person1/photo1.jpg')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'generic_url': 'https://www.example.invalid/people/person1/',
+             'event_photos_consent': 'yes',
+             'photo_consent': 'No',
+             'diet_consent': 'yes'})
+        # Check no image inline on the person page.
+        admin_session.check_open_relative('person1')
+        self.assertIsNone(admin_session.get_img())
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        expected = {'Photo URL': '', 'Badge Photo URL': None,
+                    'Generic Number': '1'}
+        expected_admin = {'Photo URL': '', 'Badge Photo URL': '',
+                          'Generic Number': '1'}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
+        self.assertEqual(reg_csv, [expected])
+
+    @_with_config(static_site_directory='static-site', consent_ui='Yes')
+    def test_person_photo_create_static_consent_not_applicable(self):
+        """
+        Test photos copied from static site at person creation time,
+        with consent information handling, consent specified as not
+        applicable so not copied.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_bytes = self.instance.static_site_bytes(
+            'people/person1/photo1.jpg')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'generic_url': 'https://www.example.invalid/people/person1/',
+             'event_photos_consent': 'yes',
+             'photo_consent': 'Not applicable, no photo uploaded',
+             'diet_consent': 'yes'})
+        # Check no image inline on the person page.
+        admin_session.check_open_relative('person1')
+        self.assertIsNone(admin_session.get_img())
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        expected = {'Photo URL': '', 'Badge Photo URL': None,
+                    'Generic Number': '1'}
+        expected_admin = {'Photo URL': '', 'Badge Photo URL': '',
+                          'Generic Number': '1'}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
+        self.assertEqual(reg_csv, [expected])
+
     def test_person_photo_edit(self):
         """
         Test photos uploaded after person creation time.
@@ -3040,6 +3392,192 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_bytes, photo_bytes)
         self.assertEqual(admin_bytes, photo_bytes)
         self.assertEqual(reg_bytes, photo_bytes)
+
+    @_with_config(consent_ui='Yes')
+    def test_person_photo_edit_consent(self):
+        """
+        Test photos uploaded after person creation time, with consent
+        information handling.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'JPEG')
+        admin_session.create_country_generic()
+        admin_session.create_country('DEF', 'Test Second Country')
+        reg_session = self.get_session('ABC_reg')
+        reg2_session = self.get_session('DEF_reg')
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'event_photos_consent': 'yes',
+             'photo_consent': 'Yes, for website and name badge',
+             'diet_consent': 'yes'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        expected = {'Photo URL': '', 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': '', 'Badge Photo URL': '',
+                          'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
+        self.assertEqual(reg_csv, [expected])
+        admin_session.edit('person', '1', {'photo-1@content': photo_filename})
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        # Check the image inline on the person page.
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, photo_bytes)
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': img_url_csv, 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': img_url_csv,
+                          'Badge Photo URL': img_url_csv, 'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
+        self.assertEqual(reg_csv, [expected])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, photo_bytes)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(reg_bytes, photo_bytes)
+        # Change the consent to badge-only.
+        admin_session.edit('person', '1',
+                           {'photo_consent': 'Yes, for name badge only'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        expected2 = {'Photo URL': '', 'Badge Photo URL': None,
+                     'Generic Number': ''}
+        expected2_admin = {'Photo URL': '', 'Badge Photo URL': img_url_csv,
+                           'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected2])
+        self.assertEqual(admin_csv, [expected2_admin])
+        self.assertEqual(reg_csv, [expected2])
+        # Check the photo is not accessible anonymously or by
+        # registering users from other countries.
+        session.check_open(img_url_csv,
+                           error='You are not allowed to view this file',
+                           status=403)
+        reg2_session.check_open(img_url_csv,
+                                error='You are not allowed to view this file',
+                                status=403)
+        # Restore consent for website.
+        admin_session.edit(
+            'person', '1',
+            {'photo_consent': 'Yes, for website and name badge'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
+        self.assertEqual(reg_csv, [expected])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        reg2_bytes = reg2_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, photo_bytes)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(reg_bytes, photo_bytes)
+        self.assertEqual(reg2_bytes, photo_bytes)
+        # Remove consent, thereby removing the photo.
+        admin_session.edit('person', '1',
+                           {'photo_consent': 'No'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        expected3 = {'Photo URL': '', 'Badge Photo URL': None,
+                     'Generic Number': ''}
+        expected3_admin = {'Photo URL': '', 'Badge Photo URL': '',
+                           'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected3])
+        self.assertEqual(admin_csv, [expected3_admin])
+        self.assertEqual(reg_csv, [expected3])
+        # Check the photo is not accessible anonymously or by
+        # registering users from other countries.
+        session.check_open(img_url_csv,
+                           error='You are not allowed to view this file',
+                           status=403)
+        reg2_session.check_open(img_url_csv,
+                                error='You are not allowed to view this file',
+                                status=403)
+        # Now restoring the consent does not bring the photo back.
+        admin_session.edit(
+            'person', '1',
+            {'photo_consent': 'Yes, for website and name badge'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        self.assertEqual(anon_csv, [expected3])
+        self.assertEqual(admin_csv, [expected3_admin])
+        self.assertEqual(reg_csv, [expected3])
+        # Check the photo is still not accessible anonymously or by
+        # registering users from other countries.
+        session.check_open(img_url_csv,
+                           error='You are not allowed to view this file',
+                           status=403)
+        reg2_session.check_open(img_url_csv,
+                                error='You are not allowed to view this file',
+                                status=403)
 
     @_with_config(static_site_directory='static-site')
     def test_person_photo_edit_static(self):
@@ -3229,6 +3767,281 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_bytes, photo_bytes)
         self.assertEqual(admin_bytes, photo_bytes)
         self.assertEqual(reg_bytes, photo_bytes)
+
+    @_with_config(static_site_directory='static-site', consent_ui='Yes')
+    def test_person_photo_edit_static_consent(self):
+        """
+        Test photos copied from static site after person creation
+        time, with consent information handling.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Coordinator',
+            {'event_photos_consent': 'yes',
+             'photo_consent': 'Yes, for website and name badge',
+             'diet_consent': 'yes'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        expected = {'Photo URL': '', 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': '', 'Badge Photo URL': '',
+                          'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
+        self.assertEqual(reg_csv, [expected])
+        photo_bytes = self.instance.static_site_bytes(
+            'people/person1/photo1.jpg')
+        admin_session.edit(
+            'person', '1',
+            {'generic_url': 'https://www.example.invalid/people/person1/'})
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        # Check the image inline on the person page.
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, photo_bytes)
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': img_url_csv, 'Badge Photo URL': None,
+                    'Generic Number': '1'}
+        expected_admin = {'Photo URL': img_url_csv,
+                          'Badge Photo URL': img_url_csv,
+                          'Generic Number': '1'}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
+        self.assertEqual(reg_csv, [expected])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, photo_bytes)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(reg_bytes, photo_bytes)
+
+    @_with_config(static_site_directory='static-site', consent_ui='Yes')
+    def test_person_photo_edit_static_consent_badge_only(self):
+        """
+        Test photos copied from static site after person creation
+        time, with consent information handling, badge-only photo.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        admin_session.create_country('DEF', 'Test Second Country')
+        reg_session = self.get_session('ABC_reg')
+        reg2_session = self.get_session('DEF_reg')
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'event_photos_consent': 'yes',
+             'photo_consent': 'Yes, for name badge only',
+             'diet_consent': 'yes'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        expected = {'Photo URL': '', 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': '', 'Badge Photo URL': '',
+                          'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
+        self.assertEqual(reg_csv, [expected])
+        photo_bytes = self.instance.static_site_bytes(
+            'people/person1/photo1.jpg')
+        admin_session.edit(
+            'person', '1',
+            {'generic_url': 'https://www.example.invalid/people/person1/'})
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        # Check the image inline on the person page.
+        got_bytes = admin_session.get_img_contents()
+        self.assertEqual(got_bytes, photo_bytes)
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': '', 'Badge Photo URL': None,
+                    'Generic Number': '1'}
+        expected_admin = {'Photo URL': '', 'Badge Photo URL': img_url_csv,
+                          'Generic Number': '1'}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
+        self.assertEqual(reg_csv, [expected])
+        # Check the image from the URL in the .csv file.
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(reg_bytes, photo_bytes)
+        # Check the photo is not accessible anonymously or by
+        # registering users from other countries.
+        session.check_open(img_url_csv,
+                           error='You are not allowed to view this file',
+                           status=403)
+        reg2_session.check_open(img_url_csv,
+                                error='You are not allowed to view this file',
+                                status=403)
+
+    @_with_config(static_site_directory='static-site', consent_ui='Yes')
+    def test_person_photo_edit_static_consent_no(self):
+        """
+        Test photos copied from static site after person creation
+        time, with consent information handling, no consent given so
+        not copied.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'event_photos_consent': 'yes',
+             'photo_consent': 'No',
+             'diet_consent': 'yes'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        expected = {'Photo URL': '', 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': '', 'Badge Photo URL': '',
+                          'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
+        self.assertEqual(reg_csv, [expected])
+        admin_session.edit(
+            'person', '1',
+            {'generic_url': 'https://www.example.invalid/people/person1/'})
+        # Check no image inline on the person page.
+        admin_session.check_open_relative('person1')
+        self.assertIsNone(admin_session.get_img())
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': '', 'Badge Photo URL': None,
+                    'Generic Number': '1'}
+        expected_admin = {'Photo URL': '', 'Badge Photo URL': '',
+                          'Generic Number': '1'}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
+        self.assertEqual(reg_csv, [expected])
+
+    @_with_config(static_site_directory='static-site', consent_ui='Yes')
+    def test_person_photo_edit_static_consent_not_applicable(self):
+        """
+        Test photos copied from static site after person creation
+        time, with consent information handling, consent specified as
+        not applicable so not copied.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'event_photos_consent': 'yes',
+             'photo_consent': 'Not applicable, no photo uploaded',
+             'diet_consent': 'yes'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        expected = {'Photo URL': '', 'Badge Photo URL': None,
+                    'Generic Number': ''}
+        expected_admin = {'Photo URL': '', 'Badge Photo URL': '',
+                          'Generic Number': ''}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
+        self.assertEqual(reg_csv, [expected])
+        admin_session.edit(
+            'person', '1',
+            {'generic_url': 'https://www.example.invalid/people/person1/'})
+        # Check no image inline on the person page.
+        admin_session.check_open_relative('person1')
+        self.assertIsNone(admin_session.get_img())
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
+                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Generic Number': anon_csv[0]['Generic Number']}
+        admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
+                        'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
+                      'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
+                      'Generic Number': reg_csv[0]['Generic Number']}
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected = {'Photo URL': '', 'Badge Photo URL': None,
+                    'Generic Number': '1'}
+        expected_admin = {'Photo URL': '', 'Badge Photo URL': '',
+                          'Generic Number': '1'}
+        self.assertEqual(anon_csv, [expected])
+        self.assertEqual(admin_csv, [expected_admin])
+        self.assertEqual(reg_csv, [expected])
 
     def test_person_photo_replace(self):
         """
@@ -3472,6 +4285,89 @@ class RegSystemTestCase(unittest.TestCase):
                          photo_bytes)
         anon_zip.close()
         admin_zip.close()
+
+    @_with_config(consent_ui='Yes')
+    def test_person_photo_zip_consent(self):
+        """
+        Test ZIP file of photos with consent information handling.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_zip_empty = session.get_photos_zip()
+        admin_zip_empty = admin_session.get_photos_zip()
+        reg_zip_empty = reg_session.get_photos_zip()
+        anon_contents = [f.filename for f in anon_zip_empty.infolist()]
+        admin_contents = [f.filename for f in admin_zip_empty.infolist()]
+        reg_contents = [f.filename for f in reg_zip_empty.infolist()]
+        expected_contents = ['photos/README.txt']
+        self.assertEqual(anon_contents, expected_contents)
+        self.assertEqual(admin_contents, expected_contents)
+        self.assertEqual(reg_contents, expected_contents)
+        anon_zip_empty.close()
+        admin_zip_empty.close()
+        reg_zip_empty.close()
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'JPEG')
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'event_photos_consent': 'yes',
+             'photo-1@content': photo_filename,
+             'photo_consent': 'Yes, for website and name badge',
+             'diet_consent': 'yes'})
+        anon_zip = session.get_photos_zip()
+        admin_zip = admin_session.get_photos_zip()
+        reg_zip = reg_session.get_photos_zip()
+        anon_contents = [f.filename for f in anon_zip.infolist()]
+        admin_contents = [f.filename for f in admin_zip.infolist()]
+        reg_contents = [f.filename for f in reg_zip.infolist()]
+        expected_contents = ['photos/README.txt', 'photos/person1/photo.jpg']
+        self.assertEqual(anon_contents, expected_contents)
+        self.assertEqual(admin_contents, expected_contents)
+        self.assertEqual(reg_contents, expected_contents)
+        self.assertEqual(anon_zip.read('photos/person1/photo.jpg'),
+                         photo_bytes)
+        self.assertEqual(admin_zip.read('photos/person1/photo.jpg'),
+                         photo_bytes)
+        self.assertEqual(reg_zip.read('photos/person1/photo.jpg'),
+                         photo_bytes)
+        anon_zip.close()
+        admin_zip.close()
+        reg_zip.close()
+        admin_session.edit('person', '1',
+                           {'photo_consent': 'Yes, for name badge only'})
+        anon_zip = session.get_photos_zip()
+        admin_zip = admin_session.get_photos_zip()
+        reg_zip = reg_session.get_photos_zip()
+        anon_contents = [f.filename for f in anon_zip.infolist()]
+        admin_contents = [f.filename for f in admin_zip.infolist()]
+        reg_contents = [f.filename for f in reg_zip.infolist()]
+        expected_contents_admin = ['photos/README.txt',
+                                   'photos/person1/photo.jpg']
+        expected_contents_public = ['photos/README.txt']
+        self.assertEqual(anon_contents, expected_contents_public)
+        self.assertEqual(admin_contents, expected_contents_admin)
+        self.assertEqual(reg_contents, expected_contents_public)
+        self.assertEqual(admin_zip.read('photos/person1/photo.jpg'),
+                         photo_bytes)
+        anon_zip.close()
+        admin_zip.close()
+        reg_zip.close()
+        admin_session.edit('person', '1', {'photo_consent': 'No'})
+        anon_zip = session.get_photos_zip()
+        admin_zip = admin_session.get_photos_zip()
+        reg_zip = reg_session.get_photos_zip()
+        anon_contents = [f.filename for f in anon_zip.infolist()]
+        admin_contents = [f.filename for f in admin_zip.infolist()]
+        reg_contents = [f.filename for f in reg_zip.infolist()]
+        expected_contents = ['photos/README.txt']
+        self.assertEqual(anon_contents, expected_contents)
+        self.assertEqual(admin_contents, expected_contents)
+        self.assertEqual(reg_contents, expected_contents)
+        anon_zip.close()
+        admin_zip.close()
+        reg_zip.close()
 
     def test_person_photo_zip_errors(self):
         """
@@ -3803,6 +4699,8 @@ class RegSystemTestCase(unittest.TestCase):
         """
         session = self.get_session()
         admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'JPEG')
         admin_session.create_person(
             'XMO 2015 Staff', 'Coordinator',
             {'diet_consent': 'yes'},
@@ -3820,6 +4718,85 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         self.assertEqual(anon_csv, [])
         self.assertEqual(admin_csv, [])
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Coordinator',
+            {'photo-1@content': photo_filename,
+             'event_photos_consent': 'yes',
+             'photo_consent': 'Not applicable, no photo uploaded',
+             'diet_consent': 'yes'},
+            error='No choice of consent for registration photo specified')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+
+    @_with_config(consent_ui='Yes')
+    def test_person_edit_audit_errors_missing_consent(self):
+        """
+        Test errors from person edit auditor, missing required consent
+        information.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'JPEG')
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Coordinator',
+            {'event_photos_consent': 'yes',
+             'photo_consent': 'Not applicable, no photo uploaded',
+             'diet_consent': 'yes'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        # "Not applicable" set, then uploading photo.
+        admin_session.edit(
+            'person', '1',
+            {'photo-1@content': photo_filename},
+            error='No choice of consent for registration photo specified')
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Coordinator',
+            {'photo-1@content': photo_filename,
+             'event_photos_consent': 'yes',
+             'photo_consent': 'Yes, for website and name badge',
+             'diet_consent': 'yes'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 2)
+        self.assertEqual(len(admin_csv), 2)
+        # Photo uploaded, then "not applicable" set.
+        admin_session.edit(
+            'person', '2',
+            {'photo_consent': 'Not applicable, no photo uploaded'},
+            error='No choice of consent for registration photo specified')
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Coordinator',
+            {'event_photos_consent': 'yes',
+             'photo_consent': 'Yes, for website and name badge',
+             'diet_consent': 'yes'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 3)
+        self.assertEqual(len(admin_csv), 3)
+        # Person created, then "not applicable" set together with
+        # uploading photo.
+        admin_session.edit(
+            'person', '3',
+            {'photo-1@content': photo_filename,
+             'photo_consent': 'Not applicable, no photo uploaded'},
+            error='No choice of consent for registration photo specified')
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
 
     def test_person_multilink_null_edit(self):
         """

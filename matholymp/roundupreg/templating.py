@@ -40,8 +40,8 @@ __all__ = ['people_from_country_internal', 'people_from_country',
            'person_case_warning', 'list_expected_roles', 'registration_status',
            'registration_status_country', 'edit_rooms', 'show_consent_form_ui',
            'string_select', 'date_of_birth_select', 'arrdep_date_select',
-           'arrdep_time_select', 'required_person_fields',
-           'register_templating_utils']
+           'arrdep_time_select', 'photo_consent_select',
+           'required_person_fields', 'register_templating_utils']
 
 import cgi
 import datetime
@@ -256,6 +256,7 @@ def registration_status(db, nonce):
     consent_forms_date = get_consent_forms_date(db)
     max_photo_size = int(db.config.ext['MATHOLYMP_PHOTO_MAX_SIZE'])
     return sitegen.registration_status_text(main_role_list, consent_forms_date,
+                                            have_consent_ui(db),
                                             max_photo_size, nonce)
 
 
@@ -269,7 +270,8 @@ def registration_status_country(db, userid):
     user_country = db.user.get(userid, 'country')
     c = sitegen.event.country_map[int(user_country)]
     return sitegen.registration_status_country_text(c, main_role_list,
-                                                    consent_forms_date)
+                                                    consent_forms_date,
+                                                    have_consent_ui(db))
 
 
 def edit_rooms(db):
@@ -307,11 +309,12 @@ def string_select(name, default_label, entry_list, selected):
         option_list.append('<option %svalue="%s">%s</option>'
                            % (sel, cgi.escape(e_value, quote=True),
                               cgi.escape(e_label)))
-    d_sel = ''
-    if not found_sel:
-        d_sel = 'selected="selected" '
-    option_list.insert(0, ('<option %svalue="">%s</option>'
-                           % (d_sel, cgi.escape(default_label))))
+    if default_label:
+        d_sel = ''
+        if not found_sel:
+            d_sel = 'selected="selected" '
+        option_list.insert(0, ('<option %svalue="">%s</option>'
+                               % (d_sel, cgi.escape(default_label))))
     return ('<select id="%s" name="%s">%s</select>'
             % (name, name, '\n'.join(option_list)))
 
@@ -363,6 +366,16 @@ def arrdep_time_select(db, kind, hour, minute):
     return '%s : %s' % (hour_select, minute_select)
 
 
+def photo_consent_select(selected):
+    """Return form content for selecting consent for uploaded photos."""
+    return string_select('photo_consent', None,
+                         (('not_applicable',
+                           'Not applicable, no photo uploaded'),
+                          ('yes', 'Yes, for website and name badge'),
+                          ('badge_only', 'Yes, for name badge only'),
+                          ('no', 'No')), selected)
+
+
 def required_person_fields(db):
     """Return the list of fields required for registered people."""
     req = ['country', 'given_name', 'family_name', 'gender', 'primary_role',
@@ -371,11 +384,13 @@ def required_person_fields(db):
         req.append('date_of_birth_year')
         req.append('date_of_birth_month')
         req.append('date_of_birth_day')
-    # event_photos_consent and diet_consent not listed here because
-    # the JavaScript support for checking required fields are set
-    # (taken unmodified from Roundup) does not support radio-button
-    # fields (it requires a single <input> with an appropriate id,
-    # which must have a value).
+    if have_consent_ui(db):
+        # event_photos_consent and diet_consent not listed here
+        # because the JavaScript support for checking required fields
+        # are set (taken unmodified from Roundup) does not support
+        # radio-button fields (it requires a single <input> with an
+        # appropriate id, which must have a value).
+        req.append('photo_consent')
     if have_passport_numbers(db):
         req.append('passport_number')
     if have_nationality(db):
@@ -424,4 +439,5 @@ def register_templating_utils(instance):
     instance.registerUtil('date_of_birth_select', date_of_birth_select)
     instance.registerUtil('arrdep_date_select', arrdep_date_select)
     instance.registerUtil('arrdep_time_select', arrdep_time_select)
+    instance.registerUtil('photo_consent_select', photo_consent_select)
     instance.registerUtil('required_person_fields', required_person_fields)

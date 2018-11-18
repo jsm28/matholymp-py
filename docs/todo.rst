@@ -192,9 +192,6 @@ Registration system
   and flags for retired person and country records, and to the
   non-current photos and flags for all person and country records.)
 
-* Support (staff only?) uploading a photo that appears on name badges
-  but not public on the site.
-
 * Add user interface for removing a language, replacing all requests
   for it by requests for a given other language.
 
