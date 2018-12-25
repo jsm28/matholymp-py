@@ -53,7 +53,7 @@
 This module provides the user auditor for the Roundup registration system.
 """
 
-__all__ = ['audit_user_fields']
+__all__ = ['valid_address', 'audit_user_fields']
 
 import re
 
@@ -65,7 +65,7 @@ _email_regexp = (r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+
 _email_rfc = re.compile('^' + _email_regexp[0] + '@' + _email_regexp[1] + '$', re.IGNORECASE)
 
 
-def _valid_address(address):
+def valid_address(address):
     """Check validity of an email address."""
     return _email_rfc.match(address)
 
@@ -80,7 +80,7 @@ def audit_user_fields(db, cl, nodeid, newvalues):
 
     if 'address' in newvalues:
         address = newvalues['address']
-        if not _valid_address(address):
+        if not valid_address(address):
             raise ValueError('Email address syntax is invalid')
 
     for rolename in [r.lower().strip()

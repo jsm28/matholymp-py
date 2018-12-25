@@ -46,7 +46,7 @@ from matholymp.roundupreg.rounduputil import have_consent_forms, \
     db_file_extension
 from matholymp.roundupreg.staticsite import static_site_event_group, \
     static_site_file_data
-from matholymp.roundupreg.userauditor import audit_user_fields
+from matholymp.roundupreg.userauditor import valid_address, audit_user_fields
 
 
 def audit_event_fields(db, cl, nodeid, newvalues):
@@ -115,6 +115,11 @@ def audit_country_fields(db, cl, nodeid, newvalues):
                  != db.country.get(nodeid, 'participants_ok'))):
             raise ValueError('Cannot change whether a country '
                              'can have participants')
+
+    # If a contact email address is specified, it must be valid.
+    if 'contact_email' in newvalues and newvalues['contact_email'] is not None:
+        if not valid_address(newvalues['contact_email']):
+            raise ValueError('Email address syntax is invalid')
 
     if 'flag' in newvalues:
         file_id = newvalues['flag']

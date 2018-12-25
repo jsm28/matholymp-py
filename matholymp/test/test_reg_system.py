@@ -622,7 +622,7 @@ class RoundupTestSession(object):
         data = {'code': code, 'name': name}
         if other is not None:
             data.update(other)
-        auto_user = 'contact_email' in data
+        auto_user = 'contact_email' in data and not error
         self.create('country', data, error=error, mail=auto_user)
         if auto_user:
             mail_bin = self.last_mail_bin
@@ -1794,6 +1794,9 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country('ZZA', 'Test First Country',
                                      error='A country with code ZZA already '
                                      'exists')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'contact_email': 'bad_email'},
+                                     error='Email address syntax is invalid')
         flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.jpg',
                                                         'JPEG')
         admin_session.create_country('ABC', 'Test First Country',
@@ -1937,6 +1940,8 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.edit('country', '3', {'participants_ok': 'no'},
                            error='Cannot change whether a country can have '
                            'participants')
+        admin_session.edit('country', '3', {'contact_email': 'bad'},
+                           error='Email address syntax is invalid')
         flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.jpg',
                                                         'JPEG')
         admin_session.edit('country', '3',
@@ -1990,6 +1995,20 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_countries_csv()
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        # Deleting a specified email address is OK.
+        admin_session.create_country('DEF', 'Test Second Country',
+                                     {'contact_email': 'DEF@example.invalid'})
+        admin_session.edit('country', '4', {'contact_email': ''})
+        expected_def = {'XMO Number': '2', 'Country Number': '4',
+                        'Annual URL': self.instance.url + 'country4',
+                        'Code': 'DEF', 'Name': 'Test Second Country',
+                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        self.assertEqual(anon_csv,
+                         [expected_abc, expected_def, expected_staff])
+        self.assertEqual(admin_csv,
+                         [expected_abc, expected_def, expected_staff])
 
     @_with_config(static_site_directory='static-site')
     def test_country_edit_audit_errors_static(self):

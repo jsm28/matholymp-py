@@ -196,6 +196,11 @@ the registration system is not active.
   system references this information.  :file:`person.item.html` has
   been updated accordingly.
 
+* Specifying an invalid contact email address for a country now
+  results more consistently in errors from the registration system,
+  rather than only producing errors if the registration system tried
+  to create a user account with the invalid address.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 
