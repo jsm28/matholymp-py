@@ -96,6 +96,7 @@ def init_schema(env):
                     code=String(),
                     name=String(),
                     contact_email=String(),
+                    contact_extra=String(),
                     generic_url=String(),
                     reuse_flag=Boolean(),
                     flag=Link('flag'),

@@ -201,6 +201,10 @@ the registration system is not active.
   rather than only producing errors if the registration system tried
   to create a user account with the invalid address.
 
+* More than one contact email address may be specified for a country
+  in the registration system, with the additional addresses all
+  receiving the email generated with username and password details.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

@@ -120,6 +120,13 @@ def audit_country_fields(db, cl, nodeid, newvalues):
     if 'contact_email' in newvalues and newvalues['contact_email'] is not None:
         if not valid_address(newvalues['contact_email']):
             raise ValueError('Email address syntax is invalid')
+    if 'contact_extra' in newvalues and newvalues['contact_extra'] is not None:
+        emails = [val.strip()
+                  for val in newvalues['contact_extra'].split('\n')]
+        emails = [val for val in emails if val]
+        for email in emails:
+            if not valid_address(email):
+                raise ValueError('Email address syntax is invalid')
 
     if 'flag' in newvalues:
         file_id = newvalues['flag']

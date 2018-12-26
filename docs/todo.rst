@@ -238,8 +238,6 @@ Registration system
 * Add automation for bulk creation of countries in registration system
   from command line (or web interface).
 
-* Support for more than one contact email address for a country.
-
 * Support bulk upload of other registration details.
 
 * Support self-registration accounts (that can register a single

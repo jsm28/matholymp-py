@@ -59,6 +59,13 @@ def country_react(db, cl, nodeid, oldvalues):
     email_addr = db.country.get(nodeid, 'contact_email')
     if not email_addr:
         return
+    email_extra = db.country.get(nodeid, 'contact_extra')
+    if email_extra:
+        email_extra = [val.strip()
+                       for val in email_extra.split('\n')]
+        email_extra = [val for val in email_extra if val]
+    else:
+        email_extra = []
     country_code = db.country.get(nodeid, 'code')
     username = country_code + '_reg'
     if db.user.stringFind(username=username):
@@ -88,6 +95,7 @@ def country_react(db, cl, nodeid, oldvalues):
     msg = mailer.get_standard_message()
     msg['Message-Id'] = email.utils.make_msgid('matholymp.' + country_code)
     email_to = [email_addr, db.config.ADMIN_EMAIL]
+    email_to.extend(email_extra)
     mailer.set_message_attributes(msg,
                                   email_to,
                                   subject,

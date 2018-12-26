@@ -940,8 +940,24 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session = self.get_session('admin')
         admin_session.create_country('ABC', 'Test First Country',
                                      {'contact_email': 'ABC@example.invalid'})
+        # Check where the email was sent.
+        self.assertIn(
+            b'\nTO: ABC@example.invalid, webmaster@example.invalid\n',
+            admin_session.last_mail_bin)
         # Test login with the new user works.
         self.get_session('ABC_reg')
+        # Test case of extra contact addresses.
+        admin_session.create_country('DEF', 'Test Second Country',
+                                     {'contact_email': 'DEF@example.invalid',
+                                      'contact_extra':
+                                      'DEF2@example.invalid\n'
+                                      '  DEF3@example.invalid \n\n'
+                                      'DEF5@example.invalid'})
+        self.assertIn(
+            b'\nTO: DEF@example.invalid, webmaster@example.invalid, '
+            b'DEF2@example.invalid, DEF3@example.invalid, '
+            b'DEF5@example.invalid\n',
+            admin_session.last_mail_bin)
 
     def test_country_csv(self):
         """
@@ -1797,6 +1813,9 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country('ABC', 'Test First Country',
                                      {'contact_email': 'bad_email'},
                                      error='Email address syntax is invalid')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'contact_extra': 'bad_email'},
+                                     error='Email address syntax is invalid')
         flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.jpg',
                                                         'JPEG')
         admin_session.create_country('ABC', 'Test First Country',
@@ -1942,6 +1961,8 @@ class RegSystemTestCase(unittest.TestCase):
                            'participants')
         admin_session.edit('country', '3', {'contact_email': 'bad'},
                            error='Email address syntax is invalid')
+        admin_session.edit('country', '3', {'contact_extra': 'bad'},
+                           error='Email address syntax is invalid')
         flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.jpg',
                                                         'JPEG')
         admin_session.edit('country', '3',
@@ -1997,8 +2018,10 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv, [expected_abc, expected_staff])
         # Deleting a specified email address is OK.
         admin_session.create_country('DEF', 'Test Second Country',
-                                     {'contact_email': 'DEF@example.invalid'})
-        admin_session.edit('country', '4', {'contact_email': ''})
+                                     {'contact_email': 'DEF@example.invalid',
+                                      'contact_extra': 'DEF2@example.invalid'})
+        admin_session.edit('country', '4', {'contact_email': '',
+                                            'contact_extra': ''})
         expected_def = {'XMO Number': '2', 'Country Number': '4',
                         'Annual URL': self.instance.url + 'country4',
                         'Code': 'DEF', 'Name': 'Test Second Country',
