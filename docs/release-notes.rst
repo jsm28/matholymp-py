@@ -204,6 +204,7 @@ the registration system is not active.
 * More than one contact email address may be specified for a country
   in the registration system, with the additional addresses all
   receiving the email generated with username and password details.
+  :file:`country.item.html` is updated accordingly.
 
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
