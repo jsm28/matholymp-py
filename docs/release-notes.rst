@@ -206,6 +206,10 @@ the registration system is not active.
   receiving the email generated with username and password details.
   :file:`country.item.html` is updated accordingly.
 
+* A bug has been fixed that produced internal errors when registering
+  a person with only part of their date of birth specified, when dates
+  of birth are not required for all participants.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

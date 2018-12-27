@@ -293,12 +293,18 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         if dob_year is not None:
             dob_year = None
             newvalues['date_of_birth_year'] = None
+            if nodeid is None:
+                del newvalues['date_of_birth_year']
         if dob_month is not None:
             dob_month = None
             newvalues['date_of_birth_month'] = None
+            if nodeid is None:
+                del newvalues['date_of_birth_month']
         if dob_day is not None:
             dob_day = None
             newvalues['date_of_birth_day'] = None
+            if nodeid is None:
+                del newvalues['date_of_birth_day']
         date_of_birth = None
     else:
         date_of_birth = date_from_ymd_str('date of birth', dob_year, dob_month,

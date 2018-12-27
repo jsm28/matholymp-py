@@ -4972,6 +4972,64 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv[1]['Departure Date'], '')
         self.assertEqual(admin_csv[1]['Departure Time'], '')
 
+    def test_person_date_of_birth_partial(self):
+        """
+        Test creating people with partial dates of birth.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_person('XMO 2015 Staff', 'Chief Coordinator',
+                                    {'date_of_birth_year': '1990',
+                                     'date_of_birth_month': 'January',
+                                     'date_of_birth_day': '(day)'})
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(admin_csv[0]['Date of Birth'], '')
+        admin_session.create_person('XMO 2015 Staff', 'Chief Guide',
+                                    {'date_of_birth_year': '2000',
+                                     'date_of_birth_month': '(month)',
+                                     'date_of_birth_day': '10'})
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(len(admin_csv), 2)
+        self.assertEqual(admin_csv[0]['Date of Birth'], '')
+        self.assertEqual(admin_csv[1]['Date of Birth'], '')
+        admin_session.create_person('XMO 2015 Staff', 'Jury Chair',
+                                    {'date_of_birth_year': '(year)',
+                                     'date_of_birth_month': 'December',
+                                     'date_of_birth_day': '10'})
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(len(admin_csv), 3)
+        self.assertEqual(admin_csv[0]['Date of Birth'], '')
+        self.assertEqual(admin_csv[1]['Date of Birth'], '')
+        self.assertEqual(admin_csv[2]['Date of Birth'], '')
+        # Verify setting and then partially unsetting details.
+        admin_session.select_main_form()
+        admin_session.set({'date_of_birth_year': '2001',
+                           'date_of_birth_month': 'February',
+                           'date_of_birth_day': '20'})
+        admin_session.check_submit_selected()
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(len(admin_csv), 3)
+        self.assertEqual(admin_csv[0]['Date of Birth'], '')
+        self.assertEqual(admin_csv[1]['Date of Birth'], '')
+        self.assertEqual(admin_csv[2]['Date of Birth'], '2001-02-20')
+        admin_session.select_main_form()
+        # It should not be necessary to upload a photo here, but
+        # MechanicalSoup ignores the specified enctype, resulting in
+        # an application/x-www-form-urlencoded submission, and
+        # Python's cgi module defaults to ignoring blank fields in
+        # such submissions, whereas the blank fields are required here
+        # for the correct semantics.
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                         'JPEG')
+        admin_session.set({'date_of_birth_day': '(day)',
+                           'photo-1@content': photo_filename})
+        admin_session.check_submit_selected()
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(len(admin_csv), 3)
+        self.assertEqual(admin_csv[0]['Date of Birth'], '')
+        self.assertEqual(admin_csv[1]['Date of Birth'], '')
+        self.assertEqual(admin_csv[2]['Date of Birth'], '')
+
     def test_event_medal_boundaries_csv_errors(self):
         """
         Test errors from medal_boundaries_csv action.
