@@ -4733,6 +4733,81 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session.check_submit_selected(error='You do not have '
                                           'permission to retire', status=403)
 
+    def test_person_create_audit_errors(self):
+        """
+        Test errors from person creation auditor.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'date_of_birth_year': '2000',
+                                     'date_of_birth_month': 'January',
+                                     'date_of_birth_day': '(day)'},
+                                    error='No day of birth specified')
+        admin_session.create_person('Test First Country', 'Contestant 2',
+                                    {'date_of_birth_year': '2000',
+                                     'date_of_birth_month': '(month)',
+                                     'date_of_birth_day': '10'},
+                                    error='No month of birth specified')
+        admin_session.create_person('Test First Country', 'Contestant 3',
+                                    {'date_of_birth_year': '(year)',
+                                     'date_of_birth_month': 'December',
+                                     'date_of_birth_day': '10'},
+                                    error='No year of birth specified')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'date_of_birth_year': '2000',
+                                   'date_of_birth_month': 'January',
+                                   'date_of_birth_day': '(day)'},
+                                  error='No day of birth specified')
+        reg_session.create_person('Test First Country', 'Contestant 2',
+                                  {'date_of_birth_year': '2000',
+                                   'date_of_birth_month': '(month)',
+                                   'date_of_birth_day': '10'},
+                                  error='No month of birth specified')
+        reg_session.create_person('Test First Country', 'Contestant 3',
+                                  {'date_of_birth_year': '(year)',
+                                   'date_of_birth_month': 'December',
+                                   'date_of_birth_day': '10'},
+                                  error='No year of birth specified')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'date_of_birth_year': '1995',
+                                     'date_of_birth_month': 'April',
+                                     'date_of_birth_day': '1'},
+                                    error='Contestant too old')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'date_of_birth_year': '1995',
+                                     'date_of_birth_month': 'March',
+                                     'date_of_birth_day': '31'},
+                                    error='Contestant too old')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'date_of_birth_year': '1994',
+                                     'date_of_birth_month': 'December',
+                                     'date_of_birth_day': '31'},
+                                     error='Contestant too old')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'date_of_birth_year': '1995',
+                                   'date_of_birth_month': 'April',
+                                   'date_of_birth_day': '1'},
+                                  error='Contestant too old')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'date_of_birth_year': '1995',
+                                   'date_of_birth_month': 'March',
+                                   'date_of_birth_day': '31'},
+                                  error='Contestant too old')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'date_of_birth_year': '1994',
+                                   'date_of_birth_month': 'December',
+                                   'date_of_birth_day': '31'},
+                                  error='Contestant too old')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+
     @_with_config(consent_ui='Yes')
     def test_person_create_audit_errors_missing_consent(self):
         """
