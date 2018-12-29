@@ -4808,6 +4808,160 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv, [])
         self.assertEqual(reg_csv, [])
 
+    def test_person_create_audit_errors_missing(self):
+        """
+        Test errors from person creation auditor, missing required data.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create('person',
+                             {'primary_role': 'Leader',
+                              'given_name': 'Given',
+                              'family_name': 'Family',
+                              'gender': 'Female',
+                              'language_1': 'English',
+                              'tshirt': 'S'},
+                             error='Required person property country '
+                             'not supplied')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'given_name': None},
+                                    error='Required person property '
+                                    'given_name not supplied')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'given_name': None},
+                                  error='Required person property '
+                                  'given_name not supplied')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'family_name': None},
+                                    error='Required person property '
+                                    'family_name not supplied')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'family_name': None},
+                                  error='Required person property '
+                                  'family_name not supplied')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'gender': None},
+                                    error='Required person property gender '
+                                    'not supplied')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'gender': None},
+                                  error='Required person property gender '
+                                  'not supplied')
+        admin_session.create('person',
+                             {'country': 'Test First Country',
+                              'given_name': 'Given',
+                              'family_name': 'Family',
+                              'gender': 'Female',
+                              'language_1': 'English',
+                              'tshirt': 'S'},
+                             error='Required person property primary_role '
+                             'not supplied')
+        reg_session.create('person',
+                           {'country': 'Test First Country',
+                            'given_name': 'Given',
+                            'family_name': 'Family',
+                            'gender': 'Female',
+                            'language_1': 'English',
+                            'tshirt': 'S'},
+                           error='Required person property primary_role '
+                           'not supplied')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'language_1': None},
+                                    error='Required person property '
+                                    'language_1 not supplied')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'language_1': None},
+                                  error='Required person property '
+                                  'language_1 not supplied')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'tshirt': None},
+                                    error='Required person property tshirt '
+                                    'not supplied')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'tshirt': None},
+                                  error='Required person property tshirt '
+                                  'not supplied')
+        # The above errors are generic Roundup ones that rely on
+        # @required being sent by the browser, so must not be relied
+        # upon to maintain required properties of data since the
+        # browser should not be trusted; also verify the checks from
+        # the auditor in case @required is not sent.
+        admin_session.create('person',
+                             {'@required': '',
+                              'primary_role': 'Leader',
+                              'given_name': 'Given',
+                              'family_name': 'Family',
+                              'gender': 'Female',
+                              'language_1': 'English',
+                              'tshirt': 'S'},
+                             error='No country specified')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'@required': '',
+                                     'given_name': None},
+                                    error='No given name specified')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'@required': '',
+                                   'given_name': None},
+                                  error='No given name specified')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'@required': '',
+                                     'family_name': None},
+                                    error='No family name specified')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'@required': '',
+                                   'family_name': None},
+                                  error='No family name specified')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'@required': '',
+                                     'gender': None},
+                                    error='No gender specified')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'@required': '',
+                                   'gender': None},
+                                  error='No gender specified')
+        admin_session.create('person',
+                             {'@required': '',
+                              'country': 'Test First Country',
+                              'given_name': 'Given',
+                              'family_name': 'Family',
+                              'gender': 'Female',
+                              'language_1': 'English',
+                              'tshirt': 'S'},
+                             error='No primary role specified')
+        reg_session.create('person',
+                           {'@required': '',
+                            'country': 'Test First Country',
+                            'given_name': 'Given',
+                            'family_name': 'Family',
+                            'gender': 'Female',
+                            'language_1': 'English',
+                            'tshirt': 'S'},
+                           error='No primary role specified')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'@required': '',
+                                     'language_1': None},
+                                    error='No first language specified')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'@required': '',
+                                   'language_1': None},
+                                  error='No first language specified')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'@required': '',
+                                     'tshirt': None},
+                                    error='No T-shirt size specified')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'@required': '',
+                                   'tshirt': None},
+                                  error='No T-shirt size specified')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+
     @_with_config(consent_ui='Yes')
     def test_person_create_audit_errors_missing_consent(self):
         """
@@ -4846,6 +5000,66 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         self.assertEqual(anon_csv, [])
         self.assertEqual(admin_csv, [])
+
+    def test_person_create_audit_errors_bad_country(self):
+        """
+        Test errors from person creation auditor: bad country for
+        registering user.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        admin_session.edit('user', self.instance.userids['ABC_reg'],
+                           {'roles': 'Admin', 'country': 'XMO 2015 Staff'})
+        reg_session = self.get_session('ABC_reg')
+        reg_session.check_open_relative('person?@template=item')
+        reg_session.select_main_form()
+        reg_session.set({'country': 'XMO 2015 Staff',
+                         'primary_role': 'Leader',
+                         'given_name': 'Given',
+                         'family_name': 'Family',
+                         'gender': 'Female',
+                         'language_1': 'English',
+                         'tshirt': 'M'})
+        admin_session.edit('user', self.instance.userids['ABC_reg'],
+                           {'roles': 'User,Register',
+                            'country': 'Test First Country'})
+        reg_session.check_submit_selected(error='Person must be from your '
+                                          'country')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+
+    def test_person_create_audit_errors_registration_disabled(self):
+        """
+        Test errors from person creation auditor: registration disabled.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        admin_session.edit('event', '1', {'registration_enabled': 'no'})
+        reg_session = self.get_session('ABC_reg')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  error='Registration is now disabled, please '
+                                  'contact the event organisers to change '
+                                  'details of registered participants')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        # Admin accounts can still register people.
+        admin_session.create_person('Test First Country', 'Contestant 1')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
 
     @_with_config(consent_ui='Yes')
     def test_person_edit_audit_errors_missing_consent(self):
