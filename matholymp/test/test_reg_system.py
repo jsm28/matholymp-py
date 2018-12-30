@@ -4962,6 +4962,99 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv, [])
         self.assertEqual(reg_csv, [])
 
+    @_with_config(require_date_of_birth='Yes')
+    def test_person_create_audit_errors_missing_date_of_birth(self):
+        """
+        Test errors from person creation auditor, missing date of birth.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Leader',
+                                    {'date_of_birth_year': '2000',
+                                     'date_of_birth_month': 'January',
+                                     'date_of_birth_day': '(day)'},
+                                    error='Required person property '
+                                    'date_of_birth_day not supplied')
+        admin_session.create_person('Test First Country', 'Leader',
+                                    {'date_of_birth_year': '2000',
+                                     'date_of_birth_month': '(month)',
+                                     'date_of_birth_day': '10'},
+                                    error='Required person property '
+                                    'date_of_birth_month not supplied')
+        admin_session.create_person('Test First Country', 'Leader',
+                                    {'date_of_birth_year': '(year)',
+                                     'date_of_birth_month': 'December',
+                                     'date_of_birth_day': '10'},
+                                    error='Required person property '
+                                    'date_of_birth_year not supplied')
+        reg_session.create_person('Test First Country', 'Leader',
+                                  {'date_of_birth_year': '2000',
+                                   'date_of_birth_month': 'January',
+                                   'date_of_birth_day': '(day)'},
+                                  error='Required person property '
+                                  'date_of_birth_day not supplied')
+        reg_session.create_person('Test First Country', 'Leader',
+                                  {'date_of_birth_year': '2000',
+                                   'date_of_birth_month': '(month)',
+                                   'date_of_birth_day': '10'},
+                                  error='Required person property '
+                                  'date_of_birth_month not supplied')
+        reg_session.create_person('Test First Country', 'Leader',
+                                  {'date_of_birth_year': '(year)',
+                                   'date_of_birth_month': 'December',
+                                   'date_of_birth_day': '10'},
+                                  error='Required person property '
+                                  'date_of_birth_year not supplied')
+        # The above errors are generic Roundup ones that rely on
+        # @required being sent by the browser, so must not be relied
+        # upon to maintain required properties of data since the
+        # browser should not be trusted; also verify the checks from
+        # the auditor in case @required is not sent.
+        admin_session.create_person('Test First Country', 'Deputy Leader',
+                                    {'@required': '',
+                                     'date_of_birth_year': '2000',
+                                     'date_of_birth_month': 'January',
+                                     'date_of_birth_day': '(day)'},
+                                    error='No day of birth specified')
+        admin_session.create_person('Test First Country', 'Deputy Leader',
+                                    {'@required': '',
+                                     'date_of_birth_year': '2000',
+                                     'date_of_birth_month': '(month)',
+                                     'date_of_birth_day': '10'},
+                                    error='No month of birth specified')
+        admin_session.create_person('Test First Country', 'Deputy Leader',
+                                    {'@required': '',
+                                     'date_of_birth_year': '(year)',
+                                     'date_of_birth_month': 'December',
+                                     'date_of_birth_day': '10'},
+                                    error='No year of birth specified')
+        reg_session.create_person('Test First Country', 'Deputy Leader',
+                                  {'@required': '',
+                                   'date_of_birth_year': '2000',
+                                   'date_of_birth_month': 'January',
+                                   'date_of_birth_day': '(day)'},
+                                  error='No day of birth specified')
+        reg_session.create_person('Test First Country', 'Deputy Leader',
+                                  {'@required': '',
+                                   'date_of_birth_year': '2000',
+                                   'date_of_birth_month': '(month)',
+                                   'date_of_birth_day': '10'},
+                                  error='No month of birth specified')
+        reg_session.create_person('Test First Country', 'Deputy Leader',
+                                  {'@required': '',
+                                   'date_of_birth_year': '(year)',
+                                   'date_of_birth_month': 'December',
+                                   'date_of_birth_day': '10'},
+                                  error='No year of birth specified')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+
     @_with_config(consent_ui='Yes')
     def test_person_create_audit_errors_missing_consent(self):
         """
@@ -5000,6 +5093,119 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         self.assertEqual(anon_csv, [])
         self.assertEqual(admin_csv, [])
+
+    @_with_config(require_passport_number='Yes')
+    def test_person_create_audit_errors_missing_passport_number(self):
+        """
+        Test errors from person creation auditor, missing passport number.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Leader',
+                                    error='Required person property '
+                                    'passport_number not supplied')
+        reg_session.create_person('Test First Country', 'Leader',
+                                  error='Required person property '
+                                  'passport_number not supplied')
+        # The above errors are generic Roundup ones that rely on
+        # @required being sent by the browser, so must not be relied
+        # upon to maintain required properties of data since the
+        # browser should not be trusted; also verify the checks from
+        # the auditor in case @required is not sent.
+        admin_session.create_person('Test First Country', 'Leader',
+                                    {'@required': ''},
+                                    error='No passport or identity card '
+                                    'number specified')
+        reg_session.create_person('Test First Country', 'Leader',
+                                  {'@required': ''},
+                                  error='No passport or identity card number '
+                                  'specified')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+
+    @_with_config(require_nationality='Yes')
+    def test_person_create_audit_errors_missing_nationality(self):
+        """
+        Test errors from person creation auditor, missing nationality.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Leader',
+                                    error='Required person property '
+                                    'nationality not supplied')
+        reg_session.create_person('Test First Country', 'Leader',
+                                  error='Required person property '
+                                  'nationality not supplied')
+        # The above errors are generic Roundup ones that rely on
+        # @required being sent by the browser, so must not be relied
+        # upon to maintain required properties of data since the
+        # browser should not be trusted; also verify the checks from
+        # the auditor in case @required is not sent.
+        admin_session.create_person('Test First Country', 'Leader',
+                                    {'@required': ''},
+                                    error='No nationality specified')
+        reg_session.create_person('Test First Country', 'Leader',
+                                  {'@required': ''},
+                                  error='No nationality specified')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+
+    @_with_config(require_diet='Yes')
+    def test_person_create_audit_errors_missing_diet(self):
+        """
+        Test errors from person creation auditor, missing diet.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Leader',
+                                    error='Required person property '
+                                    'diet not supplied')
+        reg_session.create_person('Test First Country', 'Leader',
+                                  error='Required person property '
+                                  'diet not supplied')
+        # The above errors are generic Roundup ones that rely on
+        # @required being sent by the browser, so must not be relied
+        # upon to maintain required properties of data since the
+        # browser should not be trusted; also verify the checks from
+        # the auditor in case @required is not sent.
+        admin_session.create_person('Test First Country', 'Leader',
+                                    {'@required': ''},
+                                    error='Allergies and dietary requirements '
+                                    'not specified')
+        reg_session.create_person('Test First Country', 'Leader',
+                                  {'@required': ''},
+                                  error='Allergies and dietary requirements '
+                                  'not specified')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        # Verify creation is OK once diet specified (require_diet not
+        # otherwise tested).
+        reg_session.create_person('Test First Country', 'Leader',
+                                  {'diet': 'Vegetarian'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
 
     def test_person_create_audit_errors_bad_country(self):
         """
@@ -5060,6 +5266,164 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(len(anon_csv), 1)
         self.assertEqual(len(admin_csv), 1)
         self.assertEqual(len(reg_csv), 1)
+
+    def test_person_create_audit_errors_gender_any(self):
+        """
+        Test errors from person creation auditor: all contestant
+        genders allowed by default.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'gender': 'Female'})
+        reg_session.create_person('Test First Country', 'Contestant 2',
+                                  {'gender': 'Male'})
+        admin_session.create_person('Test First Country', 'Contestant 3',
+                                    {'gender': 'Non-binary'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 3)
+        self.assertEqual(len(admin_csv), 3)
+        self.assertEqual(len(reg_csv), 3)
+
+    @_with_config(contestant_genders='Female')
+    def test_person_create_audit_errors_gender_one(self):
+        """
+        Test errors from person creation auditor: one contestant
+        gender allowed.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        reg_session.create_person('Test First Country', 'Contestant 2',
+                                  {'gender': 'Male'},
+                                  error='Contestant gender must be Female')
+        admin_session.create_person('Test First Country', 'Contestant 3',
+                                    {'gender': 'Non-binary'},
+                                    error='Contestant gender must be Female')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'gender': 'Female'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+
+    @_with_config(contestant_genders='Female, Non-binary')
+    def test_person_create_audit_errors_gender_multi(self):
+        """
+        Test errors from person creation auditor: multiple contestant
+        genders allowed.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        reg_session.create_person('Test First Country', 'Contestant 2',
+                                  {'gender': 'Male'},
+                                  error='Contestant gender must be Female or '
+                                  'Non-binary')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'gender': 'Female'})
+        admin_session.create_person('Test First Country', 'Contestant 3',
+                                    {'gender': 'Non-binary'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 2)
+        self.assertEqual(len(admin_csv), 2)
+        self.assertEqual(len(reg_csv), 2)
+
+    @_with_config(sanity_date_of_birth='2014-02-03')
+    def test_person_create_audit_errors_date_of_birth_edge(self):
+        """
+        Test errors from person creation auditor: date of birth edge cases.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        # Invalid: date of birth before the sanity-check date (note
+        # year before that not actually offered on form, so needs to
+        # be added here to exercise that auditor check).
+        reg_session.check_open_relative('person?@template=item')
+        reg_session.select_main_form()
+        form = reg_session.b.get_current_form().form
+        select = form.find('select', attrs={'name': 'date_of_birth_year'})
+        new_option = reg_session.b.get_current_page().new_tag(
+            'option', value='1901')
+        new_option.string = '1901'
+        select.append(new_option)
+        reg_session.set({'country': 'Test First Country',
+                         'primary_role': 'Leader',
+                         'given_name': 'Given',
+                         'family_name': 'Family',
+                         'gender': 'Female',
+                         'language_1': 'English',
+                         'tshirt': 'M',
+                         'date_of_birth_year': '1901',
+                         'date_of_birth_month': 'December',
+                         'date_of_birth_day': '31'})
+        reg_session.check_submit_selected(error='Participant implausibly old')
+        # Invalid: date of birth after the sanity-check date (note
+        # sanity check date changed for this test to make it more
+        # convenient to enter such dates than with the default
+        # setting).
+        admin_session.create_person('Test First Country', 'Contestant 2',
+                                    {'date_of_birth_year': '2014',
+                                     'date_of_birth_month': 'February',
+                                     'date_of_birth_day': '3'},
+                                    error='Participant implausibly young')
+        admin_session.create_person('Test First Country', 'Contestant 2',
+                                    {'date_of_birth_year': '2014',
+                                     'date_of_birth_month': 'December',
+                                     'date_of_birth_day': '1'},
+                                    error='Participant implausibly young')
+        # Last invalid contestant date of birth is tested above.
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        # Valid: first possible date of birth.
+        reg_session.create_person('Test First Country', 'Leader',
+                                  {'date_of_birth_year': '1902',
+                                   'date_of_birth_month': 'January',
+                                   'date_of_birth_day': '1'})
+        # Valid: last possible date of birth.
+        admin_session.create_person('Test First Country', 'Deputy Leader',
+                                    {'date_of_birth_year': '2014',
+                                     'date_of_birth_month': 'February',
+                                     'date_of_birth_day': '2'})
+        # Valid: first possible contestant date of birth.
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'date_of_birth_year': '1995',
+                                   'date_of_birth_month': 'April',
+                                   'date_of_birth_day': '2'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 3)
+        self.assertEqual(len(admin_csv), 3)
+        self.assertEqual(len(reg_csv), 3)
 
     @_with_config(consent_ui='Yes')
     def test_person_edit_audit_errors_missing_consent(self):
