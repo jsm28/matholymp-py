@@ -4813,6 +4813,18 @@ class RegSystemTestCase(unittest.TestCase):
                                      'departure_time_hour': '13',
                                      'departure_time_minute': '59'},
                                     error='Departure time before arrival time')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'arrival_date': '2 April 2015',
+                                   'departure_date': '1 April 2015'},
+                                  error='Departure date before arrival date')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'arrival_date': '2 April 2015',
+                                   'arrival_time_hour': '14',
+                                   'arrival_time_minute': '00',
+                                   'departure_date': '2 April 2015',
+                                   'departure_time_hour': '13',
+                                   'departure_time_minute': '59'},
+                                  error='Departure time before arrival time')
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
