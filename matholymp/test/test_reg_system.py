@@ -4825,6 +4825,53 @@ class RegSystemTestCase(unittest.TestCase):
                                    'departure_time_hour': '13',
                                    'departure_time_minute': '59'},
                                   error='Departure time before arrival time')
+        photo_filename, photo_bytes = self.gen_test_pdf()
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'photo-1@content': photo_filename},
+                                    error='Photos must be in JPEG or PNG '
+                                    'format')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'photo-1@content': photo_filename},
+                                  error='Photos must be in JPEG or PNG '
+                                  'format')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'PNG')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'photo-1@content': photo_filename},
+                                    error='Filename extension for photo must '
+                                    'match contents \(png\)')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'photo-1@content': photo_filename},
+                                  error='Filename extension for photo must '
+                                  'match contents \(png\)')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.png',
+                                                          'JPEG')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'photo-1@content': photo_filename},
+                                    error='Filename extension for photo must '
+                                    'match contents \(jpg\)')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'photo-1@content': photo_filename},
+                                  error='Filename extension for photo must '
+                                  'match contents \(jpg\)')
+        cf_filename, cf_bytes = self.gen_test_image(2, 2, 2, '.png', 'PNG')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'consent_form-1@content': cf_filename},
+                                    error='Consent forms must be in PDF '
+                                    'format')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'consent_form-1@content': cf_filename},
+                                  error='Consent forms must be in PDF '
+                                  'format')
+        cf_filename, cf_bytes = self.gen_test_pdf('.png')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'consent_form-1@content': cf_filename},
+                                    error='Filename extension for consent '
+                                    'form must match contents \(pdf\)')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'consent_form-1@content': cf_filename},
+                                  error='Filename extension for consent '
+                                  'form must match contents \(pdf\)')
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
