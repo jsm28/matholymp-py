@@ -4801,6 +4801,18 @@ class RegSystemTestCase(unittest.TestCase):
                                    'date_of_birth_month': 'December',
                                    'date_of_birth_day': '31'},
                                   error='Contestant too old')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'arrival_date': '2 April 2015',
+                                     'departure_date': '1 April 2015'},
+                                    error='Departure date before arrival date')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'arrival_date': '2 April 2015',
+                                     'arrival_time_hour': '14',
+                                     'arrival_time_minute': '00',
+                                     'departure_date': '2 April 2015',
+                                     'departure_time_hour': '13',
+                                     'departure_time_minute': '59'},
+                                    error='Departure time before arrival time')
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5425,6 +5437,107 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(len(admin_csv), 3)
         self.assertEqual(len(reg_csv), 3)
 
+    def test_person_create_audit_errors_arrival_departure_edge(self):
+        """
+        Test errors from person creation auditor: arrival / departure
+        date and time edge cases.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        # Invalid: arrival or departure dates too early or too late
+        # (note not actually offered on form, so needs to be added
+        # here to exercise that auditor check).
+        reg_session.check_open_relative('person?@template=item')
+        reg_session.select_main_form()
+        form = reg_session.b.get_current_form().form
+        select = form.find('select', attrs={'name': 'arrival_date'})
+        new_option = reg_session.b.get_current_page().new_tag(
+            'option', value='2015-03-30')
+        new_option.string = '30 March 2015'
+        select.append(new_option)
+        reg_session.set({'country': 'Test First Country',
+                         'primary_role': 'Leader',
+                         'given_name': 'Given',
+                         'family_name': 'Family',
+                         'gender': 'Female',
+                         'language_1': 'English',
+                         'tshirt': 'M',
+                         'arrival_date': '30 March 2015'})
+        reg_session.check_submit_selected(error='arrival date too early')
+        reg_session.check_open_relative('person?@template=item')
+        reg_session.select_main_form()
+        form = reg_session.b.get_current_form().form
+        select = form.find('select', attrs={'name': 'arrival_date'})
+        new_option = reg_session.b.get_current_page().new_tag(
+            'option', value='2015-04-03')
+        new_option.string = '3 April 2015'
+        select.append(new_option)
+        reg_session.set({'country': 'Test First Country',
+                         'primary_role': 'Leader',
+                         'given_name': 'Given',
+                         'family_name': 'Family',
+                         'gender': 'Female',
+                         'language_1': 'English',
+                         'tshirt': 'M',
+                         'arrival_date': '3 April 2015'})
+        reg_session.check_submit_selected(error='arrival date too late')
+        reg_session.check_open_relative('person?@template=item')
+        reg_session.select_main_form()
+        form = reg_session.b.get_current_form().form
+        select = form.find('select', attrs={'name': 'departure_date'})
+        new_option = reg_session.b.get_current_page().new_tag(
+            'option', value='2015-03-31')
+        new_option.string = '31 March 2015'
+        select.append(new_option)
+        reg_session.set({'country': 'Test First Country',
+                         'primary_role': 'Leader',
+                         'given_name': 'Given',
+                         'family_name': 'Family',
+                         'gender': 'Female',
+                         'language_1': 'English',
+                         'tshirt': 'M',
+                         'departure_date': '31 March 2015'})
+        reg_session.check_submit_selected(error='departure date too early')
+        reg_session.check_open_relative('person?@template=item')
+        reg_session.select_main_form()
+        form = reg_session.b.get_current_form().form
+        select = form.find('select', attrs={'name': 'departure_date'})
+        new_option = reg_session.b.get_current_page().new_tag(
+            'option', value='2015-04-04')
+        new_option.string = '4 April 2015'
+        select.append(new_option)
+        reg_session.set({'country': 'Test First Country',
+                         'primary_role': 'Leader',
+                         'given_name': 'Given',
+                         'family_name': 'Family',
+                         'gender': 'Female',
+                         'language_1': 'English',
+                         'tshirt': 'M',
+                         'departure_date': '4 April 2015'})
+        reg_session.check_submit_selected(error='departure date too late')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        # Valid: earliest possible arrival and departure dates.
+        reg_session.create_person('Test First Country', 'Leader',
+                                  {'arrival_date': '31 March 2015',
+                                   'departure_date': '1 April 2015'})
+        # Valid: latest possible arrival and departure dates.
+        admin_session.create_person('Test First Country', 'Deputy Leader',
+                                    {'arrival_date': '2 April 2015',
+                                     'departure_date': '3 April 2015'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 2)
+        self.assertEqual(len(admin_csv), 2)
+        self.assertEqual(len(reg_csv), 2)
+
     @_with_config(consent_ui='Yes')
     def test_person_edit_audit_errors_missing_consent(self):
         """
@@ -5559,6 +5672,10 @@ class RegSystemTestCase(unittest.TestCase):
         """
         Test creating people with partial arrival / departure times.
         """
+        # Test for a former bug where if arrival / departure time
+        # details were deleted at person creation time (because of
+        # missing date, or missing hour when minute is specified), an
+        # internal error resulted.
         admin_session = self.get_session('admin')
         admin_session.create_person('XMO 2015 Staff', 'Chief Coordinator',
                                     {'arrival_time_hour': '00',
@@ -5624,6 +5741,26 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv[1]['Arrival Time'], '')
         self.assertEqual(admin_csv[1]['Departure Date'], '')
         self.assertEqual(admin_csv[1]['Departure Time'], '')
+        # Test minute defaulting to 00 when not specified.
+        admin_session.create_person('XMO 2015 Staff', 'Transport',
+                                    {'arrival_date': '1 April 2015',
+                                     'arrival_time_hour': '10',
+                                     'departure_date': '2 April 2015',
+                                     'departure_time_hour': '20'})
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(len(admin_csv), 3)
+        self.assertEqual(admin_csv[0]['Arrival Date'], '')
+        self.assertEqual(admin_csv[0]['Arrival Time'], '')
+        self.assertEqual(admin_csv[0]['Departure Date'], '')
+        self.assertEqual(admin_csv[0]['Departure Time'], '')
+        self.assertEqual(admin_csv[1]['Arrival Date'], '2015-04-01')
+        self.assertEqual(admin_csv[1]['Arrival Time'], '')
+        self.assertEqual(admin_csv[1]['Departure Date'], '')
+        self.assertEqual(admin_csv[1]['Departure Time'], '')
+        self.assertEqual(admin_csv[2]['Arrival Date'], '2015-04-01')
+        self.assertEqual(admin_csv[2]['Arrival Time'], '10:00')
+        self.assertEqual(admin_csv[2]['Departure Date'], '2015-04-02')
+        self.assertEqual(admin_csv[2]['Departure Time'], '20:00')
 
     def test_person_date_of_birth_partial(self):
         """
