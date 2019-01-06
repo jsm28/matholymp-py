@@ -4872,6 +4872,60 @@ class RegSystemTestCase(unittest.TestCase):
                                   {'consent_form-1@content': cf_filename},
                                   error='Filename extension for consent '
                                   'form must match contents \(pdf\)')
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'generic_url': 'https://www.example.invalid/test'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/people/personN/')
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'generic_url': 'https://www.example.invalid/people/person0/'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/people/personN/')
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'generic_url':
+             'https://www.example.invalid/people/person01/'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/people/personN/')
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'generic_url': 'https://www.example.invalid/people/person1'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/people/personN/')
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'generic_url':
+             'https://www.example.invalid/people/person1N/'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/people/personN/')
+        reg_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'generic_url': 'https://www.example.invalid/test'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/people/personN/')
+        reg_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'generic_url': 'https://www.example.invalid/people/person0/'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/people/personN/')
+        reg_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'generic_url':
+             'https://www.example.invalid/people/person01/'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/people/personN/')
+        reg_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'generic_url': 'https://www.example.invalid/people/person1'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/people/personN/')
+        reg_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'generic_url':
+             'https://www.example.invalid/people/person1N/'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/people/personN/')
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5590,6 +5644,56 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_person('Test First Country', 'Deputy Leader',
                                     {'arrival_date': '2 April 2015',
                                      'departure_date': '3 April 2015'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 2)
+        self.assertEqual(len(admin_csv), 2)
+        self.assertEqual(len(reg_csv), 2)
+
+    @_with_config(static_site_directory='static-site')
+    def test_person_create_audit_errors_static(self):
+        """
+        Test errors from person creation auditor, static site checks.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'generic_url':
+             'https://www.example.invalid/people/person12345/'},
+            error=r'example\.invalid URL for previous participation not valid')
+        reg_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'generic_url':
+             'https://www.example.invalid/people/person12345/'},
+            error=r'example\.invalid URL for previous participation not valid')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+
+    def test_person_create_audit_errors_static_none(self):
+        """
+        Test errors from person creation auditor, any person number
+        valid for previous participation when no static site data.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'generic_url':
+             'https://www.example.invalid/people/person12345/'})
+        reg_session.create_person(
+            'Test First Country', 'Contestant 2',
+            {'generic_url':
+             'https://www.example.invalid/people/person54321/'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
