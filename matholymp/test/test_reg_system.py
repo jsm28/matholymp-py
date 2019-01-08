@@ -4926,6 +4926,12 @@ class RegSystemTestCase(unittest.TestCase):
              'https://www.example.invalid/people/person1N/'},
             error=r'example.invalid URLs for previous participation must be '
             'in the form https://www\.example\.invalid/people/personN/')
+        admin_session.create_country('ZZZ', 'None 2',
+                                     {'participants_ok': 'no'})
+        admin_session.create_person(
+            'None', 'Jury Chair', {}, error='Invalid country')
+        admin_session.create_person(
+            'None 2', 'Chief Coordinator', {}, error='Invalid country')
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
