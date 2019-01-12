@@ -4929,9 +4929,9 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country('ZZZ', 'None 2',
                                      {'participants_ok': 'no'})
         admin_session.create_person(
-            'None', 'Jury Chair', {}, error='Invalid country')
+            'None', 'Jury Chair', error='Invalid country')
         admin_session.create_person(
-            'None 2', 'Chief Coordinator', {}, error='Invalid country')
+            'None 2', 'Chief Coordinator', error='Invalid country')
         admin_session.create_person('XMO 2015 Staff', 'Contestant 1',
                                     error='Staff must have administrative '
                                     'roles')
