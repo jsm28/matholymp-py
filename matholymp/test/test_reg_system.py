@@ -4932,6 +4932,57 @@ class RegSystemTestCase(unittest.TestCase):
             'None', 'Jury Chair', {}, error='Invalid country')
         admin_session.create_person(
             'None 2', 'Chief Coordinator', {}, error='Invalid country')
+        admin_session.create_person('XMO 2015 Staff', 'Contestant 1',
+                                    error='Staff must have administrative '
+                                    'roles')
+        admin_session.create_person('XMO 2015 Staff', 'Leader',
+                                    error='Staff must have administrative '
+                                    'roles')
+        admin_session.create_person('XMO 2015 Staff', 'Deputy Leader',
+                                    error='Staff must have administrative '
+                                    'roles')
+        admin_session.create_person('XMO 2015 Staff', 'Observer with Leader',
+                                    error='Staff must have administrative '
+                                    'roles')
+        admin_session.create_person('XMO 2015 Staff', 'Observer with Deputy',
+                                    error='Staff must have administrative '
+                                    'roles')
+        admin_session.create_person('XMO 2015 Staff',
+                                    'Observer with Contestants',
+                                    error='Staff must have administrative '
+                                    'roles')
+        admin_session.create_person('XMO 2015 Staff', 'Chief Invigilator',
+                                    {'other_roles': ['Chief Guide',
+                                                     'Contestant 1']},
+                                    error='Staff must have administrative '
+                                    'roles')
+        admin_session.create_person('XMO 2015 Staff', 'Chief Invigilator',
+                                    {'other_roles': ['Leader']},
+                                    error='Staff must have administrative '
+                                    'roles')
+        admin_session.create_person('XMO 2015 Staff', 'Chief Invigilator',
+                                    {'other_roles': ['Deputy Leader']},
+                                    error='Staff must have administrative '
+                                    'roles')
+        admin_session.create_person('XMO 2015 Staff', 'Chief Invigilator',
+                                    {'other_roles': ['Observer with Leader']},
+                                    error='Staff must have administrative '
+                                    'roles')
+        admin_session.create_person('XMO 2015 Staff', 'Chief Invigilator',
+                                    {'other_roles': ['Observer with Deputy']},
+                                    error='Staff must have administrative '
+                                    'roles')
+        admin_session.create_person('XMO 2015 Staff', 'Chief Invigilator',
+                                    {'other_roles':
+                                     ['Observer with Contestants']},
+                                    error='Staff must have administrative '
+                                    'roles')
+        admin_session.create_person('Test First Country', 'Coordinator',
+                                    error='Invalid role for participant')
+        admin_session.create_person('Test First Country', 'Leader',
+                                    {'other_roles': ['Jury Chair']},
+                                    error='Non-staff may not have secondary '
+                                    'roles')
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5706,6 +5757,83 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(len(anon_csv), 2)
         self.assertEqual(len(admin_csv), 2)
         self.assertEqual(len(reg_csv), 2)
+
+    def test_person_create_audit_errors_role_secondary(self):
+        """
+        Test errors from person creation auditor, secondary roles OK.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person(
+            'Test First Country', 'Leader',
+            {'other_roles': ['XMO AB']})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+
+    def test_person_create_audit_errors_role_unique(self):
+        """
+        Test errors from person creation auditor, non-observer roles
+        for normal countries unique.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Leader')
+        reg_session.create_person('Test First Country', 'Deputy Leader')
+        admin_session.create_person('Test First Country', 'Contestant 1')
+        reg_session.create_person('Test First Country', 'Observer with Leader')
+        admin_session.create_person('Test First Country',
+                                    'Observer with Deputy')
+        reg_session.create_person('Test First Country',
+                                  'Observer with Contestants')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 6)
+        self.assertEqual(len(admin_csv), 6)
+        self.assertEqual(len(reg_csv), 6)
+        admin_session.create_person('Test First Country', 'Leader',
+                                    error='A person with this role already '
+                                    'exists')
+        admin_session.create_person('Test First Country', 'Deputy Leader',
+                                    error='A person with this role already '
+                                    'exists')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    error='A person with this role already '
+                                    'exists')
+        reg_session.create_person('Test First Country', 'Leader',
+                                  error='A person with this role already '
+                                  'exists')
+        reg_session.create_person('Test First Country', 'Deputy Leader',
+                                  error='A person with this role already '
+                                  'exists')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  error='A person with this role already '
+                                  'exists')
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, anon_csv_2)
+        self.assertEqual(admin_csv, admin_csv_2)
+        self.assertEqual(reg_csv, reg_csv_2)
+        reg_session.create_person('Test First Country', 'Observer with Leader')
+        admin_session.create_person('Test First Country',
+                                    'Observer with Deputy')
+        reg_session.create_person('Test First Country',
+                                  'Observer with Contestants')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 9)
+        self.assertEqual(len(admin_csv), 9)
+        self.assertEqual(len(reg_csv), 9)
 
     @_with_config(consent_ui='Yes')
     def test_person_edit_audit_errors_missing_consent(self):
