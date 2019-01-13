@@ -4983,6 +4983,13 @@ class RegSystemTestCase(unittest.TestCase):
                                     {'other_roles': ['Jury Chair']},
                                     error='Non-staff may not have secondary '
                                     'roles')
+        admin_session.create_person('XMO 2015 Staff', 'Chief Guide',
+                                    {'guide_for': ['Test First Country']},
+                                    error='People with this role may not '
+                                    'guide a country')
+        admin_session.create_person('XMO 2015 Staff', 'Guide',
+                                    {'guide_for': ['XMO 2015 Staff']},
+                                    error='May only guide normal countries')
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5834,6 +5841,26 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(len(anon_csv), 9)
         self.assertEqual(len(admin_csv), 9)
         self.assertEqual(len(reg_csv), 9)
+
+    def test_person_create_audit_errors_guide_extra(self):
+        """
+        Test errors from person creation auditor, extra roles allowed to guide.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create('matholymprole',
+                             {'name': 'Extra Guide', 'canguide': 'yes'})
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Extra Guide',
+            {'guide_for': ['Test First Country']})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
 
     @_with_config(consent_ui='Yes')
     def test_person_edit_audit_errors_missing_consent(self):
