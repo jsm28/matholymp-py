@@ -414,7 +414,7 @@ please inform the people you register of this information.
 </tal:block>
 
 <tal:block tal:condition="context/is_edit_ok">
-<tal:block tal:condition="python:utils.have_consent_ui(db._db)">
+<tal:block tal:condition="python:utils.have_consent_ui(db._db)" tal:define="required python:['event_photos_consent', 'photo_consent', 'diet_consent']">
  <tr>
   <td colspan="2">Processing some personal data requires permission
 from the participant (and their parents, if aged under 16) under the
