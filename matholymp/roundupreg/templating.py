@@ -39,8 +39,8 @@ __all__ = ['people_from_country_internal', 'people_from_country',
            'show_travel_copy_options', 'country_travel_copy_options',
            'person_case_warning', 'list_expected_roles', 'registration_status',
            'registration_status_country', 'edit_rooms', 'show_consent_form_ui',
-           'string_select', 'date_of_birth_select', 'arrdep_date_select',
-           'arrdep_time_select', 'photo_consent_select',
+           'has_consent_for_photo', 'string_select', 'date_of_birth_select',
+           'arrdep_date_select', 'arrdep_time_select', 'photo_consent_select',
            'required_person_fields', 'register_templating_utils']
 
 import cgi
@@ -376,6 +376,16 @@ def photo_consent_select(selected):
                           ('no', 'No')), selected)
 
 
+def has_consent_for_photo(db, person):
+    """
+    Return whether there is consent (if needed) to show this person's
+    photo on the website.
+    """
+    if not have_consent_ui(db):
+        return True
+    return db.person.get(person, 'photo_consent') == 'yes'
+
+
 def required_person_fields(db):
     """Return the list of fields required for registered people."""
     req = ['country', 'given_name', 'family_name', 'gender', 'primary_role',
@@ -436,6 +446,7 @@ def register_templating_utils(instance):
                           registration_status_country)
     instance.registerUtil('edit_rooms', edit_rooms)
     instance.registerUtil('show_consent_form_ui', show_consent_form_ui)
+    instance.registerUtil('has_consent_for_photo', has_consent_for_photo)
     instance.registerUtil('date_of_birth_select', date_of_birth_select)
     instance.registerUtil('arrdep_date_select', arrdep_date_select)
     instance.registerUtil('arrdep_time_select', arrdep_time_select)

@@ -519,7 +519,7 @@ select the appropriate options.  You must select &ldquo;Yes&rdquo; or
 </tal:block>
 
 <tal:block tal:condition="context/photo">
-<tal:block tal:condition="python:not utils.have_consent_ui(db._db) or context.photo_consent.plain() == 'yes' or (context.is_edit_ok() and context.photo_consent.plain() == 'badge_only')">
+<tal:block tal:condition="python:utils.has_consent_for_photo(db._db, context.id) or (context.is_edit_ok() and context.photo_consent.plain() == 'badge_only')">
 <p tal:condition="python:utils.have_consent_ui(db._db) and context.photo_consent.plain() == 'badge_only'">The following photo is for use on name badges and is not public on the website.</p>
 <table>
 <tr>
