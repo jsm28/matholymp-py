@@ -5058,6 +5058,10 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_person('XMO 2015 Staff', 'Guide',
                                     {'guide_for': ['XMO 2015 Staff']},
                                     error='May only guide normal countries')
+        admin_session.create_person('Test First Country', 'Leader',
+                                    {'phone_number': '123456789'},
+                                    error='Phone numbers may only be entered '
+                                    'for staff')
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5929,6 +5933,29 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(len(anon_csv), 1)
         self.assertEqual(len(admin_csv), 1)
         self.assertEqual(len(reg_csv), 1)
+
+    def test_person_create_audit_errors_phone_number(self):
+        """
+        Test errors from person creation auditor, phone nunbers OK for staff.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        # Phone numbers are allowed for all staff, not just Guides as
+        # was originally the case.
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Guide',
+            {'phone_number': '123'})
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Jury Chair',
+            {'phone_number': '456'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 2)
+        self.assertEqual(len(admin_csv), 2)
+        self.assertEqual(len(reg_csv), 2)
 
     @_with_config(consent_ui='Yes')
     def test_person_edit_audit_errors_missing_consent(self):
