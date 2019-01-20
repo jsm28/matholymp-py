@@ -5957,6 +5957,313 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(len(admin_csv), 2)
         self.assertEqual(len(reg_csv), 2)
 
+    def test_person_edit_audit_errors(self):
+        """
+        Test errors from person edit auditor.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        # Persons 1, 2, 3: missing some date of birth data (and thus
+        # in fact the other such data removed by the auditor on
+        # creation), so changing to contestants produces errors.
+        admin_session.create_person('Test First Country', 'Leader',
+                                    {'date_of_birth_year': '2000',
+                                     'date_of_birth_month': 'January',
+                                     'date_of_birth_day': '(day)'})
+        admin_session.create_person('Test First Country', 'Deputy Leader',
+                                    {'date_of_birth_year': '2000',
+                                     'date_of_birth_month': '(month)',
+                                     'date_of_birth_day': '10'})
+        admin_session.create_person('Test First Country',
+                                    'Observer with Leader',
+                                    {'date_of_birth_year': '(year)',
+                                     'date_of_birth_month': 'December',
+                                     'date_of_birth_day': '10'})
+        # Persons 4, 5: contestant (with arrival date set), and person
+        # too old to change to contestant.
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'date_of_birth_year': '2000',
+                                     'date_of_birth_month': 'January',
+                                     'date_of_birth_day': '10',
+                                     'arrival_date': '2 April 2015'})
+        admin_session.create_person('Test First Country',
+                                    'Observer with Deputy',
+                                    {'date_of_birth_year': '1980',
+                                     'date_of_birth_month': 'January',
+                                     'date_of_birth_day': '10'})
+        # Persons 6, 7, 8: staff with settings preventing certain changes.
+        admin_session.create_person('XMO 2015 Staff', 'Guide',
+                                    {'guide_for': ['Test First Country']})
+        admin_session.create_person('XMO 2015 Staff', 'Jury Chair',
+                                    {'phone_number': '123'})
+        admin_session.create_person('XMO 2015 Staff', 'Chief Coordinator',
+                                    {'other_roles': ['Logistics']})
+        # None of the failed edits should change the data for these people.
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 8)
+        self.assertEqual(len(admin_csv), 8)
+        self.assertEqual(len(reg_csv), 8)
+        admin_session.edit('person', '1',
+                           {'primary_role': 'Contestant 3',
+                            'date_of_birth_year': '2000',
+                            'date_of_birth_month': 'January'},
+                           error='No day of birth specified')
+        admin_session.edit('person', '2',
+                           {'primary_role': 'Contestant 3',
+                            'date_of_birth_year': '2000',
+                            'date_of_birth_day': '10'},
+                           error='No month of birth specified')
+        admin_session.edit('person', '3',
+                           {'primary_role': 'Contestant 3',
+                            'date_of_birth_month': 'December',
+                            'date_of_birth_day': '10'},
+                           error='No year of birth specified')
+        reg_session.edit('person', '1',
+                         {'primary_role': 'Contestant 3',
+                          'date_of_birth_year': '2000',
+                          'date_of_birth_month': 'January'},
+                         error='No day of birth specified')
+        reg_session.edit('person', '2',
+                         {'primary_role': 'Contestant 3',
+                          'date_of_birth_year': '2000',
+                          'date_of_birth_day': '10'},
+                         error='No month of birth specified')
+        reg_session.edit('person', '3',
+                         {'primary_role': 'Contestant 3',
+                          'date_of_birth_month': 'December',
+                          'date_of_birth_day': '10'},
+                         error='No year of birth specified')
+        admin_session.edit('person', '4',
+                           {'date_of_birth_year': '1995',
+                            'date_of_birth_month': 'April',
+                            'date_of_birth_day': '1'},
+                           error='Contestant too old')
+        admin_session.edit('person', '4',
+                           {'date_of_birth_year': '1995',
+                            'date_of_birth_month': 'March',
+                            'date_of_birth_day': '31'},
+                           error='Contestant too old')
+        admin_session.edit('person', '4',
+                           {'date_of_birth_year': '1994',
+                            'date_of_birth_month': 'December',
+                            'date_of_birth_day': '31'},
+                           error='Contestant too old')
+        reg_session.edit('person', '4',
+                         {'date_of_birth_year': '1995',
+                          'date_of_birth_month': 'April',
+                          'date_of_birth_day': '1'},
+                         error='Contestant too old')
+        reg_session.edit('person', '4',
+                         {'date_of_birth_year': '1995',
+                          'date_of_birth_month': 'March',
+                          'date_of_birth_day': '31'},
+                         error='Contestant too old')
+        reg_session.edit('person', '4',
+                         {'date_of_birth_year': '1994',
+                          'date_of_birth_month': 'December',
+                          'date_of_birth_day': '31'},
+                         error='Contestant too old')
+        admin_session.edit('person', '5',
+                           {'primary_role': 'Contestant 3'},
+                           error='Contestant too old')
+        reg_session.edit('person', '5',
+                         {'primary_role': 'Contestant 3'},
+                         error='Contestant too old')
+        admin_session.edit('person', '4',
+                           {'departure_date': '1 April 2015'},
+                           error='Departure date before arrival date')
+        admin_session.edit('person', '4',
+                           {'arrival_time_hour': '14',
+                            'arrival_time_minute': '00',
+                            'departure_date': '2 April 2015',
+                            'departure_time_hour': '13',
+                            'departure_time_minute': '59'},
+                           error='Departure time before arrival time')
+        reg_session.edit('person', '4',
+                         {'departure_date': '1 April 2015'},
+                         error='Departure date before arrival date')
+        reg_session.edit('person', '4',
+                         {'arrival_time_hour': '14',
+                          'arrival_time_minute': '00',
+                          'departure_date': '2 April 2015',
+                          'departure_time_hour': '13',
+                          'departure_time_minute': '59'},
+                         error='Departure time before arrival time')
+        photo_filename, photo_bytes = self.gen_test_pdf()
+        admin_session.edit('person', '4',
+                           {'photo-1@content': photo_filename},
+                           error='Photos must be in JPEG or PNG format')
+        reg_session.edit('person', '4',
+                         {'photo-1@content': photo_filename},
+                         error='Photos must be in JPEG or PNG format')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'PNG')
+        admin_session.edit('person', '4',
+                           {'photo-1@content': photo_filename},
+                           error='Filename extension for photo must '
+                           'match contents \(png\)')
+        reg_session.edit('person', '4',
+                         {'photo-1@content': photo_filename},
+                         error='Filename extension for photo must '
+                         'match contents \(png\)')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.png',
+                                                          'JPEG')
+        admin_session.edit('person', '4',
+                           {'photo-1@content': photo_filename},
+                           error='Filename extension for photo must '
+                           'match contents \(jpg\)')
+        reg_session.edit('person', '4',
+                         {'photo-1@content': photo_filename},
+                         error='Filename extension for photo must '
+                         'match contents \(jpg\)')
+        cf_filename, cf_bytes = self.gen_test_image(2, 2, 2, '.png', 'PNG')
+        admin_session.edit('person', '4',
+                           {'consent_form-1@content': cf_filename},
+                           error='Consent forms must be in PDF format')
+        reg_session.edit('person', '4',
+                         {'consent_form-1@content': cf_filename},
+                         error='Consent forms must be in PDF format')
+        cf_filename, cf_bytes = self.gen_test_pdf('.png')
+        admin_session.edit('person', '4',
+                           {'consent_form-1@content': cf_filename},
+                           error='Filename extension for consent '
+                           'form must match contents \(pdf\)')
+        reg_session.edit('person', '4',
+                         {'consent_form-1@content': cf_filename},
+                         error='Filename extension for consent '
+                         'form must match contents \(pdf\)')
+        admin_session.edit(
+            'person', '4',
+            {'generic_url': 'https://www.example.invalid/test'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/people/personN/')
+        admin_session.edit(
+            'person', '4',
+            {'generic_url': 'https://www.example.invalid/people/person0/'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/people/personN/')
+        admin_session.edit(
+            'person', '4',
+            {'generic_url':
+             'https://www.example.invalid/people/person01/'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/people/personN/')
+        admin_session.edit(
+            'person', '4',
+            {'generic_url': 'https://www.example.invalid/people/person1'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/people/personN/')
+        admin_session.edit(
+            'person', '4',
+            {'generic_url':
+             'https://www.example.invalid/people/person1N/'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/people/personN/')
+        reg_session.edit(
+            'person', '4',
+            {'generic_url': 'https://www.example.invalid/test'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/people/personN/')
+        reg_session.edit(
+            'person', '4',
+            {'generic_url': 'https://www.example.invalid/people/person0/'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/people/personN/')
+        reg_session.edit(
+            'person', '4',
+            {'generic_url':
+             'https://www.example.invalid/people/person01/'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/people/personN/')
+        reg_session.edit(
+            'person', '4',
+            {'generic_url': 'https://www.example.invalid/people/person1'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/people/personN/')
+        reg_session.edit(
+            'person', '4',
+            {'generic_url':
+             'https://www.example.invalid/people/person1N/'},
+            error=r'example.invalid URLs for previous participation must be '
+            'in the form https://www\.example\.invalid/people/personN/')
+        admin_session.create_country('ZZZ', 'None 2',
+                                     {'participants_ok': 'no'})
+        admin_session.edit('person', '4',
+                           {'country': 'None', 'primary_role': 'Jury Chair'},
+                           error='Invalid country')
+        admin_session.edit('person', '4',
+                           {'country': 'None 2',
+                            'primary_role': 'Chief Coordinator'},
+                           error='Invalid country')
+        admin_session.edit('person', '1',
+                           {'country': 'XMO 2015 Staff'},
+                           error='Staff must have administrative roles')
+        admin_session.edit('person', '2',
+                           {'country': 'XMO 2015 Staff'},
+                           error='Staff must have administrative roles')
+        admin_session.edit('person', '3',
+                           {'country': 'XMO 2015 Staff'},
+                           error='Staff must have administrative roles')
+        admin_session.edit('person', '4',
+                           {'country': 'XMO 2015 Staff'},
+                           error='Staff must have administrative roles')
+        admin_session.edit('person', '5',
+                           {'country': 'XMO 2015 Staff'},
+                           error='Staff must have administrative roles')
+        admin_session.edit('person', '6',
+                           {'primary_role': 'Leader'},
+                           error='Staff must have administrative roles')
+        admin_session.edit('person', '7',
+                           {'primary_role': 'Deputy Leader'},
+                           error='Staff must have administrative roles')
+        admin_session.edit('person', '6',
+                           {'other_roles': ['Contestant 2']},
+                           error='Staff must have administrative roles')
+        admin_session.edit('person', '7',
+                           {'other_roles': ['Transport', 'Contestant 3']},
+                           error='Staff must have administrative roles')
+        admin_session.edit('person', '1',
+                           {'primary_role': 'Coordinator'},
+                           error='Invalid role for participant')
+        admin_session.edit('person', '6',
+                           {'country': 'Test First Country'},
+                           error='Invalid role for participant')
+        admin_session.edit('person', '1',
+                           {'other_roles': ['Coordinator']},
+                           error='Non-staff may not have secondary roles')
+        admin_session.edit('person', '8',
+                           {'country': 'Test First Country',
+                            'primary_role': 'Observer with Contestants'},
+                           error='Non-staff may not have secondary roles')
+        admin_session.edit('person', '6',
+                           {'primary_role': 'Chief Guide'},
+                           error='People with this role may not guide a '
+                           'country')
+        admin_session.edit('person', '7',
+                           {'guide_for': ['Test First Country']},
+                           error='People with this role may not guide a '
+                           'country')
+        admin_session.edit('person', '6',
+                           {'guide_for': ['XMO 2015 Staff']},
+                           error='May only guide normal countries')
+        admin_session.edit('person', '7',
+                           {'country': 'Test First Country',
+                            'primary_role': 'Observer with Leader'},
+                           error='Phone numbers may only be entered for staff')
+        admin_session.edit('person', '5',
+                           {'phone_number': '31415926'},
+                           error='Phone numbers may only be entered for staff')
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+
     @_with_config(consent_ui='Yes')
     def test_person_edit_audit_errors_missing_consent(self):
         """
