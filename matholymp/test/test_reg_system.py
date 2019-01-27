@@ -6264,6 +6264,117 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv_2, admin_csv)
         self.assertEqual(reg_csv_2, reg_csv)
 
+    def test_person_edit_audit_errors_missing(self):
+        """
+        Test errors from person edit auditor, missing required data.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'date_of_birth_year': '2000',
+                                     'date_of_birth_month': 'January',
+                                     'date_of_birth_day': '10'})
+        # None of the failed edits should change the data for these people.
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+        admin_session.edit('person', '1',
+                           {'country': ['- no selection -']},
+                           error='Required person property country not '
+                           'supplied')
+        reg_session.edit('person', '1',
+                         {'country': ['- no selection -']},
+                         error='Required person property country not supplied')
+        admin_session.edit('person', '1',
+                           {'given_name': ''},
+                           error='Required person property given_name not '
+                           'supplied')
+        reg_session.edit('person', '1',
+                         {'given_name': ''},
+                         error='Required person property given_name not '
+                         'supplied')
+        admin_session.edit('person', '1',
+                           {'family_name': ''},
+                           error='Required person property family_name not '
+                           'supplied')
+        reg_session.edit('person', '1',
+                         {'family_name': ''},
+                         error='Required person property family_name not '
+                         'supplied')
+        admin_session.edit('person', '1',
+                           {'gender': ['- no selection -']},
+                           error='Required person property gender not '
+                           'supplied')
+        reg_session.edit('person', '1',
+                         {'gender': ['- no selection -']},
+                         error='Required person property gender not supplied')
+        admin_session.edit('person', '1',
+                           {'primary_role': ['- no selection -']},
+                           error='Required person property primary_role not '
+                           'supplied')
+        reg_session.edit('person', '1',
+                         {'primary_role': ['- no selection -']},
+                         error='Required person property primary_role not '
+                         'supplied')
+        admin_session.edit('person', '1',
+                           {'language_1': ['- no selection -']},
+                           error='Required person property language_1 not '
+                           'supplied')
+        reg_session.edit('person', '1',
+                         {'language_1': ['- no selection -']},
+                         error='Required person property language_1 not '
+                         'supplied')
+        admin_session.edit('person', '1',
+                           {'tshirt': ['- no selection -']},
+                           error='Required person property tshirt not '
+                           'supplied')
+        reg_session.edit('person', '1',
+                         {'tshirt': ['- no selection -']},
+                         error='Required person property tshirt not supplied')
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+        # With @required not sent, the auditor restores the previous
+        # values.
+        admin_session.edit('person', '1',
+                           {'@required': '',
+                            'country': ['- no selection -'],
+                            'given_name': '',
+                            'family_name': '',
+                            'gender': ['- no selection -'],
+                            'primary_role': ['- no selection -'],
+                            'language_1': ['- no selection -'],
+                            'tshirt': ['- no selection -']})
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+        reg_session.edit('person', '1',
+                         {'@required': '',
+                          'country': ['- no selection -'],
+                          'given_name': '',
+                          'family_name': '',
+                          'gender': ['- no selection -'],
+                          'primary_role': ['- no selection -'],
+                          'language_1': ['- no selection -'],
+                          'tshirt': ['- no selection -']})
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+
     @_with_config(consent_ui='Yes')
     def test_person_edit_audit_errors_missing_consent(self):
         """
