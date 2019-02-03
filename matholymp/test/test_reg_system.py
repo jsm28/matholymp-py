@@ -6375,6 +6375,166 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv_2, admin_csv)
         self.assertEqual(reg_csv_2, reg_csv)
 
+    @_with_config(require_date_of_birth='Yes')
+    def test_person_edit_audit_errors_missing_date_of_birth(self):
+        """
+        Test errors from person edit auditor, missing date of birth.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Leader',
+                                    {'date_of_birth_year': '2000',
+                                     'date_of_birth_month': 'January',
+                                     'date_of_birth_day': '10'})
+        # None of the failed edits should change the data for these
+        # people, except for photo URLs (photos uploaded to work
+        # around a MechanicalSoup issue,
+        # <https://github.com/MechanicalSoup/MechanicalSoup/issues/242>).
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'JPEG')
+        admin_session.edit('person', '1',
+                           {'date_of_birth_year': '(year)',
+                            'photo-1@content': photo_filename},
+                           error='Required person property date_of_birth_year '
+                           'not supplied')
+        reg_session.edit('person', '1',
+                         {'date_of_birth_year': '(year)',
+                          'photo-1@content': photo_filename},
+                         error='Required person property date_of_birth_year '
+                         'not supplied')
+        admin_session.edit('person', '1',
+                           {'date_of_birth_month': '(month)',
+                            'photo-1@content': photo_filename},
+                           error='Required person property '
+                           'date_of_birth_month not supplied')
+        reg_session.edit('person', '1',
+                         {'date_of_birth_month': '(month)',
+                          'photo-1@content': photo_filename},
+                         error='Required person property date_of_birth_month '
+                         'not supplied')
+        admin_session.edit('person', '1',
+                           {'date_of_birth_day': '(day)',
+                            'photo-1@content': photo_filename},
+                           error='Required person property date_of_birth_day '
+                           'not supplied')
+        reg_session.edit('person', '1',
+                         {'date_of_birth_day': '(day)',
+                          'photo-1@content': photo_filename},
+                         error='Required person property date_of_birth_day '
+                         'not supplied')
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+        # With @required not sent, the auditor restores the previous
+        # values.
+        anon_csv = [{k: v for k, v in anon_csv[0].items()
+                     if 'Photo URL' not in k}]
+        admin_csv = [{k: v for k, v in admin_csv[0].items()
+                      if 'Photo URL' not in k}]
+        reg_csv = [{k: v for k, v in reg_csv[0].items()
+                    if 'Photo URL' not in k}]
+        admin_session.edit('person', '1',
+                           {'@required': '',
+                            'date_of_birth_year': '(year)'})
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        anon_csv_2 = [{k: v for k, v in anon_csv_2[0].items()
+                       if 'Photo URL' not in k}]
+        admin_csv_2 = [{k: v for k, v in admin_csv_2[0].items()
+                        if 'Photo URL' not in k}]
+        reg_csv_2 = [{k: v for k, v in reg_csv_2[0].items()
+                      if 'Photo URL' not in k}]
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+        reg_session.edit('person', '1',
+                         {'@required': '',
+                          'date_of_birth_year': '(year)'})
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        anon_csv_2 = [{k: v for k, v in anon_csv_2[0].items()
+                       if 'Photo URL' not in k}]
+        admin_csv_2 = [{k: v for k, v in admin_csv_2[0].items()
+                        if 'Photo URL' not in k}]
+        reg_csv_2 = [{k: v for k, v in reg_csv_2[0].items()
+                      if 'Photo URL' not in k}]
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+        admin_session.edit('person', '1',
+                           {'@required': '',
+                            'date_of_birth_month': '(month)'})
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        anon_csv_2 = [{k: v for k, v in anon_csv_2[0].items()
+                       if 'Photo URL' not in k}]
+        admin_csv_2 = [{k: v for k, v in admin_csv_2[0].items()
+                        if 'Photo URL' not in k}]
+        reg_csv_2 = [{k: v for k, v in reg_csv_2[0].items()
+                      if 'Photo URL' not in k}]
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+        reg_session.edit('person', '1',
+                         {'@required': '',
+                          'date_of_birth_month': '(month)'})
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        anon_csv_2 = [{k: v for k, v in anon_csv_2[0].items()
+                       if 'Photo URL' not in k}]
+        admin_csv_2 = [{k: v for k, v in admin_csv_2[0].items()
+                        if 'Photo URL' not in k}]
+        reg_csv_2 = [{k: v for k, v in reg_csv_2[0].items()
+                      if 'Photo URL' not in k}]
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+        admin_session.edit('person', '1',
+                           {'@required': '',
+                            'date_of_birth_day': '(day)'})
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        anon_csv_2 = [{k: v for k, v in anon_csv_2[0].items()
+                       if 'Photo URL' not in k}]
+        admin_csv_2 = [{k: v for k, v in admin_csv_2[0].items()
+                        if 'Photo URL' not in k}]
+        reg_csv_2 = [{k: v for k, v in reg_csv_2[0].items()
+                      if 'Photo URL' not in k}]
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+        reg_session.edit('person', '1',
+                         {'@required': '',
+                          'date_of_birth_day': '(day)'})
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        anon_csv_2 = [{k: v for k, v in anon_csv_2[0].items()
+                       if 'Photo URL' not in k}]
+        admin_csv_2 = [{k: v for k, v in admin_csv_2[0].items()
+                        if 'Photo URL' not in k}]
+        reg_csv_2 = [{k: v for k, v in reg_csv_2[0].items()
+                      if 'Photo URL' not in k}]
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+
     @_with_config(consent_ui='Yes')
     def test_person_edit_audit_errors_missing_consent(self):
         """
@@ -6442,6 +6602,174 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv_2 = admin_session.get_people_csv()
         self.assertEqual(anon_csv_2, anon_csv)
         self.assertEqual(admin_csv_2, admin_csv)
+
+    @_with_config(require_passport_number='Yes')
+    def test_person_edit_audit_errors_missing_passport_number(self):
+        """
+        Test errors from person edit auditor, missing passport number.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'date_of_birth_year': '2000',
+                                     'date_of_birth_month': 'January',
+                                     'date_of_birth_day': '10',
+                                     'passport_number': '123456789'})
+        # None of the failed edits should change the data for these people.
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+        admin_session.edit('person', '1',
+                           {'passport_number': ''},
+                           error='Required person property passport_number '
+                           'not supplied')
+        reg_session.edit('person', '1',
+                         {'passport_number': ''},
+                         error='Required person property passport_number '
+                         'not supplied')
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+        # With @required not sent, the auditor restores the previous
+        # values.
+        admin_session.edit('person', '1',
+                           {'@required': '',
+                            'passport_number': ''})
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+        reg_session.edit('person', '1',
+                         {'@required': '',
+                          'passport_number': ''})
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+
+    @_with_config(require_nationality='Yes')
+    def test_person_edit_audit_errors_missing_nationality(self):
+        """
+        Test errors from person edit auditor, missing nationality.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'date_of_birth_year': '2000',
+                                     'date_of_birth_month': 'January',
+                                     'date_of_birth_day': '10',
+                                     'nationality': 'Matholympian'})
+        # None of the failed edits should change the data for these people.
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+        admin_session.edit('person', '1',
+                           {'nationality': ''},
+                           error='Required person property nationality not '
+                           'supplied')
+        reg_session.edit('person', '1',
+                         {'nationality': ''},
+                         error='Required person property nationality not '
+                         'supplied')
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+        # With @required not sent, the auditor restores the previous
+        # values.
+        admin_session.edit('person', '1',
+                           {'@required': '',
+                            'nationality': ''})
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+        reg_session.edit('person', '1',
+                         {'@required': '',
+                          'nationality': ''})
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+
+    @_with_config(require_diet='Yes')
+    def test_person_edit_audit_errors_missing_diet(self):
+        """
+        Test errors from person edit auditor, missing diet.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'date_of_birth_year': '2000',
+                                     'date_of_birth_month': 'January',
+                                     'date_of_birth_day': '10',
+                                     'diet': 'Vegan'})
+        # None of the failed edits should change the data for these people.
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+        admin_session.edit('person', '1',
+                           {'diet': ''},
+                           error='Required person property diet not '
+                           'supplied')
+        reg_session.edit('person', '1',
+                         {'diet': ''},
+                         error='Required person property diet not '
+                         'supplied')
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+        # With @required not sent, the auditor restores the previous
+        # values.
+        admin_session.edit('person', '1',
+                           {'@required': '',
+                            'diet': ''})
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+        reg_session.edit('person', '1',
+                         {'@required': '',
+                          'diet': ''})
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
 
     def test_person_multilink_null_edit(self):
         """
