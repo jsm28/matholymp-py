@@ -46,7 +46,7 @@ individual patches are:
 * :download:`issue2550750-no-timeout-mail.patch
   <../roundup-patches/issue2550750-no-timeout-mail.patch>` is a patch
   for `Roundup issue 2550750
-  <http://issues.roundup-tracker.org/issue2550750>`_ that avoids
+  <https://issues.roundup-tracker.org/issue2550750>`_ that avoids
   socket timeouts (when large images are served through Roundup, for
   example) generating emails to the person running the registration
   system.
@@ -60,7 +60,7 @@ individual patches are:
 * :download:`issue2550722-multilink.patch
   <../roundup-patches/issue2550722-multilink.patch>` is a patch for
   `Roundup issue 2550722
-  <http://issues.roundup-tracker.org/issue2550722>`_ that avoids
+  <https://issues.roundup-tracker.org/issue2550722>`_ that avoids
   internal errors in Roundup in certain cases of incorrect settings of
   Multilink fields in the web interface.  (For matholymp, the relevant
   fields are "Other roles" and "Guide for", so those internal errors
@@ -72,13 +72,13 @@ individual patches are:
 * :download:`issue2550992-auth.patch
   <../roundup-patches/issue2550992-auth.patch>` is a patch for
   `Roundup issue 2550992
-  <http://issues.roundup-tracker.org/issue2550992>`_ that avoids
+  <https://issues.roundup-tracker.org/issue2550992>`_ that avoids
   internal errors in Roundup in certain cases of clients sending
   invalid HTTP Authorization headers.
 
 * :download:`issue2550994-configparser.patch
   <../roundup-patches/issue2550994-configparser.patch>` is a patch for
   `Roundup issue 2550994
-  <http://issues.roundup-tracker.org/issue2550994>`_ that avoids
+  <https://issues.roundup-tracker.org/issue2550994>`_ that avoids
   problems if a Python 2 backport of the Python 3
   :py:mod:`configparser` module is installed.

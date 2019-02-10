@@ -53,7 +53,7 @@ matholymp:
   3.2.x or later, although this has only been tested with 3.4 and
   later.)
 
-* `PyICU <https://pypi.python.org/pypi/PyICU>`_ (which in turn
+* `PyICU <https://pypi.org/project/PyICU/>`_ (which in turn
   requires `ICU <http://site.icu-project.org/>`_).
 
 * `Roundup <http://roundup-tracker.org/>`_ (used to provide a web
@@ -79,7 +79,7 @@ matholymp:
   and PNG files (used in the registration system; not needed if that
   part of matholymp is not used).
 
-* `LaTeX <https://latex-project.org/>`_; specifically, the
+* `LaTeX <https://www.latex-project.org/>`_; specifically, the
   :command:`pdflatex` command (used in generating PDF documents from
   registration system data; not needed if that part of matholymp is
   not used).
@@ -90,7 +90,7 @@ matholymp:
   built-in web server and its support for Python's :py:mod:`anydbm`.)
 
 * To generate the formatted documentation, `Sphinx
-  <http://sphinx-doc.org/>`_ is needed.  This is not needed simply to
+  <https://www.sphinx-doc.org/>`_ is needed.  This is not needed simply to
   use matholymp.  If you are reading this document online, note that
   it relates to version |release|; if you are using a different
   matholymp version (including if you are using the current
@@ -106,7 +106,7 @@ matholymp:
   other dependencies) is needed.  Those tests are only expected to
   work on Unix-like operating systems, and some of them depend on the
   provided patch for `Roundup issue 2550722
-  <http://issues.roundup-tracker.org/issue2550722>`_.
+  <https://issues.roundup-tracker.org/issue2550722>`_.
 
 * To measure the code coverage of the automated tests, `Coverage.py
   <https://coverage.readthedocs.io/en/latest/>`_ is needed.  This is
