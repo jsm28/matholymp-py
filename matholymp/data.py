@@ -768,12 +768,18 @@ class Event(object):
         'num_contestants', _get_num_contestants,
         """The number of contestants at this event.""")
 
+    def _get_contestant_list_official(self):
+        return [p for p in self.contestant_list if p.country.is_official]
+
+    contestant_list_official = _PropertyCached(
+        'contestant_list_official', _get_contestant_list_official,
+        """
+        A list of all contestants (PersonEvent objects) from official
+        countries at this event.
+        """)
+
     def _get_num_contestants_official(self):
-        n = 0
-        for c in self.country_list:
-            if c.is_official:
-                n += c.num_contestants
-        return n
+        return len(self.contestant_list_official)
 
     num_contestants_official = _PropertyCached(
         'num_contestants_official', _get_num_contestants_official,
@@ -899,12 +905,16 @@ class Event(object):
         'num_countries', _get_num_countries,
         """The number of countries with contestants at this event.""")
 
+    def _get_country_with_contestants_list_official(self):
+        return [c for c in self.country_with_contestants_list if c.is_official]
+
+    country_with_contestants_list_official = _PropertyCached(
+        'country_with_contestants_list_official',
+        _get_country_with_contestants_list_official,
+        """A list of all official countries with contestants at this event.""")
+
     def _get_num_countries_official(self):
-        n = 0
-        for c in self.country_list:
-            if c.is_official:
-                n += 1
-        return n
+        return len(self.country_with_contestants_list_official)
 
     num_countries_official = _PropertyCached(
         'num_countries_official', _get_num_countries_official,
@@ -1390,6 +1400,28 @@ class PersonEvent(object):
     rank = _PropertyCached(
         'rank', _get_rank,
         """The rank of this person at this event.""")
+
+    def _get_rank_official(self):
+        assert self.is_contestant
+        if not self.country.is_official:
+            return None
+        rank = 0
+        nrank = 0
+        last_score = -1
+        for p in sorted(self.event.contestant_list_official,
+                        key=lambda x: x.total_score, reverse=True):
+            nrank += 1
+            if p.total_score != last_score:
+                rank = nrank
+                last_score = p.total_score
+            p._cache['rank_official'] = rank
+        return self._cache['rank_official']
+
+    rank_official = _PropertyCached(
+        'rank_official', _get_rank_official,
+        """
+        The rank of this person among official contestants at this event.
+        """)
 
     photo_url = _PersonEventPropertyDS(
         'photo_url',
@@ -1949,6 +1981,26 @@ class CountryEvent(object):
     rank = _PropertyCached(
         'rank', _get_rank,
         """The rank of this country at this event.""")
+
+    def _get_rank_official(self):
+        assert self.num_contestants
+        if not self.is_official:
+            return None
+        rank = 0
+        nrank = 0
+        last_score = -1
+        for c in sorted(self.event.country_with_contestants_list_official,
+                        key=lambda x: x.total_score_for_rank, reverse=True):
+            nrank += 1
+            if c.total_score_for_rank != last_score:
+                rank = nrank
+                last_score = c.total_score_for_rank
+            c._cache['rank_official'] = rank
+        return self._cache['rank_official']
+
+    rank_official = _PropertyCached(
+        'rank_official', _get_rank_official,
+        """The rank of this country among official countries at this event.""")
 
     generic_id = _CountryEventPropertyDS(
         'generic_id',

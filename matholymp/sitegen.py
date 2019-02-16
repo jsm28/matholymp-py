@@ -960,6 +960,10 @@ class SiteGenerator(object):
         row = []
         if show_rank:
             row.extend([self.html_th_scores('#', title='Rank')])
+            if event.distinguish_official:
+                row.extend([self.html_th_scores(
+                    '#<sub>O</sub>',
+                    title='Rank (%s)' % self._cfg['official_desc_lc'])])
         if show_code:
             row.extend([self.html_th_scores('Code')])
         if show_name:
@@ -986,6 +990,10 @@ class SiteGenerator(object):
         row = []
         if show_rank:
             row.extend([str(p.rank)])
+            if p.event.distinguish_official:
+                row.extend([''
+                            if p.rank_official is None
+                            else str(p.rank_official)])
         if link:
             linker = self.link_for_person
         else:
@@ -1012,11 +1020,13 @@ class SiteGenerator(object):
         assert event or country
         if event:
             show_year = False
+            show_rank_official = event.distinguish_official
             num_problems_to_show = event.num_problems
             total_top_n_header = event.rank_top_n_if_matters
             show_hm = event.honourable_mentions_available
         else:
             show_year = True
+            show_rank_official = self._data.distinguish_official
             num_problems_to_show = country.max_num_problems
             total_top_n_header = None
             show_hm = country.honourable_mentions_available
@@ -1024,6 +1034,10 @@ class SiteGenerator(object):
         if show_year:
             row.append(self.html_th_scores('Year'))
         row.append(self.html_th_scores('#', title='Rank'))
+        if show_rank_official:
+            row.append(self.html_th_scores(
+                '#<sub>O</sub>',
+                title='Rank (%s)' % self._cfg['official_desc_lc']))
         if not show_year:
             row.append(self.html_th_scores('Country'))
         row.append(self.html_th_scores('Size'))
@@ -1047,11 +1061,13 @@ class SiteGenerator(object):
         if event:
             assert event is c.event
             show_year = False
+            show_rank_official = event.distinguish_official
             num_problems_to_show = event.num_problems
             total_top_n = event.rank_top_n_matters
             show_hm = event.honourable_mentions_available
         else:
             show_year = True
+            show_rank_official = self._data.distinguish_official
             num_problems_to_show = c.country.max_num_problems
             total_top_n = None
             show_hm = c.country.honourable_mentions_available
@@ -1061,6 +1077,8 @@ class SiteGenerator(object):
                 self.link_for_country_at_event(c,
                                                cgi.escape(c.event.year)))
         row.append(str(c.rank))
+        if show_rank_official:
+            row.append('' if c.rank_official is None else str(c.rank_official))
         if not show_year:
             row.append(
                 self.link_for_country_at_event(c,

@@ -210,6 +210,11 @@ the registration system is not active.
   a person with only part of their date of birth specified, when dates
   of birth are not required for all participants.
 
+* When official and unofficial countries are distinguished,
+  scoreboards now show ranks for countries and contestants restricted
+  to official countries, in addition to ranks among the full set of
+  countries and contestants.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 
