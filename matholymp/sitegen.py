@@ -1824,6 +1824,8 @@ class SiteGenerator(object):
             if show_hm:
                 cols.extend(['Honourable Mentions'])
             cols.extend(['Total Score', 'Rank'])
+            if distinguish_official:
+                cols.extend(['%s Rank' % self._cfg['official_adj']])
             cols.extend(self.pn_csv_header(num_problems))
         return cols
 
@@ -1871,6 +1873,11 @@ class SiteGenerator(object):
                         csv_out['Honourable Mentions'] = ''
                 csv_out['Total Score'] = str(c.total_score)
                 csv_out['Rank'] = str(c.rank)
+                if distinguish_official:
+                    csv_out['%s Rank' % self._cfg['official_adj']] = (
+                        ''
+                        if c.rank_official is None
+                        else str(c.rank_official))
                 for i in range(num_problems):
                     if i < c.event.num_problems:
                         csv_out['P%d' % (i + 1)] = str(c.problem_totals[i])
@@ -1885,6 +1892,8 @@ class SiteGenerator(object):
                     csv_out['Honourable Mentions'] = ''
                 csv_out['Total Score'] = ''
                 csv_out['Rank'] = ''
+                if distinguish_official:
+                    csv_out['%s Rank' % self._cfg['official_adj']] = ''
                 for i in range(num_problems):
                     csv_out['P%d' % (i + 1)] = ''
         return csv_out
@@ -1918,8 +1927,8 @@ class SiteGenerator(object):
         self.write_csv_to_file(self.path_for_event_countries_csv(e),
                                data[0], data[1])
 
-    def people_csv_columns(self, num_problems, reg_system=False,
-                           private_data=False):
+    def people_csv_columns(self, num_problems, distinguish_official,
+                           reg_system=False, private_data=False):
         """Return list of headers for CSV file of people."""
         cols = [self._cfg['num_key'], 'Country Number', 'Person Number',
                 'Annual URL', 'Country Name', 'Country Code',
@@ -1932,6 +1941,8 @@ class SiteGenerator(object):
             cols.extend(['Generic Number'])
         if not reg_system:
             cols.extend(['Rank'])
+            if distinguish_official:
+                cols.extend(['%s Rank' % self._cfg['official_adj']])
         if private_data:
             cols.extend(['Gender', 'Date of Birth', 'Languages',
                          'Allergies and Dietary Requirements',
@@ -1944,11 +1955,14 @@ class SiteGenerator(object):
                          'Event Photos Consent'])
         return cols
 
-    def person_csv_data(self, p, num_problems=None, scores_only=False,
-                        reg_system=False, private_data=False):
+    def person_csv_data(self, p, num_problems=None, distinguish_official=None,
+                        scores_only=False, reg_system=False,
+                        private_data=False):
         """Return the CSV data for a given person."""
         if num_problems is None:
             num_problems = p.event.num_problems
+        if distinguish_official is None:
+            distinguish_official = p.event.distinguish_official
         csv_out = {}
         if not scores_only:
             csv_out[self._cfg['num_key']] = str(p.event.id)
@@ -1990,6 +2004,11 @@ class SiteGenerator(object):
             csv_out['Extra Awards'] = comma_join(p.extra_awards)
             if not reg_system:
                 csv_out['Rank'] = str(p.rank)
+                if distinguish_official:
+                    csv_out['%s Rank' % self._cfg['official_adj']] = (
+                        ''
+                        if p.rank_official is None
+                        else str(p.rank_official))
         else:
             csv_out['Contestant Code'] = ''
             if not scores_only:
@@ -2001,6 +2020,8 @@ class SiteGenerator(object):
             csv_out['Extra Awards'] = ''
             if not reg_system:
                 csv_out['Rank'] = ''
+                if distinguish_official:
+                    csv_out['%s Rank' % self._cfg['official_adj']] = ''
         if reg_system and not scores_only:
             if p.generic_id is None:
                 csv_out['Generic Number'] = ''
@@ -2040,10 +2061,13 @@ class SiteGenerator(object):
         people_sorted = sorted(self._data.person_event_list,
                                key=lambda x: x.sort_key)
         people_data_output = [
-            self.person_csv_data(p, num_problems=self._data.max_num_problems)
+            self.person_csv_data(
+                p, num_problems=self._data.max_num_problems,
+                distinguish_official=self._data.distinguish_official)
             for p in people_sorted]
         people_columns = \
-            self.people_csv_columns(self._data.max_num_problems)
+            self.people_csv_columns(self._data.max_num_problems,
+                                    self._data.distinguish_official)
         self.write_csv_to_file(self.path_for_data_people(),
                                people_data_output, people_columns)
 
@@ -2058,6 +2082,7 @@ class SiteGenerator(object):
                                                      private_data=private_data)
                                 for p in e_people_sorted]
         e_people_columns = self.people_csv_columns(e.num_problems,
+                                                   e.distinguish_official,
                                                    reg_system=reg_system,
                                                    private_data=private_data)
         return (e_people_data_output, e_people_columns)
@@ -2068,7 +2093,8 @@ class SiteGenerator(object):
         self.write_csv_to_file(self.path_for_event_people_csv(e),
                                data[0], data[1])
 
-    def scores_csv_columns(self, num_problems, reg_system=False):
+    def scores_csv_columns(self, num_problems, distinguish_official,
+                           reg_system=False):
         """Return list of headers for CSV file of scores."""
         cols = ['Country Name', 'Country Code',
                 'Contestant Code', 'Given Name', 'Family Name']
@@ -2076,6 +2102,8 @@ class SiteGenerator(object):
         cols.extend(['Total', 'Award', 'Extra Awards'])
         if not reg_system:
             cols.extend(['Rank'])
+            if distinguish_official:
+                cols.extend(['%s Rank' % self._cfg['official_adj']])
         return cols
 
     def one_event_scores_csv_content(self, e, reg_system=False):
@@ -2088,6 +2116,7 @@ class SiteGenerator(object):
                                                      reg_system=reg_system)
                                 for p in e_people_sorted]
         e_scores_columns = self.scores_csv_columns(e.num_problems,
+                                                   e.distinguish_official,
                                                    reg_system=reg_system)
         return (e_scores_data_output, e_scores_columns)
 

@@ -84,9 +84,8 @@ General and global changes
 * Add graphical statistics of results and individual and country
   performance over time.
 
-* Display (and include in CSV files) also ranks limited to official
-  countries and contestants, and support distinguishing them in tables
-  by using different CSS styles.
+* Support distinguishing official and unofficial countries and
+  contestants in tables by using different CSS styles.
 
 * Support gender as optionally public information (generally or for
   contestants).

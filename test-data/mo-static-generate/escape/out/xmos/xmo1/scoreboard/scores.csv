@@ -1,6 +1,6 @@
-﻿Country Name,Country Code,Contestant Code,Given Name,Family Name,P1,P2,P3,P4,P5,P6,Total,Award,Extra Awards,Rank
-Two <Test> Three,ABC,ABC1,Nine,Ten,7,7,0,7,7,1,29,Gold Medal,,2
-Two <Test> Three,ABC,ABC2,Eleven,Twelve,7,0,0,7,0,1,15,Bronze Medal,,4
-One <Test> Country,DEF<Test>,DEF<Test>1,One <Test>,Two <Test>,7,4,0,7,2,1,21,Silver Medal,,3
-One <Test> Country,DEF<Test>,DEF<Test>2,Three,Four,7,0,0,0,2,0,9,Honourable Mention,,5
-Four <Test> Five,ZYX,ZYX1,Thirteen,Fourteen,7,7,0,7,2,7,30,Gold Medal,,1
+﻿Country Name,Country Code,Contestant Code,Given Name,Family Name,P1,P2,P3,P4,P5,P6,Total,Award,Extra Awards,Rank,Example Rank
+Two <Test> Three,ABC,ABC1,Nine,Ten,7,7,0,7,7,1,29,Gold Medal,,2,2
+Two <Test> Three,ABC,ABC2,Eleven,Twelve,7,0,0,7,0,1,15,Bronze Medal,,4,3
+One <Test> Country,DEF<Test>,DEF<Test>1,One <Test>,Two <Test>,7,4,0,7,2,1,21,Silver Medal,,3,
+One <Test> Country,DEF<Test>,DEF<Test>2,Three,Four,7,0,0,0,2,0,9,Honourable Mention,,5,
+Four <Test> Five,ZYX,ZYX1,Thirteen,Fourteen,7,7,0,7,2,7,30,Gold Medal,,1,1
