@@ -215,6 +215,10 @@ the registration system is not active.
   contestants restricted to official countries, in addition to ranks
   among the full set of countries and contestants.
 
+* Papers for Deputy Leaders (and Observers with Deputy and
+  Contestants) are generated in a separate file from those for Leaders
+  (and Observers with Leader).
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

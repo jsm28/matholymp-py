@@ -694,32 +694,36 @@ class DocumentGenerator(object):
             self.subst_and_pdflatex(template_file_base, output_file_base,
                                     template_fields, raw_fields)
             if person_id == 'all':
-                output_file_base = 'papers-leaders' + day_text
-                country_leader_counts = {}
-                for p in self._event.person_list:
-                    if p.country.code not in country_leader_counts:
-                        country_leader_counts[p.country.code] = 0
-                    if not p.is_contestant:
-                        country_leader_counts[p.country.code] += 1
-                paper_list = []
-                for d in days:
-                    for c in sorted(country_langs.keys(),
-                                    key=coll_get_sort_key):
-                        if 'English' not in country_langs[c]:
-                            country_langs[c].append('English')
-                        country_langs[c].sort(key=coll_get_sort_key)
-                        for i in range(country_leader_counts[c]):
-                            for lang in country_langs[c]:
-                                lang_filename = lang_to_filename(lang)
-                                paper_text = self.one_paper_latex(
-                                    lang_filename, lang, d,
-                                    'Leaders: ', c)
-                                paper_list.append(paper_text)
-                paper_list_text = '%\n'.join(paper_list)
-                template_fields['papers'] = paper_list_text
-                self.subst_and_pdflatex(template_file_base,
-                                        output_file_base, template_fields,
-                                        raw_fields)
+                leader_roles = ('Leader', 'Observer with Leader')
+                for kind in ('leaders', 'deputies'):
+                    output_file_base = 'papers-%s%s' % (kind, day_text)
+                    country_leader_counts = {}
+                    for p in self._event.person_list:
+                        if p.country.code not in country_leader_counts:
+                            country_leader_counts[p.country.code] = 0
+                        if not p.is_contestant:
+                            is_leader = p.primary_role in leader_roles
+                            if is_leader == (kind == 'leaders'):
+                                country_leader_counts[p.country.code] += 1
+                    paper_list = []
+                    for d in days:
+                        for c in sorted(country_langs.keys(),
+                                        key=coll_get_sort_key):
+                            if 'English' not in country_langs[c]:
+                                country_langs[c].append('English')
+                            country_langs[c].sort(key=coll_get_sort_key)
+                            for i in range(country_leader_counts[c]):
+                                for lang in country_langs[c]:
+                                    lang_filename = lang_to_filename(lang)
+                                    paper_text = self.one_paper_latex(
+                                        lang_filename, lang, d,
+                                        '%s: ' % kind.capitalize(), c)
+                                    paper_list.append(paper_text)
+                    paper_list_text = '%\n'.join(paper_list)
+                    template_fields['papers'] = paper_list_text
+                    self.subst_and_pdflatex(template_file_base,
+                                            output_file_base, template_fields,
+                                            raw_fields)
 
     def generate_language_list(self):
         """Generate a list of languages and the contestants using them."""
