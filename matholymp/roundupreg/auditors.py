@@ -222,8 +222,8 @@ def audit_person_fields(db, cl, nodeid, newvalues):
                             'No country specified')
     user_country = db.user.get(userid, 'country')
     user_country_normal = db.country.get(user_country, 'is_normal')
-    if (user_country_normal
-        and user_country != country):
+    if (user_country != country
+        and not db.security.hasPermission('RegisterAllCountries', userid)):
         raise ValueError('Person must be from your country')
 
     if (user_country_normal

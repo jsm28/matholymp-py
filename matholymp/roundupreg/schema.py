@@ -409,8 +409,9 @@ def init_schema(env):
     p = db.security.addPermission(name='Create', klass='person',
                                   properties=('country',))
     db.security.addPermissionToRole('Score', p)
-    # So that scoring users do not see the user interface for
-    # registering people:
+
+    # Permission for registering people from all countries, as opposed
+    # to only from one's own country.
     p = db.security.addPermission(name='RegisterAllCountries')
     db.security.addPermissionToRole('Admin', p)
 

@@ -92,15 +92,15 @@ please inform the people you register of this information.
   normal_input templates/page/macros/user_normal_input;
   edit_ok context/is_edit_ok;
   ">
- <tr tal:condition="python:utils.normal_country_person(db._db,
-  request.user.id)" tal:define="name string:country; label string:Country; value context/country; edit_ok edit_ok">
+ <tr tal:condition="python:not request.user.hasPermission('RegisterAllCountries')"
+  tal:define="name string:country; label string:Country; value context/country; edit_ok edit_ok">
   <th metal:use-macro="th_label">Country</th>
   <td tal:content="structure python:context.country.menu(html_kwargs =
   { 'id' : 'country' }, id = request.user.country.id)">country</td>
  </tr>
 
- <tr tal:condition="python:not utils.normal_country_person(db._db,
-  request.user.id)" tal:define="name string:country; label string:Country; value context/country; edit_ok edit_ok">
+ <tr tal:condition="python:request.user.hasPermission('RegisterAllCountries')"
+  tal:define="name string:country; label string:Country; value context/country; edit_ok edit_ok">
   <th metal:use-macro="th_label">Country</th>
   <td tal:content="structure python:context.country.menu(html_kwargs =
   { 'id' : 'country' })">country</td>
