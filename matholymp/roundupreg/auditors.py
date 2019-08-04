@@ -226,7 +226,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         and not db.security.hasPermission('RegisterAllCountries', userid)):
         raise ValueError('Person must be from your country')
 
-    if (user_country_normal
+    if (not db.security.hasPermission('RegisterAnyTime', userid)
         and not db.event.get('1', 'registration_enabled')):
         raise ValueError('Registration is now disabled, please contact'
                          ' the event organisers to change details of'

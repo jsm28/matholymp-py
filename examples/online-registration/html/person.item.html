@@ -43,7 +43,7 @@ define="edit_ok context/is_edit_ok"
 <div tal:condition="context/is_view_ok">
 
 <p tal:condition="python:context.is_edit_ok() and
-		  utils.normal_country_person(db._db, request.user.id)
+		  not request.user.hasPermission('RegisterAnyTime')
 		  and not db._db.event.get('1',
 		  'registration_enabled')">Registration is now
 		  disabled, please contact the event organisers to change

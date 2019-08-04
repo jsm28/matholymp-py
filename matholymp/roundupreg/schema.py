@@ -415,6 +415,11 @@ def init_schema(env):
     p = db.security.addPermission(name='RegisterAllCountries')
     db.security.addPermissionToRole('Admin', p)
 
+    # Permission for registering people and changing registration
+    # details when registration is otherwise closed.
+    p = db.security.addPermission(name='RegisterAnyTime')
+    db.security.addPermissionToRole('Admin', p)
+
     # Online manipulation of participant photos has its own
     # Permission.
     p = db.security.addPermission(name='EditPhotos')
