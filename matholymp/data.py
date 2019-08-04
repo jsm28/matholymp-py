@@ -1691,6 +1691,21 @@ class Country(object):
         'flag_url', _get_flag_url,
         """The flag URL of this country.""")
 
+    def _get_is_official(self):
+        most_recent = self.participation_list[-1]
+        if most_recent.event.distinguish_official:
+            return most_recent.is_official
+        else:
+            return None
+
+    is_official = _PropertyCached(
+        'is_official', _get_is_official,
+        """
+        Whether this country is an official country at its most recent
+        event; None if official countries are not distinguished at
+        that event.
+        """)
+
     def _get_sort_key(self):
         return (coll_get_sort_key(self.code),
                 coll_get_sort_key(self.name),

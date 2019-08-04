@@ -655,14 +655,18 @@ class SiteGenerator(object):
                  ' %s in CSV format.</p>\n'
                  % (cgi.escape(self._data.short_name_plural),
                     self.link_for_data_countries('downloaded')))
-        head_row_list = [self.html_tr_list(
-            [self.html_th('Code'),
-             self.html_th('Name'),
-             self.html_th('First'),
+        head_row = [self.html_th('Code'),
+                    self.html_th('Name')]
+        if self._data.distinguish_official:
+            head_row.extend([self.html_th(
+                cgi.escape(self._cfg['official_desc']))])
+        head_row.extend(
+            [self.html_th('First'),
              self.html_th('Last'),
              self.html_th('#', title=('Number of %s'
                                       % self._data.short_name_plural)),
-             self.html_th('Host')])]
+             self.html_th('Host')])
+        head_row_list = [self.html_tr_list(head_row)]
         body_row_list = []
         countries = sorted(self._data.country_list, key=lambda x: x.sort_key)
         for c in countries:
@@ -671,11 +675,15 @@ class SiteGenerator(object):
             first_year = cgi.escape(first_c.event.year)
             last_year = cgi.escape(last_c.event.year)
             row = [self.link_for_country(c, cgi.escape(c.code)),
-                   self.link_for_country(c, cgi.escape(c.name)),
-                   self.link_for_country_at_event(first_c, first_year),
-                   self.link_for_country_at_event(last_c, last_year),
-                   c.num_participations,
-                   self.host_year_text(c)]
+                   self.link_for_country(c, cgi.escape(c.name))]
+            if self._data.distinguish_official:
+                row.extend(['' if c.is_official is None
+                            else 'Yes' if c.is_official else 'No'])
+            row.extend(
+                [self.link_for_country_at_event(first_c, first_year),
+                 self.link_for_country_at_event(last_c, last_year),
+                 c.num_participations,
+                 self.host_year_text(c)])
             body_row_list.append(self.html_tr_td_list(row))
         text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
         text += '\n'

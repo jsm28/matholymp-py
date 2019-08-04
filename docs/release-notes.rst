@@ -219,6 +219,10 @@ the registration system is not active.
   Contestants) are generated in a separate file from those for Leaders
   (and Observers with Leader).
 
+* The static site table of all countries at all events now shows which
+  countries are official countries, when official and unofficial
+  countries are distinguished at at least one event.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 
