@@ -221,7 +221,6 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     country = require_value(db, cl, nodeid, newvalues, 'country',
                             'No country specified')
     user_country = db.user.get(userid, 'country')
-    user_country_normal = db.country.get(user_country, 'is_normal')
     if (user_country != country
         and not db.security.hasPermission('RegisterAllCountries', userid)):
         raise ValueError('Person must be from your country')
@@ -393,35 +392,32 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         if file_id is not None:
             audit_file_format(db, 'photo', file_id, 'Photos', 'photo',
                               ('jpg', 'png'), 'JPEG or PNG')
-            if user_country_normal:
-                file_person = db.photo.get(file_id, 'person')
-                if file_person is not None and file_person != nodeid:
-                    raise ValueError('Photo from another person')
-                if file_person is None:
-                    # Ensure a race cannot occur linking to a photo
-                    # uploaded by another user before the person
-                    # reactor runs to set the person for that photo.
-                    file_creator = db.photo.get(file_id, 'creator')
-                    if file_creator != userid:
-                        raise ValueError('Photo from another user')
+            file_person = db.photo.get(file_id, 'person')
+            if file_person is not None and file_person != nodeid:
+                raise ValueError('Photo from another person')
+            if file_person is None:
+                # Ensure a race cannot occur linking to a photo
+                # uploaded by another user before the person reactor
+                # runs to set the person for that photo.
+                file_creator = db.photo.get(file_id, 'creator')
+                if file_creator != userid:
+                    raise ValueError('Photo from another user')
 
     if have_consent_forms(db) and 'consent_form' in newvalues:
         file_id = newvalues['consent_form']
         if file_id is not None:
             audit_file_format(db, 'consent_form', file_id, 'Consent forms',
                               'consent form', ('pdf',), 'PDF')
-            if user_country_normal:
-                file_person = db.consent_form.get(file_id, 'person')
-                if file_person is not None and file_person != nodeid:
-                    raise ValueError('Consent form from another person')
-                if file_person is None:
-                    # Ensure a race cannot occur linking to a consent
-                    # form uploaded by another user before the person
-                    # reactor runs to set the person for that consent
-                    # form.
-                    file_creator = db.consent_form.get(file_id, 'creator')
-                    if file_creator != userid:
-                        raise ValueError('Consent form from another user')
+            file_person = db.consent_form.get(file_id, 'person')
+            if file_person is not None and file_person != nodeid:
+                raise ValueError('Consent form from another person')
+            if file_person is None:
+                # Ensure a race cannot occur linking to a consent form
+                # uploaded by another user before the person reactor
+                # runs to set the person for that consent form.
+                file_creator = db.consent_form.get(file_id, 'creator')
+                if file_creator != userid:
+                    raise ValueError('Consent form from another user')
 
     generic_url = get_new_value(db, cl, nodeid, newvalues, 'generic_url')
     if generic_url is not None and generic_url != '':
