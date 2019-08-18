@@ -226,6 +226,9 @@ the registration system is not active.
 * :file:`person.item.html` and :file:`page.html` have been modified
   for internal changes in registration system code.
 
+* A bug has been fixed that produced internal errors when scaling down
+  PNG photos with an alpha channel.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

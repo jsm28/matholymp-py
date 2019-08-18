@@ -70,7 +70,9 @@ __all__ = ['gen_image', 'gen_image_file', 'gen_pdf_file',
 def gen_image(size_x, size_y, scale, mode):
     """Generate an image with random blocks scale by scale of pixels."""
     mode_bytes = {'L': 1,
-                  'RGB': 3}
+                  'LA': 2,
+                  'RGB': 3,
+                  'RGBA': 4}
     nbytes = mode_bytes[mode]
     data = bytearray(size_x * size_y * scale * scale * nbytes)
     line_size = size_x * scale * nbytes
@@ -7287,6 +7289,64 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session = self.get_session('admin')
         photo_filename, photo_bytes = self.gen_test_image(512, 512, 2,
                                                           '.jpg', 'JPEG', 'L')
+        admin_session.create_country_generic()
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                    {'photo-1@content': photo_filename})
+        # The status page should have the button to scale down the photo.
+        admin_session.check_open_relative('person?@template=status')
+        admin_session.select_main_form()
+        main_form = admin_session.get_main_form()
+        submit = main_form.find('input', type='submit')
+        self.assertEqual(submit['value'], 'Scale down')
+        admin_session.check_submit_selected()
+        admin_csv = admin_session.get_people_csv()
+        img_url_csv = admin_csv[0]['Photo URL']
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        self.assertLessEqual(len(admin_bytes), 65536)
+        # The button should not appear any more on the status page.
+        admin_session.check_open_relative('person?@template=status')
+        main_form = admin_session.get_main_form()
+        self.assertIsNone(main_form)
+
+    @_with_config(photo_max_size='65536')
+    def test_person_photo_scale_alpha(self):
+        """
+        Test scaling down photo: image with alpha channel.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(256, 256, 2,
+                                                          '.png', 'PNG',
+                                                          'RGBA')
+        admin_session.create_country_generic()
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                    {'photo-1@content': photo_filename})
+        # The status page should have the button to scale down the photo.
+        admin_session.check_open_relative('person?@template=status')
+        admin_session.select_main_form()
+        main_form = admin_session.get_main_form()
+        submit = main_form.find('input', type='submit')
+        self.assertEqual(submit['value'], 'Scale down')
+        admin_session.check_submit_selected()
+        admin_csv = admin_session.get_people_csv()
+        img_url_csv = admin_csv[0]['Photo URL']
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        self.assertLessEqual(len(admin_bytes), 65536)
+        # The button should not appear any more on the status page.
+        admin_session.check_open_relative('person?@template=status')
+        main_form = admin_session.get_main_form()
+        self.assertIsNone(main_form)
+
+    @_with_config(photo_max_size='65536')
+    def test_person_photo_scale_grey_alpha(self):
+        """
+        Test scaling down photo: greyscale image with alpha channel.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(256, 256, 2,
+                                                          '.png', 'PNG',
+                                                          'LA')
         admin_session.create_country_generic()
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
                                     {'photo-1@content': photo_filename})

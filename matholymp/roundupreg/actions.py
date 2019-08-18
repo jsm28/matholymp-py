@@ -167,6 +167,16 @@ class ScalePhotoAction(Action):
         if cur_size_bytes <= max_size_bytes:
             raise ValueError('This photo is already small enough')
         photo_orig = Image.open(filename)
+        if photo_orig.mode not in ('RGB', 'L'):
+            # Convert to RGB, removing any alpha channel.
+            if (photo_orig.mode in ('RGBA', 'LA')
+                or (photo_orig.mode == 'P'
+                    and 'transparency' in photo_orig.info)):
+                photo_orig = photo_orig.convert('RGBA')
+                background = Image.new('RGBA', photo_orig.size,
+                                       (255, 255, 255, 255))
+                photo_orig = Image.alpha_composite(background, photo_orig)
+            photo_orig = photo_orig.convert('RGB')
         size_xy = photo_orig.size
         scale_factor = 1
         while size_xy[0] >= min_photo_dimen and size_xy[1] >= min_photo_dimen:
