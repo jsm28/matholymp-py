@@ -7110,6 +7110,255 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv[0]['Allergies and Dietary Requirements'],
                          large_b)
 
+    def test_person_photo_scale(self):
+        """
+        Test scaling down photo.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(1024, 1024, 2,
+                                                          '.jpg', 'JPEG')
+        admin_session.create_country_generic()
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                    {'photo-1@content': photo_filename})
+        # The status page should have the button to scale down the photo.
+        admin_session.check_open_relative('person?@template=status')
+        admin_session.select_main_form()
+        main_form = admin_session.get_main_form()
+        submit = main_form.find('input', type='submit')
+        self.assertEqual(submit['value'], 'Scale down')
+        admin_session.check_submit_selected()
+        admin_csv = admin_session.get_people_csv()
+        img_url_csv = admin_csv[0]['Photo URL']
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        self.assertLessEqual(len(admin_bytes), 1572864)
+        # The button should not appear any more on the status page.
+        admin_session.check_open_relative('person?@template=status')
+        main_form = admin_session.get_main_form()
+        self.assertIsNone(main_form)
+
+    @_with_config(photo_max_size='65536')
+    def test_person_photo_scale_max_size(self):
+        """
+        Test scaling down photo: smaller configured maximum size.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(256, 256, 2,
+                                                          '.jpg', 'JPEG')
+        admin_session.create_country_generic()
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                    {'photo-1@content': photo_filename})
+        # The status page should have the button to scale down the photo.
+        admin_session.check_open_relative('person?@template=status')
+        admin_session.select_main_form()
+        main_form = admin_session.get_main_form()
+        submit = main_form.find('input', type='submit')
+        self.assertEqual(submit['value'], 'Scale down')
+        admin_session.check_submit_selected()
+        admin_csv = admin_session.get_people_csv()
+        img_url_csv = admin_csv[0]['Photo URL']
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        self.assertLessEqual(len(admin_bytes), 65536)
+        # The button should not appear any more on the status page.
+        admin_session.check_open_relative('person?@template=status')
+        main_form = admin_session.get_main_form()
+        self.assertIsNone(main_form)
+
+    @_with_config(photo_max_size='65536')
+    def test_person_photo_scale_png(self):
+        """
+        Test scaling down photo: PNG photo.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(256, 256, 2,
+                                                          '.png', 'PNG')
+        admin_session.create_country_generic()
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                    {'photo-1@content': photo_filename})
+        # The status page should have the button to scale down the photo.
+        admin_session.check_open_relative('person?@template=status')
+        admin_session.select_main_form()
+        main_form = admin_session.get_main_form()
+        submit = main_form.find('input', type='submit')
+        self.assertEqual(submit['value'], 'Scale down')
+        admin_session.check_submit_selected()
+        admin_csv = admin_session.get_people_csv()
+        img_url_csv = admin_csv[0]['Photo URL']
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        self.assertLessEqual(len(admin_bytes), 65536)
+        # The button should not appear any more on the status page.
+        admin_session.check_open_relative('person?@template=status')
+        main_form = admin_session.get_main_form()
+        self.assertIsNone(main_form)
+
+    @_with_config(photo_max_size='16384')
+    def test_person_photo_scale_min_dimen(self):
+        """
+        Test scaling down photo: minimum dimension prevents making
+        small enough.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(1024, 256, 2,
+                                                          '.jpg', 'JPEG')
+        admin_session.create_country_generic()
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                    {'photo-1@content': photo_filename})
+        # The status page should have the button to scale down the photo.
+        admin_session.check_open_relative('person?@template=status')
+        admin_session.select_main_form()
+        main_form = admin_session.get_main_form()
+        submit = main_form.find('input', type='submit')
+        self.assertEqual(submit['value'], 'Scale down')
+        admin_session.check_submit_selected(error='Could not make this photo '
+                                            'small enough')
+        admin_csv = admin_session.get_people_csv()
+        img_url_csv = admin_csv[0]['Photo URL']
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        self.assertGreater(len(admin_bytes), 16384)
+        # The button should still appear on the status page.
+        admin_session.check_open_relative('person?@template=status')
+        main_form = admin_session.get_main_form()
+        self.assertIsNotNone(main_form)
+        # Similarly, for the other dimension.
+        photo_filename, photo_bytes = self.gen_test_image(256, 1024, 2,
+                                                          '.jpg', 'JPEG')
+        admin_session.edit('person', '1', {'photo-1@content': photo_filename})
+        # The status page should have the button to scale down the photo.
+        admin_session.check_open_relative('person?@template=status')
+        admin_session.select_main_form()
+        main_form = admin_session.get_main_form()
+        submit = main_form.find('input', type='submit')
+        self.assertEqual(submit['value'], 'Scale down')
+        admin_session.check_submit_selected(error='Could not make this photo '
+                                            'small enough')
+        admin_csv = admin_session.get_people_csv()
+        img_url_csv = admin_csv[0]['Photo URL']
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        self.assertGreater(len(admin_bytes), 16384)
+        # The button should still appear on the status page.
+        admin_session.check_open_relative('person?@template=status')
+        main_form = admin_session.get_main_form()
+        self.assertIsNotNone(main_form)
+
+    @_with_config(photo_max_size='65536', photo_min_dimen='512')
+    def test_person_photo_scale_min_dimen_config(self):
+        """
+        Test scaling down photo: configured minimum dimension prevents
+        making small enough.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(256, 256, 2,
+                                                          '.jpg', 'JPEG')
+        admin_session.create_country_generic()
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                    {'photo-1@content': photo_filename})
+        # The status page should have the button to scale down the photo.
+        admin_session.check_open_relative('person?@template=status')
+        admin_session.select_main_form()
+        main_form = admin_session.get_main_form()
+        submit = main_form.find('input', type='submit')
+        self.assertEqual(submit['value'], 'Scale down')
+        admin_session.check_submit_selected(error='Could not make this photo '
+                                            'small enough')
+        admin_csv = admin_session.get_people_csv()
+        img_url_csv = admin_csv[0]['Photo URL']
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        self.assertGreater(len(admin_bytes), 16384)
+        # The button should still appear on the status page.
+        admin_session.check_open_relative('person?@template=status')
+        main_form = admin_session.get_main_form()
+        self.assertIsNotNone(main_form)
+
+    @_with_config(photo_max_size='65536')
+    def test_person_photo_scale_errors(self):
+        """
+        Test errors from scale_photo action.
+
+        Errors relating to the size of the photo are tested
+        separately.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(256, 256, 2,
+                                                          '.jpg', 'JPEG')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                    {'photo-1@content': photo_filename})
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        # Error trying to scale photo via GET request.
+        admin_session.check_open_relative('person1?@action=scale_photo',
+                                          error='Invalid request')
+        # Errors applying action to bad class or without id specified
+        # (requires modifying the form to exercise).
+        admin_session.check_open_relative('person?@template=status')
+        admin_session.select_main_form()
+        main_form = admin_session.get_main_form()
+        submit = main_form.find('input', type='submit')
+        self.assertEqual(submit['value'], 'Scale down')
+        main_form['action'] = 'person'
+        admin_session.check_submit_selected(error='No id specified to scale '
+                                            'photo for')
+        admin_session.check_open_relative('person?@template=status')
+        admin_session.select_main_form()
+        main_form = admin_session.get_main_form()
+        submit = main_form.find('input', type='submit')
+        self.assertEqual(submit['value'], 'Scale down')
+        main_form['action'] = 'country1'
+        admin_session.check_submit_selected(error='Photos can only be scaled '
+                                            'for people')
+        admin_session.check_open_relative('person?@template=status')
+        admin_session.select_main_form()
+        main_form = admin_session.get_main_form()
+        submit = main_form.find('input', type='submit')
+        self.assertEqual(submit['value'], 'Scale down')
+        main_form['action'] = 'person2'
+        admin_session.check_submit_selected(error='This person has no photo '
+                                            'to scale')
+        # The photo should not have been changed by these erroneous
+        # actions.
+        admin_csv = admin_session.get_people_csv()
+        img_url_csv = admin_csv[0]['Photo URL']
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(admin_csv[1]['Photo URL'], '')
+        # Test error with photo already small enough.
+        photo_filename, photo_bytes = self.gen_test_image(64, 64, 2,
+                                                          '.jpg', 'JPEG')
+        admin_session.edit('person', '2', {'photo-1@content': photo_filename})
+        admin_session.check_open_relative('person?@template=status')
+        admin_session.select_main_form()
+        main_form = admin_session.get_main_form()
+        submit = main_form.find('input', type='submit')
+        self.assertEqual(submit['value'], 'Scale down')
+        main_form['action'] = 'person2'
+        admin_session.check_submit_selected(error='This photo is already '
+                                            'small enough')
+        # The photo should not have been changed.
+        admin_csv = admin_session.get_people_csv()
+        img_url_csv = admin_csv[1]['Photo URL']
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        self.assertEqual(admin_bytes, photo_bytes)
+        # Permission error (requires user to have valid form, then
+        # have permissions removed, then try submitting it).
+        admin_session.create_user('admin2', 'XMO 2015 Staff', 'Admin')
+        admin2_session = self.get_session('admin2')
+        admin2_session.check_open_relative('person?@template=status')
+        admin2_session.select_main_form()
+        main_form = admin2_session.get_main_form()
+        submit = main_form.find('input', type='submit')
+        self.assertEqual(submit['value'], 'Scale down')
+        admin_session.edit('user', self.instance.userids['admin2'],
+                           {'roles': 'User,Score'})
+        admin2_session.check_submit_selected(error='You do not have '
+                                             'permission to scale the photo '
+                                             'for',
+                                             status=403)
+
     def test_event_medal_boundaries_csv_errors(self):
         """
         Test errors from medal_boundaries_csv action.
