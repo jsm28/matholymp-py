@@ -7697,6 +7697,80 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv_p, admin_csv)
         self.assertEqual(score_csv, admin_csv)
         self.assertEqual(score_csv_p, admin_csv)
+        # Test a null edit of scores.
+        admin_session.enter_scores('Test Second Country', 'DEF', '1',
+                                   [])
+        score_session.enter_scores('Test First Country', 'ABC', '2',
+                                   [])
+        admin_session.enter_scores('Test First Country', 'ABC', '4',
+                                   [])
+        score_session.enter_scores('Test First Country', 'ABC', '6',
+                                   [])
+        admin_csv_2 = admin_session.get_scores_csv()
+        admin_csv_p_2 = admin_session.get_people_csv_scores()
+        anon_csv_2 = session.get_scores_csv()
+        anon_csv_p_2 = session.get_people_csv_scores()
+        score_csv_2 = score_session.get_scores_csv()
+        score_csv_p_2 = score_session.get_people_csv_scores()
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(admin_csv_p_2, admin_csv)
+        self.assertEqual(anon_csv_2, admin_csv)
+        self.assertEqual(anon_csv_p_2, admin_csv)
+        self.assertEqual(score_csv_2, admin_csv)
+        self.assertEqual(score_csv_p_2, admin_csv)
+        # Test an edit that changes some scores.
+        admin_session.enter_scores('Test First Country', 'ABC', '2',
+                                   ['', '5', None, '0'])
+        score_session.enter_scores('Test First Country', 'ABC', '4',
+                                   ['', '6', None, '5'])
+        admin_csv = admin_session.get_scores_csv()
+        admin_csv_p = admin_session.get_people_csv_scores()
+        anon_csv = session.get_scores_csv()
+        anon_csv_p = session.get_people_csv_scores()
+        score_csv = score_session.get_scores_csv()
+        score_csv_p = score_session.get_people_csv_scores()
+        self.assertEqual(admin_csv,
+                         [{'Country Name': 'Test First Country',
+                           'Country Code': 'ABC', 'Contestant Code': 'ABC1',
+                           'Given Name': 'Given 1', 'Family Name': 'Family 1',
+                           'P1': '', 'P2': '', 'P3': '',
+                           'P4': '', 'P5': '', 'P6': '',
+                           'Total': '0', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test First Country',
+                           'Country Code': 'ABC', 'Contestant Code': 'ABC2',
+                           'Given Name': 'Given 2', 'Family Name': 'Family 2',
+                           'P1': '', 'P2': '5', 'P3': '',
+                           'P4': '6', 'P5': '', 'P6': '',
+                           'Total': '11', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test First Country',
+                           'Country Code': 'ABC', 'Contestant Code': 'ABC4',
+                           'Given Name': 'Given 3', 'Family Name': 'Family 3',
+                           'P1': '', 'P2': '0', 'P3': '',
+                           'P4': '5', 'P5': '', 'P6': '',
+                           'Total': '5', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test Second Country',
+                           'Country Code': 'DEF', 'Contestant Code': 'DEF2',
+                           'Given Name': 'Given 4', 'Family Name': 'Family 4',
+                           'P1': '5', 'P2': '', 'P3': '',
+                           'P4': '', 'P5': '', 'P6': '',
+                           'Total': '5', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test Second Country',
+                           'Country Code': 'DEF', 'Contestant Code': 'DEF3',
+                           'Given Name': 'Given 5', 'Family Name': 'Family 5',
+                           'P1': '1', 'P2': '', 'P3': '',
+                           'P4': '', 'P5': '', 'P6': '',
+                           'Total': '1', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test Second Country',
+                           'Country Code': 'DEF', 'Contestant Code': 'DEF4',
+                           'Given Name': 'Given 6', 'Family Name': 'Family 6',
+                           'P1': '2', 'P2': '', 'P3': '',
+                           'P4': '', 'P5': '', 'P6': '',
+                           'Total': '2', 'Award': '', 'Extra Awards': ''}])
+        self.assertEqual(admin_csv_p, admin_csv)
+        self.assertEqual(anon_csv, admin_csv)
+        self.assertEqual(anon_csv_p, admin_csv)
+        self.assertEqual(score_csv, admin_csv)
+        self.assertEqual(score_csv_p, admin_csv)
 
     def test_event_medal_boundaries_csv_errors(self):
         """
