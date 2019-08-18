@@ -807,17 +807,10 @@ class RegSystemTestCase(unittest.TestCase):
         return filename, contents
 
     def all_templates_test(self, session, forbid_classes, forbid_templates,
-                           allow_templates, can_score, scoring_user):
+                           allow_templates, can_score):
         """Test that all page templates load without errors."""
         for t in sorted(os.listdir(self.instance.html_dir)):
             if t.startswith('_generic') or not t.endswith('.html'):
-                continue
-            if scoring_user and t == 'person.item.html':
-                # Because scoring users have Create permission for the
-                # person class, country property only, in order to
-                # allow a menu of countries to be displayed properly,
-                # this template (not actually useful for such users)
-                # displays some [hidden] text for them.
                 continue
             m = re.match(r'([a-z_]+)\.([a-z_]+)\.html\Z', t)
             if not m:
@@ -838,7 +831,7 @@ class RegSystemTestCase(unittest.TestCase):
         session = self.get_session('admin')
         self.all_templates_test(session, forbid_classes=set(),
                                 forbid_templates=set(), allow_templates=set(),
-                                can_score=True, scoring_user=False)
+                                can_score=True)
 
     def test_all_templates_anon(self):
         """
@@ -856,7 +849,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.all_templates_test(session, forbid_classes=forbid_classes,
                                 forbid_templates=forbid_templates,
                                 allow_templates={'user.forgotten.html'},
-                                can_score=False, scoring_user=False)
+                                can_score=False)
 
     def test_all_templates_score(self):
         """
@@ -874,7 +867,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.all_templates_test(session, forbid_classes=forbid_classes,
                                 forbid_templates=forbid_templates,
                                 allow_templates=set(),
-                                can_score=True, scoring_user=True)
+                                can_score=True)
 
     def test_all_templates_register(self):
         """
@@ -893,7 +886,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.all_templates_test(session, forbid_classes=forbid_classes,
                                 forbid_templates=forbid_templates,
                                 allow_templates=set(),
-                                can_score=False, scoring_user=False)
+                                can_score=False)
 
     def all_templates_item_test(self, admin_session, session, forbid_classes):
         """Test that all page templates for existing items load without

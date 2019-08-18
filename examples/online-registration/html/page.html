@@ -71,8 +71,7 @@ columns string:id;
     <a href="person?@template=item">Register new participant</a><br>
    </span>
    <span tal:condition="python:request.user.hasPermission('Create',
-			'person') and utils.normal_country_person(db._db,
-			request.user.id) and not
+			'person') and not
 			request.user.hasPermission('RegisterAllCountries')">
     <a tal:attributes="href python:'person?@template=item&country=' +
     request.user.country.id">Register new participant</a><br>

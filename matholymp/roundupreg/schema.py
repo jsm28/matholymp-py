@@ -403,12 +403,6 @@ def init_schema(env):
     db.security.addPermissionToRole('Admin', p)
     db.security.addRole(name='Score', description='Entering scores')
     db.security.addPermissionToRole('Score', p)
-    # This is needed for the menu of countries to appear for entering
-    # scores (but does not actually enable scoring accounts to register
-    # new participants).
-    p = db.security.addPermission(name='Create', klass='person',
-                                  properties=('country',))
-    db.security.addPermissionToRole('Score', p)
 
     # Permission for registering people from all countries, as opposed
     # to only from one's own country.

@@ -32,8 +32,7 @@
 
 <tr tal:define="name string:country; label string:Country">
 <th metal:use-macro="th_label">Country</th>
-<td tal:content="structure python:context.country.menu(html_kwargs =
-{ 'id' : 'country' })">country</td>
+<td tal:content="structure python:utils.score_country_select(db._db)">country</td>
 </tr>
 
 <tr tal:define="name string:problem; label string:Problem; value string:">

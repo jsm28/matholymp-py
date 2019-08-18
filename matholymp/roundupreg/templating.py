@@ -41,7 +41,8 @@ __all__ = ['people_from_country_internal', 'people_from_country',
            'registration_status_country', 'edit_rooms', 'show_consent_form_ui',
            'has_consent_for_photo', 'string_select', 'date_of_birth_select',
            'arrdep_date_select', 'arrdep_time_select', 'photo_consent_select',
-           'required_person_fields', 'register_templating_utils']
+           'score_country_select', 'required_person_fields',
+           'register_templating_utils']
 
 import cgi
 import datetime
@@ -376,6 +377,13 @@ def photo_consent_select(selected):
                           ('no', 'No')), selected)
 
 
+def score_country_select(db):
+    """Return form content for selecting a country for entering scores."""
+    countries = db.country.filter(None, {'is_normal': True}, [('+', 'code')])
+    country_list = [(c, db.country.get(c, 'name')) for c in countries]
+    return string_select('country', None, country_list, None)
+
+
 def has_consent_for_photo(db, person):
     """
     Return whether there is consent (if needed) to show this person's
@@ -451,4 +459,5 @@ def register_templating_utils(instance):
     instance.registerUtil('arrdep_date_select', arrdep_date_select)
     instance.registerUtil('arrdep_time_select', arrdep_time_select)
     instance.registerUtil('photo_consent_select', photo_consent_select)
+    instance.registerUtil('score_country_select', score_country_select)
     instance.registerUtil('required_person_fields', required_person_fields)
