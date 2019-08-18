@@ -6771,6 +6771,105 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv_2, admin_csv)
         self.assertEqual(reg_csv_2, reg_csv)
 
+    def test_person_edit_audit_errors_bad_country(self):
+        """
+        Test errors from person edit auditor: bad country for
+        registering user.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        # None of the failed edits should change the data for these people.
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 2)
+        self.assertEqual(len(admin_csv), 2)
+        self.assertEqual(len(reg_csv), 2)
+        admin_session.edit('user', self.instance.userids['ABC_reg'],
+                           {'roles': 'Admin', 'country': 'XMO 2015 Staff'})
+        reg_session.check_open_relative('person1')
+        reg_session.select_main_form()
+        reg_session.set({'country': 'XMO 2015 Staff',
+                         'primary_role': 'Coordinator'})
+        admin_session.edit('user', self.instance.userids['ABC_reg'],
+                           {'roles': 'User,Register',
+                            'country': 'Test First Country'})
+        reg_session.check_submit_selected(error='Person must be from your '
+                                          'country')
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+        # If the person is already registered as from another country,
+        # a permission error from the Roundup core results.
+        admin_session.edit('user', self.instance.userids['ABC_reg'],
+                           {'roles': 'Admin', 'country': 'XMO 2015 Staff'})
+        reg_session.check_open_relative('person2')
+        reg_session.select_main_form()
+        reg_session.set({'country': 'Test First Country',
+                         'primary_role': 'Leader'})
+        admin_session.edit('user', self.instance.userids['ABC_reg'],
+                           {'roles': 'User,Register',
+                            'country': 'Test First Country'})
+        reg_session.check_submit_selected(error='You do not have permission '
+                                          'to edit', status=403)
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+
+    def test_person_edit_audit_errors_registration_disabled(self):
+        """
+        Test errors from person edit auditor: registration disabled.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        reg_session.create_person('Test First Country', 'Contestant 1')
+        # The failed edit should not change the data for this person.
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+        admin_session.edit('event', '1', {'registration_enabled': 'no'})
+        reg_session.edit('person', '1',
+                         {'primary_role': 'Contestant 2'},
+                         error='Registration is now disabled, please contact '
+                         'the event organisers to change details of '
+                         'registered participants')
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+        # Admin accounts can still change registered details.
+        admin_session.edit('person', '1',
+                           {'primary_role': 'Contestant 2'})
+        anon_csv[0]['Primary Role'] = 'Contestant 2'
+        anon_csv[0]['Contestant Code'] = 'ABC2'
+        admin_csv[0]['Primary Role'] = 'Contestant 2'
+        admin_csv[0]['Contestant Code'] = 'ABC2'
+        reg_csv[0]['Primary Role'] = 'Contestant 2'
+        reg_csv[0]['Contestant Code'] = 'ABC2'
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+
     def test_person_multilink_null_edit(self):
         """
         Test null edits on multilinks involving "no selection".
