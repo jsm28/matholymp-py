@@ -490,6 +490,25 @@ class RoundupTestSession(object):
         return self.get_download_csv('person?@action=people_csv',
                                      'people.csv')
 
+    def get_scores_csv(self):
+        """Get the CSV file of scores."""
+        return self.get_download_csv('person?@action=scores_csv',
+                                     'scores.csv')
+
+    def get_people_csv_scores(self):
+        """Get the scores from the CSV file of people."""
+        people_csv = self.get_people_csv()
+        cols = {'Country Name', 'Country Code', 'Contestant Code',
+                'Given Name', 'Family Name', 'P1', 'P2', 'P3', 'P4', 'P5',
+                'P6', 'Total', 'Award', 'Extra Awards'}
+        people_csv = [entry for entry in people_csv
+                      if entry['Contestant Code']]
+        for entry in people_csv:
+            for column in list(entry.keys()):
+                if column not in cols:
+                    del entry[column]
+        return people_csv
+
     def get_download_zip(self, url, filename):
         """Get the contents of a ZIP download."""
         temp_name = self.get_download_file(url, 'application/zip', filename)
@@ -680,6 +699,28 @@ class RoundupTestSession(object):
         self.select_main_form()
         self.set(data)
         self.check_submit_selected(error=error, mail=mail)
+
+    def enter_scores(self, country_name, country_code, problem, scores,
+                     error=False):
+        """Enter some scores through the corresponding form."""
+        self.check_open_relative('person?@template=scoreselect')
+        self.select_main_form()
+        self.set({'country': country_name, 'problem': problem})
+        self.check_submit_selected()
+        self.select_main_form()
+        for num, score in enumerate(scores, start=1):
+            if score is not None:
+                self.set({'%s%d' % (country_code, num): score})
+        # Dummy file upload to work around a MechanicalSoup issue when
+        # some scores are left blank,
+        # <https://github.com/MechanicalSoup/MechanicalSoup/issues/242>).
+        temp_file = tempfile.NamedTemporaryFile(dir=self.instance.temp_dir,
+                                                delete=False)
+        filename = temp_file.name
+        temp_file.close()
+        self.b.new_control('file', 'dummy', '')
+        self.set({'dummy': filename})
+        self.check_submit_selected(error=error)
 
 
 def _with_config(**kwargs):
@@ -7570,6 +7611,92 @@ class RegSystemTestCase(unittest.TestCase):
                                              'permission to scale the photo '
                                              'for',
                                              status=403)
+
+    def test_person_score(self):
+        """
+        Test entering scores and CSV file of scores.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_scoring_user()
+        score_session = self.get_session('scoring')
+        admin_session.create_country_generic()
+        admin_session.create_person('Test First Country', 'Contestant 1')
+        admin_session.create_person('Test First Country', 'Contestant 2')
+        admin_session.create_person('Test First Country', 'Contestant 4')
+        admin_session.create_country('DEF', 'Test Second Country')
+        admin_session.create_person('Test Second Country', 'Contestant 2')
+        admin_session.create_person('Test Second Country', 'Contestant 3')
+        admin_session.create_person('Test Second Country', 'Contestant 4')
+        admin_session.create_person('Test Second Country', 'Leader')
+        admin_session.edit('event', '1', {'registration_enabled': 'no'})
+        admin_csv = admin_session.get_scores_csv()
+        admin_csv_p = admin_session.get_people_csv_scores()
+        anon_csv = session.get_scores_csv()
+        anon_csv_p = session.get_people_csv_scores()
+        score_csv = score_session.get_scores_csv()
+        score_csv_p = score_session.get_people_csv_scores()
+        self.assertEqual(len(admin_csv), 6)
+        self.assertEqual(admin_csv_p, admin_csv)
+        self.assertEqual(anon_csv, admin_csv)
+        self.assertEqual(anon_csv_p, admin_csv)
+        self.assertEqual(score_csv, admin_csv)
+        self.assertEqual(score_csv_p, admin_csv)
+        # Enter some scores and check the results.
+        admin_session.enter_scores('Test First Country', 'ABC', '2',
+                                   ['3', '4', None, '0'])
+        score_session.enter_scores('Test First Country', 'ABC', '4',
+                                   ['7', '', None, '5'])
+        score_session.enter_scores('Test Second Country', 'DEF', '1',
+                                   [None, '5', '1', '2'])
+        admin_csv = admin_session.get_scores_csv()
+        admin_csv_p = admin_session.get_people_csv_scores()
+        anon_csv = session.get_scores_csv()
+        anon_csv_p = session.get_people_csv_scores()
+        score_csv = score_session.get_scores_csv()
+        score_csv_p = score_session.get_people_csv_scores()
+        self.assertEqual(admin_csv,
+                         [{'Country Name': 'Test First Country',
+                           'Country Code': 'ABC', 'Contestant Code': 'ABC1',
+                           'Given Name': 'Given 1', 'Family Name': 'Family 1',
+                           'P1': '', 'P2': '3', 'P3': '',
+                           'P4': '7', 'P5': '', 'P6': '',
+                           'Total': '10', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test First Country',
+                           'Country Code': 'ABC', 'Contestant Code': 'ABC2',
+                           'Given Name': 'Given 2', 'Family Name': 'Family 2',
+                           'P1': '', 'P2': '4', 'P3': '',
+                           'P4': '', 'P5': '', 'P6': '',
+                           'Total': '4', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test First Country',
+                           'Country Code': 'ABC', 'Contestant Code': 'ABC4',
+                           'Given Name': 'Given 3', 'Family Name': 'Family 3',
+                           'P1': '', 'P2': '0', 'P3': '',
+                           'P4': '5', 'P5': '', 'P6': '',
+                           'Total': '5', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test Second Country',
+                           'Country Code': 'DEF', 'Contestant Code': 'DEF2',
+                           'Given Name': 'Given 4', 'Family Name': 'Family 4',
+                           'P1': '5', 'P2': '', 'P3': '',
+                           'P4': '', 'P5': '', 'P6': '',
+                           'Total': '5', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test Second Country',
+                           'Country Code': 'DEF', 'Contestant Code': 'DEF3',
+                           'Given Name': 'Given 5', 'Family Name': 'Family 5',
+                           'P1': '1', 'P2': '', 'P3': '',
+                           'P4': '', 'P5': '', 'P6': '',
+                           'Total': '1', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test Second Country',
+                           'Country Code': 'DEF', 'Contestant Code': 'DEF4',
+                           'Given Name': 'Given 6', 'Family Name': 'Family 6',
+                           'P1': '2', 'P2': '', 'P3': '',
+                           'P4': '', 'P5': '', 'P6': '',
+                           'Total': '2', 'Award': '', 'Extra Awards': ''}])
+        self.assertEqual(admin_csv_p, admin_csv)
+        self.assertEqual(anon_csv, admin_csv)
+        self.assertEqual(anon_csv_p, admin_csv)
+        self.assertEqual(score_csv, admin_csv)
+        self.assertEqual(score_csv_p, admin_csv)
 
     def test_event_medal_boundaries_csv_errors(self):
         """

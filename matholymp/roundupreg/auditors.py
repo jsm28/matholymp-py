@@ -216,6 +216,18 @@ def audit_person_fields(db, cl, nodeid, newvalues):
 
     userid = db.getuid()
 
+    # This auditor is called for the score action as well as for the
+    # edit and create actions.
+    if nodeid is not None and db.security.hasPermission('Score', userid):
+        if list(newvalues.keys()) == ['scores']:
+            # All required checks on scores were done in the score
+            # action; the Score role does not provide access to the
+            # edit action.  Scoring users need to be able to enter
+            # scores for other countries, and scores can only be
+            # entered when registration is disabled; the other checks
+            # are irrelevant if only scores are being changed.
+            return
+
     # A country must be specified and ordinary users cannot create or
     # modify records for other countries.
     country = require_value(db, cl, nodeid, newvalues, 'country',
