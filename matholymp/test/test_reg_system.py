@@ -7084,6 +7084,32 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv[1]['Date of Birth'], '')
         self.assertEqual(admin_csv[2]['Date of Birth'], '')
 
+    def test_person_large_text_field(self):
+        """
+        Test large text fields for people.
+
+        A Roundup bug with such fields was fixed in commit
+        f60c44563c3a (Sun Mar 24 21:49:17 2019 +0000).
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        large_text_1 = ''.join(str(n) for n in range(1000))
+        large_text_2 = ''.join(str(n) for n in range(2000))
+        large_a = '%s\n%s' % (large_text_1, large_text_2)
+        large_b = '%s\n%s' % (large_text_2, large_text_1)
+        admin_session.create_person('Test First Country', 'Leader',
+                                    {'diet': large_a})
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(admin_csv[0]['Allergies and Dietary Requirements'],
+                         large_a)
+        admin_session.edit('person', '1', {'diet': large_b})
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(admin_csv[0]['Allergies and Dietary Requirements'],
+                         large_b)
+
     def test_event_medal_boundaries_csv_errors(self):
         """
         Test errors from medal_boundaries_csv action.
