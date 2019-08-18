@@ -163,11 +163,12 @@ def has_nonempty_travel(db, person):
 
 def show_travel_copy_options(db, userid, person):
     """Return whether to give options to copy travel details."""
-    if normal_country_person(db, userid):
-        return True
-    if not person:
-        return False
-    country = db.person.get(person, 'country')
+    if person:
+        country = db.person.get(person, 'country')
+    else:
+        if db.security.hasPermission('RegisterAllCountries', userid):
+            return False
+        country = db.user.get(userid, 'country')
     return db.country.get(country, 'is_normal')
 
 
