@@ -67,27 +67,31 @@ __all__ = ['gen_image', 'gen_image_file', 'gen_pdf_file',
            'RoundupTestInstance', 'RoundupTestSession', 'RegSystemTestCase']
 
 
-def gen_image(size_x, size_y, scale):
+def gen_image(size_x, size_y, scale, mode):
     """Generate an image with random blocks scale by scale of pixels."""
-    data = bytearray(size_x * size_y * scale * scale * 3)
-    line_size = size_x * scale * 3
+    mode_bytes = {'L': 1,
+                  'RGB': 3}
+    nbytes = mode_bytes[mode]
+    data = bytearray(size_x * size_y * scale * scale * nbytes)
+    line_size = size_x * scale * nbytes
     for y in range(size_y):
         for x in range(size_x):
-            for color in range(3):
+            for color in range(nbytes):
                 pixel = random.randint(0, 255)
                 for y_sub in range(scale):
                     for x_sub in range(scale):
-                        x_pos = color + 3 * (x_sub + scale * x)
+                        x_pos = color + nbytes * (x_sub + scale * x)
                         y_pos = y_sub + scale * y
                         pos = x_pos + line_size * y_pos
                         data[pos] = pixel
     data = memoryview(data).tobytes()
-    return Image.frombytes('RGB', (size_x * scale, size_y * scale), data)
+    return Image.frombytes(mode, (size_x * scale, size_y * scale), data)
 
 
-def gen_image_file(size_x, size_y, scale, filename, format, **kwargs):
+def gen_image_file(size_x, size_y, scale, filename, format, mode='RGB',
+                   **kwargs):
     """Generate an image, in a file."""
-    image = gen_image(size_x, size_y, scale)
+    image = gen_image(size_x, size_y, scale, mode)
     image.save(filename, format, **kwargs)
 
 
@@ -736,7 +740,8 @@ class RegSystemTestCase(unittest.TestCase):
         self.sessions.append(session)
         return session
 
-    def gen_test_image(self, size_x, size_y, scale, suffix, format):
+    def gen_test_image(self, size_x, size_y, scale, suffix, format,
+                       mode='RGB'):
         """Generate a test image and return a tuple of the filename and the
         contents."""
         temp_file = tempfile.NamedTemporaryFile(suffix=suffix,
@@ -744,7 +749,7 @@ class RegSystemTestCase(unittest.TestCase):
                                                 delete=False)
         filename = temp_file.name
         temp_file.close()
-        gen_image_file(size_x, size_y, scale, filename, format)
+        gen_image_file(size_x, size_y, scale, filename, format, mode)
         with open(filename, 'rb') as f:
             contents = f.read()
         return filename, contents
@@ -7272,6 +7277,34 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.check_open_relative('person?@template=status')
         main_form = admin_session.get_main_form()
         self.assertIsNotNone(main_form)
+
+    @_with_config(photo_max_size='65536')
+    def test_person_photo_scale_grey(self):
+        """
+        Test scaling down photo: greyscale image.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(512, 512, 2,
+                                                          '.jpg', 'JPEG', 'L')
+        admin_session.create_country_generic()
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                    {'photo-1@content': photo_filename})
+        # The status page should have the button to scale down the photo.
+        admin_session.check_open_relative('person?@template=status')
+        admin_session.select_main_form()
+        main_form = admin_session.get_main_form()
+        submit = main_form.find('input', type='submit')
+        self.assertEqual(submit['value'], 'Scale down')
+        admin_session.check_submit_selected()
+        admin_csv = admin_session.get_people_csv()
+        img_url_csv = admin_csv[0]['Photo URL']
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        self.assertLessEqual(len(admin_bytes), 65536)
+        # The button should not appear any more on the status page.
+        admin_session.check_open_relative('person?@template=status')
+        main_form = admin_session.get_main_form()
+        self.assertIsNone(main_form)
 
     @_with_config(photo_max_size='65536')
     def test_person_photo_scale_errors(self):
