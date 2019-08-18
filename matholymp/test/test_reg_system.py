@@ -6877,6 +6877,125 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv_2, admin_csv)
         self.assertEqual(reg_csv_2, reg_csv)
 
+    def test_person_edit_audit_errors_gender_any(self):
+        """
+        Test errors from person edit auditor: all contestant genders
+        allowed by default.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'gender': 'Female'})
+        reg_session.create_person('Test First Country', 'Contestant 2',
+                                  {'gender': 'Male'})
+        admin_session.create_person('Test First Country', 'Leader',
+                                    {'gender': 'Non-binary'})
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                    {'gender': 'Non-binary'})
+        reg_session.edit('person', '1', {'gender': 'Male'})
+        admin_session.edit('person', '2', {'gender': 'Non-binary'})
+        reg_session.edit('person', '3', {'gender': 'Female',
+                                         'primary_role': 'Contestant 3'})
+        admin_session.edit('person', '4', {'gender': 'Non-binary',
+                                           'country': 'Test First Country',
+                                           'primary_role': 'Contestant 4'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 4)
+        self.assertEqual(len(admin_csv), 4)
+        self.assertEqual(len(reg_csv), 4)
+
+    @_with_config(contestant_genders='Female')
+    def test_person_edit_audit_errors_gender_one(self):
+        """
+        Test errors from person edit auditor: one contestant gender
+        allowed.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'gender': 'Female'})
+        admin_session.create_person('Test First Country', 'Leader',
+                                    {'gender': 'Male'})
+        reg_session.create_person('Test First Country', 'Deputy Leader',
+                                    {'gender': 'Non-binary'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 3)
+        self.assertEqual(len(admin_csv), 3)
+        self.assertEqual(len(reg_csv), 3)
+        reg_session.edit('person', '1', {'gender': 'Male'},
+                         error='Contestant gender must be Female')
+        admin_session.edit('person', '2', {'primary_role': 'Contestant 2'},
+                           error='Contestant gender must be Female')
+        reg_session.edit('person', '3', {'primary_role': 'Contestant 3'},
+                         error='Contestant gender must be Female')
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+        admin_session.edit('person', '1', {'primary_role': 'Contestant 2'})
+        reg_session.edit('person', '3', {'gender': 'Female',
+                                         'primary_role': 'Contestant 3'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 3)
+        self.assertEqual(len(admin_csv), 3)
+        self.assertEqual(len(reg_csv), 3)
+
+    @_with_config(contestant_genders='Female, Non-binary')
+    def test_person_edit_audit_errors_gender_multi(self):
+        """
+        Test errors from person edit auditor: multiple contestant
+        genders allowed.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'gender': 'Female'})
+        admin_session.create_person('Test First Country', 'Leader',
+                                    {'gender': 'Male'})
+        reg_session.create_person('Test First Country', 'Deputy Leader',
+                                    {'gender': 'Non-binary'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 3)
+        self.assertEqual(len(admin_csv), 3)
+        self.assertEqual(len(reg_csv), 3)
+        reg_session.edit('person', '1', {'gender': 'Male'},
+                         error='Contestant gender must be Female or '
+                         'Non-binary')
+        admin_session.edit('person', '2', {'primary_role': 'Contestant 2'},
+                           error='Contestant gender must be Female or '
+                           'Non-binary')
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+        admin_session.edit('person', '1', {'primary_role': 'Contestant 2',
+                                           'gender': 'Non-binary'})
+        reg_session.edit('person', '3', {'primary_role': 'Contestant 3'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 3)
+        self.assertEqual(len(admin_csv), 3)
+        self.assertEqual(len(reg_csv), 3)
+
     def test_person_multilink_null_edit(self):
         """
         Test null edits on multilinks involving "no selection".
