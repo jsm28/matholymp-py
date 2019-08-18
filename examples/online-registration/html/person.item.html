@@ -154,29 +154,26 @@ please inform the people you register of this information.
  </tr>
 </tal:block>
 
- <tr tal:condition="python:utils.normal_country_person(db._db,
-  request.user.id)" tal:define="name string:primary_role; label string:Primary role; value context/primary_role; edit_ok edit_ok">
+ <tr tal:condition="python:not request.user.hasPermission('RegisterAllRoles')" tal:define="name string:primary_role; label string:Primary role; value context/primary_role; edit_ok edit_ok">
   <th metal:use-macro="th_label">Primary role</th>
   <td tal:content="structure python:context.primary_role.menu(html_kwargs =
   { 'id' : 'primary_role' }, isadmin = 'False')">primary_role">primary_role</td>
  </tr>
 
- <tr tal:condition="python:not utils.normal_country_person(db._db,
-  request.user.id)" tal:define="name string:primary_role; label string:Primary role; value context/primary_role; edit_ok edit_ok">
+ <tr tal:condition="python:request.user.hasPermission('RegisterAllRoles')" tal:define="name string:primary_role; label string:Primary role; value context/primary_role; edit_ok edit_ok">
   <th metal:use-macro="th_label">Primary role</th>
   <td tal:content="structure python:context.primary_role.menu(html_kwargs =
   { 'id' : 'primary_role' })">primary_role">primary_role</td>
  </tr>
 
- <tr tal:condition="python:(context.is_edit_ok() and not
-  utils.normal_country_person(db._db, request.user.id)) or (context.id
+ <tr tal:condition="python:(context.is_edit_ok() and request.user.hasPermission('RegisterAllRoles')) or (context.id
   and context.other_roles)" tal:define="name string:other_roles; label string:Other roles (staff only); value context/other_roles; edit_ok edit_ok">
   <th metal:use-macro="th_label">Other roles (staff only)</th>
   <td tal:content="structure context/other_roles/menu">other_roles</td>
  </tr>
 
- <tr tal:condition="python:(context.is_edit_ok() and not
-  utils.normal_country_person(db._db, request.user.id)) or (context.id
+ <tr tal:condition="python:(context.is_edit_ok() and
+  request.user.hasPermission('RegisterAllRoles')) or (context.id
   and context.guide_for)" tal:define="name string:guide_for; label string:Guide for (guides only); value context/guide_for; edit_ok edit_ok">
   <th metal:use-macro="th_label">Guide for (guides only)</th>
   <td tal:content="structure context/guide_for/menu">guide_for</td>

@@ -419,6 +419,16 @@ def init_schema(env):
     p = db.security.addPermission(name='EditPhotos')
     db.security.addPermissionToRole('Admin', p)
 
+    # Permission for registering people with all roles (both primary
+    # and other roles) rather than just non-administrative roles.
+    # This is only used to control the menu of roles shown for
+    # registering or editing a person, and the menu of countries for
+    # guide_for since being able to register all roles implies being
+    # able to register guides, not otherwise to check whether a given
+    # edit is permitted.
+    p = db.security.addPermission(name='RegisterAllRoles')
+    db.security.addPermissionToRole('Admin', p)
+
     # Viewing registration status pages (whether for everyone, or just
     # for one's own country) has its own permission.
     p = db.security.addPermission(name='RegistrationStatus')
