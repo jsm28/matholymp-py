@@ -23,7 +23,7 @@
 <span tal:condition="python:request.user.hasPermission('RegistrationStatus')
                      and not request.user.hasPermission('Omnivident')">
 
-<tal:block tal:replace="structure python:utils.registration_status_country(db._db, request.user.id)" />
+<tal:block tal:replace="structure python:utils.registration_status_country(db._db, db._db.user.get(request.user.id, 'country'))" />
 
 </span>
 

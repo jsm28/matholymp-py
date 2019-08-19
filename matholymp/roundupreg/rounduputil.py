@@ -50,11 +50,10 @@ __all__ = ['distinguish_official', 'get_consent_forms_date_str',
            'get_earliest_date_of_birth', 'get_sanity_date_of_birth',
            'get_earliest_date_of_birth_contestant', 'person_date_of_birth',
            'contestant_age', 'get_arrdep_bounds', 'get_staff_country_name',
-           'normal_country_person', 'person_is_contestant', 'contestant_code',
-           'pn_score', 'scores_final', 'any_scores_missing',
-           'country_has_contestants', 'valid_country_problem', 'valid_score',
-           'create_rss', 'db_file_format_contents', 'db_file_extension',
-           'db_file_url']
+           'person_is_contestant', 'contestant_code', 'pn_score',
+           'scores_final', 'any_scores_missing', 'country_has_contestants',
+           'valid_country_problem', 'valid_score', 'create_rss',
+           'db_file_format_contents', 'db_file_extension', 'db_file_url']
 
 
 def distinguish_official(db):
@@ -226,12 +225,6 @@ def get_staff_country_name(db):
     short_name = db.config.ext['MATHOLYMP_SHORT_NAME']
     year = db.config.ext['MATHOLYMP_YEAR']
     return short_name + ' ' + year + ' Staff'
-
-
-def normal_country_person(db, userid):
-    """Determine whether the user is from a normal country."""
-    user_country = db.user.get(userid, 'country')
-    return db.country.get(user_country, 'is_normal')
 
 
 def person_is_contestant(db, person):

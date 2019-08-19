@@ -60,9 +60,9 @@ from matholymp.roundupreg.rounduputil import distinguish_official, \
     have_passport_numbers, have_nationality, require_diet, require_dob, \
     get_language_numbers, get_earliest_date_of_birth, \
     get_sanity_date_of_birth, person_date_of_birth, contestant_age, \
-    get_arrdep_bounds, normal_country_person, person_is_contestant, \
-    contestant_code, pn_score, scores_final, any_scores_missing, \
-    country_has_contestants, valid_country_problem
+    get_arrdep_bounds, person_is_contestant, contestant_code, pn_score, \
+    scores_final, any_scores_missing, country_has_contestants, \
+    valid_country_problem
 
 
 def people_from_country_internal(db, country):
@@ -262,15 +262,14 @@ def registration_status(db, nonce):
                                             max_photo_size, nonce)
 
 
-def registration_status_country(db, userid):
+def registration_status_country(db, country):
     """Produce registration status page contents for one country."""
-    if not normal_country_person(db, userid):
+    if not db.country.get(country, 'is_normal'):
         return '<p>Cannot produce registration status for this user.</p>\n'
     sitegen = RoundupSiteGenerator(db)
     main_role_list = list_expected_roles(db)
     consent_forms_date = get_consent_forms_date(db)
-    user_country = db.user.get(userid, 'country')
-    c = sitegen.event.country_map[int(user_country)]
+    c = sitegen.event.country_map[int(country)]
     return sitegen.registration_status_country_text(c, main_role_list,
                                                     consent_forms_date,
                                                     have_consent_ui(db))
