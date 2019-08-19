@@ -429,6 +429,13 @@ def init_schema(env):
     p = db.security.addPermission(name='RegisterAllRoles')
     db.security.addPermissionToRole('Admin', p)
 
+    # Permission to edit phone numbers in at least some cases.  This
+    # is only used to control whether the interface is shown to edit
+    # phone numbers, not for actual checks of whether a given edit is
+    # permitted.
+    p = db.security.addPermission(name='RegisterPhone')
+    db.security.addPermissionToRole('Admin', p)
+
     # Viewing registration status pages (whether for everyone, or just
     # for one's own country) has its own permission.
     p = db.security.addPermission(name='RegistrationStatus')

@@ -429,7 +429,6 @@ def register_templating_utils(instance):
     instance.registerUtil('require_diet', require_diet)
     instance.registerUtil('require_dob', require_dob)
     instance.registerUtil('get_language_numbers', get_language_numbers)
-    instance.registerUtil('normal_country_person', normal_country_person)
     instance.registerUtil('person_is_contestant', person_is_contestant)
     instance.registerUtil('people_from_country', people_from_country)
     instance.registerUtil('show_country_people', show_country_people)

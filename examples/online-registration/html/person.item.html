@@ -284,7 +284,7 @@ please inform the people you register of this information.
   <td><input name="room_number" metal:use-macro="normal_input"></td>
  </tr>
 
- <tr tal:define="name string:phone_number; label string:Phone number (staff only); value context/phone_number; edit_ok context/phone_number/is_edit_ok" tal:condition="python:(context.is_edit_ok() and not utils.normal_country_person(db._db, request.user.id))">
+ <tr tal:define="name string:phone_number; label string:Phone number (staff only); value context/phone_number; edit_ok context/phone_number/is_edit_ok" tal:condition="python:(context.is_edit_ok() and request.user.hasPermission('RegisterPhone'))">
   <th metal:use-macro="th_label">Phone number (staff only)</th>
   <td><input name="phone_number" metal:use-macro="normal_input"></td>
  </tr>
