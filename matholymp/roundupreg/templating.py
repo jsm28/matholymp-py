@@ -37,7 +37,7 @@ __all__ = ['people_from_country_internal', 'people_from_country',
            'person_scores_table', 'country_scores_table', 'scoreboard_gen',
            'scoreboard', 'display_scoreboard', 'has_nonempty_travel',
            'show_travel_copy_options', 'country_travel_copy_options',
-           'person_case_warning', 'list_expected_roles', 'registration_status',
+           'person_case_warning', 'registration_status',
            'registration_status_country', 'edit_rooms', 'show_consent_form_ui',
            'has_consent_for_photo', 'string_select', 'date_of_birth_select',
            'arrdep_date_select', 'arrdep_time_select', 'photo_consent_select',
@@ -242,22 +242,12 @@ def person_case_warning(db, person):
     return warn_text
 
 
-def list_expected_roles(db):
-    """List the roles expected to be present for a normal country."""
-    main_role_list = ['Leader', 'Deputy Leader']
-    cont_per_team = int(db.config.ext['MATHOLYMP_NUM_CONTESTANTS_PER_TEAM'])
-    main_role_list.extend([('Contestant %d' % (i + 1))
-                           for i in range(cont_per_team)])
-    return main_role_list
-
-
 def registration_status(db, nonce):
     """Produce registration status page contents for all countries."""
     sitegen = RoundupSiteGenerator(db)
-    main_role_list = list_expected_roles(db)
     consent_forms_date = get_consent_forms_date(db)
     max_photo_size = int(db.config.ext['MATHOLYMP_PHOTO_MAX_SIZE'])
-    return sitegen.registration_status_text(main_role_list, consent_forms_date,
+    return sitegen.registration_status_text(consent_forms_date,
                                             have_consent_ui(db),
                                             max_photo_size, nonce)
 
@@ -267,11 +257,9 @@ def registration_status_country(db, country):
     if not db.country.get(country, 'is_normal'):
         return '<p>Cannot produce registration status for this user.</p>\n'
     sitegen = RoundupSiteGenerator(db)
-    main_role_list = list_expected_roles(db)
     consent_forms_date = get_consent_forms_date(db)
     c = sitegen.event.country_map[int(country)]
-    return sitegen.registration_status_country_text(c, main_role_list,
-                                                    consent_forms_date,
+    return sitegen.registration_status_country_text(c, consent_forms_date,
                                                     have_consent_ui(db))
 
 

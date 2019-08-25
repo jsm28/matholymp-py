@@ -298,10 +298,13 @@ def valid_int_str(int_str, max_val):
     """
     Determine whether the given string (for something required to be
     an integer, such as a score) is an integer in the range from 0 to
-    max_val inclusive.
+    max_val inclusive.  If max_val is None, there is no upper bound on
+    allowed values.
     """
     if int_str != '0' and not re.match('^[1-9][0-9]*\\Z', int_str):
         return False
+    if max_val is None:
+        return True
     if len(int_str) > len(str(max_val)):
         return False
     if int(int_str) > max_val:

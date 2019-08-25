@@ -102,6 +102,14 @@ def init_schema(env):
                     flag=Link('flag'),
                     is_normal=Boolean(),
                     participants_ok=Boolean(),
+                    expected_leaders=String(),
+                    expected_deputies=String(),
+                    expected_contestants=String(),
+                    expected_observers_a=String(),
+                    expected_observers_b=String(),
+                    expected_observers_c=String(),
+                    expected_single_rooms=String(),
+                    expected_numbers_confirmed=Boolean(),
                     **country_extra)
     country.setkey('name')
     country.setorderprop('code')

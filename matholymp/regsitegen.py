@@ -35,6 +35,7 @@ content from within the registration system.
 __all__ = ['RegSiteGenerator']
 
 import cgi
+import collections
 import io
 import os
 import zipfile
@@ -254,24 +255,36 @@ class RegSiteGenerator(SiteGenerator):
 
         return missing_list
 
-    def missing_roles_text(self, c, expected_roles):
+    def missing_roles_text(self, c):
         """Return a description of people not registered for a country."""
+        if c.expected_numbers_confirmed:
+            ret_text = ''
+        else:
+            ret_text = ('<p>Expected numbers of participants and single '
+                        'room requests not yet confirmed for '
+                        '<strong>%s</strong>.</p>\n'
+                        % cgi.escape(c.name_with_code))
+        expected_roles = c.expected_roles
         person_list = c.person_list
         if not person_list:
-            return ('<p>No participants registered from'
-                    ' <strong>%s</strong>.</p>\n'
-                    % cgi.escape(c.name_with_code))
+            ret_text += ('<p>No participants registered from'
+                         ' <strong>%s</strong>.</p>\n'
+                         % cgi.escape(c.name_with_code))
         else:
-            have_roles = [p.primary_role for p in person_list]
-            missing_roles = [r for r in expected_roles
-                             if r not in have_roles]
+            have_roles = collections.defaultdict(int)
+            for p in person_list:
+                have_roles[p.primary_role] += 1
+            missing_roles = []
+            for role in sorted(expected_roles.keys()):
+                missing = expected_roles[role] - have_roles[role]
+                if missing > 0:
+                    missing_roles += [role] * missing
             if missing_roles:
-                return ('<p>Not registered from <strong>%s</strong>:'
-                        ' %s.</p>\n'
-                        % (cgi.escape(c.name_with_code),
-                           cgi.escape(', '.join(missing_roles))))
-            else:
-                return ''
+                ret_text += ('<p>Not registered from <strong>%s</strong>:'
+                             ' %s.</p>\n'
+                             % (cgi.escape(c.name_with_code),
+                                cgi.escape(', '.join(missing_roles))))
+        return ret_text
 
     def missing_person_details_text(self, people, consent_forms_date,
                                     have_consent_ui, show_country):
@@ -319,8 +332,8 @@ class RegSiteGenerator(SiteGenerator):
         """Return a form to scale down a person's photo."""
         raise NotImplementedError
 
-    def registration_status_text(self, expected_roles, consent_forms_date,
-                                 have_consent_ui, max_photo_size, nonce):
+    def registration_status_text(self, consent_forms_date, have_consent_ui,
+                                 max_photo_size, nonce):
         """Return the text of the registration status page."""
         e = self.event
         normal_countries = sorted(e.normal_country_list,
@@ -333,9 +346,7 @@ class RegSiteGenerator(SiteGenerator):
         text += '<h2>Action needed by participating countries</h2>\n'
 
         for c in normal_countries:
-            text += self.missing_roles_text(c, expected_roles)
-        text += ('<p>Some countries may intend to send Observers'
-                 ' but not have registered them all.</p>\n')
+            text += self.missing_roles_text(c)
 
         text += self.missing_person_details_text(normal_people,
                                                  consent_forms_date,
@@ -410,14 +421,12 @@ class RegSiteGenerator(SiteGenerator):
 
         return text
 
-    def registration_status_country_text(self, country, expected_roles,
-                                         consent_forms_date, have_consent_ui):
+    def registration_status_country_text(self, country, consent_forms_date,
+                                         have_consent_ui):
         """Return the text of the registration status page for one country."""
         people = sorted(country.person_list, key=lambda x: x.sort_key)
         text = ''
-        text += self.missing_roles_text(country, expected_roles)
-        text += ('<p>The system cannot tell automatically if there are any'
-                 ' Observers you have not yet registered.</p>\n')
+        text += self.missing_roles_text(country)
 
         text += self.missing_person_details_text(people, consent_forms_date,
                                                  have_consent_ui, False)

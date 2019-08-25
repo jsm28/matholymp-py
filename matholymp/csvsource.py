@@ -370,9 +370,19 @@ class CSVDataSource(DataSource):
                                    'name': 'Name',
                                    'flag_url': 'Flag URL'}
 
-    _country_event_attr_map_int = {'generic_id': 'Generic Number'}
+    _country_event_attr_map_int = {
+        'generic_id': 'Generic Number',
+        'expected_leaders': 'Expected Leaders',
+        'expected_deputies': 'Expected Deputies',
+        'expected_contestants': 'Expected Contestants',
+        'expected_observers_a': 'Expected Observers with Leader',
+        'expected_observers_b': 'Expected Observers with Deputy',
+        'expected_observers_c': 'Expected Observers with Contestants',
+        'expected_single_rooms': 'Expected Single Rooms'}
 
-    _country_event_attr_map_bool = {'is_normal': 'Normal'}
+    _country_event_attr_map_bool = {
+        'is_normal': 'Normal',
+        'expected_numbers_confirmed': 'Expected Numbers Confirmed'}
 
     def country_event_get_attr(self, country_id, event_id, name):
         if name in CSVDataSource._country_event_attr_map_str:

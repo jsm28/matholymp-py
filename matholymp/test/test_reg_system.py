@@ -493,6 +493,14 @@ class RoundupTestSession(object):
         # irrelevant for what is being tested.
         for entry in countries_csv:
             del entry['Contact Emails']
+            del entry['Expected Leaders']
+            del entry['Expected Deputies']
+            del entry['Expected Contestants']
+            del entry['Expected Observers with Leader']
+            del entry['Expected Observers with Deputy']
+            del entry['Expected Observers with Contestants']
+            del entry['Expected Single Rooms']
+            del entry['Expected Numbers Confirmed']
         return countries_csv
 
     def get_people_csv(self):
@@ -1041,7 +1049,16 @@ class RegSystemTestCase(unittest.TestCase):
                           'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
                           'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
         expected_staff_admin = expected_staff.copy()
-        expected_staff_admin['Contact Emails'] = ''
+        expected_staff_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '0',
+             'Expected Deputies': '0',
+             'Expected Contestants': '0',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'Yes'})
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff_admin])
         admin_session.create_country_generic()
@@ -1054,7 +1071,16 @@ class RegSystemTestCase(unittest.TestCase):
                         'Code': 'ABC', 'Name': 'Test First Country',
                         'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
         expected_abc_admin = expected_abc.copy()
-        expected_abc_admin['Contact Emails'] = ''
+        expected_abc_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '1',
+             'Expected Deputies': '1',
+             'Expected Contestants': '6',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'No'})
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
@@ -1091,6 +1117,37 @@ class RegSystemTestCase(unittest.TestCase):
         expected_abc_admin['Contact Emails'] = ('ABC2@example.invalid,'
                                                 'ABC3@example.invalid,'
                                                 'ABC6@example.invalid')
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # Test different values in CSV file for expected numbers of
+        # participants.
+        admin_session.edit('country', '3',
+                           {'expected_leaders': '0',
+                            'expected_contestants': '3',
+                            'expected_observers_a': '5',
+                            'expected_observers_b': '7',
+                            'expected_observers_c': '11',
+                            'expected_single_rooms': '13'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc_admin.update(
+            {'Expected Leaders': '0',
+             'Expected Contestants': '3',
+             'Expected Observers with Leader': '5',
+             'Expected Observers with Deputy': '7',
+             'Expected Observers with Contestants': '11',
+             'Expected Single Rooms': '13'})
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        admin_session.edit('country', '3',
+                           {'expected_numbers_confirmed': 'yes'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc_admin['Expected Numbers Confirmed'] = 'Yes'
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
@@ -1925,6 +1982,132 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country('ABC', 'Test First Country',
                                      {'contact_extra': 'bad_email'},
                                      error='Email address syntax is invalid')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_leaders': '2'},
+                                     error='Invalid expected number of '
+                                     'Leaders')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_leaders': '-1'},
+                                     error='Invalid expected number of '
+                                     'Leaders')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_leaders': '01'},
+                                     error='Invalid expected number of '
+                                     'Leaders')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_leaders': '1x'},
+                                     error='Invalid expected number of '
+                                     'Leaders')
+        admin_session.create_country('ZZB', 'Extra Staff',
+                                     {'is_normal': 'no',
+                                      'expected_leaders': '1'},
+                                     error='Invalid expected number of '
+                                     'Leaders')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_deputies': '2'},
+                                     error='Invalid expected number of '
+                                     'Deputy Leaders')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_deputies': '-1'},
+                                     error='Invalid expected number of '
+                                     'Deputy Leaders')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_deputies': '01'},
+                                     error='Invalid expected number of '
+                                     'Deputy Leaders')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_deputies': '1x'},
+                                     error='Invalid expected number of '
+                                     'Deputy Leaders')
+        admin_session.create_country('ZZB', 'Extra Staff',
+                                     {'is_normal': 'no',
+                                      'expected_deputies': '1'},
+                                     error='Invalid expected number of '
+                                     'Deputy Leaders')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_contestants': '7'},
+                                     error='Invalid expected number of '
+                                     'Contestants')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_contestants': '-1'},
+                                     error='Invalid expected number of '
+                                     'Contestants')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_contestants': '01'},
+                                     error='Invalid expected number of '
+                                     'Contestants')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_contestants': '1x'},
+                                     error='Invalid expected number of '
+                                     'Contestants')
+        admin_session.create_country('ZZB', 'Extra Staff',
+                                     {'is_normal': 'no',
+                                      'expected_contestants': '1'},
+                                     error='Invalid expected number of '
+                                     'Contestants')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_observers_a': '-1'},
+                                     error='Invalid expected number of '
+                                     'Observers with Leader')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_observers_a': '01'},
+                                     error='Invalid expected number of '
+                                     'Observers with Leader')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_observers_a': '1x'},
+                                     error='Invalid expected number of '
+                                     'Observers with Leader')
+        admin_session.create_country('ZZB', 'Extra Staff',
+                                     {'is_normal': 'no',
+                                      'expected_observers_a': '1'},
+                                     error='Invalid expected number of '
+                                     'Observers with Leader')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_observers_b': '-1'},
+                                     error='Invalid expected number of '
+                                     'Observers with Deputy')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_observers_b': '01'},
+                                     error='Invalid expected number of '
+                                     'Observers with Deputy')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_observers_b': '1x'},
+                                     error='Invalid expected number of '
+                                     'Observers with Deputy')
+        admin_session.create_country('ZZB', 'Extra Staff',
+                                     {'is_normal': 'no',
+                                      'expected_observers_b': '1'},
+                                     error='Invalid expected number of '
+                                     'Observers with Deputy')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_observers_c': '-1'},
+                                     error='Invalid expected number of '
+                                     'Observers with Contestants')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_observers_c': '01'},
+                                     error='Invalid expected number of '
+                                     'Observers with Contestants')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_observers_c': '1x'},
+                                     error='Invalid expected number of '
+                                     'Observers with Contestants')
+        admin_session.create_country('ZZB', 'Extra Staff',
+                                     {'is_normal': 'no',
+                                      'expected_observers_c': '1'},
+                                     error='Invalid expected number of '
+                                     'Observers with Contestants')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_single_rooms': '-1'},
+                                     error='Invalid expected number of '
+                                     'single room requests')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_single_rooms': '01'},
+                                     error='Invalid expected number of '
+                                     'single room requests')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'expected_single_rooms': '1x'},
+                                     error='Invalid expected number of '
+                                     'single room requests')
         flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.jpg',
                                                         'JPEG')
         admin_session.create_country('ABC', 'Test First Country',
@@ -2072,6 +2255,111 @@ class RegSystemTestCase(unittest.TestCase):
                            error='Email address syntax is invalid')
         admin_session.edit('country', '3', {'contact_extra': 'bad'},
                            error='Email address syntax is invalid')
+        admin_session.edit('country', '3',
+                           {'expected_leaders': '2'},
+                           error='Invalid expected number of Leaders')
+        admin_session.edit('country', '3',
+                           {'expected_leaders': '-1'},
+                           error='Invalid expected number of Leaders')
+        admin_session.edit('country', '3',
+                           {'expected_leaders': '01'},
+                           error='Invalid expected number of Leaders')
+        admin_session.edit('country', '3',
+                           {'expected_leaders': '1x'},
+                           error='Invalid expected number of Leaders')
+        admin_session.edit('country', '1',
+                           {'expected_leaders': '1'},
+                           error='Invalid expected number of Leaders')
+        admin_session.edit('country', '3',
+                           {'expected_deputies': '2'},
+                           error='Invalid expected number of Deputy Leaders')
+        admin_session.edit('country', '3',
+                           {'expected_deputies': '-1'},
+                           error='Invalid expected number of Deputy Leaders')
+        admin_session.edit('country', '3',
+                           {'expected_deputies': '01'},
+                           error='Invalid expected number of Deputy Leaders')
+        admin_session.edit('country', '3',
+                           {'expected_deputies': '1x'},
+                           error='Invalid expected number of Deputy Leaders')
+        admin_session.edit('country', '1',
+                           {'expected_deputies': '1'},
+                           error='Invalid expected number of Deputy Leaders')
+        admin_session.edit('country', '3',
+                           {'expected_contestants': '7'},
+                           error='Invalid expected number of Contestants')
+        admin_session.edit('country', '3',
+                           {'expected_contestants': '-1'},
+                           error='Invalid expected number of Contestants')
+        admin_session.edit('country', '3',
+                           {'expected_contestants': '01'},
+                           error='Invalid expected number of Contestants')
+        admin_session.edit('country', '3',
+                           {'expected_contestants': '1x'},
+                           error='Invalid expected number of Contestants')
+        admin_session.edit('country', '1',
+                           {'expected_contestants': '1'},
+                           error='Invalid expected number of Contestants')
+        admin_session.edit('country', '3',
+                           {'expected_observers_a': '-1'},
+                           error='Invalid expected number of Observers with '
+                           'Leader')
+        admin_session.edit('country', '3',
+                           {'expected_observers_a': '01'},
+                           error='Invalid expected number of Observers with '
+                           'Leader')
+        admin_session.edit('country', '3',
+                           {'expected_observers_a': '1x'},
+                           error='Invalid expected number of Observers with '
+                           'Leader')
+        admin_session.edit('country', '1',
+                           {'expected_observers_a': '1'},
+                           error='Invalid expected number of Observers with '
+                           'Leader')
+        admin_session.edit('country', '3',
+                           {'expected_observers_b': '-1'},
+                           error='Invalid expected number of Observers with '
+                           'Deputy')
+        admin_session.edit('country', '3',
+                           {'expected_observers_b': '01'},
+                           error='Invalid expected number of Observers with '
+                           'Deputy')
+        admin_session.edit('country', '3',
+                           {'expected_observers_b': '1x'},
+                           error='Invalid expected number of Observers with '
+                           'Deputy')
+        admin_session.edit('country', '1',
+                           {'expected_observers_b': '1'},
+                           error='Invalid expected number of Observers with '
+                           'Deputy')
+        admin_session.edit('country', '3',
+                           {'expected_observers_c': '-1'},
+                           error='Invalid expected number of Observers with '
+                           'Contestants')
+        admin_session.edit('country', '3',
+                           {'expected_observers_c': '01'},
+                           error='Invalid expected number of Observers with '
+                           'Contestants')
+        admin_session.edit('country', '3',
+                           {'expected_observers_c': '1x'},
+                           error='Invalid expected number of Observers with '
+                           'Contestants')
+        admin_session.edit('country', '1',
+                           {'expected_observers_c': '1'},
+                           error='Invalid expected number of Observers with '
+                           'Contestants')
+        admin_session.edit('country', '3',
+                           {'expected_single_rooms': '-1'},
+                           error='Invalid expected number of single room '
+                           'requests')
+        admin_session.edit('country', '3',
+                           {'expected_single_rooms': '01'},
+                           error='Invalid expected number of single room '
+                           'requests')
+        admin_session.edit('country', '3',
+                           {'expected_single_rooms': '1x'},
+                           error='Invalid expected number of single room '
+                           'requests')
         flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.jpg',
                                                         'JPEG')
         admin_session.edit('country', '3',
@@ -2140,11 +2428,38 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv,
                          [expected_abc, expected_def, expected_staff])
         expected_abc_admin = expected_abc.copy()
-        expected_abc_admin['Contact Emails'] = ''
+        expected_abc_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '1',
+             'Expected Deputies': '1',
+             'Expected Contestants': '6',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'No'})
         expected_def_admin = expected_def.copy()
-        expected_def_admin['Contact Emails'] = ''
+        expected_def_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '1',
+             'Expected Deputies': '1',
+             'Expected Contestants': '6',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'No'})
         expected_staff_admin = expected_staff.copy()
-        expected_staff_admin['Contact Emails'] = ''
+        expected_staff_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '0',
+             'Expected Deputies': '0',
+             'Expected Contestants': '0',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'Yes'})
         self.assertEqual(admin_csv,
                          [expected_abc_admin, expected_def_admin,
                           expected_staff_admin])

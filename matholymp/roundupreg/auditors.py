@@ -93,6 +93,17 @@ def audit_file_format(db, cls, file_id, desc1, desc2, fmts, fmtdesc):
                          'contents (%s)' % (desc2, format_contents))
 
 
+def audit_country_expected(db, cl, nodeid, newvalues, propname, desc, def_val,
+                           max_val):
+    """Check the expected number of participants in a role is valid."""
+    value = get_new_value(db, cl, nodeid, newvalues, propname)
+    if value is None:
+        value = str(def_val)
+        newvalues[propname] = str(def_val)
+    if not valid_int_str(value, max_val):
+        raise ValueError('Invalid expected number of %s' % desc)
+
+
 def audit_country_fields(db, cl, nodeid, newvalues):
     """Make sure country properties are valid."""
     code = require_value(db, cl, nodeid, newvalues, 'code',
@@ -127,6 +138,44 @@ def audit_country_fields(db, cl, nodeid, newvalues):
         for email in emails:
             if not valid_address(email):
                 raise ValueError('Email address syntax is invalid')
+
+    # Check the expected numbers of participants and set to defaults
+    # if necessary.
+    is_normal = get_new_value(db, cl, nodeid, newvalues, 'is_normal')
+    if is_normal:
+        exp_leaders = 1
+        exp_deputies = 1
+        exp_contestants = int(
+            db.config.ext['MATHOLYMP_NUM_CONTESTANTS_PER_TEAM'])
+        max_obs = None
+    else:
+        exp_leaders = 0
+        exp_deputies = 0
+        exp_contestants = 0
+        max_obs = 0
+    audit_country_expected(db, cl, nodeid, newvalues, 'expected_leaders',
+                           'Leaders', exp_leaders, exp_leaders)
+    audit_country_expected(db, cl, nodeid, newvalues, 'expected_deputies',
+                           'Deputy Leaders', exp_deputies, exp_deputies)
+    audit_country_expected(db, cl, nodeid, newvalues, 'expected_contestants',
+                           'Contestants', exp_contestants, exp_contestants)
+    audit_country_expected(db, cl, nodeid, newvalues, 'expected_observers_a',
+                           'Observers with Leader', 0, max_obs)
+    audit_country_expected(db, cl, nodeid, newvalues, 'expected_observers_b',
+                           'Observers with Deputy', 0, max_obs)
+    audit_country_expected(db, cl, nodeid, newvalues, 'expected_observers_c',
+                           'Observers with Contestants', 0, max_obs)
+    audit_country_expected(db, cl, nodeid, newvalues, 'expected_single_rooms',
+                           'single room requests', 0, None)
+    # No check is currently made for specifying an expected number of
+    # participants or single room requests smaller than implied by the
+    # participants already registered (which could cause problems if
+    # country data is being edited for some unconnected reason after
+    # those unexpected participants have been registered), or for
+    # specifying an expected number of single room requests larger
+    # than the expected number of participants eligible to request
+    # single rooms (which might be reasonable in some unusual
+    # circumstances).
 
     if 'flag' in newvalues:
         file_id = newvalues['flag']

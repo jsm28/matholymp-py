@@ -341,6 +341,14 @@ class RoundupDataSource(DataSource):
                 contact_extra_list = [val for val in contact_extra_list if val]
                 contact_list.extend(contact_extra_list)
             return contact_list
+        elif name in ('expected_leaders', 'expected_deputies',
+                      'expected_contestants', 'expected_observers_a',
+                      'expected_observers_b', 'expected_observers_c',
+                      'expected_single_rooms'):
+            return int(self._db.country.get(country_id, name))
+        elif name == 'expected_numbers_confirmed':
+            return self._db.country.get(country_id,
+                                        'expected_numbers_confirmed')
         elif name == '_person_ids':
             person_list = self._db.person.filter(None, {'country': country_id})
             return [int(p) for p in person_list]

@@ -158,6 +158,55 @@ define="edit_ok context/is_edit_ok"
   <td colspan="2">Flags should be uploaded as PNG files.</td>
  </tr>
 
+<tal:block tal:condition="context/is_edit_ok">
+
+ <tr tal:define="name string:expected_leaders; label string:Expected number of Leaders; value context/expected_leaders; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Expected number of Leaders</th>
+  <td><input name="code" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:define="name string:expected_deputies; label string:Expected number of Deputy Leaders; value context/expected_deputies; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Expected number of Deputy Leaders</th>
+  <td><input name="code" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:define="name string:expected_contestants; label string:Expected number of Contestants; value context/expected_contestants; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Expected number of Contestants</th>
+  <td><input name="code" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:define="name string:expected_observers_a; label string:Expected number of Observers with Leader; value context/expected_observers_a; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Expected number of Observers with Leader</th>
+  <td><input name="code" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:define="name string:expected_observers_b; label string:Expected number of Observers with Deputy; value context/expected_observers_b; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Expected number of Observers with Deputy</th>
+  <td><input name="code" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:define="name string:expected_observers_c; label string:Expected number of Observers with Contestants; value context/expected_observers_c; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Expected number of Observers with Contestants</th>
+  <td><input name="code" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:define="name string:expected_single_rooms; label string:Expected number of single room requests; value context/expected_single_rooms; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Expected number of single room requests</th>
+  <td><input name="code" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:define="name string:expected_numbers_confirmed; label string:Expected numbers confirmed?; value context/expected_numbers_confirmed; edit_ok edit_ok">
+  <th class="required" metal:use-macro="th_label">Expected numbers confirmed?</th>
+  <tal:if condition="context/id">
+   <td tal:content="structure context/expected_numbers_confirmed/field">confirmed</td>
+  </tal:if>
+  <tal:if condition="not:context/id">
+   <td><input type="radio" name="expected_numbers_confirmed" value="yes">Yes<input type="radio" checked="checked" name="expected_numbers_confirmed" value="no">No</td>
+  </tal:if>
+ </tr>
+
+</tal:block>
+
  <tr tal:condition="edit_ok">
   <td>
    &nbsp;

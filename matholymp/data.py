@@ -1802,6 +1802,75 @@ class CountryEvent(object):
         event.
         """)
 
+    expected_leaders = _CountryEventPropertyDS(
+        'expected_leaders',
+        """
+        The expected number of Leaders for this country at this event.
+        """)
+
+    expected_deputies = _CountryEventPropertyDS(
+        'expected_deputies',
+        """
+        The expected number of Deputy Leaders for this country at this event.
+        """)
+
+    expected_contestants = _CountryEventPropertyDS(
+        'expected_contestants',
+        """
+        The expected number of Contestants for this country at this event.
+        """)
+
+    expected_observers_a = _CountryEventPropertyDS(
+        'expected_observers_a',
+        """
+        The expected number of Observers with Leader for this country
+        at this event.
+        """)
+
+    expected_observers_b = _CountryEventPropertyDS(
+        'expected_observers_b',
+        """
+        The expected number of Observers with Deputy for this country
+        at this event.
+        """)
+
+    expected_observers_c = _CountryEventPropertyDS(
+        'expected_observers_c',
+        """
+        The expected number of Observers with Contestants for this
+        country at this event.
+        """)
+
+    expected_single_rooms = _CountryEventPropertyDS(
+        'expected_single_rooms',
+        """
+        The expected number of single rooms for this country at this event.
+        """)
+
+    expected_numbers_confirmed = _CountryEventPropertyDS(
+        'expected_numbers_confirmed',
+        """
+        Whether the expected numbers of participants and single rooms
+        have been confirmed (rather than just being defaults).
+        """)
+
+    def _get_expected_roles(self):
+        exp_nums = {'Leader': self.expected_leaders,
+                    'Deputy Leader': self.expected_deputies,
+                    'Observer with Leader': self.expected_observers_a,
+                    'Observer with Deputy': self.expected_observers_b,
+                    'Observer with Contestants': self.expected_observers_c}
+        for i in range(self.expected_contestants):
+            exp_nums['Contestant %d' % (i + 1)] = 1
+        return exp_nums
+
+    expected_roles = _PropertyCached(
+        'expected_roles', _get_expected_roles,
+        """
+        A mapping from roles to the expected number of people in each
+        role for this country at this event.
+        """)
+
     def _get_person_list(self):
         ds = self.country.event_group._ds
         if ds.country_event_have_attr(self.country.id, self.event.id,

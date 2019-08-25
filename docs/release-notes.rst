@@ -238,6 +238,15 @@ the registration system is not active.
   Consequently, a CSV file of countries downloaded when logged in
   administratively cannot be used with :command:`mo-static-import`.
 
+* The registration system now supports tracking the expected numbers
+  of participants in each role, and the expected number of single room
+  requests, from each country.  This information appears in the CSV
+  file of countries when logged in administratively.  The registration
+  status page shows whether these numbers have not yet been confirmed
+  for a given country, and uses them in determining whether any
+  expected participants have not yet been registered.
+  :file:`country.item.html` is updated accordingly.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

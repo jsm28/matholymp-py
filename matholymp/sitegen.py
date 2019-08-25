@@ -1828,7 +1828,13 @@ class SiteGenerator(object):
             cols.extend([self._cfg['official_desc']])
         cols.extend(['Normal'])
         if private_data:
-            cols.extend(['Contact Emails'])
+            cols.extend(['Contact Emails', 'Expected Leaders',
+                         'Expected Deputies', 'Expected Contestants',
+                         'Expected Observers with Leader',
+                         'Expected Observers with Deputy',
+                         'Expected Observers with Contestants',
+                         'Expected Single Rooms',
+                         'Expected Numbers Confirmed'])
         if not reg_system:
             cols.extend(['Contestants', 'Gold Medals', 'Silver Medals',
                          'Bronze Medals'])
@@ -1872,6 +1878,20 @@ class SiteGenerator(object):
         csv_out['Normal'] = 'Yes' if c.is_normal else 'No'
         if private_data:
             csv_out['Contact Emails'] = comma_join(c.contact_emails)
+            csv_out['Expected Leaders'] = str(c.expected_leaders)
+            csv_out['Expected Deputies'] = str(c.expected_deputies)
+            csv_out['Expected Contestants'] = str(c.expected_contestants)
+            csv_out['Expected Observers with Leader'] = str(
+                c.expected_observers_a)
+            csv_out['Expected Observers with Deputy'] = str(
+                c.expected_observers_b)
+            csv_out['Expected Observers with Contestants'] = str(
+                c.expected_observers_c)
+            csv_out['Expected Single Rooms'] = str(c.expected_single_rooms)
+            csv_out['Expected Numbers Confirmed'] = (
+                'Yes'
+                if c.expected_numbers_confirmed
+                else 'No')
         if not reg_system:
             if c.num_contestants:
                 csv_out['Contestants'] = str(c.num_contestants)
