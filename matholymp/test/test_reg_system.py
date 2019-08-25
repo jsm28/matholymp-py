@@ -579,6 +579,10 @@ class RoundupTestSession(object):
 
     def workaround_ms_issue_242(self):
         """Work around MechanicalSoup issue 242."""
+        ms_version = mechanicalsoup.__version__.split('.')
+        if (int(ms_version[0]), int(ms_version[1])) > (0, 11):
+            # 0.11.0 buggy, later versions fixed.
+            return
         # Dummy file upload to work around a MechanicalSoup issue when
         # some field values are deliberately blank,
         # <https://github.com/MechanicalSoup/MechanicalSoup/issues/242>).
