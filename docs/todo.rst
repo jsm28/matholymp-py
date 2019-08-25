@@ -170,9 +170,6 @@ Registration system
 
 * Support bulk emails (announcements) to registration contacts.
 
-* Add downloadable (given administrative access) full version of
-  country list including contact details.
-
 * Extend automatic checks / warnings for all-uppercase names: also
   warn on the registration status page.
 

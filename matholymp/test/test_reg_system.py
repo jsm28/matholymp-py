@@ -485,6 +485,16 @@ class RoundupTestSession(object):
         return self.get_download_csv('country?@action=country_csv',
                                      'countries.csv')
 
+    def get_countries_csv_public_only(self):
+        """Get the CSV file of countries, public data only."""
+        countries_csv = self.get_download_csv('country?@action=country_csv',
+                                              'countries.csv')
+        # For convenience in testing when non-public data is
+        # irrelevant for what is being tested.
+        for entry in countries_csv:
+            del entry['Contact Emails']
+        return countries_csv
+
     def get_people_csv(self):
         """Get the CSV file of people."""
         return self.get_download_csv('person?@action=people_csv',
@@ -1012,8 +1022,10 @@ class RegSystemTestCase(unittest.TestCase):
                           'Annual URL': self.instance.url + 'country1',
                           'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
                           'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        expected_staff_admin = expected_staff.copy()
+        expected_staff_admin['Contact Emails'] = ''
         self.assertEqual(anon_csv, [expected_staff])
-        self.assertEqual(admin_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff_admin])
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
         anon_csv = session.get_countries_csv()
@@ -1023,8 +1035,49 @@ class RegSystemTestCase(unittest.TestCase):
                         'Annual URL': self.instance.url + 'country3',
                         'Code': 'ABC', 'Name': 'Test First Country',
                         'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        expected_abc_admin = expected_abc.copy()
+        expected_abc_admin['Contact Emails'] = ''
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
-        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # Test contact email addresses in CSV file.
+        admin_session.edit('country', '3',
+                           {'contact_email': 'ABC@example.invalid'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc_admin['Contact Emails'] = 'ABC@example.invalid'
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        admin_session.edit('country', '3',
+                           {'contact_extra':
+                            'ABC2@example.invalid\n'
+                            '  ABC3@example.invalid \n\n'
+                            'ABC6@example.invalid'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc_admin['Contact Emails'] = ('ABC@example.invalid,'
+                                                'ABC2@example.invalid,'
+                                                'ABC3@example.invalid,'
+                                                'ABC6@example.invalid')
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # Space rather than emptry string for emptying email to work
+        # around
+        # <https://github.com/MechanicalSoup/MechanicalSoup/issues/242>.
+        admin_session.edit('country', '3',
+                           {'contact_email': ' '})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc_admin['Contact Emails'] = ('ABC2@example.invalid,'
+                                                'ABC3@example.invalid,'
+                                                'ABC6@example.invalid')
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
 
     @_with_config(distinguish_official='Yes')
@@ -1035,7 +1088,7 @@ class RegSystemTestCase(unittest.TestCase):
         session = self.get_session()
         admin_session = self.get_session('admin')
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         expected_staff = {'XMO Number': '2', 'Country Number': '1',
                           'Annual URL': self.instance.url + 'country1',
                           'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
@@ -1046,7 +1099,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
         expected_abc = {'XMO Number': '2', 'Country Number': '3',
                         'Annual URL': self.instance.url + 'country3',
@@ -1059,7 +1112,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country('DEF', 'Test Second Country',
                                      {'official': 'no'})
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
         expected_def = {'XMO Number': '2', 'Country Number': '4',
                         'Annual URL': self.instance.url + 'country4',
@@ -1110,7 +1163,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(got_bytes, flag_bytes)
         reg_session = self.get_session('ABC_reg')
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
         img_url_csv = self.instance.url + 'flag1/flag.png'
         expected_abc = {'XMO Number': '2', 'Country Number': '3',
@@ -1148,7 +1201,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(got_bytes, flag_bytes)
         reg_session = self.get_session('ABC_reg')
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
         img_url_csv = self.instance.url + 'flag1/flag.png'
         expected_abc = {'XMO Number': '2', 'Country Number': '3',
@@ -1189,7 +1242,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(got_bytes, flag_bytes)
         reg_session = self.get_session('ABC_reg')
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
         img_url_csv = self.instance.url + 'flag1/flag.png'
         expected_abc = {'XMO Number': '2', 'Country Number': '3',
@@ -1224,7 +1277,7 @@ class RegSystemTestCase(unittest.TestCase):
             {'generic_url': 'https://www.example.invalid/countries/country3/'})
         reg_session = self.get_session('ABC_reg')
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
         expected_abc = {'XMO Number': '2', 'Country Number': '3',
                         'Annual URL': self.instance.url + 'country3',
@@ -1258,7 +1311,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(got_bytes, flag_bytes)
         reg_session = self.get_session('ABC_reg')
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
         img_url_csv = self.instance.url + 'flag1/flag.png'
         expected_abc = {'XMO Number': '2', 'Country Number': '3',
@@ -1291,7 +1344,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
         expected_abc = {'XMO Number': '2', 'Country Number': '3',
                         'Annual URL': self.instance.url + 'country3',
@@ -1307,7 +1360,7 @@ class RegSystemTestCase(unittest.TestCase):
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, flag_bytes)
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
         img_url_csv = self.instance.url + 'flag1/flag.png'
         expected_abc['Flag URL'] = img_url_csv
@@ -1336,7 +1389,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
         expected_abc = {'XMO Number': '2', 'Country Number': '3',
                         'Annual URL': self.instance.url + 'country3',
@@ -1356,7 +1409,7 @@ class RegSystemTestCase(unittest.TestCase):
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, flag_bytes)
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
         img_url_csv = self.instance.url + 'flag1/flag.png'
         expected_abc['Generic Number'] = '1'
@@ -1387,7 +1440,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
         expected_abc = {'XMO Number': '2', 'Country Number': '3',
                         'Annual URL': self.instance.url + 'country3',
@@ -1401,7 +1454,7 @@ class RegSystemTestCase(unittest.TestCase):
             'country', '3',
             {'generic_url': 'https://www.example.invalid/countries/country3/'})
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
         expected_abc['Generic Number'] = '3'
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
@@ -1424,7 +1477,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
         expected_abc = {'XMO Number': '2', 'Country Number': '3',
                         'Annual URL': self.instance.url + 'country3',
@@ -1443,7 +1496,7 @@ class RegSystemTestCase(unittest.TestCase):
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, flag_bytes)
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
         img_url_csv = self.instance.url + 'flag1/flag.png'
         expected_abc['Generic Number'] = '1'
@@ -1480,7 +1533,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(got_bytes, flag_bytes)
         reg_session = self.get_session('ABC_reg')
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
         img_url_csv = self.instance.url + 'flag2/flag.png'
         expected_abc = {'XMO Number': '2', 'Country Number': '3',
@@ -1522,7 +1575,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(got_bytes, flag_bytes)
         reg_session = self.get_session('ABC_reg')
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
         img_url_csv = self.instance.url + 'flag1/flag.png'
         expected_abc = {'XMO Number': '2', 'Country Number': '3',
@@ -1556,7 +1609,7 @@ class RegSystemTestCase(unittest.TestCase):
                                      {'flag-1@content': flag_filename})
         reg_session = self.get_session('ABC_reg')
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
         img_url_csv = self.instance.url + 'flag1/flag.png'
         expected_abc = {'XMO Number': '2', 'Country Number': '3',
@@ -1683,7 +1736,7 @@ class RegSystemTestCase(unittest.TestCase):
                         'Code': 'DEF', 'Name': 'Test Second Country',
                         'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         self.assertEqual(anon_csv, [expected_def, expected_staff])
         self.assertEqual(admin_csv, [expected_def, expected_staff])
         anon_csv = session.get_people_csv()
@@ -1730,7 +1783,7 @@ class RegSystemTestCase(unittest.TestCase):
                                      {'flag-1@content': flag_filename})
         reg_session = self.get_session('ABC_reg')
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
         img_url_csv = self.instance.url + 'flag1/flag.png'
         expected_abc = {'XMO Number': '2', 'Country Number': '3',
@@ -1754,7 +1807,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.select_main_form()
         admin_session.check_submit_selected()
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff])
         # Check the old flag image is no longer public, but is still
@@ -1896,7 +1949,7 @@ class RegSystemTestCase(unittest.TestCase):
             error=r'example.invalid URLs for previous participation must be '
             'in the form https://www\.example\.invalid/countries/countryN/')
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff])
         # Without static site data available, any country number is
@@ -1911,7 +1964,7 @@ class RegSystemTestCase(unittest.TestCase):
                         'Flag URL': '',
                         'Generic Number': '12345', 'Normal': 'Yes'}
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc, expected_staff])
 
@@ -1932,7 +1985,7 @@ class RegSystemTestCase(unittest.TestCase):
              'https://www.example.invalid/countries/country12345/'},
             error=r'example\.invalid URL for previous participation not valid')
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff])
 
@@ -1964,7 +2017,7 @@ class RegSystemTestCase(unittest.TestCase):
                                      {'@required': ''},
                                      error='No country name specified')
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff])
 
@@ -2043,7 +2096,7 @@ class RegSystemTestCase(unittest.TestCase):
             error=r'example.invalid URLs for previous participation must be '
             'in the form https://www\.example\.invalid/countries/countryN/')
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc, expected_staff])
         # Without static site data available, any country number is
@@ -2054,15 +2107,18 @@ class RegSystemTestCase(unittest.TestCase):
              'https://www.example.invalid/countries/country12345/'})
         expected_abc['Generic Number'] = '12345'
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc, expected_staff])
         # Deleting a specified email address is OK.
         admin_session.create_country('DEF', 'Test Second Country',
                                      {'contact_email': 'DEF@example.invalid',
                                       'contact_extra': 'DEF2@example.invalid'})
-        admin_session.edit('country', '4', {'contact_email': '',
-                                            'contact_extra': ''})
+        # Space rather than emptry string for emptying email to work
+        # around
+        # <https://github.com/MechanicalSoup/MechanicalSoup/issues/242>.
+        admin_session.edit('country', '4', {'contact_email': ' ',
+                                            'contact_extra': ' '})
         expected_def = {'XMO Number': '2', 'Country Number': '4',
                         'Annual URL': self.instance.url + 'country4',
                         'Code': 'DEF', 'Name': 'Test Second Country',
@@ -2071,8 +2127,15 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_countries_csv()
         self.assertEqual(anon_csv,
                          [expected_abc, expected_def, expected_staff])
+        expected_abc_admin = expected_abc.copy()
+        expected_abc_admin['Contact Emails'] = ''
+        expected_def_admin = expected_def.copy()
+        expected_def_admin['Contact Emails'] = ''
+        expected_staff_admin = expected_staff.copy()
+        expected_staff_admin['Contact Emails'] = ''
         self.assertEqual(admin_csv,
-                         [expected_abc, expected_def, expected_staff])
+                         [expected_abc_admin, expected_def_admin,
+                          expected_staff_admin])
 
     @_with_config(static_site_directory='static-site')
     def test_country_edit_audit_errors_static(self):
@@ -2096,7 +2159,7 @@ class RegSystemTestCase(unittest.TestCase):
              'https://www.example.invalid/countries/country12345/'},
             error=r'example\.invalid URL for previous participation not valid')
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc, expected_staff])
 
@@ -2120,7 +2183,7 @@ class RegSystemTestCase(unittest.TestCase):
                                             'code': '',
                                             'name': ''})
         anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff])
 

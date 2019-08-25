@@ -1809,7 +1809,8 @@ class SiteGenerator(object):
         """Return list of Pn headers for CSV file."""
         return [('P%d' % (i + 1)) for i in range(num_problems)]
 
-    def countries_csv_columns(self, event, reg_system=False):
+    def countries_csv_columns(self, event, reg_system=False,
+                              private_data=False):
         """Return list of headers for CSV file of countries."""
         if event:
             num_problems = event.num_problems
@@ -1826,6 +1827,8 @@ class SiteGenerator(object):
         if distinguish_official:
             cols.extend([self._cfg['official_desc']])
         cols.extend(['Normal'])
+        if private_data:
+            cols.extend(['Contact Emails'])
         if not reg_system:
             cols.extend(['Contestants', 'Gold Medals', 'Silver Medals',
                          'Bronze Medals'])
@@ -1837,7 +1840,7 @@ class SiteGenerator(object):
             cols.extend(self.pn_csv_header(num_problems))
         return cols
 
-    def country_csv_data(self, c, event, reg_system=False):
+    def country_csv_data(self, c, event, reg_system=False, private_data=False):
         """Return the CSV data for a given country."""
         if event:
             assert event is c.event
@@ -1867,6 +1870,8 @@ class SiteGenerator(object):
             else:
                 csv_out[self._cfg['official_desc']] = ''
         csv_out['Normal'] = 'Yes' if c.is_normal else 'No'
+        if private_data:
+            csv_out['Contact Emails'] = comma_join(c.contact_emails)
         if not reg_system:
             if c.num_contestants:
                 csv_out['Contestants'] = str(c.num_contestants)
@@ -1916,17 +1921,18 @@ class SiteGenerator(object):
         self.write_csv_to_file(self.path_for_data_countries(),
                                countries_data_output, countries_columns)
 
-    def one_event_countries_csv_content(self, e, reg_system=False):
+    def one_event_countries_csv_content(self, e, reg_system=False,
+                                        private_data=False):
         """
         Return a tuple of the data and column headers for the CSV file
         for countries at one event.
         """
         e_countries_sorted = sorted(e.country_list, key=lambda x: x.sort_key)
-        e_countries_data_output = [self.country_csv_data(c, e,
-                                                         reg_system=reg_system)
+        e_countries_data_output = [self.country_csv_data(
+            c, e, reg_system=reg_system, private_data=private_data)
                                    for c in e_countries_sorted]
-        e_countries_columns = self.countries_csv_columns(e,
-                                                         reg_system=reg_system)
+        e_countries_columns = self.countries_csv_columns(
+            e, reg_system=reg_system, private_data=private_data)
         return (e_countries_data_output, e_countries_columns)
 
     def generate_one_event_countries_csv(self, e):

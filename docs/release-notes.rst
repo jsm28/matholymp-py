@@ -233,6 +233,11 @@ the registration system is not active.
 * The menu of countries for entering scores no longer shows staff
   countries or "None".
 
+* When logged in administratively to the registration system, the CSV
+  file of countries now includes their contact email addresses.
+  Consequently, a CSV file of countries downloaded when logged in
+  administratively cannot be used with :command:`mo-static-import`.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

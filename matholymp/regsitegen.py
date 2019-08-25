@@ -59,10 +59,11 @@ class RegSiteGenerator(SiteGenerator):
         """The unique event described by the registration system instance."""
         super(RegSiteGenerator, self).__init__(cfg, event_group)
 
-    def countries_csv_bytes(self):
+    def countries_csv_bytes(self, private_data):
         """Return the byte contents of the CSV of countries."""
         data = self.one_event_countries_csv_content(self.event,
-                                                    reg_system=True)
+                                                    reg_system=True,
+                                                    private_data=private_data)
         return write_utf8_csv_bytes(data[0], data[1])
 
     def scores_csv_bytes(self):

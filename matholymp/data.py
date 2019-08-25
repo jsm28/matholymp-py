@@ -1795,6 +1795,13 @@ class CountryEvent(object):
         non-staff participants) at this event.
         """)
 
+    contact_emails = _CountryEventPropertyDS(
+        'contact_emails',
+        """
+        The list of contact email addresses for this country at this
+        event.
+        """)
+
     def _get_person_list(self):
         ds = self.country.event_group._ds
         if ds.country_event_have_attr(self.country.id, self.event.id,

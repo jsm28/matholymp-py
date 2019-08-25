@@ -328,6 +328,19 @@ class RoundupDataSource(DataSource):
             return self._db.country.get(country_id, 'official')
         elif name == 'is_normal':
             return self._db.country.get(country_id, 'is_normal')
+        elif name == 'contact_emails':
+            contact_main = self._db.country.get(country_id, 'contact_email')
+            if contact_main is None:
+                contact_list = []
+            else:
+                contact_list = [contact_main]
+            contact_extra = self._db.country.get(country_id, 'contact_extra')
+            if contact_extra is not None:
+                contact_extra_list = [val.strip()
+                                      for val in contact_extra.split('\n')]
+                contact_extra_list = [val for val in contact_extra_list if val]
+                contact_list.extend(contact_extra_list)
+            return contact_list
         elif name == '_person_ids':
             person_list = self._db.person.filter(None, {'country': country_id})
             return [int(p) for p in person_list]

@@ -316,12 +316,12 @@ connections for departures) has all the data they need from the site.
 It is also possible to run :command:`mo-static-import` with files
 downloaded manually from the registration system rather than having it
 download them automatically.  To do so, download the following files
-from the registration system (the list of people must be downloaded
-while not logged in administratively), and put them in the directory
-*input-directory*: the list of countries (:file:`countries.csv`), the
-list of people (:file:`people.csv`), the ZIP file of flags
-(:file:`flags.zip`), the ZIP file of participant photos
-(:file:`photos.zip`), the RSS feed of scores (save it as
+from the registration system (the lists of countries and people must
+be downloaded while not logged in administratively), and put them in
+the directory *input-directory*: the list of countries
+(:file:`countries.csv`), the list of people (:file:`people.csv`), the
+ZIP file of flags (:file:`flags.zip`), the ZIP file of participant
+photos (:file:`photos.zip`), the RSS feed of scores (save it as
 :file:`scores-rss.xml`).  (The ZIP files do not need to be unpacked;
 if they are, the directories :file:`flags/` and :file:`photos/` will
 be used instead of the ZIP files.)  Any files already present in that

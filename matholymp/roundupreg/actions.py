@@ -213,7 +213,8 @@ class CountryCSVAction(Action):
         self.client.setHeader('Content-Type', 'text/csv; charset=UTF-8')
         self.client.setHeader('Content-Disposition',
                               'attachment; filename=countries.csv')
-        return RoundupSiteGenerator(self.db).countries_csv_bytes()
+        show_all = self.hasPermission('Omnivident')
+        return RoundupSiteGenerator(self.db).countries_csv_bytes(show_all)
 
 
 class ScoresCSVAction(Action):

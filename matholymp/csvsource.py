@@ -412,4 +412,7 @@ class CSVDataSource(DataSource):
             if s == 'No':
                 return False
             raise ValueError('unexpected official setting %s', s)
+        if name == 'contact_emails':
+            s = self._countries[event_id][country_id]['Contact Emails']
+            return comma_split(s)
         raise KeyError(name)
