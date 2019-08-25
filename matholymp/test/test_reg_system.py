@@ -7030,6 +7030,248 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(len(admin_csv), 3)
         self.assertEqual(len(reg_csv), 3)
 
+    @_with_config(sanity_date_of_birth='2014-02-03')
+    def test_person_edit_audit_errors_date_of_birth_edge(self):
+        """
+        Test errors from person edit auditor: date of birth edge cases.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+        # Invalid: date of birth before the sanity-check date (note
+        # year before that not actually offered on form, so needs to
+        # be added here to exercise that auditor check).
+        reg_session.check_open_relative('person1')
+        reg_session.select_main_form()
+        form = reg_session.b.get_current_form().form
+        select = form.find('select', attrs={'name': 'date_of_birth_year'})
+        new_option = reg_session.b.get_current_page().new_tag(
+            'option', value='1901')
+        new_option.string = '1901'
+        select.append(new_option)
+        reg_session.set({'date_of_birth_year': '1901',
+                         'date_of_birth_month': 'December',
+                         'date_of_birth_day': '31'})
+        reg_session.check_submit_selected(error='Participant implausibly old')
+        # Invalid: date of birth after the sanity-check date (note
+        # sanity check date changed for this test to make it more
+        # convenient to enter such dates than with the default
+        # setting).
+        admin_session.edit('person', '1',
+                           {'date_of_birth_year': '2014',
+                            'date_of_birth_month': 'February',
+                            'date_of_birth_day': '3'},
+                           error='Participant implausibly young')
+        admin_session.edit('person', '1',
+                           {'date_of_birth_year': '2014',
+                            'date_of_birth_month': 'December',
+                            'date_of_birth_day': '1'},
+                           error='Participant implausibly young')
+        # Last invalid contestant date of birth is tested above.
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+        # Valid: first possible date of birth.
+        reg_session.edit('person', '1',
+                         {'primary_role': 'Leader',
+                          'date_of_birth_year': '1902',
+                          'date_of_birth_month': 'January',
+                          'date_of_birth_day': '1'})
+        # Valid: last possible date of birth.
+        admin_session.edit('person', '1',
+                           {'date_of_birth_year': '2014',
+                            'date_of_birth_month': 'February',
+                            'date_of_birth_day': '2'})
+        # Valid: first possible contestant date of birth.
+        reg_session.edit('person', '1',
+                         {'primary_role': 'Contestant 4',
+                          'date_of_birth_year': '1995',
+                          'date_of_birth_month': 'April',
+                          'date_of_birth_day': '2'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+
+    def test_person_edit_audit_errors_arrival_departure_edge(self):
+        """
+        Test errors from person edit auditor: arrival / departure date
+        and time edge cases.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Leader')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+        # Invalid: arrival or departure dates too early or too late
+        # (note not actually offered on form, so needs to be added
+        # here to exercise that auditor check).
+        reg_session.check_open_relative('person1')
+        reg_session.select_main_form()
+        form = reg_session.b.get_current_form().form
+        select = form.find('select', attrs={'name': 'arrival_date'})
+        new_option = reg_session.b.get_current_page().new_tag(
+            'option', value='2015-03-30')
+        new_option.string = '30 March 2015'
+        select.append(new_option)
+        reg_session.set({'arrival_date': '30 March 2015'})
+        reg_session.check_submit_selected(error='arrival date too early')
+        reg_session.check_open_relative('person1')
+        reg_session.select_main_form()
+        form = reg_session.b.get_current_form().form
+        select = form.find('select', attrs={'name': 'arrival_date'})
+        new_option = reg_session.b.get_current_page().new_tag(
+            'option', value='2015-04-03')
+        new_option.string = '3 April 2015'
+        select.append(new_option)
+        reg_session.set({'arrival_date': '3 April 2015'})
+        reg_session.check_submit_selected(error='arrival date too late')
+        reg_session.check_open_relative('person1')
+        reg_session.select_main_form()
+        form = reg_session.b.get_current_form().form
+        select = form.find('select', attrs={'name': 'departure_date'})
+        new_option = reg_session.b.get_current_page().new_tag(
+            'option', value='2015-03-31')
+        new_option.string = '31 March 2015'
+        select.append(new_option)
+        reg_session.set({'departure_date': '31 March 2015'})
+        reg_session.check_submit_selected(error='departure date too early')
+        reg_session.check_open_relative('person1')
+        reg_session.select_main_form()
+        form = reg_session.b.get_current_form().form
+        select = form.find('select', attrs={'name': 'departure_date'})
+        new_option = reg_session.b.get_current_page().new_tag(
+            'option', value='2015-04-04')
+        new_option.string = '4 April 2015'
+        select.append(new_option)
+        reg_session.set({'departure_date': '4 April 2015'})
+        reg_session.check_submit_selected(error='departure date too late')
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+        # Valid: earliest possible arrival and departure dates.
+        reg_session.edit('person', '1',
+                         {'arrival_date': '31 March 2015',
+                          'departure_date': '1 April 2015'})
+        # Valid: latest possible arrival and departure dates.
+        admin_session.edit('person', '1',
+                           {'arrival_date': '2 April 2015',
+                            'departure_date': '3 April 2015'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+
+    @_with_config(static_site_directory='static-site')
+    def test_person_edit_audit_errors_static(self):
+        """
+        Test errors from person edit auditor, static site checks.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+        admin_session.edit(
+            'person', '1',
+            {'generic_url':
+             'https://www.example.invalid/people/person12345/'},
+            error=r'example\.invalid URL for previous participation not valid')
+        reg_session.edit(
+            'person', '1',
+            {'generic_url':
+             'https://www.example.invalid/people/person12345/'},
+            error=r'example\.invalid URL for previous participation not valid')
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+
+    def test_person_edit_audit_errors_static_none(self):
+        """
+        Test errors from person edit auditor, any person number valid
+        for previous participation when no static site data.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+        admin_session.edit(
+            'person', '1',
+            {'generic_url':
+             'https://www.example.invalid/people/person12345/'})
+        reg_session.edit(
+            'person', '1',
+            {'generic_url':
+             'https://www.example.invalid/people/person54321/'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+
+    def test_person_edit_audit_errors_role_secondary(self):
+        """
+        Test errors from person edit auditor, secondary roles OK.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Leader')
+        admin_session.edit(
+            'person', '1',
+            {'other_roles': ['XMO AB']})
+        reg_session.edit(
+            'person', '1',
+            {'primary_role': 'Deputy Leader'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+
     def test_person_multilink_null_edit(self):
         """
         Test null edits on multilinks involving "no selection".
