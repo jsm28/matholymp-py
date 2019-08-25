@@ -42,7 +42,7 @@ from matholymp.roundupreg.rounduputil import have_consent_forms, \
     require_dob, get_num_problems, get_marks_per_problem, \
     get_earliest_date_of_birth, get_sanity_date_of_birth, \
     get_earliest_date_of_birth_contestant, get_arrdep_bounds, \
-    any_scores_missing, valid_score, create_rss, db_file_format_contents, \
+    any_scores_missing, valid_int_str, create_rss, db_file_format_contents, \
     db_file_extension
 from matholymp.roundupreg.staticsite import static_site_event_group, \
     static_site_file_data
@@ -62,11 +62,11 @@ def audit_event_fields(db, cl, nodeid, newvalues):
         marks_per_problem = get_marks_per_problem(db)
         # A gold medal boundary of max + 1 means no gold medals.
         max_medal_boundary = sum(marks_per_problem) + 1
-        if not valid_score(gold, max_medal_boundary):
+        if not valid_int_str(gold, max_medal_boundary):
             raise ValueError('Invalid gold medal boundary')
-        if not valid_score(silver, max_medal_boundary):
+        if not valid_int_str(silver, max_medal_boundary):
             raise ValueError('Invalid silver medal boundary')
-        if not valid_score(bronze, max_medal_boundary):
+        if not valid_int_str(bronze, max_medal_boundary):
             raise ValueError('Invalid bronze medal boundary')
         if int(silver) > int(gold) or int(bronze) > int(silver):
             raise ValueError('Medal boundaries in wrong order')

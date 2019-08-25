@@ -46,7 +46,7 @@ from roundup.exceptions import Reject
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import get_marks_per_problem, \
     scores_from_str, person_is_contestant, contestant_code, scores_final, \
-    valid_country_problem, valid_score, create_rss
+    valid_country_problem, valid_int_str, create_rss
 
 
 class ScoreAction(Action):
@@ -86,7 +86,7 @@ class ScoreAction(Action):
                 if code not in self.form:
                     raise ValueError('No score specified for ' + code)
                 score = self.form[code].value
-                if score != '' and not valid_score(score, max_this_problem):
+                if score != '' and not valid_int_str(score, max_this_problem):
                     raise ValueError('Invalid score specified for ' + code)
                 score_str = self.db.person.get(person, 'scores')
                 scores = scores_from_str(self.db, score_str)

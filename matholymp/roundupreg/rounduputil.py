@@ -52,7 +52,7 @@ __all__ = ['distinguish_official', 'get_consent_forms_date_str',
            'contestant_age', 'get_arrdep_bounds', 'get_staff_country_name',
            'person_is_contestant', 'contestant_code', 'pn_score',
            'scores_final', 'any_scores_missing', 'country_has_contestants',
-           'valid_country_problem', 'valid_score', 'create_rss',
+           'valid_country_problem', 'valid_int_str', 'create_rss',
            'db_file_format_contents', 'db_file_extension', 'db_file_url']
 
 
@@ -294,17 +294,17 @@ def valid_country_problem(db, form):
     return country_has_contestants(db, country)
 
 
-def valid_score(score_str, max_score):
+def valid_int_str(int_str, max_val):
     """
-    Determine whether the score string (for an individual problem or a
-    medal boundary) is an integer in the range from 0 to max_score
-    inclusive.
+    Determine whether the given string (for something required to be
+    an integer, such as a score) is an integer in the range from 0 to
+    max_val inclusive.
     """
-    if score_str != '0' and not re.match('^[1-9][0-9]*\\Z', score_str):
+    if int_str != '0' and not re.match('^[1-9][0-9]*\\Z', int_str):
         return False
-    if len(score_str) > len(str(max_score)):
+    if len(int_str) > len(str(max_val)):
         return False
-    if int(score_str) > max_score:
+    if int(int_str) > max_val:
         return False
     return True
 
