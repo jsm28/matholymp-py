@@ -63,7 +63,8 @@ define="edit_ok context/is_edit_ok"
   <td><input name="name" metal:use-macro="normal_input"></td>
  </tr>
 
- <tr tal:condition="context/is_edit_ok">
+<tal:block tal:condition="python:request.user.hasPermission('EditCountry')">
+ <tr>
   <td colspan="2">If a contact email address is entered, a
   registration system account will be automatically created for that
   country if one does not already exist.  This address is used only
@@ -71,22 +72,23 @@ define="edit_ok context/is_edit_ok"
   address used for general contact purposes.</td>
  </tr>
 
- <tr tal:define="name string:contact_email; label string:Contact email; value context/contact_email; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:contact_email; label string:Contact email; value context/contact_email; edit_ok edit_ok">
   <th metal:use-macro="th_label">Contact email</th>
   <td><input name="contact_email" metal:use-macro="normal_input"></td>
  </tr>
 
- <tr tal:condition="context/is_edit_ok">
+ <tr>
   <td colspan="2">If additional email addresses are specified, those
   will receive the email with the username and password in addition to
   the main contact email address given.  Give one address per
   line.</td>
  </tr>
 
- <tr tal:define="name string:contact_extra; label string:Additional email addresses; value context/contact_extra; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:contact_extra; label string:Additional email addresses; value context/contact_extra; edit_ok edit_ok">
   <th class="required" metal:use-macro="th_label">Additional email addresses</th>
   <td><textarea rows="5" cols="40" tal:replace="structure context/contact_extra/multiline"></textarea></td>
  </tr>
+</tal:block>
 
 <tal:block tal:condition="python:utils.distinguish_official(db._db)">
  <tr tal:define="name string:official; label python:db._db.config.ext['MATHOLYMP_OFFICIAL_LONG_DESC']; value context/official; edit_ok edit_ok">
@@ -100,7 +102,7 @@ define="edit_ok context/is_edit_ok"
  </tr>
 </tal:block>
 
-<tal:block tal:condition="context/is_edit_ok">
+<tal:block tal:condition="python:request.user.hasPermission('EditCountry')">
  <tr tal:define="name string:is_normal; label string:Is this country normal (non-staff participants)?; value context/is_normal; edit_ok edit_ok">
   <th class="required" metal:use-macro="th_label">Is this country normal (non-staff participants)?</th>
   <tal:if condition="context/id">
@@ -110,9 +112,7 @@ define="edit_ok context/is_edit_ok"
    <td><input type="radio" checked="checked" name="is_normal" value="yes">Yes<input type="radio" name="is_normal" value="no">No</td>
   </tal:if>
  </tr>
-</tal:block>
 
-<tal:block tal:condition="context/is_edit_ok">
  <tr tal:define="name string:participants_ok; label string:Can this country have participants?; value context/participants_ok; edit_ok edit_ok">
   <th class="required" metal:use-macro="th_label">Can this country have participants?</th>
   <tal:if condition="context/id">
@@ -122,18 +122,16 @@ define="edit_ok context/is_edit_ok"
    <td><input type="radio" checked="checked" name="participants_ok" value="yes">Yes<input type="radio" name="participants_ok" value="no">No</td>
   </tal:if>
  </tr>
-</tal:block>
 
- <tr tal:condition="context/is_edit_ok">
+ <tr>
   <td colspan="2">If this country has participated at a previous <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_SHORT_NAME']" />, please enter the corresponding <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_GENERIC_URL_DESC']" /> (for example, <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_GENERIC_URL_BASE']+'countries/country1234/'" />) below; otherwise, leave this box blank.</td>
  </tr>
 
- <tr tal:define="name string:generic_url; label python:db._db.config.ext['MATHOLYMP_GENERIC_URL_DESC']; value context/generic_url; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:generic_url; label python:db._db.config.ext['MATHOLYMP_GENERIC_URL_DESC']; value context/generic_url; edit_ok edit_ok">
   <th metal:use-macro="th_label"><tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_GENERIC_URL_DESC']" /></th>
   <td><input name="generic_url" metal:use-macro="normal_input"></td>
  </tr>
 
-<tal:block tal:condition="context/is_edit_ok">
 <tal:block tal:condition="context/id">
  <tr tal:condition="not:context/flag" tal:define="name string:reuse_flag; label string:Reuse previous flag (if available); value context/reuse_flag; edit_ok edit_ok">
   <th metal:use-macro="th_label">Reuse previous flag (if available)</th>
@@ -146,19 +144,16 @@ define="edit_ok context/is_edit_ok"
   <td><input type="radio" checked="checked" name="reuse_flag" value="yes">Yes<input type="radio" name="reuse_flag" value="no">No</td>
  </tr>
 </tal:block>
-</tal:block>
 
- <tr tal:condition="context/is_edit_ok">
+ <tr>
   <th i18n:translate="">Upload flag</th>
   <td colspan=3><input type="file" name="flag-1@content" size="20">
   <input type="hidden" name="@link@flag" value="flag-1"></td>
  </tr>
 
- <tr tal:condition="context/is_edit_ok">
+ <tr>
   <td colspan="2">Flags should be uploaded as PNG files.</td>
  </tr>
-
-<tal:block tal:condition="context/is_edit_ok">
 
  <tr tal:define="name string:expected_leaders; label string:Expected number of Leaders; value context/expected_leaders; edit_ok edit_ok">
   <th metal:use-macro="th_label">Expected number of Leaders</th>
@@ -294,7 +289,7 @@ define="edit_ok context/is_edit_ok"
 
 </tal:block>
 
-<tal:block tal:condition="context/is_edit_ok">
+<tal:block tal:condition="python:request.user.hasPermission('EditCountry')">
 <tal:block tal:condition="context/id" tal:replace="structure context/history" />
 </tal:block>
 
