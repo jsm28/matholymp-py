@@ -7272,6 +7272,110 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(len(admin_csv), 1)
         self.assertEqual(len(reg_csv), 1)
 
+    def test_person_edit_audit_errors_role_unique(self):
+        """
+        Test errors from person edit auditor, non-observer roles for
+        normal countries unique.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Leader')
+        reg_session.create_person('Test First Country', 'Deputy Leader')
+        admin_session.create_person('Test First Country', 'Contestant 1')
+        reg_session.create_person('Test First Country', 'Observer with Leader')
+        admin_session.create_person('Test First Country',
+                                    'Observer with Deputy')
+        reg_session.create_person('Test First Country',
+                                  'Observer with Contestants')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 6)
+        self.assertEqual(len(admin_csv), 6)
+        self.assertEqual(len(reg_csv), 6)
+        admin_session.edit('person', '2',
+                           {'primary_role': 'Leader'},
+                           error='A person with this role already exists')
+        admin_session.edit('person', '1',
+                           {'primary_role': 'Deputy Leader'},
+                           error='A person with this role already exists')
+        admin_session.edit('person', '4',
+                           {'primary_role': 'Contestant 1'},
+                           error='A person with this role already exists')
+        reg_session.edit('person', '2',
+                         {'primary_role': 'Leader'},
+                         error='A person with this role already exists')
+        reg_session.edit('person', '1',
+                         {'primary_role': 'Deputy Leader'},
+                         error='A person with this role already exists')
+        reg_session.edit('person', '4',
+                         {'primary_role': 'Contestant 1'},
+                         error='A person with this role already exists')
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, anon_csv_2)
+        self.assertEqual(admin_csv, admin_csv_2)
+        self.assertEqual(reg_csv, reg_csv_2)
+        reg_session.edit('person', '1',
+                         {'primary_role': 'Observer with Leader'})
+        admin_session.edit('person', '2',
+                           {'primary_role': 'Observer with Deputy'})
+        reg_session.edit('person', '3',
+                         {'primary_role': 'Observer with Contestants'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 6)
+        self.assertEqual(len(admin_csv), 6)
+        self.assertEqual(len(reg_csv), 6)
+
+    def test_person_edit_audit_errors_guide_extra(self):
+        """
+        Test errors from person edit auditor, extra roles allowed to guide.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create('matholymprole',
+                             {'name': 'Extra Guide', 'canguide': 'yes'})
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Guide',
+            {'guide_for': ['Test First Country']})
+        admin_session.edit('person', '1',
+                           {'primary_role': 'Extra Guide'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+
+    def test_person_edit_audit_errors_phone_number(self):
+        """
+        Test errors from person edit auditor, phone nunbers OK for staff.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        # Phone numbers are allowed for all staff, not just Guides as
+        # was originally the case.
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Guide',
+            {'phone_number': '123'})
+        admin_session.edit('person', '1',
+                           {'primary_role': 'Jury Chair'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+
     def test_person_multilink_null_edit(self):
         """
         Test null edits on multilinks involving "no selection".
