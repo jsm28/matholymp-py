@@ -247,6 +247,9 @@ the registration system is not active.
   expected participants have not yet been registered.
   :file:`country.item.html` is updated accordingly.
 
+* The default roles available in the registration system now include
+  "Crew", "Guest", "Press" and "VIP".
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

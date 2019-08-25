@@ -157,6 +157,14 @@ def init_data(env):
                          secondaryok=False, canguide=False)
     matholymprole.create(name='Invigilator', isadmin=True, secondaryok=False,
                          canguide=False)
+    matholymprole.create(name='Crew', isadmin=True, secondaryok=False,
+                         canguide=False)
+    matholymprole.create(name='Guest', isadmin=True, secondaryok=False,
+                         canguide=False)
+    matholymprole.create(name='Press', isadmin=True, secondaryok=False,
+                         canguide=False)
+    matholymprole.create(name='VIP', isadmin=True, secondaryok=False,
+                         canguide=False)
     for r in extra_admin_roles_secondaryok:
         matholymprole.create(name=r, isadmin=True, secondaryok=True,
                              canguide=False)
