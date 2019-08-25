@@ -577,6 +577,23 @@ class RoundupTestSession(object):
         """Select the main form from the current page."""
         self.b.select_form(self.get_main_form())
 
+    def workaround_ms_issue_242(self):
+        """Work around MechanicalSoup issue 242."""
+        # Dummy file upload to work around a MechanicalSoup issue when
+        # some field values are deliberately blank,
+        # <https://github.com/MechanicalSoup/MechanicalSoup/issues/242>).
+        form = self.b.get_current_form().form
+        dummy = form.find('input', attrs={'name': 'dummy'})
+        if dummy:
+            # Dummy input already present.
+            return
+        temp_file = tempfile.NamedTemporaryFile(dir=self.instance.temp_dir,
+                                                delete=False)
+        filename = temp_file.name
+        temp_file.close()
+        self.b.new_control('file', 'dummy', '')
+        self.b['dummy'] = filename
+
     def set(self, data):
         """Set the contents of fields in the selected form.
 
@@ -585,6 +602,7 @@ class RoundupTestSession(object):
 
         """
         form = self.b.get_current_form().form
+        any_empty = False
         for key in data:
             value = data[key]
             select = form.find('select', attrs={'name': key})
@@ -599,6 +617,10 @@ class RoundupTestSession(object):
                     new_value = new_value[0]
                 value = new_value
             self.b[key] = value
+            if value == '':
+                any_empty = True
+        if any_empty:
+            self.workaround_ms_issue_242()
 
     def create(self, cls, data, error=False, mail=False):
         """Create some kind of entity through the corresponding form."""
@@ -721,15 +743,7 @@ class RoundupTestSession(object):
         for num, score in enumerate(scores, start=1):
             if score is not None:
                 self.set({'%s%d' % (country_code, num): score})
-        # Dummy file upload to work around a MechanicalSoup issue when
-        # some scores are left blank,
-        # <https://github.com/MechanicalSoup/MechanicalSoup/issues/242>).
-        temp_file = tempfile.NamedTemporaryFile(dir=self.instance.temp_dir,
-                                                delete=False)
-        filename = temp_file.name
-        temp_file.close()
-        self.b.new_control('file', 'dummy', '')
-        self.set({'dummy': filename})
+        self.workaround_ms_issue_242()
         self.check_submit_selected(error=error)
 
 
@@ -1065,11 +1079,8 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
-        # Space rather than emptry string for emptying email to work
-        # around
-        # <https://github.com/MechanicalSoup/MechanicalSoup/issues/242>.
         admin_session.edit('country', '3',
-                           {'contact_email': ' '})
+                           {'contact_email': ''})
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv()
         reg_csv = reg_session.get_countries_csv()
@@ -2114,11 +2125,8 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country('DEF', 'Test Second Country',
                                      {'contact_email': 'DEF@example.invalid',
                                       'contact_extra': 'DEF2@example.invalid'})
-        # Space rather than emptry string for emptying email to work
-        # around
-        # <https://github.com/MechanicalSoup/MechanicalSoup/issues/242>.
-        admin_session.edit('country', '4', {'contact_email': ' ',
-                                            'contact_extra': ' '})
+        admin_session.edit('country', '4', {'contact_email': '',
+                                            'contact_extra': ''})
         expected_def = {'XMO Number': '2', 'Country Number': '4',
                         'Annual URL': self.instance.url + 'country4',
                         'Code': 'DEF', 'Name': 'Test Second Country',
@@ -6493,45 +6501,35 @@ class RegSystemTestCase(unittest.TestCase):
                                      'date_of_birth_month': 'January',
                                      'date_of_birth_day': '10'})
         # None of the failed edits should change the data for these
-        # people, except for photo URLs (photos uploaded to work
-        # around a MechanicalSoup issue,
-        # <https://github.com/MechanicalSoup/MechanicalSoup/issues/242>).
+        # people.
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         self.assertEqual(len(anon_csv), 1)
         self.assertEqual(len(admin_csv), 1)
         self.assertEqual(len(reg_csv), 1)
-        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
-                                                          'JPEG')
         admin_session.edit('person', '1',
-                           {'date_of_birth_year': '(year)',
-                            'photo-1@content': photo_filename},
+                           {'date_of_birth_year': '(year)'},
                            error='Required person property date_of_birth_year '
                            'not supplied')
         reg_session.edit('person', '1',
-                         {'date_of_birth_year': '(year)',
-                          'photo-1@content': photo_filename},
+                         {'date_of_birth_year': '(year)'},
                          error='Required person property date_of_birth_year '
                          'not supplied')
         admin_session.edit('person', '1',
-                           {'date_of_birth_month': '(month)',
-                            'photo-1@content': photo_filename},
+                           {'date_of_birth_month': '(month)'},
                            error='Required person property '
                            'date_of_birth_month not supplied')
         reg_session.edit('person', '1',
-                         {'date_of_birth_month': '(month)',
-                          'photo-1@content': photo_filename},
+                         {'date_of_birth_month': '(month)'},
                          error='Required person property date_of_birth_month '
                          'not supplied')
         admin_session.edit('person', '1',
-                           {'date_of_birth_day': '(day)',
-                            'photo-1@content': photo_filename},
+                           {'date_of_birth_day': '(day)'},
                            error='Required person property date_of_birth_day '
                            'not supplied')
         reg_session.edit('person', '1',
-                         {'date_of_birth_day': '(day)',
-                          'photo-1@content': photo_filename},
+                         {'date_of_birth_day': '(day)'},
                          error='Required person property date_of_birth_day '
                          'not supplied')
         anon_csv_2 = session.get_people_csv()
@@ -6542,24 +6540,12 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(reg_csv_2, reg_csv)
         # With @required not sent, the auditor restores the previous
         # values.
-        anon_csv = [{k: v for k, v in anon_csv[0].items()
-                     if 'Photo URL' not in k}]
-        admin_csv = [{k: v for k, v in admin_csv[0].items()
-                      if 'Photo URL' not in k}]
-        reg_csv = [{k: v for k, v in reg_csv[0].items()
-                    if 'Photo URL' not in k}]
         admin_session.edit('person', '1',
                            {'@required': '',
                             'date_of_birth_year': '(year)'})
         anon_csv_2 = session.get_people_csv()
         admin_csv_2 = admin_session.get_people_csv()
         reg_csv_2 = reg_session.get_people_csv()
-        anon_csv_2 = [{k: v for k, v in anon_csv_2[0].items()
-                       if 'Photo URL' not in k}]
-        admin_csv_2 = [{k: v for k, v in admin_csv_2[0].items()
-                        if 'Photo URL' not in k}]
-        reg_csv_2 = [{k: v for k, v in reg_csv_2[0].items()
-                      if 'Photo URL' not in k}]
         self.assertEqual(anon_csv_2, anon_csv)
         self.assertEqual(admin_csv_2, admin_csv)
         self.assertEqual(reg_csv_2, reg_csv)
@@ -6569,12 +6555,6 @@ class RegSystemTestCase(unittest.TestCase):
         anon_csv_2 = session.get_people_csv()
         admin_csv_2 = admin_session.get_people_csv()
         reg_csv_2 = reg_session.get_people_csv()
-        anon_csv_2 = [{k: v for k, v in anon_csv_2[0].items()
-                       if 'Photo URL' not in k}]
-        admin_csv_2 = [{k: v for k, v in admin_csv_2[0].items()
-                        if 'Photo URL' not in k}]
-        reg_csv_2 = [{k: v for k, v in reg_csv_2[0].items()
-                      if 'Photo URL' not in k}]
         self.assertEqual(anon_csv_2, anon_csv)
         self.assertEqual(admin_csv_2, admin_csv)
         self.assertEqual(reg_csv_2, reg_csv)
@@ -6584,12 +6564,6 @@ class RegSystemTestCase(unittest.TestCase):
         anon_csv_2 = session.get_people_csv()
         admin_csv_2 = admin_session.get_people_csv()
         reg_csv_2 = reg_session.get_people_csv()
-        anon_csv_2 = [{k: v for k, v in anon_csv_2[0].items()
-                       if 'Photo URL' not in k}]
-        admin_csv_2 = [{k: v for k, v in admin_csv_2[0].items()
-                        if 'Photo URL' not in k}]
-        reg_csv_2 = [{k: v for k, v in reg_csv_2[0].items()
-                      if 'Photo URL' not in k}]
         self.assertEqual(anon_csv_2, anon_csv)
         self.assertEqual(admin_csv_2, admin_csv)
         self.assertEqual(reg_csv_2, reg_csv)
@@ -6599,12 +6573,6 @@ class RegSystemTestCase(unittest.TestCase):
         anon_csv_2 = session.get_people_csv()
         admin_csv_2 = admin_session.get_people_csv()
         reg_csv_2 = reg_session.get_people_csv()
-        anon_csv_2 = [{k: v for k, v in anon_csv_2[0].items()
-                       if 'Photo URL' not in k}]
-        admin_csv_2 = [{k: v for k, v in admin_csv_2[0].items()
-                        if 'Photo URL' not in k}]
-        reg_csv_2 = [{k: v for k, v in reg_csv_2[0].items()
-                      if 'Photo URL' not in k}]
         self.assertEqual(anon_csv_2, anon_csv)
         self.assertEqual(admin_csv_2, admin_csv)
         self.assertEqual(reg_csv_2, reg_csv)
@@ -6614,12 +6582,6 @@ class RegSystemTestCase(unittest.TestCase):
         anon_csv_2 = session.get_people_csv()
         admin_csv_2 = admin_session.get_people_csv()
         reg_csv_2 = reg_session.get_people_csv()
-        anon_csv_2 = [{k: v for k, v in anon_csv_2[0].items()
-                       if 'Photo URL' not in k}]
-        admin_csv_2 = [{k: v for k, v in admin_csv_2[0].items()
-                        if 'Photo URL' not in k}]
-        reg_csv_2 = [{k: v for k, v in reg_csv_2[0].items()
-                      if 'Photo URL' not in k}]
         self.assertEqual(anon_csv_2, anon_csv)
         self.assertEqual(admin_csv_2, admin_csv)
         self.assertEqual(reg_csv_2, reg_csv)
@@ -6629,12 +6591,6 @@ class RegSystemTestCase(unittest.TestCase):
         anon_csv_2 = session.get_people_csv()
         admin_csv_2 = admin_session.get_people_csv()
         reg_csv_2 = reg_session.get_people_csv()
-        anon_csv_2 = [{k: v for k, v in anon_csv_2[0].items()
-                       if 'Photo URL' not in k}]
-        admin_csv_2 = [{k: v for k, v in admin_csv_2[0].items()
-                        if 'Photo URL' not in k}]
-        reg_csv_2 = [{k: v for k, v in reg_csv_2[0].items()
-                      if 'Photo URL' not in k}]
         self.assertEqual(anon_csv_2, anon_csv)
         self.assertEqual(admin_csv_2, admin_csv)
         self.assertEqual(reg_csv_2, reg_csv)
@@ -7552,17 +7508,8 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv[1]['Departure Date'], '2015-04-02')
         self.assertEqual(admin_csv[1]['Departure Time'], '09:45')
         admin_session.select_main_form()
-        # It should not be necessary to upload a photo here, but
-        # MechanicalSoup ignores the specified enctype, resulting in
-        # an application/x-www-form-urlencoded submission, and
-        # Python's cgi module defaults to ignoring blank fields in
-        # such submissions, whereas the blank fields are required here
-        # for the correct semantics.
-        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
-                                                         'JPEG')
         admin_session.set({'arrival_time_hour': '(hour)',
-                           'departure_date': '(date)',
-                           'photo-1@content': photo_filename})
+                           'departure_date': '(date)'})
         admin_session.check_submit_selected()
         admin_csv = admin_session.get_people_csv()
         self.assertEqual(len(admin_csv), 2)
@@ -7636,16 +7583,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv[1]['Date of Birth'], '')
         self.assertEqual(admin_csv[2]['Date of Birth'], '2001-02-20')
         admin_session.select_main_form()
-        # It should not be necessary to upload a photo here, but
-        # MechanicalSoup ignores the specified enctype, resulting in
-        # an application/x-www-form-urlencoded submission, and
-        # Python's cgi module defaults to ignoring blank fields in
-        # such submissions, whereas the blank fields are required here
-        # for the correct semantics.
-        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
-                                                         'JPEG')
-        admin_session.set({'date_of_birth_day': '(day)',
-                           'photo-1@content': photo_filename})
+        admin_session.set({'date_of_birth_day': '(day)'})
         admin_session.check_submit_selected()
         admin_csv = admin_session.get_people_csv()
         self.assertEqual(len(admin_csv), 3)
