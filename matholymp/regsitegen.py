@@ -278,7 +278,10 @@ class RegSiteGenerator(SiteGenerator):
             for role in sorted(expected_roles.keys()):
                 missing = expected_roles[role] - have_roles[role]
                 if missing > 0:
-                    missing_roles += [role] * missing
+                    if missing > 1:
+                        missing_roles.append('%s (x%d)' % (role, missing))
+                    else:
+                        missing_roles.append(role)
             if missing_roles:
                 ret_text += ('<p>Not registered from <strong>%s</strong>:'
                              ' %s.</p>\n'
