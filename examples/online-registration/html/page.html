@@ -65,6 +65,9 @@ columns string:id;
    <span tal:condition="python:request.user.hasPermission('Score')">
     <a href="person?@template=scoreselect"  i18n:translate="">Enter scores</a><br>
    </span>
+   <span tal:condition="python:utils.show_prereg_sidebar(db._db, request.user.id)">
+    <a tal:attributes="href python:'country%s?@template=prereg' % request.user.country.id" i18n:translate="">Confirm expected numbers of participants and single room requests</a><br>
+   </span>
    <span tal:condition="python:request.user.hasPermission('Create',
 			'person') and
 			request.user.hasPermission('RegisterAllCountries')">
@@ -156,6 +159,9 @@ columns string:id;
        tal:content="structure string:$m <br/ > " />
      <a class="form-small" tal:attributes="href request/current_url"
         i18n:translate="">clear this message</a>
+  </p>
+  <p tal:condition="python:utils.show_prereg_reminder(db._db, request.user.id)">
+  <strong>Please <a tal:attributes="href python:'country%s?@template=prereg' % request.user.country.id">confirm the expected numbers of participants and single room requests</a> for your country.</strong>
   </p>
 
  <table>

@@ -758,6 +758,14 @@ class RoundupTestSession(object):
         self.workaround_ms_issue_242()
         self.check_submit_selected(error=error)
 
+    def edit_prereg(self, entity_id, data, error=False, mail=False):
+        """Edit preregistration data through the corresponding form."""
+        self.check_open_relative('country%s?@template=prereg'
+                                 % entity_id)
+        self.select_main_form()
+        self.set(data)
+        self.check_submit_selected(error=error, mail=mail)
+
 
 def _with_config(**kwargs):
     """A decorator to add a config attribute to a test method."""
@@ -865,9 +873,12 @@ class RegSystemTestCase(unittest.TestCase):
         Test that all page templates load without errors, for the admin user.
         """
         session = self.get_session('admin')
+        # This one gives an error when used without a particular
+        # country specified.
+        forbid_templates={'country.prereg.html'}
         self.all_templates_test(session, forbid_classes=set(),
-                                forbid_templates=set(), allow_templates=set(),
-                                can_score=True)
+                                forbid_templates=forbid_templates,
+                                allow_templates=set(), can_score=True)
 
     def test_all_templates_anon(self):
         """
@@ -896,7 +907,8 @@ class RegSystemTestCase(unittest.TestCase):
         session = self.get_session('scoring')
         forbid_classes = {'event', 'rss', 'arrival', 'consent_form', 'gender',
                           'language', 'tshirt'}
-        forbid_templates = {'country.retireconfirm.html',
+        forbid_templates = {'country.prereg.html',
+                            'country.retireconfirm.html',
                             'person.retireconfirm.html',
                             'person.rooms.html',
                             'person.status.html'}
@@ -914,7 +926,8 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country_generic()
         session = self.get_session('ABC_reg')
         forbid_classes = {'event', 'rss'}
-        forbid_templates = {'country.retireconfirm.html',
+        forbid_templates = {'country.prereg.html',
+                            'country.retireconfirm.html',
                             'person.retireconfirm.html',
                             'person.rooms.html',
                             'person.scoreenter.html',
@@ -2514,6 +2527,139 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff])
 
+    def test_country_edit_audit_errors_prereg(self):
+        """
+        Test errors from country edit auditor, preregistration case.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        reg_session.edit_prereg('3',
+                                {'expected_leaders': '2'},
+                                error='Invalid expected number of Leaders')
+        reg_session.edit_prereg('3',
+                                {'expected_leaders': '-1'},
+                                error='Invalid expected number of Leaders')
+        reg_session.edit_prereg('3',
+                                {'expected_leaders': '01'},
+                                error='Invalid expected number of Leaders')
+        reg_session.edit_prereg('3',
+                                {'expected_leaders': '1x'},
+                                error='Invalid expected number of Leaders')
+        reg_session.edit_prereg('3',
+                                {'expected_deputies': '2'},
+                                error='Invalid expected number of Deputy '
+                                'Leaders')
+        reg_session.edit_prereg('3',
+                                {'expected_deputies': '-1'},
+                                error='Invalid expected number of Deputy '
+                                'Leaders')
+        reg_session.edit_prereg('3',
+                                {'expected_deputies': '01'},
+                                error='Invalid expected number of Deputy '
+                                'Leaders')
+        reg_session.edit_prereg('3',
+                                {'expected_deputies': '1x'},
+                                error='Invalid expected number of Deputy '
+                                'Leaders')
+        reg_session.edit_prereg('3',
+                                {'expected_contestants': '7'},
+                                error='Invalid expected number of Contestants')
+        reg_session.edit_prereg('3',
+                                {'expected_contestants': '-1'},
+                                error='Invalid expected number of Contestants')
+        reg_session.edit_prereg('3',
+                                {'expected_contestants': '01'},
+                                error='Invalid expected number of Contestants')
+        reg_session.edit_prereg('3',
+                                {'expected_contestants': '1x'},
+                                error='Invalid expected number of Contestants')
+        reg_session.edit_prereg('3',
+                                {'expected_observers_a': '-1'},
+                                error='Invalid expected number of Observers '
+                                'with Leader')
+        reg_session.edit_prereg('3',
+                                {'expected_observers_a': '01'},
+                                error='Invalid expected number of Observers '
+                                'with Leader')
+        reg_session.edit_prereg('3',
+                                {'expected_observers_a': '1x'},
+                                error='Invalid expected number of Observers '
+                                'with Leader')
+        reg_session.edit_prereg('3',
+                                {'expected_observers_b': '-1'},
+                                error='Invalid expected number of Observers '
+                                'with Deputy')
+        reg_session.edit_prereg('3',
+                                {'expected_observers_b': '01'},
+                                error='Invalid expected number of Observers '
+                                'with Deputy')
+        reg_session.edit_prereg('3',
+                                {'expected_observers_b': '1x'},
+                                error='Invalid expected number of Observers '
+                                'with Deputy')
+        reg_session.edit_prereg('3',
+                                {'expected_observers_c': '-1'},
+                                error='Invalid expected number of Observers '
+                                'with Contestants')
+        reg_session.edit_prereg('3',
+                                {'expected_observers_c': '01'},
+                                error='Invalid expected number of Observers '
+                                'with Contestants')
+        reg_session.edit_prereg('3',
+                                {'expected_observers_c': '1x'},
+                                error='Invalid expected number of Observers '
+                                'with Contestants')
+        reg_session.edit_prereg('3',
+                                {'expected_single_rooms': '-1'},
+                                error='Invalid expected number of single room '
+                                'requests')
+        reg_session.edit_prereg('3',
+                                {'expected_single_rooms': '01'},
+                                error='Invalid expected number of single room '
+                                'requests')
+        reg_session.edit_prereg('3',
+                                {'expected_single_rooms': '1x'},
+                                error='Invalid expected number of single room '
+                                'requests')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        self.assertEqual(anon_csv,
+                         [expected_abc, expected_staff])
+        expected_abc_admin = expected_abc.copy()
+        expected_abc_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '1',
+             'Expected Deputies': '1',
+             'Expected Contestants': '6',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'No'})
+        expected_staff_admin = expected_staff.copy()
+        expected_staff_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '0',
+             'Expected Deputies': '0',
+             'Expected Contestants': '0',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'Yes'})
+        self.assertEqual(admin_csv,
+                         [expected_abc_admin, expected_staff_admin])
+
     def test_country_no_participants_access(self):
         """
         Test access to no-participants countries.
@@ -2530,6 +2676,88 @@ class RegSystemTestCase(unittest.TestCase):
         session.check_open_relative('country4', login=True)
         reg_session.check_open_relative('country4', login=True)
         admin_session.check_open_relative('country4')
+
+    def test_country_prereg(self):
+        """
+        Test preregistration of expected number of participants.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        expected_staff_admin = expected_staff.copy()
+        expected_staff_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '0',
+             'Expected Deputies': '0',
+             'Expected Contestants': '0',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'Yes'})
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff_admin])
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        expected_abc_admin = expected_abc.copy()
+        expected_abc_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '1',
+             'Expected Deputies': '1',
+             'Expected Contestants': '6',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'No'})
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # Test editing preregistration data.
+        reg_session.edit_prereg('3',
+                                {'expected_deputies': '0',
+                                 'expected_contestants': '3',
+                                 'expected_observers_a': '5',
+                                 'expected_observers_b': '7',
+                                 'expected_observers_c': '11',
+                                 'expected_single_rooms': '13'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc_admin.update(
+            {'Expected Deputies': '0',
+             'Expected Contestants': '3',
+             'Expected Observers with Leader': '5',
+             'Expected Observers with Deputy': '7',
+             'Expected Observers with Contestants': '11',
+             'Expected Single Rooms': '13',
+             'Expected Numbers Confirmed': 'Yes'})
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        reg_session.edit_prereg('3',
+                                {'expected_leaders': '0',
+                                 'expected_deputies': '1'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc_admin['Expected Leaders'] = '0'
+        expected_abc_admin['Expected Deputies'] = '1'
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
 
     def test_country_scores_rss_errors(self):
         """

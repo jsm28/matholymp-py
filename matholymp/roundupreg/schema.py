@@ -406,6 +406,23 @@ def init_schema(env):
                                   check=own_country_consent_form)
     db.security.addPermissionToRole('Register', p)
 
+    def own_country(db, userid, itemid):
+        """Determine whether the userid matches the country being accessed."""
+        return db.user.get(userid, 'country') == itemid
+
+    # Registering users can view and edit the preregistration data for
+    # their own country.
+    prereg_props = ('expected_leaders', 'expected_deputies',
+                    'expected_contestants', 'expected_observers_a',
+                    'expected_observers_b', 'expected_observers_c',
+                    'expected_single_rooms', 'expected_numbers_confirmed')
+    p = db.security.addPermission(name='View', klass='country',
+                                  check=own_country, properties=prereg_props)
+    db.security.addPermissionToRole('Register', p)
+    p = db.security.addPermission(name='Edit', klass='country',
+                                  check=own_country, properties=prereg_props)
+    db.security.addPermissionToRole('Register', p)
+
     # Entering scores has its own Permission and Role.
     p = db.security.addPermission(name='Score')
     db.security.addPermissionToRole('Admin', p)

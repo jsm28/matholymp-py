@@ -53,12 +53,12 @@ define="edit_ok context/is_edit_ok"
   normal_input templates/page/macros/user_normal_input;
   edit_ok context/is_edit_ok;
   ">
- <tr tal:define="name string:code; label string:Code; value context/code; edit_ok edit_ok">
+ <tr tal:define="name string:code; label string:Code; value context/code; edit_ok context/code/is_edit_ok">
   <th class="required" metal:use-macro="th_label">Code</th>
   <td><input name="code" metal:use-macro="normal_input"></td>
  </tr>
 
- <tr tal:define="name string:name; label string:Name; value context/name; edit_ok edit_ok">
+ <tr tal:define="name string:name; label string:Name; value context/name; edit_ok context/name/is_edit_ok">
   <th class="required" metal:use-macro="th_label">Name</th>
   <td><input name="name" metal:use-macro="normal_input"></td>
  </tr>
@@ -200,9 +200,7 @@ define="edit_ok context/is_edit_ok"
   </tal:if>
  </tr>
 
-</tal:block>
-
- <tr tal:condition="edit_ok">
+ <tr>
   <td>
    &nbsp;
    <input type="hidden" name="@template" value="item">
@@ -217,6 +215,8 @@ define="edit_ok context/is_edit_ok"
     <input type=reset>
   </td>
  </tr>
+
+</tal:block>
 </table>
 </form>
 

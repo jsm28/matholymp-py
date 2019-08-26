@@ -42,7 +42,8 @@ __all__ = ['people_from_country_internal', 'people_from_country',
            'has_consent_for_photo', 'string_select', 'date_of_birth_select',
            'arrdep_date_select', 'arrdep_time_select', 'photo_consent_select',
            'score_country_select', 'required_person_fields',
-           'register_templating_utils']
+           'register_templating_utils', 'show_prereg_sidebar',
+           'show_prereg_reminder']
 
 import cgi
 import datetime
@@ -406,6 +407,29 @@ def required_person_fields(db):
     return req
 
 
+def show_prereg_sidebar(db, userid):
+    """Return whether to show the preregistration link in the sidebar."""
+    # The preregistration link is always for one's own country.
+    # Administrative users can edit the data via the general country
+    # edit page.
+    country = db.user.get(userid, 'country')
+    # The data collected in preregistration is mostly only relevant
+    # for normal countries (mainly numbers of participants in
+    # non-staff roles).
+    if not db.country.get(country, 'is_normal'):
+        return False
+    return db.security.hasPermission('Edit', userid, 'country',
+                                     'expected_numbers_confirmed', country)
+
+
+def show_prereg_reminder(db, userid):
+    """Return whether to show the preregistration reminder on all pages."""
+    if not show_prereg_sidebar(db, userid):
+        return False
+    country = db.user.get(userid, 'country')
+    return not db.country.get(country, 'expected_numbers_confirmed')
+
+
 def register_templating_utils(instance):
     """Register functions for use from page templates with Roundup."""
     instance.registerUtil('distinguish_official', distinguish_official)
@@ -448,3 +472,5 @@ def register_templating_utils(instance):
     instance.registerUtil('photo_consent_select', photo_consent_select)
     instance.registerUtil('score_country_select', score_country_select)
     instance.registerUtil('required_person_fields', required_person_fields)
+    instance.registerUtil('show_prereg_sidebar', show_prereg_sidebar)
+    instance.registerUtil('show_prereg_reminder', show_prereg_reminder)

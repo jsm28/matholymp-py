@@ -1,0 +1,97 @@
+<tal:doc metal:use-macro="templates/page/macros/icing"
+define="edit_ok context/is_edit_ok"
+>
+<title metal:fill-slot="head_title">Confirm expected numbers of participants and single room requests -
+<tal:x content="config/TRACKER_NAME" /></title>
+<metal:slot fill-slot="more-javascript">
+<script metal:use-macro="templates/page/macros/user_utils"></script>
+<script type="text/javascript" src="@@file/help_controls.js"></script>
+</metal:slot>
+<tal:block metal:fill-slot="body_title"
+  define="edit_ok context/is_edit_ok">Confirm expected numbers of participants and single room requests</tal:block>
+
+<td class="content" metal:fill-slot="content">
+
+<p tal:condition="python:not ((context.id
+ and request.user.hasPermission('Edit', 'country',
+ 'expected_numbers_confirmed', context.id))
+ or request.user.hasRole('Anonymous'))" i18n:translate="">
+ You are not allowed to view this page.</p>
+
+<p tal:condition="python:context.id
+ and not request.user.hasPermission('Edit', 'country',
+ 'expected_numbers_confirmed', context.id)
+ and request.user.hasRole('Anonymous')" i18n:translate="">
+ Please login with your username and password.</p>
+
+<div tal:condition="python:context.id
+ and request.user.hasPermission('Edit', 'country',
+ 'expected_numbers_confirmed', context.id)">
+
+<form method="POST"
+      name="itemSynopsis"
+      tal:define="required python:()"
+      enctype="multipart/form-data"
+      tal:attributes="action context/designator;
+      ">
+<table class="form" tal:define="
+  th_label templates/page/macros/th_label;
+  normal_input templates/page/macros/user_normal_input;
+  edit_ok context/is_edit_ok;
+  ">
+
+ <tr tal:define="name string:expected_leaders; label string:Expected number of Leaders; value context/expected_leaders; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Expected number of Leaders</th>
+  <td><input name="code" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:define="name string:expected_deputies; label string:Expected number of Deputy Leaders; value context/expected_deputies; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Expected number of Deputy Leaders</th>
+  <td><input name="code" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:define="name string:expected_contestants; label string:Expected number of Contestants; value context/expected_contestants; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Expected number of Contestants</th>
+  <td><input name="code" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:define="name string:expected_observers_a; label string:Expected number of Observers with Leader; value context/expected_observers_a; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Expected number of Observers with Leader</th>
+  <td><input name="code" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:define="name string:expected_observers_b; label string:Expected number of Observers with Deputy; value context/expected_observers_b; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Expected number of Observers with Deputy</th>
+  <td><input name="code" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:define="name string:expected_observers_c; label string:Expected number of Observers with Contestants; value context/expected_observers_c; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Expected number of Observers with Contestants</th>
+  <td><input name="code" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr tal:define="name string:expected_single_rooms; label string:Expected number of single room requests; value context/expected_single_rooms; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Expected number of single room requests</th>
+  <td><input name="code" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr>
+  <td>
+   &nbsp;
+   <input type="hidden" name="expected_numbers_confirmed" value="yes">
+   <input type="hidden" name="@action" value="edit">
+   <input type="hidden" name="@template" value="prereg">
+  </td>
+  <td><input name="@csrf" type="hidden"
+       tal:attributes="value python:utils.anti_csrf_nonce()">
+<input type="submit" value="Confirm these numbers of participants">
+  </td>
+ </tr>
+</table>
+</form>
+
+</div>
+
+</td>
+
+</tal:doc>
