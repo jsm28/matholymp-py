@@ -8659,6 +8659,257 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(score_csv, admin_csv)
         self.assertEqual(score_csv_p, admin_csv)
 
+    def test_person_score_errors(self):
+        """
+        Test errors entering scores.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_scoring_user()
+        score_session = self.get_session('scoring')
+        admin_session.create_country_generic()
+        admin_session.create_person('Test First Country', 'Contestant 1')
+        admin_session.edit('event', '1', {'registration_enabled': 'no'})
+        # Error using score action via GET request.
+        admin_session.check_open_relative('person?@action=score',
+                                          error='Invalid request')
+        score_session.check_open_relative('person?@action=score',
+                                          error='Invalid request')
+        # Error entering scores after medal boundaries are set.
+        admin_session.enter_scores('Test First Country', 'ABC', '1', ['0'])
+        score_session.enter_scores('Test First Country', 'ABC', '2', ['0'])
+        admin_session.enter_scores('Test First Country', 'ABC', '3', ['0'])
+        score_session.enter_scores('Test First Country', 'ABC', '4', ['0'])
+        admin_session.enter_scores('Test First Country', 'ABC', '5', ['0'])
+        score_session.enter_scores('Test First Country', 'ABC', '6', ['0'])
+        admin_session.edit('event', '1',
+                           {'gold': '40', 'silver': '30', 'bronze': '20'})
+        admin_session.check_open_relative('person?@template=scoreselect')
+        admin_session.select_main_form()
+        admin_session.set({'country': 'Test First Country', 'problem': '1'})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.set({'ABC1': '0'})
+        admin_session.check_submit_selected(error='Scores cannot be entered '
+                                            'after medal boundaries are set',
+                                            status=403)
+        score_session.check_open_relative('person?@template=scoreselect')
+        score_session.select_main_form()
+        score_session.set({'country': 'Test First Country', 'problem': '3'})
+        score_session.check_submit_selected()
+        score_session.select_main_form()
+        score_session.set({'ABC1': '1'})
+        score_session.check_submit_selected(error='Scores cannot be entered '
+                                            'after medal boundaries are set',
+                                            status=403)
+        # Error entering scores with registration enabled.
+        admin_session.edit('event', '1',
+                           {'registration_enabled': 'yes',
+                            'gold': '', 'silver': '', 'bronze': ''})
+        admin_session.check_open_relative('person?@template=scoreselect')
+        admin_session.select_main_form()
+        admin_session.set({'country': 'Test First Country', 'problem': '1'})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.set({'ABC1': '0'})
+        admin_session.check_submit_selected(error='Registration must be '
+                                            'disabled before scores are '
+                                            'entered',
+                                            status=403)
+        score_session.check_open_relative('person?@template=scoreselect')
+        score_session.select_main_form()
+        score_session.set({'country': 'Test First Country', 'problem': '2'})
+        score_session.check_submit_selected()
+        score_session.select_main_form()
+        score_session.set({'ABC1': '1'})
+        score_session.check_submit_selected(error='Registration must be '
+                                            'disabled before scores are '
+                                            'entered',
+                                            status=403)
+        admin_session.edit('event', '1', {'registration_enabled': 'no'})
+        # Errors applying action to bad class or with id specified
+        # (requires modifying the form to exercise).
+        admin_session.check_open_relative('person?@template=scoreselect')
+        admin_session.select_main_form()
+        admin_session.set({'country': 'Test First Country', 'problem': '1'})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.set({'ABC1': '7'})
+        form = admin_session.get_main_form()
+        form['action'] = 'country'
+        admin_session.set({'@template': 'index'})
+        admin_session.check_submit_selected(error='Scores can only be entered '
+                                            'for people')
+        score_session.check_open_relative('person?@template=scoreselect')
+        score_session.select_main_form()
+        score_session.set({'country': 'Test First Country', 'problem': '1'})
+        score_session.check_submit_selected()
+        score_session.select_main_form()
+        score_session.set({'ABC1': '7'})
+        form = score_session.get_main_form()
+        form['action'] = 'country'
+        score_session.set({'@template': 'index'})
+        score_session.check_submit_selected(error='Scores can only be entered '
+                                            'for people')
+        admin_session.check_open_relative('person?@template=scoreselect')
+        admin_session.select_main_form()
+        admin_session.set({'country': 'Test First Country', 'problem': '1'})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.set({'ABC1': '7'})
+        form = admin_session.get_main_form()
+        form['action'] = 'person1'
+        admin_session.set({'@template': 'item'})
+        admin_session.check_submit_selected(error='Node id specified when '
+                                            'entering scores')
+        score_session.check_open_relative('person?@template=scoreselect')
+        score_session.select_main_form()
+        score_session.set({'country': 'Test First Country', 'problem': '1'})
+        score_session.check_submit_selected()
+        score_session.select_main_form()
+        score_session.set({'ABC1': '7'})
+        form = score_session.get_main_form()
+        form['action'] = 'person1'
+        score_session.set({'@template': 'item'})
+        score_session.check_submit_selected(error='Node id specified when '
+                                            'entering scores')
+        # Invalid country specified.
+        admin_session.check_open_relative('person?@template=scoreselect')
+        admin_session.select_main_form()
+        admin_session.set({'country': 'Test First Country', 'problem': '1'})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.set({'country': '1', 'ABC1': '7'})
+        admin_session.check_submit_selected(error='Country or problem invalid '
+                                            'or not specified')
+        score_session.check_open_relative('person?@template=scoreselect')
+        score_session.select_main_form()
+        score_session.set({'country': 'Test First Country', 'problem': '1'})
+        score_session.check_submit_selected()
+        score_session.select_main_form()
+        score_session.set({'country': '1', 'ABC1': '7'})
+        score_session.check_submit_selected(error='Country or problem invalid '
+                                            'or not specified')
+        # Missing country.
+        admin_session.check_open_relative('person?@template=scoreselect')
+        admin_session.select_main_form()
+        admin_session.set({'country': 'Test First Country', 'problem': '1'})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.set({'ABC1': '7'})
+        form = admin_session.get_main_form()
+        country_input = form.find('input', attrs={'name': 'country'})
+        country_input.extract()
+        admin_session.check_submit_selected(error='Country or problem invalid '
+                                            'or not specified')
+        score_session.check_open_relative('person?@template=scoreselect')
+        score_session.select_main_form()
+        score_session.set({'country': 'Test First Country', 'problem': '1'})
+        score_session.check_submit_selected()
+        score_session.select_main_form()
+        score_session.set({'ABC1': '7'})
+        form = score_session.get_main_form()
+        country_input = form.find('input', attrs={'name': 'country'})
+        country_input.extract()
+        score_session.check_submit_selected(error='Country or problem invalid '
+                                            'or not specified')
+        # Invalid problem specified.
+        admin_session.check_open_relative('person?@template=scoreselect')
+        admin_session.select_main_form()
+        admin_session.set({'country': 'Test First Country', 'problem': '1'})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.set({'problem': '-1', 'ABC1': '7'})
+        admin_session.check_submit_selected(error='Country or problem invalid '
+                                            'or not specified')
+        score_session.check_open_relative('person?@template=scoreselect')
+        score_session.select_main_form()
+        score_session.set({'country': 'Test First Country', 'problem': '1'})
+        score_session.check_submit_selected()
+        score_session.select_main_form()
+        score_session.set({'problem': '0', 'ABC1': '7'})
+        score_session.check_submit_selected(error='Country or problem invalid '
+                                            'or not specified')
+        admin_session.check_open_relative('person?@template=scoreselect')
+        admin_session.select_main_form()
+        admin_session.set({'country': 'Test First Country', 'problem': '1'})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.set({'problem': '7', 'ABC1': '7'})
+        admin_session.check_submit_selected(error='Country or problem invalid '
+                                            'or not specified')
+        # Missing problem.
+        admin_session.check_open_relative('person?@template=scoreselect')
+        admin_session.select_main_form()
+        admin_session.set({'country': 'Test First Country', 'problem': '1'})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.set({'ABC1': '7'})
+        form = admin_session.get_main_form()
+        problem_input = form.find('input', attrs={'name': 'problem'})
+        problem_input.extract()
+        admin_session.check_submit_selected(error='Country or problem invalid '
+                                            'or not specified')
+        score_session.check_open_relative('person?@template=scoreselect')
+        score_session.select_main_form()
+        score_session.set({'country': 'Test First Country', 'problem': '1'})
+        score_session.check_submit_selected()
+        score_session.select_main_form()
+        score_session.set({'ABC1': '7'})
+        form = score_session.get_main_form()
+        problem_input = form.find('input', attrs={'name': 'problem'})
+        problem_input.extract()
+        score_session.check_submit_selected(error='Country or problem invalid '
+                                            'or not specified')
+        # Missing score.
+        admin_session.check_open_relative('person?@template=scoreselect')
+        admin_session.select_main_form()
+        admin_session.set({'country': 'Test First Country', 'problem': '1'})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.set({'ABC1': '7'})
+        form = admin_session.get_main_form()
+        abc1_input = form.find('input', attrs={'name': 'ABC1'})
+        abc1_input.extract()
+        admin_session.check_submit_selected(error='No score specified for '
+                                            'ABC1')
+        score_session.check_open_relative('person?@template=scoreselect')
+        score_session.select_main_form()
+        score_session.set({'country': 'Test First Country', 'problem': '1'})
+        score_session.check_submit_selected()
+        score_session.select_main_form()
+        score_session.set({'ABC1': '7'})
+        form = score_session.get_main_form()
+        abc1_input = form.find('input', attrs={'name': 'ABC1'})
+        abc1_input.extract()
+        score_session.check_submit_selected(error='No score specified for '
+                                            'ABC1')
+        # Invalid score.
+        admin_session.enter_scores('Test First Country', 'ABC', '1', ['-1'],
+                                   error='Invalid score specified for ABC1')
+        admin_session.enter_scores('Test First Country', 'ABC', '1', ['8'],
+                                   error='Invalid score specified for ABC1')
+        # All these failed edits should not have changed the all-0
+        # scores entered earlier.
+        admin_csv = admin_session.get_scores_csv()
+        admin_csv_p = admin_session.get_people_csv_scores()
+        anon_csv = session.get_scores_csv()
+        anon_csv_p = session.get_people_csv_scores()
+        score_csv = score_session.get_scores_csv()
+        score_csv_p = score_session.get_people_csv_scores()
+        self.assertEqual(admin_csv,
+                         [{'Country Name': 'Test First Country',
+                           'Country Code': 'ABC', 'Contestant Code': 'ABC1',
+                           'Given Name': 'Given 1', 'Family Name': 'Family 1',
+                           'P1': '0', 'P2': '0', 'P3': '0',
+                           'P4': '0', 'P5': '0', 'P6': '0',
+                           'Total': '0', 'Award': '', 'Extra Awards': ''}])
+        self.assertEqual(admin_csv_p, admin_csv)
+        self.assertEqual(anon_csv, admin_csv)
+        self.assertEqual(anon_csv_p, admin_csv)
+        self.assertEqual(score_csv, admin_csv)
+        self.assertEqual(score_csv_p, admin_csv)
+
     def test_event_medal_boundaries_csv_errors(self):
         """
         Test errors from medal_boundaries_csv action.
