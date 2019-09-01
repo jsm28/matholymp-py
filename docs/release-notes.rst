@@ -256,6 +256,16 @@ the registration system is not active.
 * The default roles available in the registration system now include
   "Crew", "Guest", "Press" and "VIP".
 
+* Requests for single rooms can now be made through the registration
+  system; the available types of rooms, generally and for particular
+  roles, can be configured online.  There are five new configuration
+  variables that must be specified in :file:`extensions/config.ini`
+  for the registration system: ``matholymp_initial_room_types``,
+  ``matholymp_initial_room_types_non_contestant``,
+  ``matholymp_initial_room_types_contestant``,
+  ``matholymp_initial_default_room_type_non_contestant`` and
+  ``matholymp_initial_default_room_type_contestant``.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

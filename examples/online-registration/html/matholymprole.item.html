@@ -43,7 +43,7 @@ define="edit_ok context/is_edit_ok"
 
 <form method="POST"
       name="itemSynopsis"
-      tal:define="required python:'name'.split()"
+      tal:define="required python:'name default_room_type'.split()"
       enctype="multipart/form-data"
       tal:attributes="action context/designator;
       onSubmit python:'return checkRequiredFields(\'%s\')'%'\', \''.join(required);
@@ -85,11 +85,22 @@ define="edit_ok context/is_edit_ok"
   </tal:if>
  </tr>
 
+ <tr tal:define="name string:room_types; label string:Room types; value context/room_types; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Room types</th>
+  <td tal:content="structure context/room_types/menu">room_types</td>
+ </tr>
+
+ <tr tal:define="name string:default_room_type; label string:Default room type; value context/default_room_type; edit_ok edit_ok">
+  <th class="required" metal:use-macro="th_label">Default room type</th>
+  <td tal:content="structure python:context.default_room_type.menu(html_kwargs =
+  { 'id' : 'default_room_type' })">default_room_type</td>
+ </tr>
+
  <tr tal:condition="edit_ok">
   <td>
    &nbsp;
    <input type="hidden" name="@template" value="item">
-   <input type="hidden" name="@required" value="name,isadmin,secondaryok,canguide"
+   <input type="hidden" name="@required" value="name,isadmin,secondaryok,canguide,default_room_type"
           tal:attributes="value python:','.join(required)">
   </td>
   <td><input type="submit" value="save" tal:replace="structure context/submit"><!--submit button here-->

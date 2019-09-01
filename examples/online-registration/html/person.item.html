@@ -289,6 +289,20 @@ please inform the people you register of this information.
  </tr>
 </tal:block>
 
+ <tr tal:define="name string:room_type; label string:Preferred room type; value context/room_type; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label">Preferred room type</th>
+  <td tal:content="structure python:context.room_type.menu(html_kwargs =
+  { 'id' : 'room_type' })">room_type">room_type</td>
+ </tr>
+
+<tal:block tal:condition="context/is_edit_ok">
+ <tr>
+  <td colspan="2">Please see the regulations or consult the organisers
+  regarding availability of single rooms and associated fees and
+  deadlines, and consult the organisers for any special requests.</td>
+ </tr>
+</tal:block>
+
  <tr tal:define="name string:room_number; label string:Room number; value context/room_number; edit_ok context/room_number/is_edit_ok" tal:condition="context/is_edit_ok">
   <th metal:use-macro="th_label">Room number</th>
   <td><input name="room_number" metal:use-macro="normal_input"></td>

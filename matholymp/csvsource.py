@@ -223,6 +223,7 @@ class CSVDataSource(DataSource):
                                   'photo_url': 'Photo URL',
                                   'badge_photo_url': 'Badge Photo URL',
                                   'diet': 'Allergies and Dietary Requirements',
+                                  'room_type': 'Room Type',
                                   'room_number': 'Room Number',
                                   'phone_number': 'Phone Number',
                                   'gender': 'Gender',

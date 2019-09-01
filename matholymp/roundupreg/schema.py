@@ -115,11 +115,17 @@ def init_schema(env):
     country.setkey('name')
     country.setorderprop('code')
 
+    room_type = Class(db, 'room_type',
+                      name=String())
+    room_type.setkey('name')
+
     matholymprole = Class(db, 'matholymprole',
                           name=String(),
                           isadmin=Boolean(),
                           secondaryok=Boolean(),
-                          canguide=Boolean())
+                          canguide=Boolean(),
+                          room_types=Multilink('room_type'),
+                          default_room_type=Link('room_type'))
     matholymprole.setkey('name')
 
     gender = Class(db, 'gender',
@@ -178,6 +184,7 @@ def init_schema(env):
                    departure_time_hour=String(),
                    departure_time_minute=String(),
                    departure_flight=String(),
+                   room_type=Link('room_type'),
                    room_number=String(),
                    phone_number=String(),
                    generic_url=String(),
@@ -291,7 +298,7 @@ def init_schema(env):
     # All users can view certain person details, but not for retired people.
     db.security.addRole(name='Register', description='Registering people')
 
-    for cl in ('gender', 'tshirt', 'language', 'arrival'):
+    for cl in ('gender', 'tshirt', 'language', 'arrival', 'room_type'):
         db.security.addPermissionToRole('Register', 'View', cl)
 
     def own_country_person(db, userid, itemid):
@@ -311,8 +318,8 @@ def init_schema(env):
                         'arrival_time_minute', 'arrival_flight',
                         'departure_place', 'departure_date',
                         'departure_time_hour', 'departure_time_minute',
-                        'departure_flight', 'generic_url', 'reuse_photo',
-                        'photo']
+                        'departure_flight', 'room_type', 'generic_url',
+                        'reuse_photo', 'photo']
     if have_consent_forms(db):
         person_reg_props.append('consent_form')
     if have_consent_ui(db):
@@ -464,6 +471,12 @@ def init_schema(env):
     # phone numbers, not for actual checks of whether a given edit is
     # permitted.
     p = db.security.addPermission(name='RegisterPhone')
+    db.security.addPermissionToRole('Admin', p)
+
+    # Permission to register room types not otherwise allowed (e.g.,
+    # to request a single room for a contestant if that is not
+    # normally permitted).
+    p = db.security.addPermission(name='RegisterAnyRoomType')
     db.security.addPermissionToRole('Admin', p)
 
     # Permission to edit countries in general, rather than just a

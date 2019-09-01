@@ -1473,6 +1473,10 @@ class PersonEvent(object):
         event.
         """)
 
+    room_type = _PersonEventPropertyDS(
+        'room_type',
+        """The requested room type of this person at this event.""")
+
     room_number = _PersonEventPropertyDS(
         'room_number',
         """The room number of this person at this event.""")

@@ -111,65 +111,75 @@ def init_data(env):
                                   is_normal=False, participants_ok=False,
                                   **country_extra)
 
+    # Create room types.
+    room_type_cl = db.getclass('room_type')
+    initial_room_types = db.config.ext['MATHOLYMP_INITIAL_'
+                                       'ROOM_TYPES'].split(',')
+    for room_type in initial_room_types:
+        room_type = room_type.strip()
+        if room_type != '':
+            room_type_cl.create(name=room_type)
+    room_types_nc = db.config.ext['MATHOLYMP_INITIAL_'
+                                  'ROOM_TYPES_NON_CONTESTANT'].split(',')
+    room_types_nc = [t.strip() for t in room_types_nc]
+    room_types_nc = [db.room_type.lookup(t) for t in room_types_nc if t != '']
+    room_type_nc_def = db.room_type.lookup(
+        db.config.ext['MATHOLYMP_INITIAL_DEFAULT_ROOM_TYPE_NON_CONTESTANT'])
+    rt_props_nc = {'room_types': room_types_nc,
+                   'default_room_type': room_type_nc_def}
+    room_types_c = db.config.ext['MATHOLYMP_INITIAL_'
+                                 'ROOM_TYPES_CONTESTANT'].split(',')
+    room_types_c = [t.strip() for t in room_types_c]
+    room_types_c = [db.room_type.lookup(t) for t in room_types_c if t != '']
+    room_type_c_def = db.room_type.lookup(
+        db.config.ext['MATHOLYMP_INITIAL_DEFAULT_ROOM_TYPE_CONTESTANT'])
+    rt_props_c = {'room_types': room_types_c,
+                  'default_room_type': room_type_c_def}
+
     # Create standard roles for olympiad participants.
+    props_most_admin = rt_props_nc.copy()
+    props_most_admin['isadmin'] = True
+    props_most_admin['secondaryok'] = False
+    props_most_admin['canguide'] = False
     matholymprole = db.getclass('matholymprole')
     for i in range(int(db.config.ext['MATHOLYMP_NUM_CONTESTANTS_PER_TEAM'])):
         rolename = 'Contestant %d' % (i + 1)
         matholymprole.create(name=rolename, isadmin=False, secondaryok=False,
-                             canguide=False)
+                             canguide=False, **rt_props_c)
     matholymprole.create(name='Leader', isadmin=False, secondaryok=False,
-                         canguide=False)
+                         canguide=False, **rt_props_nc)
     matholymprole.create(name='Deputy Leader', isadmin=False,
-                         secondaryok=False, canguide=False)
+                         secondaryok=False, canguide=False, **rt_props_nc)
     matholymprole.create(name='Observer with Contestants', isadmin=False,
-                         secondaryok=False, canguide=False)
+                         secondaryok=False, canguide=False, **rt_props_nc)
     matholymprole.create(name='Observer with Leader', isadmin=False,
-                         secondaryok=False, canguide=False)
+                         secondaryok=False, canguide=False, **rt_props_nc)
     matholymprole.create(name='Observer with Deputy', isadmin=False,
-                         secondaryok=False, canguide=False)
-    matholymprole.create(name='Staff', isadmin=True, secondaryok=False,
-                         canguide=False)
-    matholymprole.create(name='Jury Chair', isadmin=True, secondaryok=False,
-                         canguide=False)
-    matholymprole.create(name='Chief Coordinator', isadmin=True,
-                         secondaryok=False, canguide=False)
-    matholymprole.create(name='Coordinator', isadmin=True, secondaryok=False,
-                         canguide=False)
-    matholymprole.create(name='Chief Guide', isadmin=True, secondaryok=False,
-                         canguide=False)
-    matholymprole.create(name='Deputy Chief Guide', isadmin=True,
-                         secondaryok=False, canguide=False)
+                         secondaryok=False, canguide=False, **rt_props_nc)
+    matholymprole.create(name='Staff', **props_most_admin)
+    matholymprole.create(name='Jury Chair', **props_most_admin)
+    matholymprole.create(name='Chief Coordinator', **props_most_admin)
+    matholymprole.create(name='Coordinator', **props_most_admin)
+    matholymprole.create(name='Chief Guide', **props_most_admin)
+    matholymprole.create(name='Deputy Chief Guide', **props_most_admin)
     matholymprole.create(name='Guide', isadmin=True, secondaryok=False,
-                         canguide=True)
-    matholymprole.create(name='Treasurer', isadmin=True, secondaryok=False,
-                         canguide=False)
-    matholymprole.create(name='IT', isadmin=True, secondaryok=False,
-                         canguide=False)
-    matholymprole.create(name='Transport', isadmin=True, secondaryok=False,
-                         canguide=False)
-    matholymprole.create(name='Entertainment', isadmin=True, secondaryok=False,
-                         canguide=False)
-    matholymprole.create(name='Logistics', isadmin=True, secondaryok=False,
-                         canguide=False)
-    matholymprole.create(name='Problem Selection Chair', isadmin=True,
-                         secondaryok=False, canguide=False)
-    matholymprole.create(name='Problem Selection', isadmin=True,
-                         secondaryok=False, canguide=False)
-    matholymprole.create(name='Chief Invigilator', isadmin=True,
-                         secondaryok=False, canguide=False)
-    matholymprole.create(name='Invigilator', isadmin=True, secondaryok=False,
-                         canguide=False)
-    matholymprole.create(name='Crew', isadmin=True, secondaryok=False,
-                         canguide=False)
-    matholymprole.create(name='Guest', isadmin=True, secondaryok=False,
-                         canguide=False)
-    matholymprole.create(name='Press', isadmin=True, secondaryok=False,
-                         canguide=False)
-    matholymprole.create(name='VIP', isadmin=True, secondaryok=False,
-                         canguide=False)
+                         canguide=True, **rt_props_nc)
+    matholymprole.create(name='Treasurer', **props_most_admin)
+    matholymprole.create(name='IT', **props_most_admin)
+    matholymprole.create(name='Transport', **props_most_admin)
+    matholymprole.create(name='Entertainment', **props_most_admin)
+    matholymprole.create(name='Logistics', **props_most_admin)
+    matholymprole.create(name='Problem Selection Chair', **props_most_admin)
+    matholymprole.create(name='Problem Selection', **props_most_admin)
+    matholymprole.create(name='Chief Invigilator', **props_most_admin)
+    matholymprole.create(name='Invigilator', **props_most_admin)
+    matholymprole.create(name='Crew', **props_most_admin)
+    matholymprole.create(name='Guest', **props_most_admin)
+    matholymprole.create(name='Press', **props_most_admin)
+    matholymprole.create(name='VIP', **props_most_admin)
     for r in extra_admin_roles_secondaryok:
         matholymprole.create(name=r, isadmin=True, secondaryok=True,
-                             canguide=False)
+                             canguide=False, **rt_props_nc)
 
     # Create three genders.
     gender = db.getclass('gender')

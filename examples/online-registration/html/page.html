@@ -107,6 +107,12 @@ columns string:id;
    <span tal:condition="python:request.user.hasPermission('Create', 'arrival')">
     <a href="arrival?@template=item" i18n:translate="">Add Arrival/Departure Point</a><br>
    </span>
+   <span tal:condition="python:request.user.hasPermission('Edit', 'room_type')">
+    <a href="room_type"  i18n:translate="">Room Type List</a><br>
+   </span>
+   <span tal:condition="python:request.user.hasPermission('Create', 'room_type')">
+    <a href="room_type?@template=item" i18n:translate="">Add Room Type</a><br>
+   </span>
    <span tal:condition="python:request.user.hasPermission('Edit', 'event')">
     <a href="event1"  i18n:translate="">Set medal boundaries or
     disable registration</a><br>

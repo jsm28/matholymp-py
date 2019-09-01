@@ -30,7 +30,8 @@
 """This module provides auditors for the Roundup registration system."""
 
 __all__ = ['audit_event_fields', 'audit_file_format', 'audit_country_fields',
-           'audit_person_arrdep', 'audit_person_fields', 'register_auditors']
+           'audit_person_arrdep', 'audit_person_fields',
+           'audit_matholymprole_fields', 'register_auditors']
 
 import re
 
@@ -461,6 +462,24 @@ def audit_person_fields(db, cl, nodeid, newvalues):
                 if dep_time < arr_time:
                     raise ValueError('Departure time before arrival time')
 
+    # If no room type is specified, use the default for the role.
+    room_type = get_new_value(db, cl, nodeid, newvalues, 'room_type')
+    if room_type is None:
+        room_type = db.matholymprole.get(primary_role, 'default_room_type')
+        newvalues['room_type'] = room_type
+
+    # The room type must be one permitted for the role, unless the
+    # user is permitted to register room types not normally permitted
+    # for the role, or unless such a room type was previously set and
+    # neither role nor room type are being changed.
+    if (('room_type' in newvalues or 'primary_role' in newvalues)
+        and not db.security.hasPermission('RegisterAnyRoomType', userid)):
+        valid_room_types = db.matholymprole.get(primary_role, 'room_types')
+        if valid_room_types and room_type not in valid_room_types:
+            raise ValueError('Room type for this role must be %s'
+                             % (' or '.join(db.room_type.get(r, 'name')
+                                            for r in valid_room_types)))
+
     if 'photo' in newvalues:
         file_id = newvalues['photo']
         if file_id is not None:
@@ -580,6 +599,19 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         raise ValueError('Phone numbers may only be entered for staff')
 
 
+def audit_matholymprole_fields(db, cl, nodeid, newvalues):
+    """Make sure role properties are valid."""
+    require_value(db, cl, nodeid, newvalues, 'name',
+                  'No role name specified')
+
+    default_room_type = require_value(db, cl, nodeid, newvalues,
+                                      'default_room_type',
+                                      'No default room type specified')
+    room_types = get_new_value(db, cl, nodeid, newvalues, 'room_types')
+    if room_types and default_room_type not in room_types:
+        raise ValueError('Default room type not in permitted room types')
+
+
 def register_auditors(db):
     """Register the matholymp auditors with Roundup."""
     db.event.audit('set', audit_event_fields)
@@ -588,5 +620,7 @@ def register_auditors(db):
     db.country.audit('create', audit_country_fields)
     db.person.audit('set', audit_person_fields)
     db.person.audit('create', audit_person_fields)
+    db.matholymprole.audit('set', audit_matholymprole_fields)
+    db.matholymprole.audit('create', audit_matholymprole_fields)
     db.user.audit('set', audit_user_fields)
     db.user.audit('create', audit_user_fields)

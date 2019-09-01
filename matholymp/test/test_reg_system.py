@@ -886,7 +886,7 @@ class RegSystemTestCase(unittest.TestCase):
         """
         session = self.get_session()
         forbid_classes = {'event', 'rss', 'arrival', 'consent_form', 'gender',
-                          'language', 'tshirt', 'user'}
+                          'language', 'room_type', 'tshirt', 'user'}
         forbid_templates = {'country.retireconfirm.html',
                             'person.retireconfirm.html',
                             'person.rooms.html',
@@ -906,7 +906,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_scoring_user()
         session = self.get_session('scoring')
         forbid_classes = {'event', 'rss', 'arrival', 'consent_form', 'gender',
-                          'language', 'tshirt'}
+                          'language', 'room_type', 'tshirt'}
         forbid_templates = {'country.prereg.html',
                             'country.retireconfirm.html',
                             'person.retireconfirm.html',
@@ -980,7 +980,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session = self.get_session('admin')
         session = self.get_session()
         forbid_classes = {'event', 'rss', 'arrival', 'consent_form', 'gender',
-                          'language', 'tshirt', 'user'}
+                          'language', 'room_type', 'tshirt', 'user'}
         self.all_templates_item_test(admin_session, session,
                                      forbid_classes=forbid_classes)
 
@@ -994,7 +994,7 @@ class RegSystemTestCase(unittest.TestCase):
         session = self.get_session('scoring')
         # user1 is another user, so gives an error.
         forbid_classes = {'event', 'rss', 'arrival', 'consent_form', 'gender',
-                          'language', 'tshirt', 'user'}
+                          'language', 'room_type', 'tshirt', 'user'}
         self.all_templates_item_test(admin_session, session,
                                      forbid_classes=forbid_classes)
 
@@ -2904,7 +2904,8 @@ class RegSystemTestCase(unittest.TestCase):
              'departure_date': '3 April 2015',
              'departure_time_hour': '14',
              'departure_time_minute': '50',
-             'departure_flight': 'ABC987'})
+             'departure_flight': 'ABC987',
+             'room_type': 'Single room'})
         admin_session.create_person(
             'XMO 2015 Staff', 'Guide',
             {'guide_for': ['Test First Country'],
@@ -2958,10 +2959,10 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Place': 'Example Airport', 'Arrival Date': '2015-04-02',
              'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
-             'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '', 'Nationality': '',
-             'Event Photos Consent': ''})
+             'Departure Flight': '', 'Room Type': 'Shared room',
+             'Room Number': '987', 'Phone Number': '', 'Badge Photo URL': '',
+             'Consent Form URL': '', 'Passport or Identity Card Number': '',
+             'Nationality': '', 'Event Photos Consent': ''})
         expected_leader_admin.update(
             {'Gender': 'Male', 'Date of Birth': '',
              'Languages': 'English,French',
@@ -2969,10 +2970,10 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Place': '', 'Arrival Date': '', 'Arrival Time': '',
              'Arrival Flight': '', 'Departure Place': 'Example Airport',
              'Departure Date': '2015-04-03', 'Departure Time': '14:50',
-             'Departure Flight': 'ABC987', 'Room Number': '',
-             'Phone Number': '', 'Badge Photo URL': '', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '', 'Nationality': '',
-             'Event Photos Consent': ''})
+             'Departure Flight': 'ABC987', 'Room Type': 'Single room',
+             'Room Number': '', 'Phone Number': '', 'Badge Photo URL': '',
+             'Consent Form URL': '', 'Passport or Identity Card Number': '',
+             'Nationality': '', 'Event Photos Consent': ''})
         expected_staff_admin.update(
             {'Gender': 'Female', 'Date of Birth': '2000-01-01',
              'Languages': 'English',
@@ -2980,10 +2981,10 @@ class RegSystemTestCase(unittest.TestCase):
              'T-Shirt Size': 'S', 'Arrival Place': '', 'Arrival Date': '',
              'Arrival Time': '', 'Arrival Flight': '', 'Departure Place': '',
              'Departure Date': '', 'Departure Time': '',
-             'Departure Flight': '', 'Room Number': '',
-             'Phone Number': '9876543210', 'Badge Photo URL': '',
-             'Consent Form URL': '', 'Passport or Identity Card Number': '',
-             'Nationality': '',
+             'Departure Flight': '', 'Room Type': 'Shared room',
+             'Room Number': '', 'Phone Number': '9876543210',
+             'Badge Photo URL': '', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
              'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
@@ -3040,10 +3041,10 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Place': 'Example Airport', 'Arrival Date': '2015-04-02',
              'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
-             'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '', 'Nationality': '',
-             'Event Photos Consent': ''})
+             'Departure Flight': '', 'Room Type': 'Shared room',
+             'Room Number': '987', 'Phone Number': '', 'Badge Photo URL': '',
+             'Consent Form URL': '', 'Passport or Identity Card Number': '',
+             'Nationality': '', 'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -3096,8 +3097,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Place': 'Example Airport', 'Arrival Date': '2015-04-02',
              'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
-             'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Consent Form URL': '',
+             'Departure Flight': '', 'Room Type': 'Shared room',
+             'Room Number': '987', 'Phone Number': '', 'Badge Photo URL': '',
+             'Consent Form URL': '',
              'Passport or Identity Card Number': '123456789',
              'Nationality': '', 'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
@@ -3152,9 +3154,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Place': 'Example Airport', 'Arrival Date': '2015-04-02',
              'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
-             'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '',
+             'Departure Flight': '', 'Room Type': 'Shared room',
+             'Room Number': '987', 'Phone Number': '', 'Badge Photo URL': '',
+             'Consent Form URL': '', 'Passport or Identity Card Number': '',
              'Nationality': 'Matholympian', 'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
@@ -3210,9 +3212,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Date': '2015-04-02', 'Arrival Time': '13:30',
              'Arrival Flight': 'ABC123', 'Departure Place': '',
              'Departure Date': '', 'Departure Time': '',
-             'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '',
+             'Departure Flight': '', 'Room Type': 'Shared room',
+             'Room Number': '987', 'Phone Number': '', 'Badge Photo URL': '',
+             'Consent Form URL': '', 'Passport or Identity Card Number': '',
              'Nationality': '', 'Event Photos Consent': 'Yes'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
@@ -3270,9 +3272,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Date': '2015-04-02', 'Arrival Time': '13:30',
              'Arrival Flight': 'ABC123', 'Departure Place': '',
              'Departure Date': '', 'Departure Time': '',
-             'Departure Flight': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '',
+             'Departure Flight': '', 'Room Type': 'Shared room',
+             'Room Number': '987', 'Phone Number': '', 'Badge Photo URL': '',
+             'Consent Form URL': '', 'Passport or Identity Card Number': '',
              'Nationality': '', 'Event Photos Consent': 'No'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
@@ -3336,8 +3338,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Allergies and Dietary Requirements': '', 'T-Shirt Size': 'S',
              'Arrival Place': '', 'Arrival Date': '', 'Arrival Time': '',
              'Arrival Flight': '', 'Departure Place': '', 'Departure Date': '',
-             'Departure Time': '', 'Departure Flight': '', 'Room Number': '',
-             'Phone Number': '', 'Badge Photo URL': '', 'Consent Form URL': '',
+             'Departure Time': '', 'Departure Flight': '',
+             'Room Type': 'Shared room', 'Room Number': '', 'Phone Number': '',
+             'Badge Photo URL': '', 'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Event Photos Consent': ''})
         expected_cont2 = expected_cont1.copy()
@@ -3386,7 +3389,9 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session = self.get_session('admin')
         admin_session.create_country_generic()
         admin_session.create_country('DEF', 'Second,Country')
-        admin_session.create('matholymprole', {'name': 'Extra,Role'})
+        admin_session.create('matholymprole',
+                             {'name': 'Extra,Role',
+                              'default_room_type': 'Shared room'})
         admin_session.create('language', {'name': 'Another,Language'})
         reg_session = self.get_session('ABC_reg')
         anon_csv = session.get_people_csv()
@@ -3421,10 +3426,10 @@ class RegSystemTestCase(unittest.TestCase):
              'T-Shirt Size': 'S', 'Arrival Place': '', 'Arrival Date': '',
              'Arrival Time': '', 'Arrival Flight': '', 'Departure Place': '',
              'Departure Date': '', 'Departure Time': '',
-             'Departure Flight': '', 'Room Number': '', 'Phone Number': '',
-             'Badge Photo URL': '', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '', 'Nationality': '',
-             'Event Photos Consent': ''})
+             'Departure Flight': '', 'Room Type': 'Shared room',
+             'Room Number': '', 'Phone Number': '', 'Badge Photo URL': '',
+             'Consent Form URL': '', 'Passport or Identity Card Number': '',
+             'Nationality': '', 'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -6371,6 +6376,105 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(len(admin_csv), 2)
         self.assertEqual(len(reg_csv), 2)
 
+    def test_person_create_audit_errors_room_type_one(self):
+        """
+        Test errors from person creation auditor: restrictions on room
+        types.  One room type allowed for contestants by default.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        reg_session.create_person('Test First Country', 'Contestant 2',
+                                  {'room_type': 'Single room'},
+                                  error='Room type for this role must be '
+                                  'Shared room')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'room_type': 'Shared room'})
+        reg_session.create_person('Test First Country', 'Leader',
+                                  {'room_type': 'Single room'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 2)
+        self.assertEqual(len(admin_csv), 2)
+        self.assertEqual(len(reg_csv), 2)
+
+    def test_person_create_audit_errors_room_type_one_admin(self):
+        """
+        Test errors from person creation auditor: restrictions on room
+        types.  One room type allowed for contestants by default, but
+        administrative users can override.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Contestant 2',
+                                    {'room_type': 'Single room'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+
+    @_with_config(initial_room_types='Shared room, Single room, Tent, Palace',
+                  initial_room_types_non_contestant='Single room, Palace',
+                  initial_room_types_contestant='Tent, Shared room',
+                  initial_default_room_type_non_contestant='Palace',
+                  initial_default_room_type_contestant='Tent')
+    def test_person_create_audit_errors_room_type_config(self):
+        """
+        Test errors from person creation auditor: restrictions on room
+        types.  Configured variations on default rules.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        reg_session.create_person('Test First Country', 'Contestant 2',
+                                  {'room_type': 'Palace'},
+                                  error='Room type for this role must be '
+                                  'Tent or Shared room')
+        reg_session.create_person('Test First Country', 'Leader',
+                                  {'room_type': 'Tent'},
+                                  error='Room type for this role must be '
+                                  'Single room or Palace')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'room_type': 'Shared room'})
+        reg_session.create_person('Test First Country', 'Contestant 2',
+                                  {'room_type': 'Tent'})
+        reg_session.create_person('Test First Country', 'Contestant 6')
+        reg_session.create_person('Test First Country', 'Leader')
+        reg_session.create_person('Test First Country', 'Observer with Deputy',
+                                  {'room_type': 'Single room'})
+        reg_session.create_person('Test First Country', 'Observer with Leader',
+                                  {'room_type': 'Palace'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 6)
+        self.assertEqual(len(admin_csv), 6)
+        self.assertEqual(len(reg_csv), 6)
+        # Test the defaults.
+        self.assertEqual(admin_csv[2]['Primary Role'], 'Contestant 6')
+        self.assertEqual(admin_csv[2]['Room Type'], 'Tent')
+        self.assertEqual(admin_csv[3]['Primary Role'], 'Leader')
+        self.assertEqual(admin_csv[3]['Room Type'], 'Palace')
+
     @_with_config(sanity_date_of_birth='2014-02-03')
     def test_person_create_audit_errors_date_of_birth_edge(self):
         """
@@ -6682,7 +6786,8 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
         admin_session.create('matholymprole',
-                             {'name': 'Extra Guide', 'canguide': 'yes'})
+                             {'name': 'Extra Guide', 'canguide': 'yes',
+                              'default_room_type': 'Shared room'})
         admin_session.create_person(
             'XMO 2015 Staff', 'Extra Guide',
             {'guide_for': ['Test First Country']})
@@ -7700,6 +7805,120 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(len(admin_csv), 3)
         self.assertEqual(len(reg_csv), 3)
 
+    def test_person_edit_audit_errors_room_type_one(self):
+        """
+        Test errors from person edit auditor: restrictions on room
+        types.  One room type allowed for contestants by default.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        reg_session.create_person('Test First Country', 'Contestant 2')
+        reg_session.create_person('Test First Country', 'Leader',
+                                  {'room_type': 'Single room'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 2)
+        self.assertEqual(len(admin_csv), 2)
+        self.assertEqual(len(reg_csv), 2)
+        reg_session.edit('person', '1',
+                         {'room_type': 'Single room'},
+                         error='Room type for this role must be Shared room')
+        reg_session.edit('person', '2',
+                         {'primary_role': 'Contestant 5'},
+                         error='Room type for this role must be Shared room')
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+
+    def test_person_edit_audit_errors_room_type_one_admin(self):
+        """
+        Test errors from person edit auditor: restrictions on room
+        types.  One room type allowed for contestants by default, but
+        administrative users can override.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        reg_session.create_person('Test First Country', 'Contestant 2')
+        reg_session.create_person('Test First Country', 'Leader',
+                                  {'room_type': 'Single room'})
+        admin_session.edit('person', '1',
+                           {'room_type': 'Single room'})
+        admin_session.edit('person', '2',
+                           {'primary_role': 'Contestant 5'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 2)
+        self.assertEqual(len(admin_csv), 2)
+        self.assertEqual(len(reg_csv), 2)
+        # Having been overridden by an administrative user,
+        # registering users can still edit other data.
+        reg_session.edit('person', '1',
+                         {'diet': 'Vegetarian'})
+        reg_session.edit('person', '2',
+                         {'diet': 'Vegan'})
+
+    @_with_config(initial_room_types='Shared room, Single room, Tent, Palace',
+                  initial_room_types_non_contestant='Single room, Palace',
+                  initial_room_types_contestant='Tent, Shared room',
+                  initial_default_room_type_non_contestant='Palace',
+                  initial_default_room_type_contestant='Tent')
+    def test_person_edit_audit_errors_room_type_config(self):
+        """
+        Test errors from person edit auditor: restrictions on room
+        types.  Configured variations on default rules.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        reg_session.create_person('Test First Country', 'Contestant 1')
+        reg_session.create_person('Test First Country', 'Leader')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 2)
+        self.assertEqual(len(admin_csv), 2)
+        self.assertEqual(len(reg_csv), 2)
+        reg_session.edit('person', '1',
+                         {'room_type': 'Palace'},
+                         error='Room type for this role must be Tent or '
+                         'Shared room')
+        reg_session.edit('person', '1',
+                         {'room_type': 'Single room'},
+                         error='Room type for this role must be Tent or '
+                         'Shared room')
+        reg_session.edit('person', '1',
+                         {'primary_role': 'Deputy Leader'},
+                         error='Room type for this role must be '
+                         'Single room or Palace')
+        reg_session.edit('person', '2',
+                         {'room_type': 'Tent'},
+                         error='Room type for this role must be '
+                         'Single room or Palace')
+        reg_session.edit('person', '2',
+                         {'room_type': 'Shared room'},
+                         error='Room type for this role must be '
+                         'Single room or Palace')
+        reg_session.edit('person', '2',
+                         {'primary_role': 'Contestant 3'},
+                         error='Room type for this role must be Tent or '
+                         'Shared room')
+        anon_csv_2 = session.get_people_csv()
+        admin_csv_2 = admin_session.get_people_csv()
+        reg_csv_2 = reg_session.get_people_csv()
+        self.assertEqual(anon_csv_2, anon_csv)
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(reg_csv_2, reg_csv)
+
     @_with_config(sanity_date_of_birth='2014-02-03')
     def test_person_edit_audit_errors_date_of_birth_edge(self):
         """
@@ -8011,7 +8230,8 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
         admin_session.create('matholymprole',
-                             {'name': 'Extra Guide', 'canguide': 'yes'})
+                             {'name': 'Extra Guide', 'canguide': 'yes',
+                              'default_room_type': 'Shared room'})
         admin_session.create_person(
             'XMO 2015 Staff', 'Guide',
             {'guide_for': ['Test First Country']})
@@ -9037,6 +9257,97 @@ class RegSystemTestCase(unittest.TestCase):
                                           'medal_boundaries_csv',
                                           error='Node id specified for CSV '
                                           'generation')
+
+    def test_role_create_audit_errors(self):
+        """
+        Test errors from role creation auditor.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create('matholymprole',
+                             {'name': 'Random',
+                              'room_types': ['Single room'],
+                              'default_room_type': 'Shared room'},
+                             error='Default room type not in permitted '
+                             'room types')
+
+    def test_role_create_audit_errors_missing(self):
+        """
+        Test errors from role creation auditor, missing required data.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create('matholymprole',
+                             {'default_room_type': 'Shared room'},
+                             error='Required matholymprole property name not '
+                             'supplied')
+        admin_session.create('matholymprole',
+                             {'name': 'Something'},
+                             error='Required matholymprole property '
+                             'default_room_type not supplied')
+        # The above errors are generic Roundup ones that rely on
+        # @required being sent by the browser, so must not be relied
+        # upon to maintain required properties of data since the
+        # browser should not be trusted; also verify the checks from
+        # the auditor in case @required is not sent.
+        admin_session.create('matholymprole',
+                             {'@required': '',
+                              'default_room_type': 'Shared room'},
+                             error='No role name specified')
+        admin_session.create('matholymprole',
+                             {'@required': '',
+                              'name': 'Something'},
+                             error='No default room type specified')
+
+    def test_role_edit_audit_errors(self):
+        """
+        Test errors from role edit auditor.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.edit('matholymprole', '1',
+                           {'room_types': ['Single room'],
+                            'default_room_type': 'Shared room'},
+                           error='Default room type not in permitted '
+                           'room types')
+
+    def test_role_edit_audit_errors_missing(self):
+        """
+        Test errors from role edit auditor, missing required data.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.edit('matholymprole', '1',
+                           {'name': ''},
+                           error='Required matholymprole property name not '
+                           'supplied')
+        admin_session.edit('matholymprole', '1',
+                           {'default_room_type': ['- no selection -']},
+                           error='Required matholymprole property '
+                           'default_room_type not supplied')
+        # With @required not sent, the auditor restores the previous
+        # values.
+        admin_session.edit('matholymprole', '1',
+                           {'@required': '',
+                            'name': ''})
+        admin_session.edit('matholymprole', '1',
+                           {'@required': '',
+                            'default_room_type': ['- no selection -']},)
+        # Role 1 is Contestant 1.
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'room_type': 'Single room'},
+                                  error='Room type for this role must be '
+                                  'Shared room')
+        reg_session.create_person('Test First Country', 'Contestant 1')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+        self.assertEqual(admin_csv[0]['Room Type'], 'Shared room')
 
 
 def _set_coverage(tests, coverage):
