@@ -426,6 +426,9 @@ def show_prereg_reminder(db, userid):
     """Return whether to show the preregistration reminder on all pages."""
     if not show_prereg_sidebar(db, userid):
         return False
+    if (not db.security.hasPermission('PreRegisterAnyTime', userid)
+        and not db.event.get('1', 'preregistration_enabled')):
+        return False
     country = db.user.get(userid, 'country')
     return not db.country.get(country, 'expected_numbers_confirmed')
 

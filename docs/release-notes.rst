@@ -242,12 +242,16 @@ the registration system is not active.
   of participants in each role, and the expected number of single room
   requests, from each country.  This information can be edited by
   registering users for that country, and appears in the CSV file of
-  countries when logged in administratively.  The registration status
-  page shows whether these numbers have not yet been confirmed for a
-  given country, and uses them in determining whether any expected
-  participants have not yet been registered.
-  :file:`country.item.html` and :file:`page.html` are updated
-  accordingly; a new template :file:`country.prereg.html` is added.
+  countries when logged in administratively.  Entering this data can
+  be enabled or disabled for registering users independently of
+  enabling or disabling registering details of participants.  The
+  registration status page shows whether these numbers have not yet
+  been confirmed for a given country, and uses them in determining
+  whether any expected participants have not yet been registered.
+  :file:`country.item.html`, :file:`event.item.html`,
+  :file:`person.item.html` and :file:`page.html` are updated
+  accordingly, as is :file:`extensions/email-template-new-user`; a new
+  template :file:`country.prereg.html` is added.
 
 * The default roles available in the registration system now include
   "Crew", "Guest", "Press" and "VIP".

@@ -88,7 +88,9 @@ def init_data(env):
 
     # Create a record for this event.
     event = db.getclass('event')
-    event.create(year=year, registration_enabled=True)
+    event.create(year=year,
+                 registration_enabled=True,
+                 preregistration_enabled=True)
 
     # Create country records for administration and special-case users.
     country = db.getclass('country')

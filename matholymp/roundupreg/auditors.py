@@ -139,6 +139,16 @@ def audit_country_fields(db, cl, nodeid, newvalues):
             if not valid_address(email):
                 raise ValueError('Email address syntax is invalid')
 
+    userid = db.getuid()
+    if (nodeid is not None
+        and not db.security.hasPermission('PreRegisterAnyTime', userid)
+        and not db.event.get('1', 'preregistration_enabled')):
+        for k in newvalues:
+            if k.startswith('expected_') and k != 'expected_numbers_confirmed':
+                raise ValueError('Preregistration is now disabled, please '
+                                 'contact the event organisers to change '
+                                 'expected numbers of registered participants')
+
     # Check the expected numbers of participants and set to defaults
     # if necessary.
     is_normal = get_new_value(db, cl, nodeid, newvalues, 'is_normal')
@@ -288,9 +298,12 @@ def audit_person_fields(db, cl, nodeid, newvalues):
 
     if (not db.security.hasPermission('RegisterAnyTime', userid)
         and not db.event.get('1', 'registration_enabled')):
-        raise ValueError('Registration is now disabled, please contact'
-                         ' the event organisers to change details of'
-                         ' registered participants')
+        if db.event.get('1', 'preregistration_enabled'):
+            raise ValueError('Registration has not yet opened')
+        else:
+            raise ValueError('Registration is now disabled, please contact'
+                             ' the event organisers to change details of'
+                             ' registered participants')
 
     # Given and family names must be specified.
     require_value(db, cl, nodeid, newvalues, 'given_name',

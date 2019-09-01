@@ -68,6 +68,16 @@ define="edit_ok context/is_edit_ok"
   </tal:if>
  </tr>
 
+ <tr tal:define="name string:preregistration_enabled; label string:Preregistration enabled?; value context/preregistration_enabled; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Preregistration enabled?</th>
+  <tal:if condition="context/id">
+   <td tal:content="structure context/preregistration_enabled/field">staff</td>
+  </tal:if>
+  <tal:if condition="not:context/id">
+   <td><input type="radio" checked="checked" name="preregistration_enabled" value="yes">Yes<input type="radio" name="preregistration_enabled" value="no">No</td>
+  </tal:if>
+ </tr>
+
  <tal:if condition="python:utils.any_scores_missing(db._db)">
   <tr>
    <td colspan="2"><strong>Medal boundaries cannot be set as not all

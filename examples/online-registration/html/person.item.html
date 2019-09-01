@@ -45,9 +45,19 @@ define="edit_ok context/is_edit_ok"
 <p tal:condition="python:context.is_edit_ok() and
 		  not request.user.hasPermission('RegisterAnyTime')
 		  and not db._db.event.get('1',
-		  'registration_enabled')">Registration is now
+		  'registration_enabled')
+		  and not db._db.event.get('1',
+		  'preregistration_enabled')">Registration is now
 		  disabled, please contact the event organisers to change
 		  details of registered participants.</p>
+
+<p tal:condition="python:context.is_edit_ok() and
+		  not request.user.hasPermission('RegisterAnyTime')
+		  and not db._db.event.get('1',
+		  'registration_enabled')
+		  and db._db.event.get('1',
+		  'preregistration_enabled')">Registration has not yet
+		  opened.</p>
 
 <p tal:condition="context/is_edit_ok">
 Information about <a tal:attributes="href python:db._db.config.ext['MATHOLYMP_DATA_PROTECTION_URL']" target="_blank">how

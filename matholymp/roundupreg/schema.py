@@ -84,6 +84,7 @@ def init_schema(env):
     Class(db, 'event',
           year=String(),
           registration_enabled=Boolean(),
+          preregistration_enabled=Boolean(),
           gold=String(),
           silver=String(),
           bronze=String())
@@ -437,6 +438,10 @@ def init_schema(env):
     # Permission for registering people and changing registration
     # details when registration is otherwise closed.
     p = db.security.addPermission(name='RegisterAnyTime')
+    db.security.addPermissionToRole('Admin', p)
+
+    # Likewise, for preregistration data.
+    p = db.security.addPermission(name='PreRegisterAnyTime')
     db.security.addPermissionToRole('Admin', p)
 
     # Online manipulation of participant photos has its own

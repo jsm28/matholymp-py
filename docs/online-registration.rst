@@ -175,7 +175,13 @@ Point` to add details of the places (e.g., airports) where
 participants may arrive or depart (one of which is likely to be "Own
 travel arrangements" or similar, for local staff not needing airport
 transport).  There may also be local roles to add (:guilabel:`Add
-Role`).
+Role`).  Initially, both registration of participants and
+preregistration (confirming expected numbers of participants and
+single room requests) are enabled; if you want to have a period where
+only preregistration is possible, you can disable registration before
+adding countries and enable it later.
+:file:`extensions/email-template-new-user` should be set up to reflect
+which of registration and preregistration are enabled.
 
 Extra administrative users can be added, with their roles set to
 ``Admin``.
@@ -273,7 +279,16 @@ disable registration` to disable registration (including all changes
 by participating countries to registered details of participants), so
 that any countries with late changes to participants need to go
 through the organisers to ensure the organisers can update logistical
-arrangements to handle the changes.
+arrangements to handle the changes.  If using preregistration, you can
+disable that at some point if desired (and enable registration if
+initially disabling it); when disabling registration because late
+changes need to go through the organisers, preregistration should be
+disabled as well, as the system treats the combination of registration
+disabled and preregistration enabled as meaning registration has not
+yet started, and displays corresponding messages.  When
+preregistration is disabled, countries can still confirm the default
+numbers of participants, but not otherwise change the expected
+numbers.
 
 Allocating room numbers
 ^^^^^^^^^^^^^^^^^^^^^^^

@@ -2660,6 +2660,103 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv,
                          [expected_abc_admin, expected_staff_admin])
 
+    def test_country_edit_audit_errors_prereg_disabled(self):
+        """
+        Test errors from country edit auditor, preregistration disabled.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        admin_session.edit('event', '1', {'preregistration_enabled': 'no',
+                                          'registration_enabled': 'no'})
+        # Confirming unchanged numbers is OK even when preregistration
+        # is disabled.
+        reg_session.edit_prereg('3',
+                                {})
+        admin_session.edit('event', '1', {'preregistration_enabled': 'yes'})
+        reg_session.edit_prereg('3',
+                                {'expected_single_rooms': '2'})
+        admin_session.edit('event', '1', {'preregistration_enabled': 'no'})
+        reg_session.edit_prereg('3',
+                                {'expected_leaders': '0'},
+                                error='Preregistration is now disabled, '
+                                'please contact the event organisers to '
+                                'change expected numbers of registered '
+                                'participants')
+        reg_session.edit_prereg('3',
+                                {'expected_deputies': '0'},
+                                error='Preregistration is now disabled, '
+                                'please contact the event organisers to '
+                                'change expected numbers of registered '
+                                'participants')
+        reg_session.edit_prereg('3',
+                                {'expected_contestants': '0'},
+                                error='Preregistration is now disabled, '
+                                'please contact the event organisers to '
+                                'change expected numbers of registered '
+                                'participants')
+        reg_session.edit_prereg('3',
+                                {'expected_observers_a': '1'},
+                                error='Preregistration is now disabled, '
+                                'please contact the event organisers to '
+                                'change expected numbers of registered '
+                                'participants')
+        reg_session.edit_prereg('3',
+                                {'expected_observers_b': '1'},
+                                error='Preregistration is now disabled, '
+                                'please contact the event organisers to '
+                                'change expected numbers of registered '
+                                'participants')
+        reg_session.edit_prereg('3',
+                                {'expected_observers_c': '1'},
+                                error='Preregistration is now disabled, '
+                                'please contact the event organisers to '
+                                'change expected numbers of registered '
+                                'participants')
+        reg_session.edit_prereg('3',
+                                {'expected_single_rooms': '1'},
+                                error='Preregistration is now disabled, '
+                                'please contact the event organisers to '
+                                'change expected numbers of registered '
+                                'participants')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        self.assertEqual(anon_csv,
+                         [expected_abc, expected_staff])
+        expected_abc_admin = expected_abc.copy()
+        expected_abc_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '1',
+             'Expected Deputies': '1',
+             'Expected Contestants': '6',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '2',
+             'Expected Numbers Confirmed': 'Yes'})
+        expected_staff_admin = expected_staff.copy()
+        expected_staff_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '0',
+             'Expected Deputies': '0',
+             'Expected Contestants': '0',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'Yes'})
+        self.assertEqual(admin_csv,
+                         [expected_abc_admin, expected_staff_admin])
+
     def test_country_no_participants_access(self):
         """
         Test access to no-participants countries.
@@ -6169,6 +6266,9 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.edit('event', '1', {'registration_enabled': 'no'})
         reg_session = self.get_session('ABC_reg')
         reg_session.create_person('Test First Country', 'Contestant 1',
+                                  error='Registration has not yet opened')
+        admin_session.edit('event', '1', {'preregistration_enabled': 'no'})
+        reg_session.create_person('Test First Country', 'Contestant 1',
                                   error='Registration is now disabled, please '
                                   'contact the event organisers to change '
                                   'details of registered participants')
@@ -7450,6 +7550,10 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(len(admin_csv), 1)
         self.assertEqual(len(reg_csv), 1)
         admin_session.edit('event', '1', {'registration_enabled': 'no'})
+        reg_session.edit('person', '1',
+                         {'primary_role': 'Contestant 2'},
+                         error='Registration has not yet opened')
+        admin_session.edit('event', '1', {'preregistration_enabled': 'no'})
         reg_session.edit('person', '1',
                          {'primary_role': 'Contestant 2'},
                          error='Registration is now disabled, please contact '

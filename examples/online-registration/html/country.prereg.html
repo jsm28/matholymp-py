@@ -28,6 +28,12 @@ define="edit_ok context/is_edit_ok"
  and request.user.hasPermission('Edit', 'country',
  'expected_numbers_confirmed', context.id)">
 
+<p tal:condition="python:not request.user.hasPermission('PreRegisterAnyTime')
+		  and not db._db.event.get('1',
+		  'preregistration_enabled')">Preregistration is now
+		  disabled, please contact the event organisers to change
+		  expected numbers of registered participants.</p>
+
 <form method="POST"
       name="itemSynopsis"
       tal:define="required python:()"
