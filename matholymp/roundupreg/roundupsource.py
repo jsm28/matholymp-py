@@ -224,6 +224,8 @@ class RoundupDataSource(DataSource):
         elif name == 'room_type':
             room_type = self._db.person.get(person_id, 'room_type')
             return self._db.room_type.get(room_type, 'name')
+        elif name == 'room_share_with':
+            return self._db.person.get(person_id, 'room_share_with') or None
         elif name == 'room_number':
             return self._db.person.get(person_id, 'room_number') or None
         elif name == 'phone_number':

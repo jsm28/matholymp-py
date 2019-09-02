@@ -266,6 +266,9 @@ the registration system is not active.
   ``matholymp_initial_default_room_type_non_contestant`` and
   ``matholymp_initial_default_room_type_contestant``.
 
+* Requests to share a room with a given other person can now be made
+  through the registration system.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

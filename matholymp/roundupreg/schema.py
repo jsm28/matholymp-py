@@ -185,6 +185,7 @@ def init_schema(env):
                    departure_time_minute=String(),
                    departure_flight=String(),
                    room_type=Link('room_type'),
+                   room_share_with=String(),
                    room_number=String(),
                    phone_number=String(),
                    generic_url=String(),
@@ -318,8 +319,8 @@ def init_schema(env):
                         'arrival_time_minute', 'arrival_flight',
                         'departure_place', 'departure_date',
                         'departure_time_hour', 'departure_time_minute',
-                        'departure_flight', 'room_type', 'generic_url',
-                        'reuse_photo', 'photo']
+                        'departure_flight', 'room_type', 'room_share_with',
+                        'generic_url', 'reuse_photo', 'photo']
     if have_consent_forms(db):
         person_reg_props.append('consent_form')
     if have_consent_ui(db):

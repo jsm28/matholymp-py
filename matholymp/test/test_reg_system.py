@@ -2891,6 +2891,7 @@ class RegSystemTestCase(unittest.TestCase):
              'arrival_time_hour': '13',
              'arrival_time_minute': '30',
              'arrival_flight': 'ABC123',
+             'room_share_with': 'Some Other Person',
              'room_number': '987'})
         admin_session.create_person(
             'Test First Country', 'Leader',
@@ -2960,9 +2961,10 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
-             'Room Number': '987', 'Phone Number': '', 'Badge Photo URL': '',
-             'Consent Form URL': '', 'Passport or Identity Card Number': '',
-             'Nationality': '', 'Event Photos Consent': ''})
+             'Share Room With': 'Some Other Person', 'Room Number': '987',
+             'Phone Number': '', 'Badge Photo URL': '', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Event Photos Consent': ''})
         expected_leader_admin.update(
             {'Gender': 'Male', 'Date of Birth': '',
              'Languages': 'English,French',
@@ -2971,9 +2973,10 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Flight': '', 'Departure Place': 'Example Airport',
              'Departure Date': '2015-04-03', 'Departure Time': '14:50',
              'Departure Flight': 'ABC987', 'Room Type': 'Single room',
-             'Room Number': '', 'Phone Number': '', 'Badge Photo URL': '',
-             'Consent Form URL': '', 'Passport or Identity Card Number': '',
-             'Nationality': '', 'Event Photos Consent': ''})
+             'Share Room With': '', 'Room Number': '', 'Phone Number': '',
+             'Badge Photo URL': '', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Event Photos Consent': ''})
         expected_staff_admin.update(
             {'Gender': 'Female', 'Date of Birth': '2000-01-01',
              'Languages': 'English',
@@ -2982,10 +2985,10 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Time': '', 'Arrival Flight': '', 'Departure Place': '',
              'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
-             'Room Number': '', 'Phone Number': '9876543210',
-             'Badge Photo URL': '', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '', 'Nationality': '',
-             'Event Photos Consent': ''})
+             'Share Room With': '', 'Room Number': '',
+             'Phone Number': '9876543210', 'Badge Photo URL': '',
+             'Consent Form URL': '', 'Passport or Identity Card Number': '',
+             'Nationality': '', 'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -3042,9 +3045,10 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
-             'Room Number': '987', 'Phone Number': '', 'Badge Photo URL': '',
-             'Consent Form URL': '', 'Passport or Identity Card Number': '',
-             'Nationality': '', 'Event Photos Consent': ''})
+             'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
+             'Badge Photo URL': '', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -3098,8 +3102,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
-             'Room Number': '987', 'Phone Number': '', 'Badge Photo URL': '',
-             'Consent Form URL': '',
+             'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
+             'Badge Photo URL': '', 'Consent Form URL': '',
              'Passport or Identity Card Number': '123456789',
              'Nationality': '', 'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
@@ -3155,8 +3159,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
-             'Room Number': '987', 'Phone Number': '', 'Badge Photo URL': '',
-             'Consent Form URL': '', 'Passport or Identity Card Number': '',
+             'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
+             'Badge Photo URL': '', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '',
              'Nationality': 'Matholympian', 'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
@@ -3213,9 +3218,10 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Flight': 'ABC123', 'Departure Place': '',
              'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
-             'Room Number': '987', 'Phone Number': '', 'Badge Photo URL': '',
-             'Consent Form URL': '', 'Passport or Identity Card Number': '',
-             'Nationality': '', 'Event Photos Consent': 'Yes'})
+             'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
+             'Badge Photo URL': '', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Event Photos Consent': 'Yes'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -3273,9 +3279,10 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Flight': 'ABC123', 'Departure Place': '',
              'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
-             'Room Number': '987', 'Phone Number': '', 'Badge Photo URL': '',
-             'Consent Form URL': '', 'Passport or Identity Card Number': '',
-             'Nationality': '', 'Event Photos Consent': 'No'})
+             'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
+             'Badge Photo URL': '', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Event Photos Consent': 'No'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -3339,10 +3346,10 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Place': '', 'Arrival Date': '', 'Arrival Time': '',
              'Arrival Flight': '', 'Departure Place': '', 'Departure Date': '',
              'Departure Time': '', 'Departure Flight': '',
-             'Room Type': 'Shared room', 'Room Number': '', 'Phone Number': '',
-             'Badge Photo URL': '', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '', 'Nationality': '',
-             'Event Photos Consent': ''})
+             'Room Type': 'Shared room', 'Share Room With': '',
+             'Room Number': '', 'Phone Number': '', 'Badge Photo URL': '',
+             'Consent Form URL': '', 'Passport or Identity Card Number': '',
+             'Nationality': '', 'Event Photos Consent': ''})
         expected_cont2 = expected_cont1.copy()
         expected_cont2_admin = expected_cont1_admin.copy()
         expected_cont2.update(
@@ -3427,9 +3434,10 @@ class RegSystemTestCase(unittest.TestCase):
              'Arrival Time': '', 'Arrival Flight': '', 'Departure Place': '',
              'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
-             'Room Number': '', 'Phone Number': '', 'Badge Photo URL': '',
-             'Consent Form URL': '', 'Passport or Identity Card Number': '',
-             'Nationality': '', 'Event Photos Consent': ''})
+             'Share Room With': '', 'Room Number': '', 'Phone Number': '',
+             'Badge Photo URL': '', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()

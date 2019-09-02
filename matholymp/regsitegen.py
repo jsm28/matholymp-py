@@ -454,7 +454,7 @@ class RegSiteGenerator(SiteGenerator):
             rtext = '<h2>%s</h2>\n' % cgi.escape(rdesc)
             head_row_list = [self.html_tr_th_list(['Country', 'Person', 'Role',
                                                    'Gender', 'Room Type',
-                                                   'Room'])]
+                                                   'Share With', 'Room'])]
             body_row_list = []
             for p in sorted(people_by_room[r], key=lambda x: x.sort_key):
                 row = [cgi.escape(p.country.name_with_code),
@@ -462,6 +462,7 @@ class RegSiteGenerator(SiteGenerator):
                        cgi.escape(p.primary_role),
                        cgi.escape(p.gender),
                        cgi.escape(p.room_type),
+                       cgi.escape(p.room_share_with),
                        self.room_edit_field(p)]
                 body_row_list.append(self.html_tr_td_list(row))
             rtext += self.html_table_thead_tbody_list(head_row_list,

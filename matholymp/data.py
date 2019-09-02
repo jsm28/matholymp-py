@@ -1477,6 +1477,13 @@ class PersonEvent(object):
         'room_type',
         """The requested room type of this person at this event.""")
 
+    room_share_with = _PersonEventPropertyDS(
+        'room_share_with',
+        """
+        The person (name and country) this person requests to share a
+        room with at this event.
+        """)
+
     room_number = _PersonEventPropertyDS(
         'room_number',
         """The room number of this person at this event.""")

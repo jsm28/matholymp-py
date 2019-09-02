@@ -115,11 +115,12 @@ class DataSource(object):
         given_name, family_name, problem_scores, total_score, award,
         extra_awards, photo_url, photo_filename, badge_photo_url,
         badge_photo_filename, consent_form_url, consent_form_filename,
-        languages, diet, room_type, room_number, phone_number,
-        generic_id, gender, date_of_birth, passport_number,
-        nationality, tshirt, arrival_place, arrival_date,
-        arrival_time, arrival_flight, departure_place, departure_date,
-        departure_time, departure_flight, event_photos_consent.
+        languages, diet, room_type, room_share_with, room_number,
+        phone_number, generic_id, gender, date_of_birth,
+        passport_number, nationality, tshirt, arrival_place,
+        arrival_date, arrival_time, arrival_flight, departure_place,
+        departure_date, departure_time, departure_flight,
+        event_photos_consent.
         """
         raise NotImplementedError
 

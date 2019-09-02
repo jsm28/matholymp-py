@@ -1983,8 +1983,9 @@ class SiteGenerator(object):
                          'T-Shirt Size', 'Arrival Place', 'Arrival Date',
                          'Arrival Time', 'Arrival Flight', 'Departure Place',
                          'Departure Date', 'Departure Time',
-                         'Departure Flight', 'Room Type', 'Room Number',
-                         'Phone Number', 'Badge Photo URL', 'Consent Form URL',
+                         'Departure Flight', 'Room Type', 'Share Room With',
+                         'Room Number', 'Phone Number', 'Badge Photo URL',
+                         'Consent Form URL',
                          'Passport or Identity Card Number', 'Nationality',
                          'Event Photos Consent'])
         return cols
@@ -2076,6 +2077,7 @@ class SiteGenerator(object):
             csv_out['Departure Time'] = time_to_hhmm(p.departure_time)
             csv_out['Departure Flight'] = p.departure_flight or ''
             csv_out['Room Type'] = p.room_type or ''
+            csv_out['Share Room With'] = p.room_share_with or ''
             csv_out['Room Number'] = p.room_number or ''
             csv_out['Phone Number'] = p.phone_number or ''
             csv_out['Badge Photo URL'] = p.badge_photo_url or ''

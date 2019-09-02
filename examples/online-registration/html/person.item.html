@@ -295,6 +295,11 @@ please inform the people you register of this information.
   { 'id' : 'room_type' })">room_type">room_type</td>
  </tr>
 
+ <tr tal:define="name string:room_share_with; label string:Share room with (name and country); value context/room_share_with; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+  <th metal:use-macro="th_label">Share room with (name and country)</th>
+  <td><input name="room_share_with" metal:use-macro="normal_input"></td>
+ </tr>
+
 <tal:block tal:condition="context/is_edit_ok">
  <tr>
   <td colspan="2">Please see the regulations or consult the organisers
