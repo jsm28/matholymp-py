@@ -200,8 +200,6 @@ Registration system
 * Support for registration contact to view room allocations for their
   country and people sharing rooms with them.
 
-* Support entering accommodation preferences / requests.
-
 * Support for automatic room allocation based on information about the
   capacities of available rooms and which rooms should have people in
   which roles.
