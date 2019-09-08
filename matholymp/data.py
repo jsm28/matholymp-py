@@ -1451,6 +1451,13 @@ class PersonEvent(object):
         (for the name badge) at this event.
         """)
 
+    badge_background = _PersonEventPropertyDS(
+        'badge_background',
+        """
+        The background name for the name badge of this person at this
+        event.
+        """)
+
     consent_form_url = _PersonEventPropertyDS(
         'consent_form_url',
         """The URL of the consent form of this person at this event.""")

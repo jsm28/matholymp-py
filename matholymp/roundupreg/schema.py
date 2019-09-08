@@ -119,13 +119,19 @@ def init_schema(env):
                       name=String())
     room_type.setkey('name')
 
+    badge_type = Class(db, 'badge_type',
+                       name=String(),
+                       background_name=String())
+    badge_type.setkey('name')
+
     matholymprole = Class(db, 'matholymprole',
                           name=String(),
                           isadmin=Boolean(),
                           secondaryok=Boolean(),
                           canguide=Boolean(),
                           room_types=Multilink('room_type'),
-                          default_room_type=Link('room_type'))
+                          default_room_type=Link('room_type'),
+                          badge_type=Link('badge_type'))
     matholymprole.setkey('name')
 
     gender = Class(db, 'gender',

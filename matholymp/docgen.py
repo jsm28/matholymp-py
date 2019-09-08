@@ -273,27 +273,7 @@ class DocumentGenerator(object):
         role = self.role_text(person)
         template_fields['role'] = role
 
-        if person.is_contestant:
-            background_type = 'contestant'
-        elif primary_role == 'Observer with Contestants':
-            background_type = 'observerc'
-        elif (primary_role == 'Leader'
-              or primary_role == 'Observer with Leader'):
-            background_type = 'leader'
-        elif (primary_role == 'Deputy Leader'
-              or primary_role == 'Observer with Deputy'):
-            background_type = 'deputy'
-        elif 'Chief Guide' in primary_role:
-            background_type = 'chiefguide'
-        elif 'Guide' in primary_role:
-            background_type = 'guide'
-        elif 'Coordinator' in primary_role:
-            background_type = 'coordinator'
-        elif 'Invigilator' in primary_role:
-            background_type = 'invigilator'
-        else:
-            background_type = 'organiser'
-        template_fields['background_type'] = background_type
+        template_fields['background_type'] = person.badge_background
 
         photo_filename = person.badge_photo_filename
         if photo_filename is None:

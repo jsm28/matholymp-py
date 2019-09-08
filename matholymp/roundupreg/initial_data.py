@@ -136,6 +136,35 @@ def init_data(env):
     rt_props_c = {'room_types': room_types_c,
                   'default_room_type': room_type_c_def}
 
+    # Create badge types.
+    badge_type = db.getclass('badge_type')
+    badge_type_leader = badge_type.create(name='Leader',
+                                          background_name='leader')
+    badge_type_deputy = badge_type.create(name='Deputy Leader',
+                                          background_name='deputy')
+    badge_type_contestant = badge_type.create(name='Contestant',
+                                              background_name='contestant')
+    badge_type_obsa = badge_type.create(name='Observer with Leader',
+                                        background_name='leader')
+    badge_type_obsb = badge_type.create(name='Observer with Deputy',
+                                        background_name='deputy')
+    badge_type_obsc = badge_type.create(name='Observer with Contestants',
+                                        background_name='observerc')
+    badge_type_guide = badge_type.create(name='Guide',
+                                         background_name='guide')
+    badge_type_chiefguide = badge_type.create(name='Chief Guide',
+                                              background_name='chiefguide')
+    badge_type_coordinator = badge_type.create(name='Coordinator',
+                                               background_name='coordinator')
+    badge_type_invigilator = badge_type.create(name='Invigilator',
+                                               background_name='invigilator')
+    badge_type_crew = badge_type.create(name='Crew',
+                                        background_name='organiser')
+    badge_type_guest = badge_type.create(name='Guest',
+                                         background_name='organiser')
+    badge_type_organiser = badge_type.create(name='Organiser',
+                                             background_name='organiser')
+
     # Create standard roles for olympiad participants.
     props_most_admin = rt_props_nc.copy()
     props_most_admin['isadmin'] = True
@@ -145,41 +174,68 @@ def init_data(env):
     for i in range(int(db.config.ext['MATHOLYMP_NUM_CONTESTANTS_PER_TEAM'])):
         rolename = 'Contestant %d' % (i + 1)
         matholymprole.create(name=rolename, isadmin=False, secondaryok=False,
-                             canguide=False, **rt_props_c)
+                             canguide=False, badge_type=badge_type_contestant,
+                             **rt_props_c)
     matholymprole.create(name='Leader', isadmin=False, secondaryok=False,
-                         canguide=False, **rt_props_nc)
+                         canguide=False, badge_type=badge_type_leader,
+                         **rt_props_nc)
     matholymprole.create(name='Deputy Leader', isadmin=False,
-                         secondaryok=False, canguide=False, **rt_props_nc)
+                         secondaryok=False, canguide=False,
+                         badge_type=badge_type_deputy, **rt_props_nc)
     matholymprole.create(name='Observer with Contestants', isadmin=False,
-                         secondaryok=False, canguide=False, **rt_props_nc)
+                         secondaryok=False, canguide=False,
+                         badge_type=badge_type_obsc, **rt_props_nc)
     matholymprole.create(name='Observer with Leader', isadmin=False,
-                         secondaryok=False, canguide=False, **rt_props_nc)
+                         secondaryok=False, canguide=False,
+                         badge_type=badge_type_obsa, **rt_props_nc)
     matholymprole.create(name='Observer with Deputy', isadmin=False,
-                         secondaryok=False, canguide=False, **rt_props_nc)
-    matholymprole.create(name='Staff', **props_most_admin)
-    matholymprole.create(name='Jury Chair', **props_most_admin)
-    matholymprole.create(name='Chief Coordinator', **props_most_admin)
-    matholymprole.create(name='Coordinator', **props_most_admin)
-    matholymprole.create(name='Chief Guide', **props_most_admin)
-    matholymprole.create(name='Deputy Chief Guide', **props_most_admin)
+                         secondaryok=False, canguide=False,
+                         badge_type=badge_type_obsb, **rt_props_nc)
+    matholymprole.create(name='Staff', badge_type=badge_type_organiser,
+                         **props_most_admin)
+    matholymprole.create(name='Jury Chair', badge_type=badge_type_organiser,
+                         **props_most_admin)
+    matholymprole.create(name='Chief Coordinator',
+                         badge_type=badge_type_coordinator, **props_most_admin)
+    matholymprole.create(name='Coordinator', badge_type=badge_type_coordinator,
+                         **props_most_admin)
+    matholymprole.create(name='Chief Guide', badge_type=badge_type_chiefguide,
+                         **props_most_admin)
+    matholymprole.create(name='Deputy Chief Guide',
+                         badge_type=badge_type_chiefguide, **props_most_admin)
     matholymprole.create(name='Guide', isadmin=True, secondaryok=False,
-                         canguide=True, **rt_props_nc)
-    matholymprole.create(name='Treasurer', **props_most_admin)
-    matholymprole.create(name='IT', **props_most_admin)
-    matholymprole.create(name='Transport', **props_most_admin)
-    matholymprole.create(name='Entertainment', **props_most_admin)
-    matholymprole.create(name='Logistics', **props_most_admin)
-    matholymprole.create(name='Problem Selection Chair', **props_most_admin)
-    matholymprole.create(name='Problem Selection', **props_most_admin)
-    matholymprole.create(name='Chief Invigilator', **props_most_admin)
-    matholymprole.create(name='Invigilator', **props_most_admin)
-    matholymprole.create(name='Crew', **props_most_admin)
-    matholymprole.create(name='Guest', **props_most_admin)
-    matholymprole.create(name='Press', **props_most_admin)
-    matholymprole.create(name='VIP', **props_most_admin)
+                         canguide=True, badge_type=badge_type_guide,
+                         **rt_props_nc)
+    matholymprole.create(name='Treasurer', badge_type=badge_type_organiser,
+                         **props_most_admin)
+    matholymprole.create(name='IT', badge_type=badge_type_organiser,
+                         **props_most_admin)
+    matholymprole.create(name='Transport', badge_type=badge_type_organiser,
+                         **props_most_admin)
+    matholymprole.create(name='Entertainment', badge_type=badge_type_organiser,
+                         **props_most_admin)
+    matholymprole.create(name='Logistics', badge_type=badge_type_organiser,
+                         **props_most_admin)
+    matholymprole.create(name='Problem Selection Chair',
+                         badge_type=badge_type_organiser, **props_most_admin)
+    matholymprole.create(name='Problem Selection',
+                         badge_type=badge_type_organiser, **props_most_admin)
+    matholymprole.create(name='Chief Invigilator',
+                         badge_type=badge_type_invigilator, **props_most_admin)
+    matholymprole.create(name='Invigilator', badge_type=badge_type_invigilator,
+                         **props_most_admin)
+    matholymprole.create(name='Crew', badge_type=badge_type_crew,
+                         **props_most_admin)
+    matholymprole.create(name='Guest', badge_type=badge_type_guest,
+                         **props_most_admin)
+    matholymprole.create(name='Press', badge_type=badge_type_organiser,
+                         **props_most_admin)
+    matholymprole.create(name='VIP', badge_type=badge_type_guest,
+                         **props_most_admin)
     for r in extra_admin_roles_secondaryok:
         matholymprole.create(name=r, isadmin=True, secondaryok=True,
-                             canguide=False, **rt_props_nc)
+                             canguide=False, badge_type=badge_type_organiser,
+                             **rt_props_nc)
 
     # Create three genders.
     gender = db.getclass('gender')

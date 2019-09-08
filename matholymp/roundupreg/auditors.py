@@ -603,6 +603,9 @@ def audit_matholymprole_fields(db, cl, nodeid, newvalues):
     """Make sure role properties are valid."""
     require_value(db, cl, nodeid, newvalues, 'name',
                   'No role name specified')
+    require_value(db, cl, nodeid, newvalues,
+                  'badge_type',
+                  'No badge type specified')
 
     default_room_type = require_value(db, cl, nodeid, newvalues,
                                       'default_room_type',
@@ -610,6 +613,20 @@ def audit_matholymprole_fields(db, cl, nodeid, newvalues):
     room_types = get_new_value(db, cl, nodeid, newvalues, 'room_types')
     if room_types and default_room_type not in room_types:
         raise ValueError('Default room type not in permitted room types')
+
+
+def audit_badge_type_fields(db, cl, nodeid, newvalues):
+    """Make sure badge type properties are valid."""
+    require_value(db, cl, nodeid, newvalues, 'name',
+                  'No badge type name specified')
+
+    background_name = require_value(db, cl, nodeid, newvalues,
+                                    'background_name',
+                                    'No background name specified')
+    # Verify background name is safe for inclusion in file names.
+    if not re.match('^[A-Za-z0-9._-]+\\Z', background_name):
+        raise ValueError("Background names must contain only alphanumerics, "
+                         "'.', '_' and '-'")
 
 
 def register_auditors(db):
@@ -622,5 +639,7 @@ def register_auditors(db):
     db.person.audit('create', audit_person_fields)
     db.matholymprole.audit('set', audit_matholymprole_fields)
     db.matholymprole.audit('create', audit_matholymprole_fields)
+    db.badge_type.audit('set', audit_badge_type_fields)
+    db.badge_type.audit('create', audit_badge_type_fields)
     db.user.audit('set', audit_user_fields)
     db.user.audit('create', audit_user_fields)

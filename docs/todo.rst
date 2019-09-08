@@ -216,9 +216,9 @@ Registration system
 * Use database to describe other role properties rather than
   hardcoding based on names (also applies to some other things,
   e.g., document generation).  This includes at least contestant
-  number, whether should have phone number, which badge background to
-  use.  (Need to pass some information through to CSV files so
-  registration status generation can work from those.)
+  number, whether should have phone number.  (Need to pass some
+  information through to CSV files so registration status generation
+  can work from those.)
 
 * Allow other options for which roles are (initially) expected to have
   phone numbers instead of just participants guiding countries; this

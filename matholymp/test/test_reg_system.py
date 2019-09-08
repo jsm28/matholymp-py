@@ -885,8 +885,9 @@ class RegSystemTestCase(unittest.TestCase):
         Test that all page templates load without errors, not logged in.
         """
         session = self.get_session()
-        forbid_classes = {'event', 'rss', 'arrival', 'consent_form', 'gender',
-                          'language', 'room_type', 'tshirt', 'user'}
+        forbid_classes = {'event', 'rss', 'arrival', 'badge_type',
+                          'consent_form', 'gender', 'language', 'room_type',
+                          'tshirt', 'user'}
         forbid_templates = {'country.retireconfirm.html',
                             'person.retireconfirm.html',
                             'person.rooms.html',
@@ -905,8 +906,9 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session = self.get_session('admin')
         admin_session.create_scoring_user()
         session = self.get_session('scoring')
-        forbid_classes = {'event', 'rss', 'arrival', 'consent_form', 'gender',
-                          'language', 'room_type', 'tshirt'}
+        forbid_classes = {'event', 'rss', 'arrival', 'badge_type',
+                          'consent_form', 'gender', 'language', 'room_type',
+                          'tshirt'}
         forbid_templates = {'country.prereg.html',
                             'country.retireconfirm.html',
                             'person.retireconfirm.html',
@@ -925,7 +927,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session = self.get_session('admin')
         admin_session.create_country_generic()
         session = self.get_session('ABC_reg')
-        forbid_classes = {'event', 'rss'}
+        forbid_classes = {'badge_type', 'event', 'rss'}
         forbid_templates = {'country.prereg.html',
                             'country.retireconfirm.html',
                             'person.retireconfirm.html',
@@ -979,8 +981,9 @@ class RegSystemTestCase(unittest.TestCase):
         """
         admin_session = self.get_session('admin')
         session = self.get_session()
-        forbid_classes = {'event', 'rss', 'arrival', 'consent_form', 'gender',
-                          'language', 'room_type', 'tshirt', 'user'}
+        forbid_classes = {'event', 'rss', 'arrival', 'badge_type',
+                          'consent_form', 'gender', 'language', 'room_type',
+                          'tshirt', 'user'}
         self.all_templates_item_test(admin_session, session,
                                      forbid_classes=forbid_classes)
 
@@ -993,8 +996,9 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_scoring_user()
         session = self.get_session('scoring')
         # user1 is another user, so gives an error.
-        forbid_classes = {'event', 'rss', 'arrival', 'consent_form', 'gender',
-                          'language', 'room_type', 'tshirt', 'user'}
+        forbid_classes = {'event', 'rss', 'arrival', 'badge_type',
+                          'consent_form', 'gender', 'language', 'room_type',
+                          'tshirt', 'user'}
         self.all_templates_item_test(admin_session, session,
                                      forbid_classes=forbid_classes)
 
@@ -1008,7 +1012,7 @@ class RegSystemTestCase(unittest.TestCase):
         session = self.get_session('ABC_reg')
         # consent_form1 is for another country, so gives an error.
         # user1 is another user, so gives an error.
-        forbid_classes = {'consent_form', 'event', 'rss', 'user'}
+        forbid_classes = {'badge_type', 'consent_form', 'event', 'rss', 'user'}
         self.all_templates_item_test(admin_session, session,
                                      forbid_classes=forbid_classes)
 
@@ -2962,7 +2966,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
              'Share Room With': 'Some Other Person', 'Room Number': '987',
-             'Phone Number': '', 'Badge Photo URL': '', 'Consent Form URL': '',
+             'Phone Number': '', 'Badge Photo URL': '',
+             'Badge Background': 'contestant', 'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Event Photos Consent': ''})
         expected_leader_admin.update(
@@ -2974,9 +2979,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Date': '2015-04-03', 'Departure Time': '14:50',
              'Departure Flight': 'ABC987', 'Room Type': 'Single room',
              'Share Room With': '', 'Room Number': '', 'Phone Number': '',
-             'Badge Photo URL': '', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '', 'Nationality': '',
-             'Event Photos Consent': ''})
+             'Badge Photo URL': '', 'Badge Background': 'leader',
+             'Consent Form URL': '', 'Passport or Identity Card Number': '',
+             'Nationality': '', 'Event Photos Consent': ''})
         expected_staff_admin.update(
             {'Gender': 'Female', 'Date of Birth': '2000-01-01',
              'Languages': 'English',
@@ -2987,8 +2992,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Flight': '', 'Room Type': 'Shared room',
              'Share Room With': '', 'Room Number': '',
              'Phone Number': '9876543210', 'Badge Photo URL': '',
-             'Consent Form URL': '', 'Passport or Identity Card Number': '',
-             'Nationality': '', 'Event Photos Consent': ''})
+             'Badge Background': 'guide', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -3046,9 +3052,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
              'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '', 'Nationality': '',
-             'Event Photos Consent': ''})
+             'Badge Photo URL': '', 'Badge Background': 'contestant',
+             'Consent Form URL': '', 'Passport or Identity Card Number': '',
+             'Nationality': '', 'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -3103,7 +3109,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
              'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Consent Form URL': '',
+             'Badge Photo URL': '', 'Badge Background': 'contestant',
+             'Consent Form URL': '',
              'Passport or Identity Card Number': '123456789',
              'Nationality': '', 'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
@@ -3160,8 +3167,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
              'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '',
+             'Badge Photo URL': '', 'Badge Background': 'contestant',
+             'Consent Form URL': '', 'Passport or Identity Card Number': '',
              'Nationality': 'Matholympian', 'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
@@ -3219,9 +3226,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
              'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '', 'Nationality': '',
-             'Event Photos Consent': 'Yes'})
+             'Badge Photo URL': '', 'Badge Background': 'contestant',
+             'Consent Form URL': '', 'Passport or Identity Card Number': '',
+             'Nationality': '', 'Event Photos Consent': 'Yes'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -3280,9 +3287,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
              'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '', 'Nationality': '',
-             'Event Photos Consent': 'No'})
+             'Badge Photo URL': '', 'Badge Background': 'contestant',
+             'Consent Form URL': '', 'Passport or Identity Card Number': '',
+             'Nationality': '', 'Event Photos Consent': 'No'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -3348,8 +3355,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Time': '', 'Departure Flight': '',
              'Room Type': 'Shared room', 'Share Room With': '',
              'Room Number': '', 'Phone Number': '', 'Badge Photo URL': '',
-             'Consent Form URL': '', 'Passport or Identity Card Number': '',
-             'Nationality': '', 'Event Photos Consent': ''})
+             'Badge Background': 'contestant', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Event Photos Consent': ''})
         expected_cont2 = expected_cont1.copy()
         expected_cont2_admin = expected_cont1_admin.copy()
         expected_cont2.update(
@@ -3398,7 +3406,8 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country('DEF', 'Second,Country')
         admin_session.create('matholymprole',
                              {'name': 'Extra,Role',
-                              'default_room_type': 'Shared room'})
+                              'default_room_type': 'Shared room',
+                              'badge_type': 'Organiser'})
         admin_session.create('language', {'name': 'Another,Language'})
         reg_session = self.get_session('ABC_reg')
         anon_csv = session.get_people_csv()
@@ -3435,9 +3444,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
              'Share Room With': '', 'Room Number': '', 'Phone Number': '',
-             'Badge Photo URL': '', 'Consent Form URL': '',
-             'Passport or Identity Card Number': '', 'Nationality': '',
-             'Event Photos Consent': ''})
+             'Badge Photo URL': '', 'Badge Background': 'guide',
+             'Consent Form URL': '', 'Passport or Identity Card Number': '',
+             'Nationality': '', 'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -6795,7 +6804,8 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session = self.get_session('ABC_reg')
         admin_session.create('matholymprole',
                              {'name': 'Extra Guide', 'canguide': 'yes',
-                              'default_room_type': 'Shared room'})
+                              'default_room_type': 'Shared room',
+                              'badge_type': 'Guide'})
         admin_session.create_person(
             'XMO 2015 Staff', 'Extra Guide',
             {'guide_for': ['Test First Country']})
@@ -8239,7 +8249,8 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session = self.get_session('ABC_reg')
         admin_session.create('matholymprole',
                              {'name': 'Extra Guide', 'canguide': 'yes',
-                              'default_room_type': 'Shared room'})
+                              'default_room_type': 'Shared room',
+                              'badge_type': 'Guide'})
         admin_session.create_person(
             'XMO 2015 Staff', 'Guide',
             {'guide_for': ['Test First Country']})
@@ -9275,7 +9286,8 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create('matholymprole',
                              {'name': 'Random',
                               'room_types': ['Single room'],
-                              'default_room_type': 'Shared room'},
+                              'default_room_type': 'Shared room',
+                              'badge_type': 'Organiser'},
                              error='Default room type not in permitted '
                              'room types')
 
@@ -9286,13 +9298,20 @@ class RegSystemTestCase(unittest.TestCase):
         session = self.get_session()
         admin_session = self.get_session('admin')
         admin_session.create('matholymprole',
-                             {'default_room_type': 'Shared room'},
+                             {'default_room_type': 'Shared room',
+                              'badge_type': 'Organiser'},
                              error='Required matholymprole property name not '
                              'supplied')
         admin_session.create('matholymprole',
-                             {'name': 'Something'},
+                             {'name': 'Something',
+                              'badge_type': 'Organiser'},
                              error='Required matholymprole property '
                              'default_room_type not supplied')
+        admin_session.create('matholymprole',
+                             {'name': 'Something',
+                              'default_room_type': 'Shared room'},
+                             error='Required matholymprole property '
+                             'badge_type not supplied')
         # The above errors are generic Roundup ones that rely on
         # @required being sent by the browser, so must not be relied
         # upon to maintain required properties of data since the
@@ -9300,12 +9319,19 @@ class RegSystemTestCase(unittest.TestCase):
         # the auditor in case @required is not sent.
         admin_session.create('matholymprole',
                              {'@required': '',
-                              'default_room_type': 'Shared room'},
+                              'default_room_type': 'Shared room',
+                              'badge_type': 'Organiser'},
                              error='No role name specified')
         admin_session.create('matholymprole',
                              {'@required': '',
-                              'name': 'Something'},
+                              'name': 'Something',
+                              'badge_type': 'Organiser'},
                              error='No default room type specified')
+        admin_session.create('matholymprole',
+                             {'@required': '',
+                              'name': 'Something',
+                              'default_room_type': 'Shared room'},
+                             error='No badge type specified')
 
     def test_role_edit_audit_errors(self):
         """
@@ -9333,6 +9359,10 @@ class RegSystemTestCase(unittest.TestCase):
                            {'default_room_type': ['- no selection -']},
                            error='Required matholymprole property '
                            'default_room_type not supplied')
+        admin_session.edit('matholymprole', '1',
+                           {'badge_type': ['- no selection -']},
+                           error='Required matholymprole property '
+                           'badge_type not supplied')
         # With @required not sent, the auditor restores the previous
         # values.
         admin_session.edit('matholymprole', '1',
@@ -9341,6 +9371,9 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.edit('matholymprole', '1',
                            {'@required': '',
                             'default_room_type': ['- no selection -']},)
+        admin_session.edit('matholymprole', '1',
+                           {'@required': '',
+                            'badge_type': ['- no selection -']},)
         # Role 1 is Contestant 1.
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
@@ -9356,6 +9389,98 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(len(admin_csv), 1)
         self.assertEqual(len(reg_csv), 1)
         self.assertEqual(admin_csv[0]['Room Type'], 'Shared room')
+        self.assertEqual(admin_csv[0]['Badge Background'], 'contestant')
+
+    def test_badge_type_create_audit_errors(self):
+        """
+        Test errors from badge type creation auditor.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create('badge_type',
+                             {'name': 'Random',
+                              'background_name': '/../hack'},
+                             error="Background names must contain only "
+                             "alphanumerics, '.', '_' and '-'")
+        admin_session.create('badge_type',
+                             {'name': 'Random',
+                              'background_name': 'a-z.A-Z.0_9OK'})
+
+    def test_badge_type_create_audit_errors_missing(self):
+        """
+        Test errors from badge type creation auditor, missing required data.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create('badge_type',
+                             {'background_name': 'random'},
+                             error='Required badge_type property name not '
+                             'supplied')
+        admin_session.create('badge_type',
+                             {'name': 'Random'},
+                             error='Required badge_type property '
+                             'background_name not supplied')
+        # The above errors are generic Roundup ones that rely on
+        # @required being sent by the browser, so must not be relied
+        # upon to maintain required properties of data since the
+        # browser should not be trusted; also verify the checks from
+        # the auditor in case @required is not sent.
+        admin_session.create('badge_type',
+                             {'@required': '',
+                              'background_name': 'random'},
+                             error='No badge type name specified')
+        admin_session.create('badge_type',
+                             {'@required': '',
+                              'name': 'Random'},
+                             error='No background name specified')
+
+    def test_badge_type_edit_audit_errors(self):
+        """
+        Test errors from badge type edit auditor.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.edit('badge_type', '1',
+                           {'background_name': '/../hack'},
+                           error="Background names must contain only "
+                           "alphanumerics, '.', '_' and '-'")
+        admin_session.edit('badge_type', '1',
+                           {'name': 'Random',
+                            'background_name': 'a-z.A-Z.0_9OK'})
+
+    def test_badge_type_edit_audit_errors_missing(self):
+        """
+        Test errors from badge type edit auditor, missing required data.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.edit('badge_type', '1',
+                           {'name': ''},
+                           error='Required badge_type property name not '
+                           'supplied')
+        admin_session.edit('badge_type', '1',
+                           {'background_name': ''},
+                           error='Required badge_type property '
+                           'background_name not supplied')
+        # With @required not sent, the auditor restores the previous
+        # values.
+        admin_session.edit('badge_type', '1',
+                           {'@required': '',
+                            'name': ''})
+        admin_session.edit('badge_type', '1',
+                           {'@required': '',
+                            'background_name': ''})
+        # Badge type 1 is Leader.
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        reg_session.create_person('Test First Country', 'Leader')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 1)
+        self.assertEqual(len(admin_csv), 1)
+        self.assertEqual(len(reg_csv), 1)
+        self.assertEqual(admin_csv[0]['Badge Background'], 'leader')
 
 
 def _set_coverage(tests, coverage):

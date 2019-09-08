@@ -1985,7 +1985,7 @@ class SiteGenerator(object):
                          'Departure Date', 'Departure Time',
                          'Departure Flight', 'Room Type', 'Share Room With',
                          'Room Number', 'Phone Number', 'Badge Photo URL',
-                         'Consent Form URL',
+                         'Badge Background', 'Consent Form URL',
                          'Passport or Identity Card Number', 'Nationality',
                          'Event Photos Consent'])
         return cols
@@ -2081,6 +2081,7 @@ class SiteGenerator(object):
             csv_out['Room Number'] = p.room_number or ''
             csv_out['Phone Number'] = p.phone_number or ''
             csv_out['Badge Photo URL'] = p.badge_photo_url or ''
+            csv_out['Badge Background'] = p.badge_background or ''
             csv_out['Consent Form URL'] = p.consent_form_url or ''
             csv_out['Passport or Identity Card Number'] = (p.passport_number
                                                            or '')

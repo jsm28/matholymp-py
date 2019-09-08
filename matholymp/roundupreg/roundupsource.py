@@ -209,6 +209,10 @@ class RoundupDataSource(DataSource):
             if not have_consent_ui(self._db):
                 return None
             return self._db.person.get(person_id, 'event_photos_consent')
+        elif name == 'badge_background':
+            primary_role = self._db.person.get(person_id, 'primary_role')
+            badge_type = self._db.matholymprole.get(primary_role, 'badge_type')
+            return self._db.badge_type.get(badge_type, 'background_name')
         elif name == 'languages':
             ret = []
             langs = set()

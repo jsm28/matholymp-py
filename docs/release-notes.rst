@@ -274,6 +274,12 @@ the registration system is not active.
   through the registration system.  :file:`person.item.html` is
   updated accordingly.
 
+* The choice of background PDFs for name badges is now configured
+  through the registration system rather than hardcoded in Python
+  code.  There are new templates :file:`badge_type.index.html` and
+  :file:`badge_type.item.html`, while :file:`matholymprole.item.html`
+  and :file:`page.html` are updated accordingly.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

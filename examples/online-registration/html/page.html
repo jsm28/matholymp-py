@@ -113,6 +113,12 @@ columns string:id;
    <span tal:condition="python:request.user.hasPermission('Create', 'room_type')">
     <a href="room_type?@template=item" i18n:translate="">Add Room Type</a><br>
    </span>
+   <span tal:condition="python:request.user.hasPermission('Edit', 'badge_type')">
+    <a href="badge_type"  i18n:translate="">Badge Type List</a><br>
+   </span>
+   <span tal:condition="python:request.user.hasPermission('Create', 'badge_type')">
+    <a href="badge_type?@template=item" i18n:translate="">Add Badge Type</a><br>
+   </span>
    <span tal:condition="python:request.user.hasPermission('Edit', 'event')">
     <a href="event1"  i18n:translate="">Set medal boundaries or
     disable registration</a><br>
