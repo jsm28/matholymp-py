@@ -264,10 +264,15 @@ the registration system is not active.
   ``matholymp_initial_room_types_non_contestant``,
   ``matholymp_initial_room_types_contestant``,
   ``matholymp_initial_default_room_type_non_contestant`` and
-  ``matholymp_initial_default_room_type_contestant``.
+  ``matholymp_initial_default_room_type_contestant``.  There are new
+  templates :file:`room_type.index.html` and
+  :file:`room_type.item.html`, while :file:`matholymprole.item.html`,
+  :file:`page.html` and :file:`person.item.html` are updated
+  accordingly.
 
 * Requests to share a room with a given other person can now be made
-  through the registration system.
+  through the registration system.  :file:`person.item.html` is
+  updated accordingly.
 
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
