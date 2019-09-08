@@ -217,9 +217,9 @@ def init_data(env):
     matholymprole.create(name='Logistics', badge_type=badge_type_organiser,
                          **props_most_admin)
     matholymprole.create(name='Problem Selection Chair',
-                         badge_type=badge_type_organiser, **props_most_admin)
+                         badge_type=badge_type_coordinator, **props_most_admin)
     matholymprole.create(name='Problem Selection',
-                         badge_type=badge_type_organiser, **props_most_admin)
+                         badge_type=badge_type_coordinator, **props_most_admin)
     matholymprole.create(name='Chief Invigilator',
                          badge_type=badge_type_invigilator, **props_most_admin)
     matholymprole.create(name='Invigilator', badge_type=badge_type_invigilator,

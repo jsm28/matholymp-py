@@ -280,6 +280,10 @@ the registration system is not active.
   :file:`badge_type.item.html`, while :file:`matholymprole.item.html`
   and :file:`page.html` are updated accordingly.
 
+* Badges for the "Problem Selection" and "Problem Selection Chair"
+  roles now default to using the badge type for coordinators rather
+  than the generic type for organisers.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 
