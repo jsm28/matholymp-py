@@ -284,6 +284,9 @@ the registration system is not active.
   roles now default to using the badge type for coordinators rather
   than the generic type for organisers.
 
+* The default document generation template :file:`badge-template.tex`
+  has been adjusted to allow more space for the event venue.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 
