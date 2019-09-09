@@ -1458,6 +1458,20 @@ class PersonEvent(object):
         event.
         """)
 
+    badge_colour_outer = _PersonEventPropertyDS(
+        'badge_colour_outer',
+        """
+        The outer colour for the name badge of this person at this
+        event.
+        """)
+
+    badge_colour_inner = _PersonEventPropertyDS(
+        'badge_colour_inner',
+        """
+        The inner colour for the name badge of this person at this
+        event.
+        """)
+
     consent_form_url = _PersonEventPropertyDS(
         'consent_form_url',
         """The URL of the consent form of this person at this event.""")

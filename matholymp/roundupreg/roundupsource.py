@@ -213,6 +213,14 @@ class RoundupDataSource(DataSource):
             primary_role = self._db.person.get(person_id, 'primary_role')
             badge_type = self._db.matholymprole.get(primary_role, 'badge_type')
             return self._db.badge_type.get(badge_type, 'background_name')
+        elif name == 'badge_colour_outer':
+            primary_role = self._db.person.get(person_id, 'primary_role')
+            badge_type = self._db.matholymprole.get(primary_role, 'badge_type')
+            return self._db.badge_type.get(badge_type, 'colour_outer')
+        elif name == 'badge_colour_inner':
+            primary_role = self._db.person.get(person_id, 'primary_role')
+            badge_type = self._db.matholymprole.get(primary_role, 'badge_type')
+            return self._db.badge_type.get(badge_type, 'colour_inner')
         elif name == 'languages':
             ret = []
             langs = set()

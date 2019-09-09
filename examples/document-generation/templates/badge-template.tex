@@ -63,6 +63,8 @@
 % options used.
 \setboolean{matholympusebackground}{@@use_background@@}%
 \newcommand{\matholympbackgroundtype}{@@background_type@@}%
+\newcommand{\matholympcolourouter}{@@colour_outer@@}%
+\newcommand{\matholympcolourinner}{@@colour_inner@@}%
 \newcommand{\matholymprole}{@@role@@}%
 \newcommand{\matholympphoto}{@@photo@@}%
 \newcommand{\matholympname}{@@name@@}%
@@ -110,6 +112,9 @@
 \end{center}%
 \end{minipage}%
 }}%
+\put(2.5,-0.5){\makebox(143,20.5){\vbox{\color[rgb]{1,1,1}{\hrule width 143mm height 20.5mm}}}}%
+\put(3,0){\makebox(142,19.5){\vbox{\color[rgb]{\matholympcolourouter}{\hrule width 142mm height 19.5mm}}}}%
+\put(23,0){\makebox(102,19.5){\vbox{\color[rgb]{\matholympcolourinner}{\hrule width 102mm height 19.5mm}}}}%
 }{}%
 \put(23,0){\makebox(102,19.5){%
 \begin{minipage}{102mm}%
@@ -157,6 +162,9 @@
 \end{center}%
 \end{minipage}%
 }}%
+\put(2.5,-0.5){\makebox(143,20.5){\vbox{\color[rgb]{1,1,1}{\hrule width 143mm height 20.5mm}}}}%
+\put(3,0){\makebox(142,19.5){\vbox{\color[rgb]{\matholympcolourouter}{\hrule width 142mm height 19.5mm}}}}%
+\put(23,0){\makebox(102,19.5){\vbox{\color[rgb]{\matholympcolourinner}{\hrule width 102mm height 19.5mm}}}}%
 }{}%
 \put(23,0){\makebox(102,19.5){%
 \begin{minipage}{102mm}%

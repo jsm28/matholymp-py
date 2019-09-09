@@ -128,6 +128,16 @@ class DocumentGenerator(object):
         else:
             return self.text_to_latex(data[name])
 
+    def hex_to_decimal_float(self, text):
+        """Convert a two-digit hex value to a floating-point value."""
+        return int(text, 16) / 255.0
+
+    def colour_to_latex(self, colour):
+        """Convert a hex RGB colour to a suitable form for LaTeX."""
+        return '%.6f,%.6f,%.6f' % (self.hex_to_decimal_float(colour[:2]),
+                                   self.hex_to_decimal_float(colour[2:4]),
+                                   self.hex_to_decimal_float(colour[4:]))
+
     def subst_values_in_template_text(self, template_text, data, raw_fields):
         """Substitute values from a dictionary in a LaTeX template."""
         output_text = re.sub('@@([A-Za-z0-9_]+)@@',
@@ -274,6 +284,10 @@ class DocumentGenerator(object):
         template_fields['role'] = role
 
         template_fields['background_type'] = person.badge_background
+        template_fields['colour_outer'] = self.colour_to_latex(
+            person.badge_colour_outer)
+        template_fields['colour_inner'] = self.colour_to_latex(
+            person.badge_colour_inner)
 
         photo_filename = person.badge_photo_filename
         if photo_filename is None:

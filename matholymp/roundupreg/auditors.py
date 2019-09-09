@@ -31,7 +31,8 @@
 
 __all__ = ['audit_event_fields', 'audit_file_format', 'audit_country_fields',
            'audit_person_arrdep', 'audit_person_fields',
-           'audit_matholymprole_fields', 'register_auditors']
+           'audit_matholymprole_fields', 'audit_badge_type_fields',
+           'register_auditors']
 
 import re
 
@@ -627,6 +628,16 @@ def audit_badge_type_fields(db, cl, nodeid, newvalues):
     if not re.match('^[A-Za-z0-9._-]+\\Z', background_name):
         raise ValueError("Background names must contain only alphanumerics, "
                          "'.', '_' and '-'")
+
+    colour = require_value(db, cl, nodeid, newvalues, 'colour_outer',
+                           'No outer colour specified')
+    if not re.match('^[0-9a-fA-F]{6}\\Z', colour):
+        raise ValueError('Outer colour not six hexadecimal characters')
+
+    colour = require_value(db, cl, nodeid, newvalues, 'colour_inner',
+                           'No inner colour specified')
+    if not re.match('^[0-9a-fA-F]{6}\\Z', colour):
+        raise ValueError('Inner colour not six hexadecimal characters')
 
 
 def register_auditors(db):

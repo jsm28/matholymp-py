@@ -287,6 +287,13 @@ the registration system is not active.
 * The default document generation template :file:`badge-template.tex`
   has been adjusted to allow more space for the event venue.
 
+* Background colours for name badges are now configured through the
+  registration system.  This means that typically only a single
+  background PDF :file:`lanyard-generic.pdf` is needed for producing
+  name badges, when PDFs for different roles differed only in choice
+  of colours.  The default document generation template
+  :file:`badge-template.tex` is adjusted accordingly.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

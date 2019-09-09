@@ -2967,7 +2967,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Flight': '', 'Room Type': 'Shared room',
              'Share Room With': 'Some Other Person', 'Room Number': '987',
              'Phone Number': '', 'Badge Photo URL': '',
-             'Badge Background': 'contestant', 'Consent Form URL': '',
+             'Badge Background': 'generic', 'Badge Outer Colour': '7ab558',
+             'Badge Inner Colour': 'c9deb0', 'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Event Photos Consent': ''})
         expected_leader_admin.update(
@@ -2979,7 +2980,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Date': '2015-04-03', 'Departure Time': '14:50',
              'Departure Flight': 'ABC987', 'Room Type': 'Single room',
              'Share Room With': '', 'Room Number': '', 'Phone Number': '',
-             'Badge Photo URL': '', 'Badge Background': 'leader',
+             'Badge Photo URL': '', 'Badge Background': 'generic',
+             'Badge Outer Colour': 'd22027', 'Badge Inner Colour': 'eb9984',
              'Consent Form URL': '', 'Passport or Identity Card Number': '',
              'Nationality': '', 'Event Photos Consent': ''})
         expected_staff_admin.update(
@@ -2992,7 +2994,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Flight': '', 'Room Type': 'Shared room',
              'Share Room With': '', 'Room Number': '',
              'Phone Number': '9876543210', 'Badge Photo URL': '',
-             'Badge Background': 'guide', 'Consent Form URL': '',
+             'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
+             'Badge Inner Colour': '9c95cc', 'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
@@ -3052,7 +3055,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
              'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Badge Background': 'contestant',
+             'Badge Photo URL': '', 'Badge Background': 'generic',
+             'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Consent Form URL': '', 'Passport or Identity Card Number': '',
              'Nationality': '', 'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
@@ -3109,7 +3113,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
              'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Badge Background': 'contestant',
+             'Badge Photo URL': '', 'Badge Background': 'generic',
+             'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Consent Form URL': '',
              'Passport or Identity Card Number': '123456789',
              'Nationality': '', 'Event Photos Consent': ''})
@@ -3167,7 +3172,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
              'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Badge Background': 'contestant',
+             'Badge Photo URL': '', 'Badge Background': 'generic',
+             'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Consent Form URL': '', 'Passport or Identity Card Number': '',
              'Nationality': 'Matholympian', 'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
@@ -3226,7 +3232,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
              'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Badge Background': 'contestant',
+             'Badge Photo URL': '', 'Badge Background': 'generic',
+             'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Consent Form URL': '', 'Passport or Identity Card Number': '',
              'Nationality': '', 'Event Photos Consent': 'Yes'})
         anon_csv = session.get_people_csv()
@@ -3287,7 +3294,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
              'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Badge Background': 'contestant',
+             'Badge Photo URL': '', 'Badge Background': 'generic',
+             'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Consent Form URL': '', 'Passport or Identity Card Number': '',
              'Nationality': '', 'Event Photos Consent': 'No'})
         anon_csv = session.get_people_csv()
@@ -3355,7 +3363,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Time': '', 'Departure Flight': '',
              'Room Type': 'Shared room', 'Share Room With': '',
              'Room Number': '', 'Phone Number': '', 'Badge Photo URL': '',
-             'Badge Background': 'contestant', 'Consent Form URL': '',
+             'Badge Background': 'generic', 'Badge Outer Colour': '7ab558',
+             'Badge Inner Colour': 'c9deb0', 'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Event Photos Consent': ''})
         expected_cont2 = expected_cont1.copy()
@@ -3444,7 +3453,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Departure Date': '', 'Departure Time': '',
              'Departure Flight': '', 'Room Type': 'Shared room',
              'Share Room With': '', 'Room Number': '', 'Phone Number': '',
-             'Badge Photo URL': '', 'Badge Background': 'guide',
+             'Badge Photo URL': '', 'Badge Background': 'generic',
+             'Badge Outer Colour': '2a3e92', 'Badge Inner Colour': '9c95cc',
              'Consent Form URL': '', 'Passport or Identity Card Number': '',
              'Nationality': '', 'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
@@ -9389,7 +9399,9 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(len(admin_csv), 1)
         self.assertEqual(len(reg_csv), 1)
         self.assertEqual(admin_csv[0]['Room Type'], 'Shared room')
-        self.assertEqual(admin_csv[0]['Badge Background'], 'contestant')
+        self.assertEqual(admin_csv[0]['Badge Background'], 'generic')
+        self.assertEqual(admin_csv[0]['Badge Outer Colour'], '7ab558')
+        self.assertEqual(admin_csv[0]['Badge Inner Colour'], 'c9deb0')
 
     def test_badge_type_create_audit_errors(self):
         """
@@ -9399,12 +9411,44 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session = self.get_session('admin')
         admin_session.create('badge_type',
                              {'name': 'Random',
-                              'background_name': '/../hack'},
+                              'background_name': '/../hack',
+                              'colour_outer': 'ffffff',
+                              'colour_inner': 'ffffff'},
                              error="Background names must contain only "
                              "alphanumerics, '.', '_' and '-'")
         admin_session.create('badge_type',
                              {'name': 'Random',
-                              'background_name': 'a-z.A-Z.0_9OK'})
+                              'background_name': 'random',
+                              'colour_outer': '00000g',
+                              'colour_inner': 'ffffff'},
+                             error='Outer colour not six hexadecimal '
+                             'characters')
+        admin_session.create('badge_type',
+                             {'name': 'Random',
+                              'background_name': 'random',
+                              'colour_outer': '000',
+                              'colour_inner': 'ffffff'},
+                             error='Outer colour not six hexadecimal '
+                             'characters')
+        admin_session.create('badge_type',
+                             {'name': 'Random',
+                              'background_name': 'random',
+                              'colour_outer': '000000',
+                              'colour_inner': 'gfffff'},
+                             error='Inner colour not six hexadecimal '
+                             'characters')
+        admin_session.create('badge_type',
+                             {'name': 'Random',
+                              'background_name': 'random',
+                              'colour_outer': '000000',
+                              'colour_inner': 'fffff'},
+                             error='Inner colour not six hexadecimal '
+                             'characters')
+        admin_session.create('badge_type',
+                             {'name': 'Random',
+                              'background_name': 'a-z.A-Z.0_9OK',
+                              'colour_outer': 'FeDcBa',
+                              'colour_inner': '987654'})
 
     def test_badge_type_create_audit_errors_missing(self):
         """
@@ -9413,13 +9457,29 @@ class RegSystemTestCase(unittest.TestCase):
         session = self.get_session()
         admin_session = self.get_session('admin')
         admin_session.create('badge_type',
-                             {'background_name': 'random'},
+                             {'background_name': 'random',
+                              'colour_outer': 'ffffff',
+                              'colour_inner': 'ffffff'},
                              error='Required badge_type property name not '
                              'supplied')
         admin_session.create('badge_type',
-                             {'name': 'Random'},
+                             {'name': 'Random',
+                              'colour_outer': 'ffffff',
+                              'colour_inner': 'ffffff'},
                              error='Required badge_type property '
                              'background_name not supplied')
+        admin_session.create('badge_type',
+                             {'name': 'Random',
+                              'background_name': 'random',
+                              'colour_inner': 'ffffff'},
+                             error='Required badge_type property '
+                             'colour_outer not supplied')
+        admin_session.create('badge_type',
+                             {'name': 'Random',
+                              'background_name': 'random',
+                              'colour_outer': 'ffffff'},
+                             error='Required badge_type property '
+                             'colour_inner not supplied')
         # The above errors are generic Roundup ones that rely on
         # @required being sent by the browser, so must not be relied
         # upon to maintain required properties of data since the
@@ -9427,12 +9487,28 @@ class RegSystemTestCase(unittest.TestCase):
         # the auditor in case @required is not sent.
         admin_session.create('badge_type',
                              {'@required': '',
-                              'background_name': 'random'},
+                              'background_name': 'random',
+                              'colour_outer': 'ffffff',
+                              'colour_inner': 'ffffff'},
                              error='No badge type name specified')
         admin_session.create('badge_type',
                              {'@required': '',
-                              'name': 'Random'},
+                              'name': 'Random',
+                              'colour_outer': 'ffffff',
+                              'colour_inner': 'ffffff'},
                              error='No background name specified')
+        admin_session.create('badge_type',
+                             {'@required': '',
+                              'name': 'Random',
+                              'background_name': 'random',
+                              'colour_inner': 'ffffff'},
+                             error='No outer colour specified')
+        admin_session.create('badge_type',
+                             {'@required': '',
+                              'name': 'Random',
+                              'background_name': 'random',
+                              'colour_outer': 'ffffff'},
+                             error='No inner colour specified')
 
     def test_badge_type_edit_audit_errors(self):
         """
@@ -9445,8 +9521,22 @@ class RegSystemTestCase(unittest.TestCase):
                            error="Background names must contain only "
                            "alphanumerics, '.', '_' and '-'")
         admin_session.edit('badge_type', '1',
+                           {'colour_outer': '00000g'},
+                           error='Outer colour not six hexadecimal characters')
+        admin_session.edit('badge_type', '1',
+                           {'colour_outer': '000'},
+                           error='Outer colour not six hexadecimal characters')
+        admin_session.edit('badge_type', '1',
+                           {'colour_inner': 'gfffff'},
+                           error='Inner colour not six hexadecimal characters')
+        admin_session.edit('badge_type', '1',
+                           {'colour_inner': 'fffff'},
+                           error='Inner colour not six hexadecimal characters')
+        admin_session.edit('badge_type', '1',
                            {'name': 'Random',
-                            'background_name': 'a-z.A-Z.0_9OK'})
+                            'background_name': 'a-z.A-Z.0_9OK',
+                            'colour_outer': 'FeDcBa',
+                            'colour_inner': '987654'})
 
     def test_badge_type_edit_audit_errors_missing(self):
         """
@@ -9462,6 +9552,14 @@ class RegSystemTestCase(unittest.TestCase):
                            {'background_name': ''},
                            error='Required badge_type property '
                            'background_name not supplied')
+        admin_session.edit('badge_type', '1',
+                           {'colour_outer': ''},
+                           error='Required badge_type property colour_outer '
+                           'not supplied')
+        admin_session.edit('badge_type', '1',
+                           {'colour_inner': ''},
+                           error='Required badge_type property colour_inner '
+                           'not supplied')
         # With @required not sent, the auditor restores the previous
         # values.
         admin_session.edit('badge_type', '1',
@@ -9470,6 +9568,12 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.edit('badge_type', '1',
                            {'@required': '',
                             'background_name': ''})
+        admin_session.edit('badge_type', '1',
+                           {'@required': '',
+                            'colour_outer': ''})
+        admin_session.edit('badge_type', '1',
+                           {'@required': '',
+                            'colour_inner': ''})
         # Badge type 1 is Leader.
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
@@ -9480,7 +9584,9 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(len(anon_csv), 1)
         self.assertEqual(len(admin_csv), 1)
         self.assertEqual(len(reg_csv), 1)
-        self.assertEqual(admin_csv[0]['Badge Background'], 'leader')
+        self.assertEqual(admin_csv[0]['Badge Background'], 'generic')
+        self.assertEqual(admin_csv[0]['Badge Outer Colour'], 'd22027')
+        self.assertEqual(admin_csv[0]['Badge Inner Colour'], 'eb9984')
 
 
 def _set_coverage(tests, coverage):
