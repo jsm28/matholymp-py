@@ -9403,6 +9403,149 @@ class RegSystemTestCase(unittest.TestCase):
                                           error='Node id specified for CSV '
                                           'generation')
 
+    def test_event_edit_audit_errors(self):
+        """
+        Test errors from event edit auditor.
+        """
+        # The same errors apply for event creation, but only event 1
+        # is ever used, so there are no tests for event creation.
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        admin_session.create_person('Test First Country', 'Contestant 1')
+        admin_session.edit('event', '1', {'registration_enabled': 'no'})
+        admin_session.enter_scores('Test First Country', 'ABC', '1', ['0'])
+        admin_session.enter_scores('Test First Country', 'ABC', '2', ['0'])
+        admin_session.enter_scores('Test First Country', 'ABC', '3', ['0'])
+        admin_session.enter_scores('Test First Country', 'ABC', '5', ['0'])
+        admin_session.enter_scores('Test First Country', 'ABC', '6', ['0'])
+        admin_session.edit('event', '1',
+                           {'gold': '40', 'silver': '30', 'bronze': '20'},
+                           error='Scores not all entered')
+        admin_session.enter_scores('Test First Country', 'ABC', '4', ['0'])
+        admin_session.edit('event', '1',
+                           {'gold': '40', 'silver': '30'},
+                           error='Must set all medal boundaries at once')
+        admin_session.edit('event', '1',
+                           {'silver': '30', 'bronze': '20'},
+                           error='Must set all medal boundaries at once')
+        admin_session.edit('event', '1',
+                           {'gold': '40', 'bronze': '20'},
+                           error='Must set all medal boundaries at once')
+        admin_session.edit('event', '1',
+                           {'gold': '44', 'silver': '30', 'bronze': '20'},
+                           error='Invalid gold medal boundary')
+        admin_session.edit('event', '1',
+                           {'gold': '-1', 'silver': '30', 'bronze': '20'},
+                           error='Invalid gold medal boundary')
+        admin_session.edit('event', '1',
+                           {'gold': '42', 'silver': '44', 'bronze': '20'},
+                           error='Invalid silver medal boundary')
+        admin_session.edit('event', '1',
+                           {'gold': '42', 'silver': '-1', 'bronze': '20'},
+                           error='Invalid silver medal boundary')
+        admin_session.edit('event', '1',
+                           {'gold': '42', 'silver': '42', 'bronze': '44'},
+                           error='Invalid bronze medal boundary')
+        admin_session.edit('event', '1',
+                           {'gold': '42', 'silver': '42', 'bronze': '-1'},
+                           error='Invalid bronze medal boundary')
+        admin_session.edit('event', '1',
+                           {'gold': '40', 'silver': '41', 'bronze': '40'},
+                           error='Medal boundaries in wrong order')
+        admin_session.edit('event', '1',
+                           {'gold': '40', 'silver': '40', 'bronze': '41'},
+                           error='Medal boundaries in wrong order')
+        # Boundaries one more than the total number of marks (so no
+        # medals) are OK.
+        admin_session.edit('event', '1',
+                           {'gold': '43', 'silver': '43', 'bronze': '43'})
+        admin_csv = admin_session.get_scores_csv()
+        admin_csv_p = admin_session.get_people_csv_scores()
+        anon_csv = session.get_scores_csv()
+        anon_csv_p = session.get_people_csv_scores()
+        self.assertEqual(admin_csv_p, admin_csv)
+        self.assertEqual(anon_csv, admin_csv)
+        self.assertEqual(anon_csv_p, admin_csv)
+        self.assertEqual(admin_csv[0]['Award'], '')
+        # Boundaries of 0 are OK.
+        admin_session.edit('event', '1',
+                           {'bronze': '0'})
+        admin_csv = admin_session.get_scores_csv()
+        admin_csv_p = admin_session.get_people_csv_scores()
+        anon_csv = session.get_scores_csv()
+        anon_csv_p = session.get_people_csv_scores()
+        self.assertEqual(admin_csv_p, admin_csv)
+        self.assertEqual(anon_csv, admin_csv)
+        self.assertEqual(anon_csv_p, admin_csv)
+        self.assertEqual(admin_csv[0]['Award'], 'Bronze Medal')
+        admin_session.edit('event', '1',
+                           {'silver': '0'})
+        admin_csv = admin_session.get_scores_csv()
+        admin_csv_p = admin_session.get_people_csv_scores()
+        anon_csv = session.get_scores_csv()
+        anon_csv_p = session.get_people_csv_scores()
+        self.assertEqual(admin_csv_p, admin_csv)
+        self.assertEqual(anon_csv, admin_csv)
+        self.assertEqual(anon_csv_p, admin_csv)
+        self.assertEqual(admin_csv[0]['Award'], 'Silver Medal')
+        admin_session.edit('event', '1',
+                           {'gold': '0'})
+        admin_csv = admin_session.get_scores_csv()
+        admin_csv_p = admin_session.get_people_csv_scores()
+        anon_csv = session.get_scores_csv()
+        anon_csv_p = session.get_people_csv_scores()
+        self.assertEqual(admin_csv_p, admin_csv)
+        self.assertEqual(anon_csv, admin_csv)
+        self.assertEqual(anon_csv_p, admin_csv)
+        self.assertEqual(admin_csv[0]['Award'], 'Gold Medal')
+        # Editing individual boundaries after being set produces same
+        # errors as setting them for the first time.
+        admin_session.edit('event', '1',
+                           {'gold': ''},
+                           error='Must set all medal boundaries at once')
+        admin_session.edit('event', '1',
+                           {'silver': ''},
+                           error='Must set all medal boundaries at once')
+        admin_session.edit('event', '1',
+                           {'bronze': ''},
+                           error='Must set all medal boundaries at once')
+        admin_session.edit('event', '1',
+                           {'gold': '44'},
+                           error='Invalid gold medal boundary')
+        admin_session.edit('event', '1',
+                           {'gold': '-1'},
+                           error='Invalid gold medal boundary')
+        admin_session.edit('event', '1',
+                           {'silver': '44'},
+                           error='Invalid silver medal boundary')
+        admin_session.edit('event', '1',
+                           {'silver': '-1'},
+                           error='Invalid silver medal boundary')
+        admin_session.edit('event', '1',
+                           {'bronze': '44'},
+                           error='Invalid bronze medal boundary')
+        admin_session.edit('event', '1',
+                           {'bronze': '-1'},
+                           error='Invalid bronze medal boundary')
+        admin_session.edit('event', '1',
+                           {'gold': '40', 'silver': '30', 'bronze': '20'})
+        admin_session.edit('event', '1',
+                           {'gold': '29'},
+                           error='Medal boundaries in wrong order')
+        admin_session.edit('event', '1',
+                           {'silver': '41'},
+                           error='Medal boundaries in wrong order')
+        admin_session.edit('event', '1',
+                           {'silver': '19'},
+                           error='Medal boundaries in wrong order')
+        admin_session.edit('event', '1',
+                           {'bronze': '31'},
+                           error='Medal boundaries in wrong order')
+        # Unsetting all medal boundaries at once is OK.
+        admin_session.edit('event', '1',
+                           {'gold': '', 'silver': '', 'bronze': ''})
+
     def test_role_create_audit_errors(self):
         """
         Test errors from role creation auditor.
