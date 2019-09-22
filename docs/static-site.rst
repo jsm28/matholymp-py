@@ -328,11 +328,6 @@ be used instead of the ZIP files.)  Any files already present in that
 directory will be used by :command:`mo-static-import` in preference to
 downloading files automatically.
 
-.. warning::
-
-   Python versions before 2.7.9, 3.4.3 and 3.5 do not check for TLS
-   certificate validity when downloading data from https URLs.
-
 Removing a photo
 ^^^^^^^^^^^^^^^^
 

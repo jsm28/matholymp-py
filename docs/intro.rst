@@ -48,32 +48,27 @@ you're using it for your event and I'll add it to the list.
 The following prerequisite software should be installed to use
 matholymp:
 
-* `Python <https://www.python.org/>`_, version 2.7.x (not Python 3).
-  (The command-line parts of matholymp should also work with Python
-  3.2.x or later, although this has only been tested with 3.4 and
-  later.)
+* `Python <https://www.python.org/>`_, version 3.5 or later.
 
 * `PyICU <https://pypi.org/project/PyICU/>`_ (which in turn
   requires `ICU <http://site.icu-project.org/>`_).
 
-* `Roundup <http://roundup-tracker.org/>`_ (used to provide a web
-  interface for editing databases for the online registration system;
-  the issue-tracking parts of Roundup, and the email interface, are
-  not used; Roundup is not needed if the online registration system is
-  not used).  (Roundup does not yet support Python 3, which is why
-  Python 3 is not supported for online registration.)  Use of the
-  current version of Roundup, 1.6.0 as of this writing, is
-  recommended; older versions will not work because of Roundup API
-  changes.  Some bugs relevant to some uses of matholymp are still
-  present in 1.6.0, so you should consider applying the patches in the
-  :file:`roundup-patches/` directory in the matholymp source
-  distribution before installing Roundup.  See :ref:`roundup-patches`
-  for more details of those patches.
+* `Roundup <http://roundup-tracker.org/>`_, version 2.0.0 or later
+  (used to provide a web interface for editing databases for the
+  online registration system; the issue-tracking parts of Roundup, and
+  the email interface, are not used; Roundup is not needed if the
+  online registration system is not used).  Until version 2.0.0 is
+  released, the current development version of Roundup is needed;
+  older versions will not work because of Roundup API changes .  Some
+  bugs relevant to some uses of matholymp are still present in the
+  current development version of Roundup, so you should consider
+  applying the patches in the :file:`roundup-patches/` directory in
+  the matholymp source distribution before installing Roundup.  See
+  :ref:`roundup-patches` for more details of those patches.
 
-* `PyPDF2 <https://mstamy2.github.io/PyPDF2/>`_ or the older `pyPdf
-  <http://pybrary.net/pyPdf/>`_ (used in generating PDF documents from
-  registration system data; not needed if that part of matholymp is
-  not used).
+* `PyPDF2 <https://mstamy2.github.io/PyPDF2/>`_ (used in generating
+  PDF documents from registration system data; not needed if that part
+  of matholymp is not used).
 
 * `Pillow <https://python-pillow.org/>`_, built with support for JPEG
   and PNG files (used in the registration system; not needed if that
@@ -87,7 +82,7 @@ matholymp:
 * A web server such as Apache, and a database server (MySQL or
   PostgreSQL), are also recommended for use with the online
   registration system.  (For testing purposes, you can use Roundup's
-  built-in web server and its support for Python's :py:mod:`anydbm`.)
+  built-in web server and its support for Python's :py:mod:`dbm`.)
 
 * To generate the formatted documentation, `Sphinx
   <https://www.sphinx-doc.org/>`_ is needed.  This is not needed simply to
@@ -104,9 +99,7 @@ matholymp:
 * To run automated tests of the registration system, `MechanicalSoup
   <https://mechanicalsoup.readthedocs.io/>`_ (which in turn has some
   other dependencies) is needed.  Those tests are only expected to
-  work on Unix-like operating systems, and some of them depend on the
-  provided patch for `Roundup issue 2550722
-  <https://issues.roundup-tracker.org/issue2550722>`_.
+  work on Unix-like operating systems.
 
 * To measure the code coverage of the automated tests, `Coverage.py
   <https://coverage.readthedocs.io/en/latest/>`_ is needed.  This is

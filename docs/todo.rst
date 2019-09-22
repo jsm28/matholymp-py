@@ -285,10 +285,6 @@ The following ideas are more speculative.
   public, but could still indicate that something has changed or is
   new).
 
-* Add Python 3 support in registration system code (not very useful
-  until Roundup supports Python 3, and may already be ready for Python
-  3 apart from that).
-
 * Make registration system code avoid time-of-check / time-of-use race
   conditions (registering multiple people with the same role from the
   same country at the same time; creating / editing countries to

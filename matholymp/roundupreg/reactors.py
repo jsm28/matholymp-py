@@ -101,10 +101,6 @@ def country_react(db, cl, nodeid, oldvalues):
                                   subject,
                                   (author_name, db.config.ADMIN_EMAIL))
     msg.set_payload(email_text)
-    if hasattr(roundup.mailer, 'encode_quopri'):
-        # Roundup 1.6.0 (removed and no longer needed after that as
-        # part of Python 3 support).
-        roundup.mailer.encode_quopri(msg)
     try:
         mailer.smtp_send(email_to, msg.as_string())
     except roundup.mailer.MessageSendError:

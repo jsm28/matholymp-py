@@ -40,7 +40,6 @@ import signal
 import socket
 import subprocess
 import sys
-_py3 = sys.version_info.major >= 3
 import tempfile
 import traceback
 import unittest
@@ -357,29 +356,8 @@ class RoundupTestSession(object):
             sb_method = getattr(self.b, sb_name)
             old_mail_size = os.stat(self.instance.mail_file).st_size
 
-            def fn(*args, **kwargs):
-                # This code can be simplified once we require Python 3
-                # and thus can use keyword-only parameters.
-                mail = False
-                if 'mail' in kwargs:
-                    mail = kwargs['mail']
-                    del kwargs['mail']
-                error = False
-                if 'error' in kwargs:
-                    error = kwargs['error']
-                    del kwargs['error']
-                status = None
-                if 'status' in kwargs:
-                    status = kwargs['status']
-                    del kwargs['status']
-                login = False
-                if 'login' in kwargs:
-                    login = kwargs['login']
-                    del kwargs['login']
-                html = True
-                if 'html' in kwargs:
-                    html = kwargs['html']
-                    del kwargs['html']
+            def fn(*args, mail=False, error=False, status=None, login=False,
+                   html=True, **kwargs):
                 response = sb_method(*args, **kwargs)
                 if status is None:
                     response.raise_for_status()
@@ -704,12 +682,8 @@ class RoundupTestSession(object):
                 raise ValueError('unexpected password line: %s'
                                  % str(password_str))
             password_str = password_str[len(b'Password: '):]
-            if _py3:
-                username = username_str.decode()
-                password = password_str.decode()
-            else:
-                username = username_str
-                password = password_str
+            username = username_str.decode()
+            password = password_str.decode()
             self.instance.passwords[username] = password
             self.instance.num_users += 1
             self.instance.userids[username] = str(self.instance.num_users)

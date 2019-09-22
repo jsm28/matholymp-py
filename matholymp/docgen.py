@@ -39,10 +39,7 @@ import re
 import shutil
 import subprocess
 
-try:
-    from PyPDF2 import PdfFileReader
-except ImportError:
-    from pyPdf import PdfFileReader
+from PyPDF2 import PdfFileReader
 
 from matholymp.collate import coll_get_sort_key
 from matholymp.fileutil import read_utf8_csv, make_dirs_for_file, \

@@ -51,6 +51,12 @@ Because of changes to how data is represented in the registration
 system, upgrades to this version can only be made between events when
 the registration system is not active.
 
+* Python 3 is now fully supported in the registration system.  Python
+  3.5 or later is now required; Python 2 is no longer supported.  To
+  support Python 3, Roundup 2.0.0 or later (the current development
+  version of Roundup, until Roundup 2.0.0 is released) by the
+  registration system.
+
 * A bug has been fixed in :command:`mo-static-import` where it would
   download an incorrect file as the RSS feed of scores when
   downloading files automatically from the registration system.
@@ -75,7 +81,7 @@ the registration system is not active.
   for the registration system have been changed.
 
 * The registration system code and associated Roundup patches have
-  been updated for Roundup 1.6.0, as have many HTML templates for the
+  been updated for Roundup 2.0.0, as have many HTML templates for the
   registration system and the example :file:`config.ini`.  Because of
   Roundup API changes, the code will no longer work with older Roundup
   versions.  The modified templates are :file:`_generic.404.html`,
@@ -83,24 +89,20 @@ the registration system is not active.
   :file:`help_controls.js`, :file:`page.html`,
   :file:`person.retireconfirm.html`, :file:`person.rooms.html`,
   :file:`person.scoreenter.html`, :file:`person.status.html` and
-  :file:`user.forgotten.html`.
-
-* The included patch for `Roundup issue 2550722
-  <http://issues.roundup-tracker.org/issue2550722>`_ has been extended
-  to fix further internal errors.
+  :file:`user.forgotten.html`.  Some Roundup patches have been removed
+  as integrated into Roundup 2.0.0.  As well as applying changes to
+  :file:`config.ini`, a new ``secret_key`` setting in that file needs
+  to be added using :command:`roundup-admin updateconfig` followed by
+  merging the matholymp-specific comments back into the file.
 
 * Various HTML templates for the registration system have been updated
-  in preparation for Python 3 support with a future version of
-  Roundup.  The modified templates are :file:`_generic.index.html`,
-  :file:`_generic.item.html`, :file:`arrival.index.html`,
-  :file:`country.index.html`, :file:`event.index.html`,
-  :file:`gender.index.html`, :file:`language.index.html`,
-  :file:`matholymprole.index.html`, :file:`rss.index.html`,
-  :file:`tshirt.index.html` and :file:`user.index.html`.
-
-* A patch has been added for `Roundup issue 2550992
-  <http://issues.roundup-tracker.org/issue2550992>`_ to fix further
-  internal errors.
+  to support Python 3.  The modified templates are
+  :file:`_generic.index.html`, :file:`_generic.item.html`,
+  :file:`arrival.index.html`, :file:`country.index.html`,
+  :file:`event.index.html`, :file:`gender.index.html`,
+  :file:`language.index.html`, :file:`matholymprole.index.html`,
+  :file:`rss.index.html`, :file:`tshirt.index.html` and
+  :file:`user.index.html`.
 
 * The example :file:`extensions/email-template-new-user` for the
   registration system has been extended to discuss more cases of which
@@ -109,11 +111,6 @@ the registration system is not active.
 * :file:`person.item.html` now says explicitly that names should be
   entered in the form they should appear on the website and name
   badges, rather than entering full legal names as on a passport.
-
-* A patch has been added for `Roundup issue 2550994
-  <http://issues.roundup-tracker.org/issue2550994>`_ to fix problems
-  if a Python 2 backport of the Python 3 :py:mod:`configparser` module
-  is installed.
 
 * The automated tests run by :command:`mo-run-tests` now include some
   tests of the registration system, if Roundup and `MechanicalSoup

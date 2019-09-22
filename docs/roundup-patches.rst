@@ -39,9 +39,10 @@ installing Roundup.  All these patches can be applied with
 :command:`patch -p1 -N -E` from within the Roundup source directory.
 
 These are located in the :file:`roundup-patches/` directory of the
-source distribution, and are relative to Roundup version 1.6.0 (so may
-require changes to apply cleanly to later versions).  Details of the
-individual patches are:
+source distribution, and are relative to the current development
+version of Roundup as of September 2019 (so may require changes to
+apply cleanly to later versions).  Details of the individual patches
+are:
 
 * :download:`issue2550750-no-timeout-mail.patch
   <../roundup-patches/issue2550750-no-timeout-mail.patch>` is a patch
@@ -56,29 +57,3 @@ individual patches are:
   increases the socket timeout to reduce the number of such timeouts
   (there may however not be a great need for this when the previous
   patch is applied).
-
-* :download:`issue2550722-multilink.patch
-  <../roundup-patches/issue2550722-multilink.patch>` is a patch for
-  `Roundup issue 2550722
-  <https://issues.roundup-tracker.org/issue2550722>`_ that avoids
-  internal errors in Roundup in certain cases of incorrect settings of
-  Multilink fields in the web interface.  (For matholymp, the relevant
-  fields are "Other roles" and "Guide for", so those internal errors
-  can only be triggered by administrative users and cannot arise for
-  registration of ordinary participants.  However, when they do arise,
-  it may be necessary to restart the process of registering the person
-  for which the mistake was made.)
-
-* :download:`issue2550992-auth.patch
-  <../roundup-patches/issue2550992-auth.patch>` is a patch for
-  `Roundup issue 2550992
-  <https://issues.roundup-tracker.org/issue2550992>`_ that avoids
-  internal errors in Roundup in certain cases of clients sending
-  invalid HTTP Authorization headers.
-
-* :download:`issue2550994-configparser.patch
-  <../roundup-patches/issue2550994-configparser.patch>` is a patch for
-  `Roundup issue 2550994
-  <https://issues.roundup-tracker.org/issue2550994>`_ that avoids
-  problems if a Python 2 backport of the Python 3
-  :py:mod:`configparser` module is installed.

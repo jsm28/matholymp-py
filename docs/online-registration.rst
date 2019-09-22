@@ -61,7 +61,10 @@ Having copied the examples, you then need to customise the following
 files:
 
 * :file:`config.ini` (the comments at the top indicate the settings
-  that are most likely to need changing).
+  that are most likely to need changing; note in particular the need
+  to use :command:`roundup-admin updateconfig` in order to set the
+  ``secret_key`` value, followed by merging those comments back into
+  the file).
 
 * :file:`extensions/config.ini` (see the comments in the file for
   details of the individual settings; note that some of these settings

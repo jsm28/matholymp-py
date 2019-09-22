@@ -53,15 +53,8 @@ import os
 import os.path
 import re
 import shutil
-import sys
-_py3 = sys.version_info.major >= 3
 import tempfile
-if _py3:
-    import urllib.request
-    _urlretrieve = urllib.request.urlretrieve
-else:
-    import urllib
-    _urlretrieve = urllib.urlretrieve
+import urllib.request
 import zipfile
 
 import matholymp
@@ -95,22 +88,22 @@ def _import_from_dir(top_directory, input_directory, temp_dir):
     if not os.access(input_countries_csv, os.F_OK):
         if reg_url is None:
             raise ValueError('downloading data for unknown event')
-        _urlretrieve(reg_url + 'country?@action=country_csv',
-                     input_countries_csv)
+        urllib.request.urlretrieve(reg_url + 'country?@action=country_csv',
+                                   input_countries_csv)
     input_people_csv = os.path.join(input_directory, 'people.csv')
     if not os.access(input_people_csv, os.F_OK):
         if reg_url is None:
             raise ValueError('downloading data for unknown event')
-        _urlretrieve(reg_url + 'person?@action=people_csv',
-                     input_people_csv)
+        urllib.request.urlretrieve(reg_url + 'person?@action=people_csv',
+                                   input_people_csv)
     input_flags_dir = os.path.join(input_directory, 'flags')
     if not os.access(input_flags_dir, os.F_OK):
         input_flags_zip = os.path.join(input_directory, 'flags.zip')
         if not os.access(input_flags_zip, os.F_OK):
             if reg_url is None:
                 raise ValueError('downloading data for unknown event')
-            _urlretrieve(reg_url + 'country?@action=flags_zip',
-                         input_flags_zip)
+            urllib.request.urlretrieve(reg_url + 'country?@action=flags_zip',
+                                       input_flags_zip)
         with zipfile.ZipFile(input_flags_zip, 'r') as z:
             z.extractall(temp_dir)
         input_flags_dir = os.path.join(temp_dir, 'flags')
@@ -120,8 +113,8 @@ def _import_from_dir(top_directory, input_directory, temp_dir):
         if not os.access(input_photos_zip, os.F_OK):
             if reg_url is None:
                 raise ValueError('downloading data for unknown event')
-            _urlretrieve(reg_url + 'person?@action=photos_zip',
-                         input_photos_zip)
+            urllib.request.urlretrieve(reg_url + 'person?@action=photos_zip',
+                                       input_photos_zip)
         with zipfile.ZipFile(input_photos_zip, 'r') as z:
             z.extractall(temp_dir)
         input_photos_dir = os.path.join(temp_dir, 'photos')
@@ -129,8 +122,8 @@ def _import_from_dir(top_directory, input_directory, temp_dir):
     if not os.access(input_scores_rss, os.F_OK):
         if reg_url is None:
             raise ValueError('downloading data for unknown event')
-        _urlretrieve(reg_url + 'country?@action=scores_rss',
-                     input_scores_rss)
+        urllib.request.urlretrieve(reg_url + 'country?@action=scores_rss',
+                                   input_scores_rss)
 
     max_num_problems = 0
     event_number = None

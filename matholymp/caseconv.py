@@ -31,10 +31,6 @@
 This module provides case conversion support for matholymp use.
 """
 
-import sys
-_py3 = sys.version_info.major >= 3
-import codecs
-
 import icu
 
 __all__ = ['tolower', 'toupper', 'all_uppercase']
@@ -43,19 +39,13 @@ __all__ = ['tolower', 'toupper', 'all_uppercase']
 def tolower(text):
     """Return the argument string converted to lowercase."""
     usret = icu.UnicodeString(text).toLower(icu.Locale('en_GB'))
-    if _py3:
-        return str(usret)
-    else:
-        return codecs.encode(unicode(usret), 'utf-8')
+    return str(usret)
 
 
 def toupper(text):
     """Return the argument string converted to uppercase."""
     usret = icu.UnicodeString(text).toUpper(icu.Locale('en_GB'))
-    if _py3:
-        return str(usret)
-    else:
-        return codecs.encode(unicode(usret), 'utf-8')
+    return str(usret)
 
 
 def all_uppercase(text):
