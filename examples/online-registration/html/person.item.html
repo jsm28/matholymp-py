@@ -116,13 +116,13 @@ please inform the people you register of this information.
   { 'id' : 'country' })">country</td>
  </tr>
 
- <tr tal:define="name string:given_name; label string:Given name; value context/given_name; edit_ok edit_ok">
-  <th class="required" metal:use-macro="th_label">Given name</th>
+ <tr tal:define="name string:given_name; label python:'Given name (for website and name badge)' if context.is_edit_ok() else 'Given name'; value context/given_name; edit_ok edit_ok">
+  <th class="required" metal:use-macro="th_label">Given name (for website and name badge)</th>
   <td><input name="given_name" metal:use-macro="normal_input"></td>
  </tr>
 
- <tr tal:define="name string:family_name; label string:Family name; value context/family_name; edit_ok edit_ok">
-  <th class="required" metal:use-macro="th_label">Family name</th>
+ <tr tal:define="name string:family_name; label python:'Family name (for website and name badge)' if context.is_edit_ok() else 'Family name'; value context/family_name; edit_ok edit_ok">
+  <th class="required" metal:use-macro="th_label">Family name (for website and name badge)</th>
   <td><input name="family_name" metal:use-macro="normal_input"></td>
  </tr>
 
@@ -131,7 +131,7 @@ please inform the people you register of this information.
   tal:replace="structure python:utils.person_case_warning(db._db, context.id)"/>
   Please enter names in mixed case (e.g. &lsquo;Jane
   Doe&rsquo;, not &lsquo;JANE DOE&rsquo; or &lsquo;Jane DOE&rsquo;).
-  Names should be entered in the form they should appear on the
+  Names should be entered above in the form they should appear on the
   website and name badges; they do not need to be full legal names as
   on a participant&rsquo;s passport.</td>
  </tr>
@@ -161,6 +161,26 @@ please inform the people you register of this information.
      tal:define="name string:nationality; label string:Nationality; value context/nationality; edit_ok edit_ok">
   <th class="required" metal:use-macro="th_label">Nationality</th>
   <td><input name="nationality" metal:use-macro="normal_input"></td>
+ </tr>
+</tal:block>
+
+<tal:block tal:condition="python:utils.have_passport_numbers(db._db) and utils.have_nationality(db._db)">
+ <tr tal:condition="context/is_edit_ok">
+  <td colspan="2">If a visa invitation letter is required for this
+  participant, and if the name on their passport is not the same as
+  that given above for use on the website and their name badge, please
+  enter their name here exactly as it appears in their passport with
+  passport number and nationality given above.</td>
+ </tr>
+ <tr tal:condition="context/is_edit_ok"
+     tal:define="name string:passport_given_name; label string:Given name (as in passport); value context/passport_given_name; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Given name (as in passport)</th>
+  <td><input name="passport_given_name" metal:use-macro="normal_input"></td>
+ </tr>
+ <tr tal:condition="context/is_edit_ok"
+     tal:define="name string:passport_family_name; label string:Family name (as in passport); value context/passport_family_name; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Family name (as in passport)</th>
+  <td><input name="passport_family_name" metal:use-macro="normal_input"></td>
  </tr>
 </tal:block>
 

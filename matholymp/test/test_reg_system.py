@@ -2944,7 +2944,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Background': 'generic', 'Badge Outer Colour': '7ab558',
              'Badge Inner Colour': 'c9deb0', 'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
-             'Event Photos Consent': ''})
+             'Passport Given Name': 'Given 1',
+             'Passport Family Name': 'Family 1', 'Event Photos Consent': ''})
         expected_leader_admin.update(
             {'Gender': 'Male', 'Date of Birth': '',
              'Languages': 'English,French',
@@ -2957,7 +2958,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': 'd22027', 'Badge Inner Colour': 'eb9984',
              'Consent Form URL': '', 'Passport or Identity Card Number': '',
-             'Nationality': '', 'Event Photos Consent': ''})
+             'Nationality': '', 'Passport Given Name': 'Given 2',
+             'Passport Family Name': 'Family 2', 'Event Photos Consent': ''})
         expected_staff_admin.update(
             {'Gender': 'Female', 'Date of Birth': '2000-01-01',
              'Languages': 'English',
@@ -2971,7 +2973,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
              'Badge Inner Colour': '9c95cc', 'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
-             'Event Photos Consent': ''})
+             'Passport Given Name': 'Given 3',
+             'Passport Family Name': 'Family 3', 'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -3032,7 +3035,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Consent Form URL': '', 'Passport or Identity Card Number': '',
-             'Nationality': '', 'Event Photos Consent': ''})
+             'Nationality': '', 'Passport Given Name': 'Given 1',
+             'Passport Family Name': 'Family 1', 'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -3091,7 +3095,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Consent Form URL': '',
              'Passport or Identity Card Number': '123456789',
-             'Nationality': '', 'Event Photos Consent': ''})
+             'Nationality': '', 'Passport Given Name': 'Given 1',
+             'Passport Family Name': 'Family 1', 'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -3149,13 +3154,139 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Consent Form URL': '', 'Passport or Identity Card Number': '',
-             'Nationality': 'Matholympian', 'Event Photos Consent': ''})
+             'Nationality': 'Matholympian', 'Passport Given Name': 'Given 1',
+             'Passport Family Name': 'Family 1', 'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         self.assertEqual(anon_csv, [expected_cont])
         self.assertEqual(admin_csv, [expected_cont_admin])
         self.assertEqual(reg_csv, [expected_cont])
+
+    @_with_config(require_passport_number='Yes', require_nationality='Yes')
+    def test_person_csv_passport_name(self):
+        """
+        Test CSV file of people, names as in passports collected.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create('arrival', {'name': 'Example Airport'})
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'arrival_place': 'Example Airport',
+             'arrival_date': '2 April 2015',
+             'arrival_time_hour': '13',
+             'arrival_time_minute': '30',
+             'arrival_flight': 'ABC123',
+             'room_number': '987',
+             'passport_number': '123456789',
+             'nationality': 'Matholympian'})
+        expected_cont = {'XMO Number': '2', 'Country Number': '3',
+                         'Person Number': '1',
+                         'Annual URL': self.instance.url + 'person1',
+                         'Country Name': 'Test First Country',
+                         'Country Code': 'ABC', 'Primary Role': 'Contestant 1',
+                         'Other Roles': '', 'Guide For': '',
+                         'Contestant Code': 'ABC1', 'Contestant Age': '15',
+                         'Given Name': 'Given 1', 'Family Name': 'Family 1',
+                         'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                         'P6': '', 'Total': '0', 'Award': '',
+                         'Extra Awards': '', 'Photo URL': '',
+                         'Generic Number': ''}
+        expected_cont_admin = expected_cont.copy()
+        # By default passport names are copied from non-passport names.
+        expected_cont_admin.update(
+            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
+             'Languages': 'English',
+             'Allergies and Dietary Requirements': '', 'T-Shirt Size': 'S',
+             'Arrival Place': 'Example Airport', 'Arrival Date': '2015-04-02',
+             'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
+             'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': 'Shared room',
+             'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
+             'Badge Photo URL': '', 'Badge Background': 'generic',
+             'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
+             'Consent Form URL': '',
+             'Passport or Identity Card Number': '123456789',
+             'Nationality': 'Matholympian', 'Passport Given Name': 'Given 1',
+             'Passport Family Name': 'Family 1', 'Event Photos Consent': ''})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [expected_cont])
+        self.assertEqual(admin_csv, [expected_cont_admin])
+        self.assertEqual(reg_csv, [expected_cont])
+        # Non-default passport names may be set, at person creation or
+        # edit time.
+        reg_session.edit('person', '1',
+                         {'passport_given_name': 'Other Given',
+                          'passport_family_name': 'Other Family'})
+        expected_cont_admin.update(
+            {'Passport Given Name': 'Other Given',
+             'Passport Family Name': 'Other Family'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [expected_cont])
+        self.assertEqual(admin_csv, [expected_cont_admin])
+        self.assertEqual(reg_csv, [expected_cont])
+        reg_session.create_person(
+            'Test First Country', 'Contestant 2',
+            {'given_name': 'Given 2',
+             'family_name': 'Family 2',
+             'arrival_place': 'Example Airport',
+             'arrival_date': '2 April 2015',
+             'arrival_time_hour': '13',
+             'arrival_time_minute': '30',
+             'arrival_flight': 'ABC123',
+             'passport_number': '123456790',
+             'nationality': 'Other-olympian',
+             'passport_given_name': 'Random',
+             'passport_family_name': 'Randomer'})
+        expected_cont2 = {'XMO Number': '2', 'Country Number': '3',
+                          'Person Number': '2',
+                          'Annual URL': self.instance.url + 'person2',
+                          'Country Name': 'Test First Country',
+                          'Country Code': 'ABC',
+                          'Primary Role': 'Contestant 2', 'Other Roles': '',
+                          'Guide For': '', 'Contestant Code': 'ABC2',
+                          'Contestant Age': '15', 'Given Name': 'Given 2',
+                          'Family Name': 'Family 2',
+                          'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                          'P6': '', 'Total': '0', 'Award': '',
+                          'Extra Awards': '', 'Photo URL': '',
+                          'Generic Number': ''}
+        expected_cont2_admin = expected_cont2.copy()
+        expected_cont2_admin.update(
+            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
+             'Languages': 'English',
+             'Allergies and Dietary Requirements': '', 'T-Shirt Size': 'S',
+             'Arrival Place': 'Example Airport', 'Arrival Date': '2015-04-02',
+             'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
+             'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': 'Shared room',
+             'Share Room With': '', 'Room Number': '', 'Phone Number': '',
+             'Badge Photo URL': '', 'Badge Background': 'generic',
+             'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
+             'Consent Form URL': '',
+             'Passport or Identity Card Number': '123456790',
+             'Nationality': 'Other-olympian', 'Passport Given Name': 'Random',
+             'Passport Family Name': 'Randomer', 'Event Photos Consent': ''})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [expected_cont, expected_cont2])
+        self.assertEqual(admin_csv, [expected_cont_admin,
+                                     expected_cont2_admin])
+        self.assertEqual(reg_csv, [expected_cont, expected_cont2])
 
     @_with_config(consent_ui='Yes')
     def test_person_csv_consent_ui(self):
@@ -3209,7 +3340,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Consent Form URL': '', 'Passport or Identity Card Number': '',
-             'Nationality': '', 'Event Photos Consent': 'Yes'})
+             'Nationality': '', 'Passport Given Name': 'Given 1',
+             'Passport Family Name': 'Family 1',
+             'Event Photos Consent': 'Yes'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -3271,7 +3404,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Consent Form URL': '', 'Passport or Identity Card Number': '',
-             'Nationality': '', 'Event Photos Consent': 'No'})
+             'Nationality': '', 'Passport Given Name': 'Given 2',
+             'Passport Family Name': 'Family 2', 'Event Photos Consent': 'No'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -3340,7 +3474,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Background': 'generic', 'Badge Outer Colour': '7ab558',
              'Badge Inner Colour': 'c9deb0', 'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
-             'Event Photos Consent': ''})
+             'Passport Given Name': 'Given 1',
+             'Passport Family Name': 'Family 1', 'Event Photos Consent': ''})
         expected_cont2 = expected_cont1.copy()
         expected_cont2_admin = expected_cont1_admin.copy()
         expected_cont2.update(
@@ -3348,6 +3483,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Primary Role': 'Contestant 2', 'Contestant Code': 'ABC2',
              'Given Name': 'Given 2', 'Family Name': 'Family 2'})
         expected_cont2_admin.update(expected_cont2)
+        expected_cont2_admin.update({'Passport Given Name': 'Given 2',
+                                     'Passport Family Name': 'Family 2'})
         expected_cont2_admin['Date of Birth'] = '2000-04-01'
         expected_cont3 = expected_cont1.copy()
         expected_cont3_admin = expected_cont1_admin.copy()
@@ -3356,6 +3493,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Primary Role': 'Contestant 3', 'Contestant Code': 'ABC3',
              'Given Name': 'Given 3', 'Family Name': 'Family 3'})
         expected_cont3_admin.update(expected_cont3)
+        expected_cont3_admin.update({'Passport Given Name': 'Given 3',
+                                     'Passport Family Name': 'Family 3'})
         expected_cont3_admin['Date of Birth'] = '2000-04-02'
         expected_cont4 = expected_cont1.copy()
         expected_cont4_admin = expected_cont1_admin.copy()
@@ -3365,6 +3504,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Contestant Age': '14', 'Given Name': 'Given 4',
              'Family Name': 'Family 4'})
         expected_cont4_admin.update(expected_cont4)
+        expected_cont4_admin.update({'Passport Given Name': 'Given 4',
+                                     'Passport Family Name': 'Family 4'})
         expected_cont4_admin['Date of Birth'] = '2000-04-03'
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
@@ -3430,7 +3571,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '2a3e92', 'Badge Inner Colour': '9c95cc',
              'Consent Form URL': '', 'Passport or Identity Card Number': '',
-             'Nationality': '', 'Event Photos Consent': ''})
+             'Nationality': '', 'Passport Given Name': 'Given 1',
+             'Passport Family Name': 'Family 1', 'Event Photos Consent': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()

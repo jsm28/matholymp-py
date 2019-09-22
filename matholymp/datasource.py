@@ -118,10 +118,10 @@ class DataSource(object):
         badge_colour_inner, consent_form_url, consent_form_filename,
         languages, diet, room_type, room_share_with, room_number,
         phone_number, generic_id, gender, date_of_birth,
-        passport_number, nationality, tshirt, arrival_place,
-        arrival_date, arrival_time, arrival_flight, departure_place,
-        departure_date, departure_time, departure_flight,
-        event_photos_consent.
+        passport_number, nationality, passport_given_name,
+        passport_family_name, tshirt, arrival_place, arrival_date,
+        arrival_time, arrival_flight, departure_place, departure_date,
+        departure_time, departure_flight, event_photos_consent.
         """
         raise NotImplementedError
 

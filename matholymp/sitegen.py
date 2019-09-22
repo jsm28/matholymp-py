@@ -1988,6 +1988,7 @@ class SiteGenerator(object):
                          'Badge Background', 'Badge Outer Colour',
                          'Badge Inner Colour', 'Consent Form URL',
                          'Passport or Identity Card Number', 'Nationality',
+                         'Passport Given Name', 'Passport Family Name',
                          'Event Photos Consent'])
         return cols
 
@@ -2088,6 +2089,8 @@ class SiteGenerator(object):
             csv_out['Consent Form URL'] = p.consent_form_url or ''
             csv_out['Passport or Identity Card Number'] = (p.passport_number
                                                            or '')
+            csv_out['Passport Given Name'] = p.passport_given_name
+            csv_out['Passport Family Name'] = p.passport_family_name
             csv_out['Nationality'] = p.nationality or ''
             if p.event_photos_consent is None:
                 csv_out['Event Photos Consent'] = ''

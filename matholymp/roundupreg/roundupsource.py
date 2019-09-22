@@ -265,6 +265,18 @@ class RoundupDataSource(DataSource):
             if not have_nationality(self._db):
                 return None
             return self._db.person.get(person_id, 'nationality') or None
+        elif name == 'passport_given_name':
+            if (not have_passport_numbers(self._db)
+                or not have_nationality(self._db)):
+                return self._db.person.get(person_id, 'given_name')
+            return (self._db.person.get(person_id, 'passport_given_name')
+                    or self._db.person.get(person_id, 'given_name'))
+        elif name == 'passport_family_name':
+            if (not have_passport_numbers(self._db)
+                or not have_nationality(self._db)):
+                return self._db.person.get(person_id, 'family_name')
+            return (self._db.person.get(person_id, 'passport_family_name')
+                    or self._db.person.get(person_id, 'family_name'))
         elif name == 'tshirt':
             tshirt = self._db.person.get(person_id, 'tshirt')
             return self._db.tshirt.get(tshirt, 'name')

@@ -167,6 +167,9 @@ def init_schema(env):
         person_extra['passport_number'] = String()
     if have_nationality(db):
         person_extra['nationality'] = String()
+    if have_passport_numbers(db) and have_nationality(db):
+        person_extra['passport_given_name'] = String()
+        person_extra['passport_family_name'] = String()
     for i in get_language_numbers(db):
         person_extra['language_%d' % i] = Link('language')
     person = Class(db, 'person',
@@ -339,6 +342,9 @@ def init_schema(env):
         person_reg_props.append('passport_number')
     if have_nationality(db):
         person_reg_props.append('nationality')
+    if have_passport_numbers(db) and have_nationality(db):
+        person_reg_props.append('passport_given_name')
+        person_reg_props.append('passport_family_name')
     for i in get_language_numbers(db):
         person_reg_props.append('language_%d' % i)
     p = db.security.addPermission(name='Edit', klass='person',

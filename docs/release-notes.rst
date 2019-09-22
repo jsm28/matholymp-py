@@ -291,6 +291,12 @@ the registration system is not active.
   of colours.  The default document generation template
   :file:`badge-template.tex` is adjusted accordingly.
 
+* When the registration system is configured to collect passport
+  numbers and nationality information, it also asks for participants'
+  names as in their passports if different from the names given for
+  the website and name badges and needed for visa invitation letters.
+  :file:`person.item.html` is updated accordingly.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

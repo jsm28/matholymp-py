@@ -239,7 +239,10 @@ class CSVDataSource(DataSource):
                                   'consent_form_url': 'Consent Form URL',
                                   'passport_number':
                                   'Passport or Identity Card Number',
-                                  'nationality': 'Nationality'}
+                                  'nationality': 'Nationality',
+                                  'passport_given_name': 'Passport Given Name',
+                                  'passport_family_name':
+                                  'Passport Family Name'}
 
     _person_event_attr_map_date = {'date_of_birth': 'Date of Birth',
                                    'arrival_date': 'Arrival Date',

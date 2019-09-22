@@ -1540,6 +1540,20 @@ class PersonEvent(object):
         'nationality',
         """The nationality of this person at this event.""")
 
+    passport_given_name = _PersonEventPropertyDS(
+        'passport_given_name',
+        """
+        The given name of this person in their passport at this event,
+        if relevant, or the same as given_name otherwise.
+        """)
+
+    passport_family_name = _PersonEventPropertyDS(
+        'passport_family_name',
+        """
+        The family name of this person in their passport at this
+        event, if relevant, or the same as family_name otherwise.
+        """)
+
     tshirt = _PersonEventPropertyDS(
         'tshirt',
         """The T-shirt size of this person at this event.""")
