@@ -75,9 +75,6 @@ def init_data(env):
 
     staff_country_name = get_staff_country_name(db)
 
-    # The year, from the configuration file.
-    year = db.config.ext['MATHOLYMP_YEAR']
-
     # Extra roles from the configuration file.
     extra_admin_roles_secondaryok = \
         db.config.ext['MATHOLYMP_EXTRA_ADMIN_ROLES_SECONDARYOK'].split(',')
@@ -88,8 +85,7 @@ def init_data(env):
 
     # Create a record for this event.
     event = db.getclass('event')
-    event.create(year=year,
-                 registration_enabled=True,
+    event.create(registration_enabled=True,
                  preregistration_enabled=True)
 
     # Create country records for administration and special-case users.

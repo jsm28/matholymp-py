@@ -82,7 +82,6 @@ def init_schema(env):
 
     # The 'event' class has only one instance, to store global information.
     Class(db, 'event',
-          year=String(),
           registration_enabled=Boolean(),
           preregistration_enabled=Boolean(),
           gold=String(),

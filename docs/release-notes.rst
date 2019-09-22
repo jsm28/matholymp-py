@@ -220,7 +220,8 @@ the registration system is not active.
   countries are official countries, when official and unofficial
   countries are distinguished at at least one event.
 
-* :file:`person.item.html`, :file:`person.scoreselect.html`,
+* :file:`event.index.html`, :file:`event.item.html`,
+  :file:`person.item.html`, :file:`person.scoreselect.html`,
   :file:`person.status.html` and :file:`page.html` have been modified
   for internal changes in registration system code.
 

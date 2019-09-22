@@ -53,6 +53,12 @@ from matholymp.roundupreg.userauditor import valid_address, audit_user_fields
 
 def audit_event_fields(db, cl, nodeid, newvalues):
     """Verify medal boundaries can be set and create RSS item for them."""
+    if nodeid is None:
+        # Event creation; must only happen at initialisation: only one
+        # event is ever handled in a given registration system
+        # instance, and code using the event class always uses event 1.
+        if db.event.list():
+            raise ValueError('Cannot create a second event object')
     gold = get_new_value(db, cl, nodeid, newvalues, 'gold')
     silver = get_new_value(db, cl, nodeid, newvalues, 'silver')
     bronze = get_new_value(db, cl, nodeid, newvalues, 'bronze')

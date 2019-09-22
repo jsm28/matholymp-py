@@ -9403,12 +9403,20 @@ class RegSystemTestCase(unittest.TestCase):
                                           error='Node id specified for CSV '
                                           'generation')
 
+    def test_event_create_audit_errors(self):
+        """
+        Test errors from event creation auditor.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create('event',
+                             {},
+                             error='Cannot create a second event object')
+
     def test_event_edit_audit_errors(self):
         """
         Test errors from event edit auditor.
         """
-        # The same errors apply for event creation, but only event 1
-        # is ever used, so there are no tests for event creation.
         session = self.get_session()
         admin_session = self.get_session('admin')
         admin_session.create_country_generic()
