@@ -31,6 +31,7 @@
 Tests for matholymp registration system.
 """
 
+import codecs
 import os
 import os.path
 import random
@@ -58,7 +59,8 @@ try:
 except ImportError:
     _skip_test = True
 
-from matholymp.fileutil import read_utf8_csv, write_text_to_file, \
+from matholymp.fileutil import read_utf8_csv, write_utf8_csv_bytes, \
+    write_utf8_csv, write_bytes_to_file, write_text_to_file, \
     read_text_from_file, replace_text_in_file, read_config_raw, \
     write_config_raw
 
@@ -824,8 +826,30 @@ class RegSystemTestCase(unittest.TestCase):
             contents = f.read()
         return filename, contents
 
+    def gen_test_csv(self, rows, keys):
+        """Generate a CSV file with specified contents."""
+        temp_file = tempfile.NamedTemporaryFile(suffix='.csv',
+                                                dir=self.temp_dir,
+                                                delete=False)
+        filename = temp_file.name
+        temp_file.close()
+        write_utf8_csv(filename, rows, keys)
+        return filename
+
+    def gen_test_csv_no_bom(self, rows, keys):
+        """Generate a CSV file with specified contents and no BOM."""
+        temp_file = tempfile.NamedTemporaryFile(suffix='.csv',
+                                                dir=self.temp_dir,
+                                                delete=False)
+        filename = temp_file.name
+        temp_file.close()
+        file_contents = write_utf8_csv_bytes(rows, keys)
+        file_contents = file_contents[len(codecs.BOM_UTF8):]
+        write_bytes_to_file(file_contents, filename)
+        return filename
+
     def all_templates_test(self, session, forbid_classes, forbid_templates,
-                           allow_templates, can_score):
+                           allow_templates, can_score, admin_user):
         """Test that all page templates load without errors."""
         for t in sorted(os.listdir(self.instance.html_dir)):
             if t.startswith('_generic') or not t.endswith('.html'):
@@ -833,9 +857,12 @@ class RegSystemTestCase(unittest.TestCase):
             m = re.match(r'([a-z_]+)\.([a-z_]+)\.html\Z', t)
             if not m:
                 continue
-            # This template should give an error, if able to enter
-            # scores, unless country and problem are specified.
-            error = can_score and t == 'person.scoreenter.html'
+            # country.bulkconfirm.html should given an error, if an
+            # admin user, unless used with an upload of a CSV file.
+            # person.scoreenter.html should give an error, if able to
+            # enter scores, unless country and problem are specified.
+            error = ((can_score and t == 'person.scoreenter.html')
+                     or (admin_user and t == 'country.bulkconfirm.html'))
             login = ((m.group(1) in forbid_classes or t in forbid_templates)
                      and t not in allow_templates)
             session.check_open_relative('%s?@template=%s'
@@ -852,7 +879,8 @@ class RegSystemTestCase(unittest.TestCase):
         forbid_templates={'country.prereg.html'}
         self.all_templates_test(session, forbid_classes=set(),
                                 forbid_templates=forbid_templates,
-                                allow_templates=set(), can_score=True)
+                                allow_templates=set(), can_score=True,
+                                admin_user=True)
 
     def test_all_templates_anon(self):
         """
@@ -862,7 +890,9 @@ class RegSystemTestCase(unittest.TestCase):
         forbid_classes = {'event', 'rss', 'arrival', 'badge_type',
                           'consent_form', 'gender', 'language', 'room_type',
                           'tshirt', 'user'}
-        forbid_templates = {'country.retireconfirm.html',
+        forbid_templates = {'country.bulkconfirm.html',
+                            'country.bulkregister.html',
+                            'country.retireconfirm.html',
                             'person.retireconfirm.html',
                             'person.rooms.html',
                             'person.scoreenter.html',
@@ -871,7 +901,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.all_templates_test(session, forbid_classes=forbid_classes,
                                 forbid_templates=forbid_templates,
                                 allow_templates={'user.forgotten.html'},
-                                can_score=False)
+                                can_score=False, admin_user=False)
 
     def test_all_templates_score(self):
         """
@@ -883,7 +913,9 @@ class RegSystemTestCase(unittest.TestCase):
         forbid_classes = {'event', 'rss', 'arrival', 'badge_type',
                           'consent_form', 'gender', 'language', 'room_type',
                           'tshirt'}
-        forbid_templates = {'country.prereg.html',
+        forbid_templates = {'country.bulkconfirm.html',
+                            'country.bulkregister.html',
+                            'country.prereg.html',
                             'country.retireconfirm.html',
                             'person.retireconfirm.html',
                             'person.rooms.html',
@@ -891,7 +923,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.all_templates_test(session, forbid_classes=forbid_classes,
                                 forbid_templates=forbid_templates,
                                 allow_templates=set(),
-                                can_score=True)
+                                can_score=True, admin_user=False)
 
     def test_all_templates_register(self):
         """
@@ -902,7 +934,9 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country_generic()
         session = self.get_session('ABC_reg')
         forbid_classes = {'badge_type', 'event', 'rss'}
-        forbid_templates = {'country.prereg.html',
+        forbid_templates = {'country.bulkconfirm.html',
+                            'country.bulkregister.html',
+                            'country.prereg.html',
                             'country.retireconfirm.html',
                             'person.retireconfirm.html',
                             'person.rooms.html',
@@ -911,7 +945,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.all_templates_test(session, forbid_classes=forbid_classes,
                                 forbid_templates=forbid_templates,
                                 allow_templates=set(),
-                                can_score=False)
+                                can_score=False, admin_user=False)
 
     def all_templates_item_test(self, admin_session, session, forbid_classes):
         """Test that all page templates for existing items load without
@@ -1967,6 +2001,9 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country('ZZA', 'Test First Country',
                                      error='A country with code ZZA already '
                                      'exists')
+        admin_session.create_country('ZZX', 'XMO 2015 Staff',
+                                     error='A country with name XMO 2015 Staff '
+                                     'already exists')
         admin_session.create_country('ABC', 'Test First Country',
                                      {'contact_email': 'bad_email'},
                                      error='Email address syntax is invalid')
@@ -2229,6 +2266,9 @@ class RegSystemTestCase(unittest.TestCase):
                            error='Country codes must be all capital letters')
         admin_session.edit('country', '1', {'code': 'ABC'},
                            error='A country with code ABC already exists')
+        admin_session.edit('country', '1', {'name': 'Test First Country'},
+                           error='A country with name Test First Country '
+                           'already exists')
         admin_session.edit('country', '1', {'is_normal': 'yes'},
                            error='Cannot change whether a country is normal')
         admin_session.edit('country', '3', {'is_normal': 'no'},
@@ -2833,6 +2873,525 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
+
+    def test_country_bulk_register(self):
+        """
+        Test bulk registration of countries.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
+        csv_cols = ['Country Number', 'Name', 'Ignore', 'Code',
+                    'Contact Email 1', 'Contact Email 2', 'Contact Email 3']
+        csv_in = [{'Country Number': '123',
+                   'Name': 'Test First Country  ',
+                   'Ignore': 'Random text',
+                   'Code': 'ABC'},
+                  {'Name': ' Test Second Countr\u00fd',
+                   'Code': 'DEF',
+                   'Contact Email 1': 'DEF1@example.invalid',
+                   'Contact Email 2': 'DEF2@example.invalid',
+                   'Contact Email 3': 'DEF3@example.invalid'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.check_submit_selected(mail=True)
+        self.assertIn(
+            b'\nTO: DEF1@example.invalid, webmaster@example.invalid, '
+            b'DEF2@example.invalid, DEF3@example.invalid\n',
+            admin_session.last_mail_bin)
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '', 'Generic Number': '123',
+                        'Normal': 'Yes'}
+        expected_def = {'XMO Number': '2', 'Country Number': '4',
+                        'Annual URL': self.instance.url + 'country4',
+                        'Code': 'DEF', 'Name': 'Test Second Countr\u00fd',
+                        'Flag URL': '', 'Generic Number': '',
+                        'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_def,
+                                    expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_def,
+                                     expected_staff])
+        # Test without BOM in CSV file.
+        csv_in = [{'Name': 'Test Third Countr\u00fd',
+                   'Code': 'GHI'}]
+        csv_filename = self.gen_test_csv_no_bom(csv_in, csv_cols)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.check_submit_selected()
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        expected_ghi = {'XMO Number': '2', 'Country Number': '5',
+                        'Annual URL': self.instance.url + 'country5',
+                        'Code': 'GHI', 'Name': 'Test Third Countr\u00fd',
+                        'Flag URL': '', 'Generic Number': '',
+                        'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_def, expected_ghi,
+                                    expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_def, expected_ghi,
+                                     expected_staff])
+
+    @_with_config(distinguish_official='Yes')
+    def test_country_bulk_register_official(self):
+        """
+        Test bulk registration of countries, official / unofficial distinction.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '',
+                          'Official Example': 'No', 'Normal': 'No'}
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
+        csv_cols = ['Country Number', 'Name', 'Ignore', 'Code',
+                    'Official Example', 'Contact Email 1', 'Contact Email 2',
+                    'Contact Email 3']
+        csv_in = [{'Country Number': '123',
+                   'Name': 'Test First Country',
+                   'Ignore': 'Random text',
+                   'Code': 'ABC', 'Official Example': 'No'},
+                  {'Name': 'Test Second Countr\u00fd',
+                   'Code': 'DEF',
+                   'Contact Email 1': 'DEF1@example.invalid',
+                   'Contact Email 2': 'DEF2@example.invalid',
+                   'Contact Email 3': 'DEF3@example.invalid',
+                   'Official Example': 'Yes'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.check_submit_selected(mail=True)
+        self.assertIn(
+            b'\nTO: DEF1@example.invalid, webmaster@example.invalid, '
+            b'DEF2@example.invalid, DEF3@example.invalid\n',
+            admin_session.last_mail_bin)
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '', 'Generic Number': '123',
+                        'Official Example': 'No', 'Normal': 'Yes'}
+        expected_def = {'XMO Number': '2', 'Country Number': '4',
+                        'Annual URL': self.instance.url + 'country4',
+                        'Code': 'DEF', 'Name': 'Test Second Countr\u00fd',
+                        'Flag URL': '', 'Generic Number': '',
+                        'Official Example': 'Yes', 'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_def,
+                                    expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_def,
+                                     expected_staff])
+
+    @_with_config(static_site_directory='static-site')
+    def test_country_bulk_register_static(self):
+        """
+        Test bulk registration of countries, flags available on static site.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        flag_bytes = self.instance.static_site_bytes(
+            'countries/country2/flag1.png')
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
+        csv_cols = ['Country Number', 'Name', 'Ignore', 'Code',
+                    'Contact Email 1', 'Contact Email 2', 'Contact Email 3']
+        csv_in = [{'Country Number': '3',
+                   'Name': 'Test First Country',
+                   'Ignore': 'Random text',
+                   'Code': 'ABC'},
+                  {'Country Number': '2', 'Name': 'Test Second Countr\u00fd',
+                   'Code': 'DEF',
+                   'Contact Email 1': 'DEF1@example.invalid',
+                   'Contact Email 2': 'DEF2@example.invalid',
+                   'Contact Email 3': 'DEF3@example.invalid'},
+                  {'Name': 'Test Third Countr\u00fd',
+                   'Code': 'GHI'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.check_submit_selected(mail=True)
+        self.assertIn(
+            b'\nTO: DEF1@example.invalid, webmaster@example.invalid, '
+            b'DEF2@example.invalid, DEF3@example.invalid\n',
+            admin_session.last_mail_bin)
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        img_url_csv = self.instance.url + 'flag1/flag.png'
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '', 'Generic Number': '3',
+                        'Normal': 'Yes'}
+        expected_def = {'XMO Number': '2', 'Country Number': '4',
+                        'Annual URL': self.instance.url + 'country4',
+                        'Code': 'DEF', 'Name': 'Test Second Countr\u00fd',
+                        'Flag URL': img_url_csv, 'Generic Number': '2',
+                        'Normal': 'Yes'}
+        expected_ghi = {'XMO Number': '2', 'Country Number': '5',
+                        'Annual URL': self.instance.url + 'country5',
+                        'Code': 'GHI', 'Name': 'Test Third Countr\u00fd',
+                        'Flag URL': '', 'Generic Number': '',
+                        'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_def, expected_ghi,
+                                    expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_def, expected_ghi,
+                                     expected_staff])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, flag_bytes)
+        self.assertEqual(admin_bytes, flag_bytes)
+
+    def test_country_bulk_register_errors(self):
+        """
+        Test errors from bulk registration of countries.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
+        # Error using bulk registration via GET request.
+        admin_session.check_open_relative(
+            'country?@action=country_bulk_register',
+            error='Invalid request')
+        # Errors applying action to bad class or with id specified
+        # (requires modifying the form to exercise).
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        form = admin_session.get_main_form()
+        form['action'] = 'person'
+        admin_session.set({'@template': 'index'})
+        admin_session.check_submit_selected(error='Invalid class for bulk '
+                                            'registration')
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        form = admin_session.get_main_form()
+        form['action'] = 'country1'
+        admin_session.set({'@template': 'item'})
+        admin_session.check_submit_selected(error='Node id specified for bulk '
+                                            'registration')
+        # Errors missing uploaded CSV data.
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        form = admin_session.get_main_form()
+        csv_file_input = form.find('input', attrs={'name': 'csv_file'})
+        csv_file_input.extract()
+        admin_session.check_submit_selected(error='no CSV file uploaded')
+        # Errors with CSV data of wrong type.
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        form = admin_session.get_main_form()
+        csv_file_input = form.find('input', attrs={'name': 'csv_file'})
+        csv_file_input.extract()
+        admin_session.b.new_control('text', 'csv_file', 'some text')
+        admin_session.check_submit_selected(error='csv_file not an uploaded '
+                                            'file')
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        form = admin_session.get_main_form()
+        csv_file_input = form.find('input', attrs={'name': 'csv_file'})
+        csv_file_input.extract()
+        admin_session.b.new_control('file', 'csv_contents', '')
+        csv_filename = self.gen_test_csv([{'Test': 'text'}], ['Test'])
+        admin_session.set({'csv_contents': csv_filename})
+        admin_session.check_submit_selected(error='csv_contents an uploaded '
+                                            'file')
+        # Errors with encoding of CSV data.
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        form = admin_session.get_main_form()
+        csv_file_input = form.find('input', attrs={'name': 'csv_file'})
+        csv_file_input.extract()
+        admin_session.b.new_control('text', 'csv_contents', '\u00ff')
+        # error='.' used for cases where the error message comes from
+        # the standard Python library, to avoid depending on the exact
+        # text of such errors.
+        admin_session.check_submit_selected(error='.')
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        form = admin_session.get_main_form()
+        csv_file_input = form.find('input', attrs={'name': 'csv_file'})
+        csv_file_input.extract()
+        admin_session.b.new_control('text', 'csv_contents', '!')
+        admin_session.check_submit_selected(error='.')
+        temp_file = tempfile.NamedTemporaryFile(suffix='.csv',
+                                                dir=self.temp_dir,
+                                                delete=False)
+        csv_filename = temp_file.name
+        temp_file.close()
+        write_bytes_to_file(b'\xff', csv_filename)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='.')
+        # Errors with content, where the uploaded file is a valid CSV
+        # file.
+        csv_cols = ['Country Number', 'Name', 'Ignore', 'Code',
+                    'Contact Email 1', 'Contact Email 2', 'Contact Email 3']
+        csv_in = [{'Country Number': '123',
+                   'Name': 'Test First Country',
+                   'Ignore': 'Random text',
+                   'Code': 'ABC'},
+                  {'Name': 'Test Second Country'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error="'Code' missing in row 2")
+        csv_in = [{'Country Number': '123',
+                   'Name': 'Test First Country',
+                   'Ignore': 'Random text',
+                   'Code': 'ABC'},
+                  {'Code': 'DEF', 'Name': '   '}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error="'Name' missing in row 2")
+        csv_in = [{'Country Number': '123',
+                   'Name': 'Test First Country',
+                   'Ignore': 'Random text',
+                   'Code': 'ABC'},
+                  {'Code': 'ABC', 'Name': 'Test Second Country'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error="'Code' duplicate value in "
+                                            "row 2")
+        csv_in = [{'Country Number': '123',
+                   'Name': 'Test First Country',
+                   'Ignore': 'Random text',
+                   'Code': 'ABC'},
+                  {'Code': 'DEF', 'Name': 'Test First Country'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error="'Name' duplicate value in "
+                                            "row 2")
+        csv_in = [{'Code': 'ABC', 'Name': 'Test First Country'},
+                  {'Code': 'DEF', 'Name': 'Test Second Country'},
+                  {'Country Number': '1', 'Code': 'GHI', 'Name': 'GHI'},
+                  {'Country Number': '1', 'Code': 'JKL', 'Name': 'JKL'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error="'Country Number' duplicate "
+                                            "value in row 4")
+        # Errors from auditor.
+        csv_in = [{'Code': 'ABC', 'Name': 'Test First Country'},
+                  {'Code': 'def', 'Name': 'Test Second Country'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 2: Country codes must '
+                                            'be all capital letters')
+        csv_in = [{'Code': 'ABC', 'Name': 'Test First Country'},
+                  {'Code': 'DEF', 'Name': 'Test Second Country',
+                   'Contact Email 1': 'invalid email'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 2: Email address '
+                                            'syntax is invalid')
+        csv_in = [{'Code': 'ABC', 'Name': 'Test First Country'},
+                  {'Code': 'DEF', 'Name': 'Test Second Country',
+                   'Contact Email 1': 'DEF@example.invalid',
+                   'Contact Email 2': '! ! !'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 2: Email address '
+                                            'syntax is invalid')
+        csv_in = [{'Code': 'ABC', 'Name': 'Test First Country'},
+                  {'Code': 'DEF', 'Name': 'Test Second Country',
+                   'Country Number': '0'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(
+            error=r'row 2: example\.invalid URLs for previous participation '
+            r'must be in the form https://www\.example\.invalid/countries/'
+            r'countryN/')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
+        # Errors from auditor when existing countries are duplicated.
+        admin_session.create_country_generic()
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        csv_in = [{'Code': 'ABC', 'Name': 'Test'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: A country with code '
+                                            'ABC already exists')
+        csv_in = [{'Code': 'DEF', 'Name': 'Test First Country'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: A country with name '
+                                            'Test First Country already '
+                                            'exists')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_staff])
+        # Errors from auditor bulk creation stage when duplicate
+        # countries were added after initial validation.
+        admin2_session = self.get_session('admin')
+        csv_in = [{'Code': 'DEF', 'Name': 'Test Second Country'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected()
+        admin2_session.create_country('DEF', 'Another Test Country')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin2_session.get_countries_csv_public_only()
+        expected_def = {'XMO Number': '2', 'Country Number': '4',
+                        'Annual URL': self.instance.url + 'country4',
+                        'Code': 'DEF', 'Name': 'Another Test Country',
+                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_def,
+                                    expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_def,
+                                     expected_staff])
+        admin_session.select_main_form()
+        admin_session.check_submit_selected(error='row 1: A country with code '
+                                            'DEF already exists')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        self.assertEqual(anon_csv, [expected_abc, expected_def,
+                                    expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_def,
+                                     expected_staff])
+
+    @_with_config(distinguish_official='Yes')
+    def test_country_bulk_register_errors_official(self):
+        """
+        Test errors from bulk registration of countries, official /
+        unofficial distinction.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '',
+                          'Official Example': 'No', 'Normal': 'No'}
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
+        csv_cols = ['Name', 'Code', 'Official Example']
+        csv_in = [{'Name': 'Test First Country', 'Code': 'ABC',
+                   'Official Example': 'Yes'},
+                  {'Name': 'Test Second Country', 'Code': 'DEF'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error="'Official Example' missing "
+                                            "in row 2")
+        csv_in = [{'Name': 'Test First Country', 'Code': 'ABC',
+                   'Official Example': 'Yes'},
+                  {'Name': 'Test Second Country', 'Code': 'DEF',
+                   'Official Example': 'abc'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error="'Official Example' bad "
+                                            "value in row 2")
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
+
+    @_with_config(static_site_directory='static-site')
+    def test_country_bulk_register_errors_static(self):
+        """
+        Test errors from bulk registration of countries, static site checks.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
+        csv_cols = ['Name', 'Code', 'Country Number']
+        csv_in = [{'Code': 'ABC', 'Name': 'Test First Country'},
+                  {'Code': 'DEF', 'Name': 'Test Second Country',
+                   'Country Number': '12345'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(
+            error=r'row 2: example\.invalid URL for previous participation '
+            r'not valid')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
 
     def test_country_scores_rss_errors(self):
         """

@@ -229,10 +229,7 @@ Registration system
 * Support for sending emails to registration contacts with reminders
   about missing data, and summaries of present data.
 
-* Add automation for bulk creation of countries in registration system
-  from command line (or web interface).
-
-* Support bulk upload of other registration details.
+* Support bulk upload of registration details for people.
 
 * Support self-registration accounts (that can register a single
   person in a particular role only, for both staff and normal

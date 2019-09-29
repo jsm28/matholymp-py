@@ -32,9 +32,11 @@
 __all__ = ['ScoreAction', 'RetireCountryAction', 'ScalePhotoAction',
            'CountryCSVAction', 'ScoresCSVAction', 'PeopleCSVAction',
            'MedalBoundariesCSVAction', 'FlagsZIPAction', 'PhotosZIPAction',
-           'ScoresRSSAction', 'register_actions']
+           'ScoresRSSAction', 'BulkRegisterAction',
+           'CountryBulkRegisterAction', 'register_actions']
 
 import cgi
+import collections
 import io
 import os
 
@@ -43,10 +45,14 @@ from roundup.cgi.actions import Action
 from roundup.cgi.exceptions import Unauthorised
 from roundup.exceptions import Reject
 
+from matholymp.fileutil import boolean_states
+from matholymp.roundupreg.auditors import audit_country_fields
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
-from matholymp.roundupreg.rounduputil import get_marks_per_problem, \
-    scores_from_str, person_is_contestant, contestant_code, scores_final, \
-    valid_country_problem, valid_int_str, create_rss
+from matholymp.roundupreg.rounduputil import distinguish_official, \
+    get_marks_per_problem, scores_from_str, person_is_contestant, \
+    contestant_code, scores_final, valid_country_problem, valid_int_str, \
+    create_rss, bulk_csv_data, bulk_csv_contact_emails, \
+    bulk_csv_country_number_url
 
 
 class ScoreAction(Action):
@@ -371,6 +377,163 @@ class ScoresRSSAction(Action):
         return text
 
 
+class BulkRegisterAction(Action):
+
+    """Base class for bulk registration actions."""
+
+    def handle(self):
+        """Bulk register or check bulk registration data."""
+        if self.client.env['REQUEST_METHOD'] != 'POST':
+            raise Reject(self._('Invalid request'))
+        if self.classname != self.required_classname:
+            raise ValueError('Invalid class for bulk registration')
+        if self.nodeid is not None:
+            raise ValueError('Node id specified for bulk registration')
+        csv_data = bulk_csv_data(self.form)
+        if isinstance(csv_data, str):
+            self.client.add_error_message(csv_data)
+            return
+        file_data, check_only = csv_data
+        # Verify the rows individually, generating corresponding data
+        # for subsequent item creation.
+        required_columns = self.get_required_columns()
+        unique_columns = self.get_unique_columns()
+        unique_vals = collections.defaultdict(set)
+        default_values = self.get_default_values()
+        str_column_map = self.get_str_column_map()
+        bool_column_map = self.get_bool_column_map()
+        item_class = self.db.getclass(self.classname)
+        item_data = []
+        for row_num, row in enumerate(file_data, start=1):
+            for key in required_columns:
+                if key not in row:
+                    self.client.add_error_message(
+                        "'%s' missing in row %d" % (key, row_num))
+                    return
+            for key in unique_columns:
+                if key in row:
+                    if row[key] in unique_vals[key]:
+                        self.client.add_error_message(
+                            "'%s' duplicate value in row %d" % (key, row_num))
+                        return
+                    unique_vals[key].add(row[key])
+            newvalues = default_values.copy()
+            for key in str_column_map:
+                if key in row:
+                    newvalues[str_column_map[key]] = row[key]
+            for key in bool_column_map:
+                if key in row:
+                    try:
+                        bool_val = boolean_states[row[key].lower()]
+                    except KeyError:
+                        self.client.add_error_message(
+                            "'%s' bad value in row %d" % (key, row_num))
+                        return
+                    newvalues[bool_column_map[key]] = bool_val
+            try:
+                self.map_csv_data(row, newvalues)
+                # Run the auditor for each item at this point to
+                # detect errors early and avoid possibly confusing
+                # effects of errors after some items have been
+                # created.
+                self.auditor(self.db, item_class, None, newvalues)
+                self.adjust_after_audit(row, newvalues)
+            except ValueError as exc:
+                self.client.add_error_message('row %d: %s'
+                                              % (row_num, str(exc)))
+                return
+            item_data.append(newvalues)
+        if check_only:
+            self.client.template = 'bulkconfirm'
+        else:
+            self.client.template = 'index'
+            for item in item_data:
+                item_id = item_class.create(**item)
+                self.db.commit()
+                self.client.add_ok_message('%s%s created'
+                                           % (self.classname, item_id))
+
+    def get_required_columns(self):
+        """Return the list of columns that must have nonempty values."""
+        return ()
+
+    def get_unique_columns(self):
+        """Return the list of columns that must have unique values."""
+        return ()
+
+    def get_default_values(self):
+        """Return default property values."""
+        return {}
+
+    def get_str_column_map(self):
+        """Return the mapping of string column names to property names."""
+        return {}
+
+    def get_bool_column_map(self):
+        """Return the mapping of boolean column names to property names."""
+        return {}
+
+    def map_csv_data(self, row, newvalues):
+        """Convert CSV data into item properties in class-specific way."""
+
+    def adjust_after_audit(self, row, newvalues):
+        """Adjust item properties after call to auditor."""
+
+
+class CountryBulkRegisterAction(BulkRegisterAction):
+
+    """Action to bulk register countries from a CSV file."""
+
+    name = 'bulk register'
+    permissionType = 'BulkRegisterCountry'
+    required_classname = 'country'
+    auditor = staticmethod(audit_country_fields)
+
+    def get_required_columns(self):
+        req_cols = ['Name', 'Code']
+        if distinguish_official(self.db):
+            req_cols.append(self.db.config.ext['MATHOLYMP_OFFICIAL_DESC'])
+        return req_cols
+
+    def get_unique_columns(self):
+        # Country Number is not actually checked by other code to be
+        # unique, but multiple countries corresponding to the same
+        # past country is an error, so check it here.
+        return ('Country Number', 'Name', 'Code')
+
+    def get_default_values(self):
+        return {'is_normal': True,
+                'participants_ok': True,
+                'reuse_flag': False,
+                'expected_numbers_confirmed': False}
+
+    def get_str_column_map(self):
+        return {'Name': 'name', 'Code': 'code'}
+
+    def get_bool_column_map(self):
+        if distinguish_official(self.db):
+            return {self.db.config.ext['MATHOLYMP_OFFICIAL_DESC']: 'official'}
+        else:
+            return {}
+
+    def map_csv_data(self, row, newvalues):
+        dummy_number, generic_url = bulk_csv_country_number_url(self.db, row)
+        if generic_url:
+            newvalues['generic_url'] = generic_url
+        contact_list = bulk_csv_contact_emails(row)
+        if contact_list:
+            newvalues['contact_email'] = contact_list[0]
+            contact_extra = contact_list[1:]
+            if contact_extra:
+                newvalues['contact_extra'] = '\n'.join(contact_extra)
+
+    def adjust_after_audit(self, row, newvalues):
+        # reuse_flag is set to false until the auditor is called, to
+        # avoid creating flag items when only doing initial
+        # validation, then to True afterwards.
+        newvalues['reuse_flag'] = True
+
+
 def register_actions(instance):
     """Register the matholymp actions with Roundup."""
     instance.registerAction('score', ScoreAction)
@@ -384,3 +547,4 @@ def register_actions(instance):
     instance.registerAction('photos_zip', PhotosZIPAction)
     instance.registerAction('consent_forms_zip', ConsentFormsZIPAction)
     instance.registerAction('scores_rss', ScoresRSSAction)
+    instance.registerAction('country_bulk_register', CountryBulkRegisterAction)

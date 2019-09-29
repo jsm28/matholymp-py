@@ -298,6 +298,15 @@ the registration system is not active.
   the website and name badges and needed for visa invitation letters.
   :file:`person.item.html` is updated accordingly.
 
+* Countries can be registered in bulk by uploading a CSV file of
+  country details rather than needing to fill in an online form for
+  each country being registered.  (If there is no flag to reuse or a
+  new flag is to be used, that still needs to be handled manually for
+  each such country.)  There are new templates
+  :file:`country.bulkregister.html` and
+  :file:`country.bulkconfirm.html`, while :file:`page.html` is updated
+  accordingly.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

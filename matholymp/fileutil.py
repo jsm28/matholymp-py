@@ -40,8 +40,8 @@ import os.path
 import re
 import string
 
-__all__ = ['read_utf8_csv', 'write_utf8_csv_bytes', 'write_utf8_csv',
-           'comma_join', 'comma_split', 'make_dirs_for_file',
+__all__ = ['read_utf8_csv', 'read_utf8_csv_bytes', 'write_utf8_csv_bytes',
+           'write_utf8_csv', 'comma_join', 'comma_split', 'make_dirs_for_file',
            'write_bytes_to_file', 'write_text_to_file', 'read_text_from_file',
            'replace_text_in_file', 'read_config_raw', 'read_config',
            'write_config_raw', 'boolean_states', 'remove_if_exists',
@@ -58,6 +58,20 @@ def read_utf8_csv(csv_file_name):
         csv_reader = csv.DictReader(csv_file)
         rows = [row for row in csv_reader]
         return rows
+
+
+def read_utf8_csv_bytes(csv_file_bytes):
+    """
+    Read the contents of a UTF-8 CSV file (with BOM), given as byte
+    contents, into an array of dictionaries.
+    """
+    csv_bytes_file_b = io.BytesIO(csv_file_bytes)
+    csv_bytes_file = io.TextIOWrapper(csv_bytes_file_b,
+                                      encoding='utf-8-sig',
+                                      newline='')
+    csv_reader = csv.DictReader(csv_bytes_file)
+    rows = [row for row in csv_reader]
+    return rows
 
 
 def write_utf8_csv_bytes(rows, keys):

@@ -1,0 +1,46 @@
+<tal:block metal:use-macro="templates/page/macros/icing">
+<title metal:fill-slot="head_title" i18n:translate="">Confirm Bulk Country Registration - <span
+ i18n:name="tracker" tal:replace="config/TRACKER_NAME" /></title>
+<span metal:fill-slot="body_title" tal:omit-tag="python:1"
+ i18n:translate="">Confirm bulk country registration</span>
+
+<td class="content" metal:fill-slot="content">
+
+<span tal:condition="python:not (request.user.hasPermission('BulkRegisterCountry')
+ or request.user.hasRole('Anonymous'))"
+ i18n:translate="">You are not allowed to view this page.</span>
+
+<span tal:condition="python:not request.user.hasPermission('BulkRegisterCountry')
+ and request.user.hasRole('Anonymous')"
+ i18n:translate="">Please login with your username and password.</span>
+
+<span tal:condition="python:request.user.hasPermission('BulkRegisterCountry')">
+
+<p>Check these country details carefully.  If OK, click to complete
+bulk registration; if not OK, try uploading a fixed CSV file.</p>
+
+<tal:block tal:replace="structure python:utils.show_bulk_csv_country(db._db, request.form)" />
+
+<form method="POST"
+      enctype="multipart/form-data"
+      tal:attributes="action request/classname">
+<table class="form">
+<tr>
+<td>
+<input type="hidden" name="@template" value="bulkregister">
+<input type="hidden" name="@action" value="country_bulk_register">
+<input type="hidden" name="csv_contents"
+       tal:attributes="value python:utils.bulk_csv_contents(request.form)">
+<input name="@csrf" type="hidden"
+       tal:attributes="value python:utils.anti_csrf_nonce()">
+<input type="submit" value="Complete bulk registration of these countries">
+</td>
+</tr>
+</table>
+</form>
+
+</span>
+
+</td>
+
+</tal:block>

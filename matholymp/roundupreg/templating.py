@@ -43,8 +43,10 @@ __all__ = ['people_from_country_internal', 'people_from_country',
            'arrdep_date_select', 'arrdep_time_select', 'photo_consent_select',
            'score_country_select', 'required_person_fields',
            'register_templating_utils', 'show_prereg_sidebar',
-           'show_prereg_reminder']
+           'show_prereg_reminder', 'bulk_csv_contents',
+           'show_bulk_csv_country']
 
+import base64
 import cgi
 import datetime
 import json
@@ -63,7 +65,9 @@ from matholymp.roundupreg.rounduputil import distinguish_official, \
     get_sanity_date_of_birth, person_date_of_birth, contestant_age, \
     get_arrdep_bounds, person_is_contestant, contestant_code, pn_score, \
     scores_final, any_scores_missing, country_has_contestants, \
-    valid_country_problem
+    valid_country_problem, bulk_csv_data, bulk_csv_contact_emails, \
+    bulk_csv_country_number_url
+from matholymp.roundupreg.staticsite import static_site_event_group
 
 
 def people_from_country_internal(db, country):
@@ -433,6 +437,57 @@ def show_prereg_reminder(db, userid):
     return not db.country.get(country, 'expected_numbers_confirmed')
 
 
+def bulk_csv_contents(form):
+    """Return base64-encoded contents of a previously uploaded CSV file."""
+    # In valid uses, csv_file is present as an uploaded file.  To
+    # avoid errors to the registration system admin when the template
+    # using this function is accessed directly without such an upload,
+    # silently return an empty string in such a case.
+    if 'csv_file' not in form or not isinstance(form['csv_file'].value, bytes):
+        return ''
+    return base64.b64encode(form['csv_file'].value).decode('ascii')
+
+
+def show_bulk_csv_country(db, form):
+    """Return HTML text of bulk-country-registration CSV contents."""
+    csv_data = bulk_csv_data(form)
+    if isinstance(csv_data, str):
+        return '<p class="error-message">%s</p>' % cgi.escape(csv_data)
+    file_data = csv_data[0]
+    sitegen = RoundupSiteGenerator(db)
+    sdata = static_site_event_group(db)
+    columns = ['Code', 'Name', 'Previous Participation']
+    dist_official = distinguish_official(db)
+    if dist_official:
+        official_desc = db.config.ext['MATHOLYMP_OFFICIAL_DESC']
+        columns.append(official_desc)
+    columns.append('Contact Emails')
+    head_row_list = [sitegen.html_tr_th_list(columns)]
+    body_row_list = []
+    for csv_row in file_data:
+        out_row = []
+        out_row.append(cgi.escape(csv_row.get('Code', '')))
+        out_row.append(cgi.escape(csv_row.get('Name', '')))
+        country_number, generic_url = bulk_csv_country_number_url(db, csv_row)
+        country_link = ''
+        if country_number is not None:
+            if sdata and country_number in sdata.country_map:
+                country_link = sitegen.html_a(cgi.escape(
+                    sdata.country_map[country_number].name), generic_url)
+            else:
+                # Either invalid country number (would normally have
+                # been detected by auditor) or no static site data
+                # available.
+                country_link = str(country_number)
+        out_row.append(country_link)
+        if dist_official:
+            out_row.append(cgi.escape(csv_row.get(official_desc, '')))
+        contact_emails = bulk_csv_contact_emails(csv_row)
+        out_row.append(cgi.escape(', '.join(contact_emails)))
+        body_row_list.append(sitegen.html_tr_td_list(out_row))
+    return sitegen.html_table_thead_tbody_list(head_row_list, body_row_list)
+
+
 def register_templating_utils(instance):
     """Register functions for use from page templates with Roundup."""
     instance.registerUtil('distinguish_official', distinguish_official)
@@ -477,3 +532,5 @@ def register_templating_utils(instance):
     instance.registerUtil('required_person_fields', required_person_fields)
     instance.registerUtil('show_prereg_sidebar', show_prereg_sidebar)
     instance.registerUtil('show_prereg_reminder', show_prereg_reminder)
+    instance.registerUtil('bulk_csv_contents', bulk_csv_contents)
+    instance.registerUtil('show_bulk_csv_country', show_bulk_csv_country)

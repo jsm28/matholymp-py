@@ -32,15 +32,18 @@ This module provides various utility functions for the Roundup
 registration system.
 """
 
+import base64
+import binascii
 import cgi
+import csv
 import datetime
 import re
 import time
 
 from matholymp.datetimeutil import date_from_ymd_str, date_from_ymd_iso, \
     age_on_date
-from matholymp.fileutil import boolean_states, file_format_contents, \
-    file_extension
+from matholymp.fileutil import read_utf8_csv_bytes, boolean_states, \
+    file_format_contents, file_extension
 
 __all__ = ['distinguish_official', 'get_consent_forms_date_str',
            'get_consent_forms_date', 'have_consent_forms', 'have_consent_ui',
@@ -53,7 +56,9 @@ __all__ = ['distinguish_official', 'get_consent_forms_date_str',
            'person_is_contestant', 'contestant_code', 'pn_score',
            'scores_final', 'any_scores_missing', 'country_has_contestants',
            'valid_country_problem', 'valid_int_str', 'create_rss',
-           'db_file_format_contents', 'db_file_extension', 'db_file_url']
+           'db_file_format_contents', 'db_file_extension', 'db_file_url',
+           'bulk_csv_data', 'bulk_csv_contact_emails',
+           'bulk_csv_country_number_url']
 
 
 def distinguish_official(db):
@@ -363,3 +368,71 @@ def db_file_url(db, cls, kind, file_id):
             url = '%s%s%s/%s.%s' % (db.config.TRACKER_WEB, cls, file_id, kind,
                                     ext)
     return url
+
+
+def bulk_csv_data(form):
+    """
+    Return the rows of an uploaded CSV file, in a tuple with a boolean
+    for whether just to check the results or act on them, or a string
+    error message.
+    """
+    # A csv_file form input means data has been uploaded for initial
+    # checking.  A csv_contents form input means the previously
+    # checked data has been submitted for actual bulk registration
+    # (but should still be rechecked rather than trusting the client).
+    if 'csv_file' in form:
+        check_only = True
+        file_bytes = form['csv_file'].value
+        if not isinstance(file_bytes, bytes):
+            return 'csv_file not an uploaded file'
+    elif 'csv_contents' in form:
+        check_only = False
+        file_base64_str = form['csv_contents'].value
+        if not isinstance(file_base64_str, str):
+            return 'csv_contents an uploaded file'
+        try:
+            file_bytes = base64.b64decode(file_base64_str, validate=True)
+        except (ValueError, binascii.Error) as exc:
+            return str(exc)
+    else:
+        return 'no CSV file uploaded'
+    try:
+        file_data = read_utf8_csv_bytes(file_bytes)
+    except (UnicodeError, csv.Error) as exc:
+        return str(exc)
+    # For user convenience, strip leading and trailing whitespace
+    # from CSV file fields.  Remove empty fields.
+    for row in file_data:
+        for key in list(row.keys()):
+            row[key] = row[key].strip()
+            if row[key] == '':
+                del row[key]
+    return (file_data, check_only)
+
+
+def bulk_csv_contact_emails(row):
+    """Return main and extra contact emails from an uploaded countries CSV."""
+    contact_email = row.get('Contact Email 1', '')
+    if contact_email:
+        contact_list = [contact_email]
+        n = 2
+        while ('Contact Email %d' % n) in row:
+            contact_list.append(row['Contact Email %d' % n])
+            n += 1
+        return contact_list
+    else:
+        return []    
+
+
+def bulk_csv_country_number_url(db, row):
+    """
+    Return the country number and previous participation URL for a
+    bulk-registered country.
+    """
+    country_number = row.get('Country Number', '')
+    if country_number and valid_int_str(country_number, None):
+        gubase = db.config.ext['MATHOLYMP_GENERIC_URL_BASE']
+        return (int(country_number),
+                '%scountries/country%s/' % (gubase, country_number))
+    else:
+        return None, None

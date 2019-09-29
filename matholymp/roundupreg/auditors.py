@@ -123,8 +123,16 @@ def audit_country_fields(db, cl, nodeid, newvalues):
         if c != nodeid:
             raise ValueError('A country with code %s already exists' % code)
 
-    require_value(db, cl, nodeid, newvalues, 'name',
-                  'No country name specified')
+    # As name is the key property, this is also checked in generic
+    # Roundup code, but check it here as well for the benefit of bulk
+    # registration.
+    name = require_value(db, cl, nodeid, newvalues, 'name',
+                         'No country name specified')
+    countries_with_name = db.country.filter(None, {'name': name})
+    for c in countries_with_name:
+        if c != nodeid:
+            raise ValueError('A country with name %s already exists' % name)
+
     if nodeid is not None:
         if ('is_normal' in newvalues
             and newvalues['is_normal'] != db.country.get(nodeid, 'is_normal')):

@@ -196,6 +196,11 @@ If it seems likely that participants from the country will want papers
 in a language not currently listed in the system, add that language
 (:guilabel:`Add Language`).
 
+Countries can be added in bulk, including creating registration system
+accounts and sending details of them by email to specified contacts,
+by uploading a CSV file (:guilabel:`Bulk register countries`).
+Otherwise, countries can be added individually.
+
 Create the country (:guilabel:`Add Country`), including uploading a
 (PNG) flag image (if a flag is available from a previous year in the
 static site, and ``matholymp_static_site_directory`` in

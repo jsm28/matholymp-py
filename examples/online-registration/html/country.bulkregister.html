@@ -1,0 +1,74 @@
+<tal:block metal:use-macro="templates/page/macros/icing">
+<title metal:fill-slot="head_title" i18n:translate="">Bulk Register Countries - <span
+ i18n:name="tracker" tal:replace="config/TRACKER_NAME" /></title>
+<span metal:fill-slot="body_title" tal:omit-tag="python:1"
+ i18n:translate="">Bulk register countries</span>
+
+<td class="content" metal:fill-slot="content">
+
+<span tal:condition="python:not (request.user.hasPermission('BulkRegisterCountry')
+ or request.user.hasRole('Anonymous'))"
+ i18n:translate="">You are not allowed to view this page.</span>
+
+<span tal:condition="python:not request.user.hasPermission('BulkRegisterCountry')
+ and request.user.hasRole('Anonymous')"
+ i18n:translate="">Please login with your username and password.</span>
+
+<span tal:condition="python:request.user.hasPermission('BulkRegisterCountry')">
+
+<form method="POST"
+      name="itemSynopsis"
+      enctype="multipart/form-data"
+      tal:define="required python:'csv_file'.split()"
+      tal:attributes="action request/classname;
+      onSubmit python:'return checkRequiredFields(\'%s\')'%'\', \''.join(required);
+      ">
+
+<table class="form" tal:define="
+  th_label templates/page/macros/th_label;
+  normal_input templates/page/macros/user_normal_input;
+  edit_ok true;
+  ">
+
+<tr>
+<td colspan="2">
+CSV files must be encoded in UTF-8 (BOM optional). They may contain
+the following columns, in any order: Country Number (optional), Name
+(required), Code
+(required)<tal:block tal:condition="python:utils.distinguish_official(db._db)"
+		     tal:replace="python:', %s (required)' % db._db.config.ext['MATHOLYMP_OFFICIAL_DESC']" />.  In addition, they may contain
+any number of columns with names &lsquo;Contact Email 1&rsquo;,
+&lsquo;Contact Email 2&rsquo;, etc., giving contact email addresses
+for each country.  Country numbers are the numbers in the
+<tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_GENERIC_URL_DESC']"
+/> for previous participation, or empty for a country that has not
+previously participated.  Unknown columns are ignored.
+</td>
+</tr>
+
+<tr>
+<th i18n:translate="">Upload CSV file</th>
+<td colspan=3><input type="file" name="csv_file" size="20"></td>
+</tr>
+
+<tr>
+<td>
+<input type="hidden" name="@template" value="bulkregister">
+<input type="hidden" name="@action" value="country_bulk_register">
+</td>
+<td>
+<input name="@csrf" type="hidden"
+       tal:attributes="value python:utils.anti_csrf_nonce()">
+<input type="submit" value="Check this CSV file">
+</td>
+</tr>
+
+</table>
+
+</form>
+
+</span>
+
+</td>
+
+</tal:block>
