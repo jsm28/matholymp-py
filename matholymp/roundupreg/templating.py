@@ -177,14 +177,14 @@ def show_travel_copy_options(db, userid, person):
     return db.country.get(country, 'is_normal')
 
 
-def country_travel_copy_options(db, country, person):
+def country_travel_copy_options(db, country, person_to):
     """
     Produce text giving the option to copy travel details from any
     other person from this country with nonempty travel details.
     """
     person_list = people_from_country_internal(db, country)
     person_list = [i for i in person_list
-                   if i != person and has_nonempty_travel(db, i)]
+                   if i != person_to and has_nonempty_travel(db, i)]
     travel_list = []
     for person in person_list:
         prop_js_list = []
