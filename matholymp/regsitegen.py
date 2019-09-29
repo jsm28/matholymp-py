@@ -332,7 +332,7 @@ class RegSiteGenerator(SiteGenerator):
                      ' as missing phone numbers, not other staff.</p>\n')
         return text
 
-    def photo_scale_form(self, p, nonce):
+    def photo_scale_form(self, person, nonce):
         """Return a form to scale down a person's photo."""
         raise NotImplementedError
 
