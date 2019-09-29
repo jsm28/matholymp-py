@@ -36,7 +36,7 @@ from which other data is derived.
 __all__ = ['DataSource']
 
 
-class DataSource(object):
+class DataSource:
 
     """
     A DataSource represents the underlying source (such as files or a

@@ -70,7 +70,7 @@ def read_docgen_config(top_directory):
     return config_data
 
 
-class DocumentGenerator(object):
+class DocumentGenerator:
 
     """
     A DocumentGenerator supports generating documents for a particular

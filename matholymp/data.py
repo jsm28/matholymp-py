@@ -114,7 +114,7 @@ class _EventGroupPropertyDS(_PropertyCached):
         super(_EventGroupPropertyDS, self).__init__(name, ds_get, doc)
 
 
-class EventGroup(object):
+class EventGroup:
 
     """
     An EventGroup represents a group of related events (instances of
@@ -336,7 +336,7 @@ class _EventPropertyDS(_PropertyCached):
         super(_EventPropertyDS, self).__init__(name, ds_get, doc)
 
 
-class Event(object):
+class Event:
 
     """
     An Event represents a single competition.  Attributes where the
@@ -1010,7 +1010,7 @@ class Event(object):
         """General-purpose sort key.""")
 
 
-class Paper(object):
+class Paper:
 
     """A paper represents one version of one paper at one Event."""
 
@@ -1032,7 +1032,7 @@ class Paper(object):
         """The URL of this paper."""
 
 
-class Person(object):
+class Person:
 
     """
     A Person represents an individual involved in one or more Events
@@ -1183,7 +1183,7 @@ class _PersonEventPropertyDS(_PropertyCached):
         super(_PersonEventPropertyDS, self).__init__(name, ds_get, doc)
 
 
-class PersonEvent(object):
+class PersonEvent:
 
     """
     A PersonEvent represents the participation of a Person in a
@@ -1630,7 +1630,7 @@ class PersonEvent(object):
         """Sort key by contestant number for exams.""")
 
 
-class Country(object):
+class Country:
 
     """
     A Country represents a group of people involved together in one or
@@ -1774,7 +1774,7 @@ class _CountryEventPropertyDS(_PropertyCached):
         super(_CountryEventPropertyDS, self).__init__(name, ds_get, doc)
 
 
-class CountryEvent(object):
+class CountryEvent:
 
     """
     A CountryEvent represents the participation of a Country in a

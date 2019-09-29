@@ -118,7 +118,7 @@ def gen_pdf_file(dirname, suffix):
     return ret_file
 
 
-class RoundupTestInstance(object):
+class RoundupTestInstance:
 
     """
     A RoundupTestInstance provides a temporary Roundup installation
@@ -324,7 +324,7 @@ class RoundupTestInstance(object):
             return in_file.read()
 
 
-class RoundupTestSession(object):
+class RoundupTestSession:
 
     """
     A RoundupTestSession automates interation with a RoundupTestInstance.

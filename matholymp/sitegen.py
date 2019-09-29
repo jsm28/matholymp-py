@@ -111,7 +111,7 @@ def sitegen_event_group(top_directory, cfg_data):
                                     top_directory))
 
 
-class SiteGenerator(object):
+class SiteGenerator:
 
     """
     A SiteGenerator supports website generation for a particular
