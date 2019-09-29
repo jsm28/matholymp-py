@@ -194,6 +194,7 @@ class SiteGenerator:
         return self.html_a(contents, href, target='_blank', **attrs)
 
     def html_img(self, **attrs):
+        """Generate an HTML img element."""
         return self.html_element_empty('img', **attrs)
 
     def html_th(self, contents, **attrs):
