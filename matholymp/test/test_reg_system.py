@@ -90,11 +90,11 @@ def gen_image(size_x, size_y, scale, mode):
     return Image.frombytes(mode, (size_x * scale, size_y * scale), data)
 
 
-def gen_image_file(size_x, size_y, scale, filename, format, mode='RGB',
+def gen_image_file(size_x, size_y, scale, filename, fmt, mode='RGB',
                    **kwargs):
     """Generate an image, in a file."""
     image = gen_image(size_x, size_y, scale, mode)
-    image.save(filename, format, **kwargs)
+    image.save(filename, fmt, **kwargs)
 
 
 def gen_pdf_file(dirname, suffix):
@@ -802,8 +802,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.sessions.append(session)
         return session
 
-    def gen_test_image(self, size_x, size_y, scale, suffix, format,
-                       mode='RGB'):
+    def gen_test_image(self, size_x, size_y, scale, suffix, fmt, mode='RGB'):
         """Generate a test image and return a tuple of the filename and the
         contents."""
         temp_file = tempfile.NamedTemporaryFile(suffix=suffix,
@@ -811,7 +810,7 @@ class RegSystemTestCase(unittest.TestCase):
                                                 delete=False)
         filename = temp_file.name
         temp_file.close()
-        gen_image_file(size_x, size_y, scale, filename, format, mode)
+        gen_image_file(size_x, size_y, scale, filename, fmt, mode)
         with open(filename, 'rb') as f:
             contents = f.read()
         return filename, contents
