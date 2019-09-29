@@ -2145,34 +2145,34 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country('ABC', 'Test First Country',
                                      {'flag-1@content': flag_filename},
                                      error=r'Filename extension for flag '
-                                     'must match contents \(png\)')
+                                     r'must match contents \(png\)')
         admin_session.create_country(
             'ABC', 'Test First Country',
             {'generic_url': 'https://www.example.invalid/test'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/countries/countryN/')
+            r'in the form https://www\.example\.invalid/countries/countryN/')
         admin_session.create_country(
             'ABC', 'Test First Country',
             {'generic_url': 'https://www.example.invalid/countries/country0/'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/countries/countryN/')
+            r'in the form https://www\.example\.invalid/countries/countryN/')
         admin_session.create_country(
             'ABC', 'Test First Country',
             {'generic_url':
              'https://www.example.invalid/countries/country01/'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/countries/countryN/')
+            r'in the form https://www\.example\.invalid/countries/countryN/')
         admin_session.create_country(
             'ABC', 'Test First Country',
             {'generic_url': 'https://www.example.invalid/countries/country1'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/countries/countryN/')
+            r'in the form https://www\.example\.invalid/countries/countryN/')
         admin_session.create_country(
             'ABC', 'Test First Country',
             {'generic_url':
              'https://www.example.invalid/countries/country1N/'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/countries/countryN/')
+            r'in the form https://www\.example\.invalid/countries/countryN/')
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv_public_only()
         self.assertEqual(anon_csv, [expected_staff])
@@ -2400,34 +2400,34 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.edit('country', '3',
                            {'flag-1@content': flag_filename},
                            error=r'Filename extension for flag must match '
-                           'contents \(png\)')
+                           r'contents \(png\)')
         admin_session.edit(
             'country', '3',
             {'generic_url': 'https://www.example.invalid/test'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/countries/countryN/')
+            r'in the form https://www\.example\.invalid/countries/countryN/')
         admin_session.edit(
             'country', '3',
             {'generic_url': 'https://www.example.invalid/countries/country0/'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/countries/countryN/')
+            r'in the form https://www\.example\.invalid/countries/countryN/')
         admin_session.edit(
             'country', '3',
             {'generic_url':
              'https://www.example.invalid/countries/country01/'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/countries/countryN/')
+            r'in the form https://www\.example\.invalid/countries/countryN/')
         admin_session.edit(
             'country', '3',
             {'generic_url': 'https://www.example.invalid/countries/country1'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/countries/countryN/')
+            r'in the form https://www\.example\.invalid/countries/countryN/')
         admin_session.edit(
             'country', '3',
             {'generic_url':
              'https://www.example.invalid/countries/country1N/'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/countries/countryN/')
+            r'in the form https://www\.example\.invalid/countries/countryN/')
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv_public_only()
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
@@ -6362,22 +6362,22 @@ class RegSystemTestCase(unittest.TestCase):
                                                           'PNG')
         admin_session.create_person('Test First Country', 'Contestant 1',
                                     {'photo-1@content': photo_filename},
-                                    error='Filename extension for photo must '
-                                    'match contents \(png\)')
+                                    error=r'Filename extension for photo must '
+                                    r'match contents \(png\)')
         reg_session.create_person('Test First Country', 'Contestant 1',
                                   {'photo-1@content': photo_filename},
-                                  error='Filename extension for photo must '
-                                  'match contents \(png\)')
+                                  error=r'Filename extension for photo must '
+                                  r'match contents \(png\)')
         photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.png',
                                                           'JPEG')
         admin_session.create_person('Test First Country', 'Contestant 1',
                                     {'photo-1@content': photo_filename},
-                                    error='Filename extension for photo must '
-                                    'match contents \(jpg\)')
+                                    error=r'Filename extension for photo must '
+                                    r'match contents \(jpg\)')
         reg_session.create_person('Test First Country', 'Contestant 1',
                                   {'photo-1@content': photo_filename},
-                                  error='Filename extension for photo must '
-                                  'match contents \(jpg\)')
+                                  error=r'Filename extension for photo must '
+                                  r'match contents \(jpg\)')
         cf_filename, cf_bytes = self.gen_test_image(2, 2, 2, '.png', 'PNG')
         admin_session.create_person('Test First Country', 'Contestant 1',
                                     {'consent_form-1@content': cf_filename},
@@ -6390,66 +6390,66 @@ class RegSystemTestCase(unittest.TestCase):
         cf_filename, cf_bytes = self.gen_test_pdf('.png')
         admin_session.create_person('Test First Country', 'Contestant 1',
                                     {'consent_form-1@content': cf_filename},
-                                    error='Filename extension for consent '
-                                    'form must match contents \(pdf\)')
+                                    error=r'Filename extension for consent '
+                                    r'form must match contents \(pdf\)')
         reg_session.create_person('Test First Country', 'Contestant 1',
                                   {'consent_form-1@content': cf_filename},
-                                  error='Filename extension for consent '
-                                  'form must match contents \(pdf\)')
+                                  error=r'Filename extension for consent '
+                                  r'form must match contents \(pdf\)')
         admin_session.create_person(
             'Test First Country', 'Contestant 1',
             {'generic_url': 'https://www.example.invalid/test'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/people/personN/')
+            r'in the form https://www\.example\.invalid/people/personN/')
         admin_session.create_person(
             'Test First Country', 'Contestant 1',
             {'generic_url': 'https://www.example.invalid/people/person0/'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/people/personN/')
+            r'in the form https://www\.example\.invalid/people/personN/')
         admin_session.create_person(
             'Test First Country', 'Contestant 1',
             {'generic_url':
              'https://www.example.invalid/people/person01/'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/people/personN/')
+            r'in the form https://www\.example\.invalid/people/personN/')
         admin_session.create_person(
             'Test First Country', 'Contestant 1',
             {'generic_url': 'https://www.example.invalid/people/person1'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/people/personN/')
+            r'in the form https://www\.example\.invalid/people/personN/')
         admin_session.create_person(
             'Test First Country', 'Contestant 1',
             {'generic_url':
              'https://www.example.invalid/people/person1N/'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/people/personN/')
+            r'in the form https://www\.example\.invalid/people/personN/')
         reg_session.create_person(
             'Test First Country', 'Contestant 1',
             {'generic_url': 'https://www.example.invalid/test'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/people/personN/')
+            r'in the form https://www\.example\.invalid/people/personN/')
         reg_session.create_person(
             'Test First Country', 'Contestant 1',
             {'generic_url': 'https://www.example.invalid/people/person0/'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/people/personN/')
+            r'in the form https://www\.example\.invalid/people/personN/')
         reg_session.create_person(
             'Test First Country', 'Contestant 1',
             {'generic_url':
              'https://www.example.invalid/people/person01/'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/people/personN/')
+            r'in the form https://www\.example\.invalid/people/personN/')
         reg_session.create_person(
             'Test First Country', 'Contestant 1',
             {'generic_url': 'https://www.example.invalid/people/person1'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/people/personN/')
+            r'in the form https://www\.example\.invalid/people/personN/')
         reg_session.create_person(
             'Test First Country', 'Contestant 1',
             {'generic_url':
              'https://www.example.invalid/people/person1N/'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/people/personN/')
+            r'in the form https://www\.example\.invalid/people/personN/')
         admin_session.create_country('ZZZ', 'None 2',
                                      {'participants_ok': 'no'})
         admin_session.create_person(
@@ -7664,22 +7664,22 @@ class RegSystemTestCase(unittest.TestCase):
                                                           'PNG')
         admin_session.edit('person', '4',
                            {'photo-1@content': photo_filename},
-                           error='Filename extension for photo must '
-                           'match contents \(png\)')
+                           error=r'Filename extension for photo must '
+                           r'match contents \(png\)')
         reg_session.edit('person', '4',
                          {'photo-1@content': photo_filename},
-                         error='Filename extension for photo must '
-                         'match contents \(png\)')
+                         error=r'Filename extension for photo must '
+                         r'match contents \(png\)')
         photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.png',
                                                           'JPEG')
         admin_session.edit('person', '4',
                            {'photo-1@content': photo_filename},
-                           error='Filename extension for photo must '
-                           'match contents \(jpg\)')
+                           error=r'Filename extension for photo must '
+                           r'match contents \(jpg\)')
         reg_session.edit('person', '4',
                          {'photo-1@content': photo_filename},
-                         error='Filename extension for photo must '
-                         'match contents \(jpg\)')
+                         error=r'Filename extension for photo must '
+                         r'match contents \(jpg\)')
         cf_filename, cf_bytes = self.gen_test_image(2, 2, 2, '.png', 'PNG')
         admin_session.edit('person', '4',
                            {'consent_form-1@content': cf_filename},
@@ -7690,66 +7690,66 @@ class RegSystemTestCase(unittest.TestCase):
         cf_filename, cf_bytes = self.gen_test_pdf('.png')
         admin_session.edit('person', '4',
                            {'consent_form-1@content': cf_filename},
-                           error='Filename extension for consent '
-                           'form must match contents \(pdf\)')
+                           error=r'Filename extension for consent '
+                           r'form must match contents \(pdf\)')
         reg_session.edit('person', '4',
                          {'consent_form-1@content': cf_filename},
-                         error='Filename extension for consent '
-                         'form must match contents \(pdf\)')
+                         error=r'Filename extension for consent '
+                         r'form must match contents \(pdf\)')
         admin_session.edit(
             'person', '4',
             {'generic_url': 'https://www.example.invalid/test'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/people/personN/')
+            r'in the form https://www\.example\.invalid/people/personN/')
         admin_session.edit(
             'person', '4',
             {'generic_url': 'https://www.example.invalid/people/person0/'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/people/personN/')
+            r'in the form https://www\.example\.invalid/people/personN/')
         admin_session.edit(
             'person', '4',
             {'generic_url':
              'https://www.example.invalid/people/person01/'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/people/personN/')
+            r'in the form https://www\.example\.invalid/people/personN/')
         admin_session.edit(
             'person', '4',
             {'generic_url': 'https://www.example.invalid/people/person1'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/people/personN/')
+            r'in the form https://www\.example\.invalid/people/personN/')
         admin_session.edit(
             'person', '4',
             {'generic_url':
              'https://www.example.invalid/people/person1N/'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/people/personN/')
+            r'in the form https://www\.example\.invalid/people/personN/')
         reg_session.edit(
             'person', '4',
             {'generic_url': 'https://www.example.invalid/test'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/people/personN/')
+            r'in the form https://www\.example\.invalid/people/personN/')
         reg_session.edit(
             'person', '4',
             {'generic_url': 'https://www.example.invalid/people/person0/'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/people/personN/')
+            r'in the form https://www\.example\.invalid/people/personN/')
         reg_session.edit(
             'person', '4',
             {'generic_url':
              'https://www.example.invalid/people/person01/'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/people/personN/')
+            r'in the form https://www\.example\.invalid/people/personN/')
         reg_session.edit(
             'person', '4',
             {'generic_url': 'https://www.example.invalid/people/person1'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/people/personN/')
+            r'in the form https://www\.example\.invalid/people/personN/')
         reg_session.edit(
             'person', '4',
             {'generic_url':
              'https://www.example.invalid/people/person1N/'},
             error=r'example.invalid URLs for previous participation must be '
-            'in the form https://www\.example\.invalid/people/personN/')
+            r'in the form https://www\.example\.invalid/people/personN/')
         admin_session.create_country('ZZZ', 'None 2',
                                      {'participants_ok': 'no'})
         admin_session.edit('person', '4',
