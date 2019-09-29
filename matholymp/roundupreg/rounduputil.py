@@ -421,7 +421,7 @@ def bulk_csv_contact_emails(row):
             n += 1
         return contact_list
     else:
-        return []    
+        return []
 
 
 def bulk_csv_country_number_url(db, row):

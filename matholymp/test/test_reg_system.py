@@ -767,7 +767,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.method_name = method_name
         method = getattr(self, method_name)
         self.config = getattr(method, 'config', {})
-        super(RegSystemTestCase, self).__init__(method_name)        
+        super(RegSystemTestCase, self).__init__(method_name)
 
     def __str__(self):
         # Generate test names similar to those for script tests.
@@ -875,7 +875,7 @@ class RegSystemTestCase(unittest.TestCase):
         session = self.get_session('admin')
         # This one gives an error when used without a particular
         # country specified.
-        forbid_templates={'country.prereg.html'}
+        forbid_templates = {'country.prereg.html'}
         self.all_templates_test(session, forbid_classes=set(),
                                 forbid_templates=forbid_templates,
                                 allow_templates=set(), can_score=True,
@@ -954,7 +954,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_country('DEF', 'Test Second Country',
                                      {'flag-1@content': flag_filename})
         photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
-                                                         'JPEG')
+                                                          'JPEG')
         pdf_filename, pdf_bytes = self.gen_test_pdf()
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
                                     {'photo-1@content': photo_filename,
@@ -2001,8 +2001,8 @@ class RegSystemTestCase(unittest.TestCase):
                                      error='A country with code ZZA already '
                                      'exists')
         admin_session.create_country('ZZX', 'XMO 2015 Staff',
-                                     error='A country with name XMO 2015 Staff '
-                                     'already exists')
+                                     error='A country with name XMO 2015 '
+                                     'Staff already exists')
         admin_session.create_country('ABC', 'Test First Country',
                                      {'contact_email': 'bad_email'},
                                      error='Email address syntax is invalid')
@@ -4198,7 +4198,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -4254,7 +4254,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -4314,7 +4314,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -4373,7 +4373,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -4419,7 +4419,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -4463,7 +4463,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -4507,7 +4507,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -4553,7 +4553,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -4594,7 +4594,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -4634,7 +4634,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -4691,7 +4691,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -4752,7 +4752,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -4810,7 +4810,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -4854,7 +4854,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -4885,7 +4885,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -4909,7 +4909,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -4956,7 +4956,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -4986,7 +4986,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5016,7 +5016,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5047,7 +5047,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5074,7 +5074,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5105,7 +5105,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5139,7 +5139,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5167,7 +5167,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5207,7 +5207,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5229,7 +5229,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5262,7 +5262,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5289,7 +5289,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5333,7 +5333,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5367,7 +5367,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5413,7 +5413,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5449,7 +5449,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5499,7 +5499,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5528,7 +5528,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5564,7 +5564,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5593,7 +5593,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5632,7 +5632,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5680,7 +5680,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5721,7 +5721,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -5778,7 +5778,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -6177,7 +6177,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         anon_csv[0] = {'Photo URL': anon_csv[0]['Photo URL'],
-                        'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
+                       'Badge Photo URL': anon_csv[0].get('Badge Photo URL'),
                        'Generic Number': anon_csv[0]['Generic Number']}
         admin_csv[0] = {'Photo URL': admin_csv[0]['Photo URL'],
                         'Badge Photo URL': admin_csv[0]['Badge Photo URL'],
@@ -6309,7 +6309,7 @@ class RegSystemTestCase(unittest.TestCase):
                                     {'date_of_birth_year': '1994',
                                      'date_of_birth_month': 'December',
                                      'date_of_birth_day': '31'},
-                                     error='Contestant too old')
+                                    error='Contestant too old')
         reg_session.create_person('Test First Country', 'Contestant 1',
                                   {'date_of_birth_year': '1995',
                                    'date_of_birth_month': 'April',
@@ -8428,7 +8428,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_person('Test First Country', 'Leader',
                                     {'gender': 'Male'})
         reg_session.create_person('Test First Country', 'Deputy Leader',
-                                    {'gender': 'Non-binary'})
+                                  {'gender': 'Non-binary'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -8472,7 +8472,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_person('Test First Country', 'Leader',
                                     {'gender': 'Male'})
         reg_session.create_person('Test First Country', 'Deputy Leader',
-                                    {'gender': 'Non-binary'})
+                                  {'gender': 'Non-binary'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
