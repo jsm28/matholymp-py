@@ -61,8 +61,7 @@ except ImportError:
 
 from matholymp.fileutil import read_utf8_csv, write_utf8_csv_bytes, \
     write_utf8_csv, write_bytes_to_file, write_text_to_file, \
-    read_text_from_file, replace_text_in_file, read_config_raw, \
-    write_config_raw
+    replace_text_in_file, read_config_raw, write_config_raw
 
 __all__ = ['gen_image', 'gen_image_file', 'gen_pdf_file',
            'RoundupTestInstance', 'RoundupTestSession', 'RegSystemTestCase']
@@ -440,7 +439,7 @@ class RoundupTestSession(object):
         if response.headers['content-disposition'] != expected_disposition:
             raise ValueError('request for %s produced content disposition '
                              '%s, not %s'
-                             % (response.headers['content-disposition'],
+                             % (url, response.headers['content-disposition'],
                                 expected_disposition))
         return response.content
 
@@ -4792,8 +4791,6 @@ class RegSystemTestCase(unittest.TestCase):
         """
         session = self.get_session()
         admin_session = self.get_session('admin')
-        photo_bytes = self.instance.static_site_bytes(
-            'people/person1/photo1.jpg')
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
         admin_session.create_person(
@@ -4838,8 +4835,6 @@ class RegSystemTestCase(unittest.TestCase):
         """
         session = self.get_session()
         admin_session = self.get_session('admin')
-        photo_bytes = self.instance.static_site_bytes(
-            'people/person1/photo1.jpg')
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
         admin_session.create_person(
@@ -5541,7 +5536,6 @@ class RegSystemTestCase(unittest.TestCase):
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
                       'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
-        img_url_csv = self.instance.url + 'photo1/photo.jpg'
         expected = {'Photo URL': '', 'Badge Photo URL': None,
                     'Generic Number': '1'}
         expected_admin = {'Photo URL': '', 'Badge Photo URL': '',
@@ -5607,7 +5601,6 @@ class RegSystemTestCase(unittest.TestCase):
         reg_csv[0] = {'Photo URL': reg_csv[0]['Photo URL'],
                       'Badge Photo URL': reg_csv[0].get('Badge Photo URL'),
                       'Generic Number': reg_csv[0]['Generic Number']}
-        img_url_csv = self.instance.url + 'photo1/photo.jpg'
         expected = {'Photo URL': '', 'Badge Photo URL': None,
                     'Generic Number': '1'}
         expected_admin = {'Photo URL': '', 'Badge Photo URL': '',
@@ -9173,7 +9166,6 @@ class RegSystemTestCase(unittest.TestCase):
         A Roundup bug with such fields was fixed in commit
         f60c44563c3a (Sun Mar 24 21:49:17 2019 +0000).
         """
-        session = self.get_session()
         admin_session = self.get_session('admin')
         admin_session.create_country_generic()
         large_text_1 = ''.join(str(n) for n in range(1000))
@@ -9196,7 +9188,6 @@ class RegSystemTestCase(unittest.TestCase):
         """
         Test scaling down photo.
         """
-        session = self.get_session()
         admin_session = self.get_session('admin')
         photo_filename, photo_bytes = self.gen_test_image(1024, 1024, 2,
                                                           '.jpg', 'JPEG')
@@ -9224,7 +9215,6 @@ class RegSystemTestCase(unittest.TestCase):
         """
         Test scaling down photo: smaller configured maximum size.
         """
-        session = self.get_session()
         admin_session = self.get_session('admin')
         photo_filename, photo_bytes = self.gen_test_image(256, 256, 2,
                                                           '.jpg', 'JPEG')
@@ -9252,7 +9242,6 @@ class RegSystemTestCase(unittest.TestCase):
         """
         Test scaling down photo: PNG photo.
         """
-        session = self.get_session()
         admin_session = self.get_session('admin')
         photo_filename, photo_bytes = self.gen_test_image(256, 256, 2,
                                                           '.png', 'PNG')
@@ -9281,7 +9270,6 @@ class RegSystemTestCase(unittest.TestCase):
         Test scaling down photo: minimum dimension prevents making
         small enough.
         """
-        session = self.get_session()
         admin_session = self.get_session('admin')
         photo_filename, photo_bytes = self.gen_test_image(1024, 256, 2,
                                                           '.jpg', 'JPEG')
@@ -9331,7 +9319,6 @@ class RegSystemTestCase(unittest.TestCase):
         Test scaling down photo: configured minimum dimension prevents
         making small enough.
         """
-        session = self.get_session()
         admin_session = self.get_session('admin')
         photo_filename, photo_bytes = self.gen_test_image(256, 256, 2,
                                                           '.jpg', 'JPEG')
@@ -9360,7 +9347,6 @@ class RegSystemTestCase(unittest.TestCase):
         """
         Test scaling down photo: greyscale image.
         """
-        session = self.get_session()
         admin_session = self.get_session('admin')
         photo_filename, photo_bytes = self.gen_test_image(512, 512, 2,
                                                           '.jpg', 'JPEG', 'L')
@@ -9388,7 +9374,6 @@ class RegSystemTestCase(unittest.TestCase):
         """
         Test scaling down photo: image with alpha channel.
         """
-        session = self.get_session()
         admin_session = self.get_session('admin')
         photo_filename, photo_bytes = self.gen_test_image(256, 256, 2,
                                                           '.png', 'PNG',
@@ -9417,7 +9402,6 @@ class RegSystemTestCase(unittest.TestCase):
         """
         Test scaling down photo: greyscale image with alpha channel.
         """
-        session = self.get_session()
         admin_session = self.get_session('admin')
         photo_filename, photo_bytes = self.gen_test_image(256, 256, 2,
                                                           '.png', 'PNG',
@@ -9449,12 +9433,10 @@ class RegSystemTestCase(unittest.TestCase):
         Errors relating to the size of the photo are tested
         separately.
         """
-        session = self.get_session()
         admin_session = self.get_session('admin')
         photo_filename, photo_bytes = self.gen_test_image(256, 256, 2,
                                                           '.jpg', 'JPEG')
         admin_session.create_country_generic()
-        reg_session = self.get_session('ABC_reg')
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
                                     {'photo-1@content': photo_filename})
         admin_session.create_person('XMO 2015 Staff', 'Coordinator')
@@ -9966,7 +9948,6 @@ class RegSystemTestCase(unittest.TestCase):
         """
         Test errors from event creation auditor.
         """
-        session = self.get_session()
         admin_session = self.get_session('admin')
         admin_session.create('event',
                              {},
@@ -10117,7 +10098,6 @@ class RegSystemTestCase(unittest.TestCase):
         """
         Test errors from role creation auditor.
         """
-        session = self.get_session()
         admin_session = self.get_session('admin')
         admin_session.create('matholymprole',
                              {'name': 'Random',
@@ -10131,7 +10111,6 @@ class RegSystemTestCase(unittest.TestCase):
         """
         Test errors from role creation auditor, missing required data.
         """
-        session = self.get_session()
         admin_session = self.get_session('admin')
         admin_session.create('matholymprole',
                              {'default_room_type': 'Shared room',
@@ -10173,7 +10152,6 @@ class RegSystemTestCase(unittest.TestCase):
         """
         Test errors from role edit auditor.
         """
-        session = self.get_session()
         admin_session = self.get_session('admin')
         admin_session.edit('matholymprole', '1',
                            {'room_types': ['Single room'],
@@ -10233,7 +10211,6 @@ class RegSystemTestCase(unittest.TestCase):
         """
         Test errors from badge type creation auditor.
         """
-        session = self.get_session()
         admin_session = self.get_session('admin')
         admin_session.create('badge_type',
                              {'name': 'Random',
@@ -10280,7 +10257,6 @@ class RegSystemTestCase(unittest.TestCase):
         """
         Test errors from badge type creation auditor, missing required data.
         """
-        session = self.get_session()
         admin_session = self.get_session('admin')
         admin_session.create('badge_type',
                              {'background_name': 'random',
@@ -10340,7 +10316,6 @@ class RegSystemTestCase(unittest.TestCase):
         """
         Test errors from badge type edit auditor.
         """
-        session = self.get_session()
         admin_session = self.get_session('admin')
         admin_session.edit('badge_type', '1',
                            {'background_name': '/../hack'},

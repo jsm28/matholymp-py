@@ -276,7 +276,6 @@ class DocumentGenerator(object):
         else:
             template_fields['use_background'] = 'false'
 
-        primary_role = person.primary_role
         role = self.role_text(person)
         template_fields['role'] = role
 
