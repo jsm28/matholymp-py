@@ -34,8 +34,8 @@ content from within the registration system.
 
 __all__ = ['RegSiteGenerator']
 
-import cgi
 import collections
+import html
 import io
 import os
 import zipfile
@@ -263,13 +263,13 @@ class RegSiteGenerator(SiteGenerator):
             ret_text = ('<p>Expected numbers of participants and single '
                         'room requests not yet confirmed for '
                         '<strong>%s</strong>.</p>\n'
-                        % cgi.escape(c.name_with_code))
+                        % html.escape(c.name_with_code))
         expected_roles = c.expected_roles
         person_list = c.person_list
         if not person_list:
             ret_text += ('<p>No participants registered from'
                          ' <strong>%s</strong>.</p>\n'
-                         % cgi.escape(c.name_with_code))
+                         % html.escape(c.name_with_code))
         else:
             have_roles = collections.defaultdict(int)
             for p in person_list:
@@ -285,8 +285,8 @@ class RegSiteGenerator(SiteGenerator):
             if missing_roles:
                 ret_text += ('<p>Not registered from <strong>%s</strong>:'
                              ' %s.</p>\n'
-                             % (cgi.escape(c.name_with_code),
-                                cgi.escape(', '.join(missing_roles))))
+                             % (html.escape(c.name_with_code),
+                                html.escape(', '.join(missing_roles))))
         return ret_text
 
     def missing_person_details_text(self, people, consent_forms_date,
@@ -310,10 +310,11 @@ class RegSiteGenerator(SiteGenerator):
                 if 'phone number' in p_needed:
                     missing_phone = True
                 if show_country:
-                    row = [cgi.escape(p.country.name_with_code)]
+                    row = [html.escape(p.country.name_with_code)]
                 else:
                     row = []
-                row.extend([self.link_for_person(p.person, cgi.escape(p.name)),
+                row.extend([self.link_for_person(p.person,
+                                                 html.escape(p.name)),
                             ', '.join(p_needed)])
                 body_row_list.append(self.html_tr_td_list(row))
         if body_row_list:
@@ -361,7 +362,7 @@ class RegSiteGenerator(SiteGenerator):
             if not c.guide_list:
                 text += ('<p>No guide registered for'
                          ' <strong>%s</strong>.</p>\n'
-                         % cgi.escape(c.name_with_code))
+                         % html.escape(c.name_with_code))
         text += ('<p>The system cannot tell automatically if not all'
                  ' staff have been registered.</p>\n')
 
@@ -372,9 +373,9 @@ class RegSiteGenerator(SiteGenerator):
         body_row_list = []
         for p in people:
             if p.room_number is None:
-                row = [cgi.escape(p.country.name_with_code),
-                       self.link_for_person(p.person, cgi.escape(p.name)),
-                       cgi.escape(p.primary_role)]
+                row = [html.escape(p.country.name_with_code),
+                       self.link_for_person(p.person, html.escape(p.name)),
+                       html.escape(p.primary_role)]
                 body_row_list.append(self.html_tr_td_list(row))
         if body_row_list:
             text += '<h2>Room allocations needed</h2>\n'
@@ -397,8 +398,8 @@ class RegSiteGenerator(SiteGenerator):
             if filename is not None:
                 photo_size = os.stat(filename).st_size
                 if photo_size > max_photo_size:
-                    row = [cgi.escape(p.country.name_with_code),
-                           self.link_for_person(p.person, cgi.escape(p.name)),
+                    row = [html.escape(p.country.name_with_code),
+                           self.link_for_person(p.person, html.escape(p.name)),
                            str(photo_size),
                            self.photo_scale_form(p.person, nonce)]
                     body_row_list.append(self.html_tr_td_list(row))
@@ -416,7 +417,7 @@ class RegSiteGenerator(SiteGenerator):
         for c in normal_countries:
             if not c.flag_url:
                 flags_needed += ('<p>No flag for <strong>%s</strong>.</p>\n'
-                                 % cgi.escape(c.name_with_code))
+                                 % html.escape(c.name_with_code))
         if flags_needed:
             text += ('<h2>Action needed by registration system'
                      ' maintainers</h2>\n')
@@ -451,18 +452,18 @@ class RegSiteGenerator(SiteGenerator):
                 rdesc = 'No room allocated'
             else:
                 rdesc = 'Room: %s' % r
-            rtext = '<h2>%s</h2>\n' % cgi.escape(rdesc)
+            rtext = '<h2>%s</h2>\n' % html.escape(rdesc)
             head_row_list = [self.html_tr_th_list(['Country', 'Person', 'Role',
                                                    'Gender', 'Room Type',
                                                    'Share With', 'Room'])]
             body_row_list = []
             for p in sorted(people_by_room[r], key=lambda x: x.sort_key):
-                row = [cgi.escape(p.country.name_with_code),
-                       self.link_for_person(p.person, cgi.escape(p.name)),
-                       cgi.escape(p.primary_role),
-                       cgi.escape(p.gender),
-                       cgi.escape(p.room_type),
-                       cgi.escape(p.room_share_with),
+                row = [html.escape(p.country.name_with_code),
+                       self.link_for_person(p.person, html.escape(p.name)),
+                       html.escape(p.primary_role),
+                       html.escape(p.gender),
+                       html.escape(p.room_type),
+                       html.escape(p.room_share_with),
                        self.room_edit_field(p)]
                 body_row_list.append(self.html_tr_td_list(row))
             rtext += self.html_table_thead_tbody_list(head_row_list,

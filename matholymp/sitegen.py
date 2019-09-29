@@ -32,7 +32,7 @@ This module provides the SiteGenerator class that can be used to
 generate a whole website or individual pages or page fragments.
 """
 
-import cgi
+import html
 import os
 import os.path
 import re
@@ -135,8 +135,8 @@ class SiteGenerator:
 
     def write_html_to_file(self, out_text, title, header, out_path):
         """Write HTML text to a file in standard template."""
-        long_title = cgi.escape(self._data.long_name) + ': ' + title
-        short_title = cgi.escape(self._data.short_name) + ': ' + header
+        long_title = html.escape(self._data.long_name) + ': ' + title
+        short_title = html.escape(self._data.short_name) + ': ' + header
         page_data = {'title': long_title,
                      'header': short_title,
                      'body': out_text}
@@ -159,7 +159,7 @@ class SiteGenerator:
             else:
                 nk = k
             nattrs[nk] = attrs[k]
-        return ''.join([' %s="%s"' % (k, cgi.escape(nattrs[k], quote=True))
+        return ''.join([' %s="%s"' % (k, html.escape(nattrs[k]))
                         for k in sorted(nattrs.keys())])
 
     def html_element(self, tag, contents, **attrs):
@@ -529,9 +529,10 @@ class SiteGenerator:
         """
         return ('%s in %s'
                 % (self.link_for_event(event,
-                                       cgi.escape(event.short_name_with_year)),
+                                       html.escape(
+                                           event.short_name_with_year)),
                    self.link_for_country(event.host_country,
-                                         cgi.escape(
+                                         html.escape(
                                              event.host_country_name_in))))
 
     def generate_sidebar_out(self):
@@ -541,8 +542,8 @@ class SiteGenerator:
         sidebar_out = os.path.join(self._auto_out_dir, out_filename)
         out_list = []
         for e in self._data.event_list:
-            short_name = cgi.escape(e.short_name_with_year)
-            location = cgi.escape(e.host_location)
+            short_name = html.escape(e.short_name_with_year)
+            location = html.escape(e.host_location)
             event_link = self.link_for_event(e, short_name)
             home_link = self.home_page_link_for_event(e)
             text = ('<li><strong>%s</strong>, %s%s</li>'
@@ -559,8 +560,8 @@ class SiteGenerator:
         contact_out = os.path.join(self._auto_out_dir, out_filename)
         out_list = []
         for e in self._data.event_list:
-            short_name = cgi.escape(e.short_name_with_year)
-            contact = cgi.escape(e.contact or '')
+            short_name = html.escape(e.short_name_with_year)
+            contact = html.escape(e.contact or '')
             if contact:
                 text = ('  <li>For communications about %s,'
                         ' please contact %s.</li>'
@@ -574,7 +575,7 @@ class SiteGenerator:
         text = ''
         text += ('<p>Details of all %s may also be %s in CSV format,'
                  ' as may %s.</p>\n'
-                 % (cgi.escape(self._data.short_name_plural),
+                 % (html.escape(self._data.short_name_plural),
                     self.link_for_data_events('downloaded'),
                     self.link_for_data_papers('a list of all language versions'
                                               ' of all papers')))
@@ -605,10 +606,10 @@ class SiteGenerator:
         body_row_list = []
         for e in self._data.event_list:
             number = self.link_for_event(e, str(e.id))
-            year = self.link_for_event(e, cgi.escape(e.year))
+            year = self.link_for_event(e, html.escape(e.year))
             country = self.link_for_country(e.host_country,
-                                            cgi.escape(e.host_country_name))
-            city = cgi.escape(e.host_city or '')
+                                            html.escape(e.host_country_name))
+            city = html.escape(e.host_city or '')
             if e.start_date is None or e.end_date is None:
                 dates = ''
             else:
@@ -639,12 +640,12 @@ class SiteGenerator:
         body_row_list.reverse()
         text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
         text += '\n'
-        title = 'List of %s' % cgi.escape(self._data.short_name_plural)
+        title = 'List of %s' % html.escape(self._data.short_name_plural)
         self.write_html_to_file(text, title, title, self.path_for_events())
 
     def host_year_text(self, c):
         """Generate text listing years for which one country was host."""
-        host_year_list = [self.link_for_event(e, cgi.escape(e.year))
+        host_year_list = [self.link_for_event(e, html.escape(e.year))
                           for e in c.host_list]
         return ', '.join(host_year_list)
 
@@ -653,13 +654,13 @@ class SiteGenerator:
         text = ''
         text += ('<p>Details of all countries at all %s may also be'
                  ' %s in CSV format.</p>\n'
-                 % (cgi.escape(self._data.short_name_plural),
+                 % (html.escape(self._data.short_name_plural),
                     self.link_for_data_countries('downloaded')))
         head_row = [self.html_th('Code'),
                     self.html_th('Name')]
         if self._data.distinguish_official:
             head_row.extend([self.html_th(
-                cgi.escape(self._cfg['official_desc']))])
+                html.escape(self._cfg['official_desc']))])
         head_row.extend(
             [self.html_th('First'),
              self.html_th('Last'),
@@ -672,10 +673,10 @@ class SiteGenerator:
         for c in countries:
             first_c = c.participation_list[0]
             last_c = c.participation_list[-1]
-            first_year = cgi.escape(first_c.event.year)
-            last_year = cgi.escape(last_c.event.year)
-            row = [self.link_for_country(c, cgi.escape(c.code)),
-                   self.link_for_country(c, cgi.escape(c.name))]
+            first_year = html.escape(first_c.event.year)
+            last_year = html.escape(last_c.event.year)
+            row = [self.link_for_country(c, html.escape(c.code)),
+                   self.link_for_country(c, html.escape(c.name))]
             if self._data.distinguish_official:
                 row.extend(['' if c.is_official is None
                             else 'Yes' if c.is_official else 'No'])
@@ -695,11 +696,11 @@ class SiteGenerator:
         """Generate a summary of all people."""
         text = ''
         hoftxt = ('hall of fame of %s contestants by medal count'
-                  % cgi.escape(self._data.short_name))
+                  % html.escape(self._data.short_name))
         text += ('<p>A %s is also available.  Details of all people at'
                  ' all %s may also be %s in CSV format.</p>\n'
                  % (self.link_for_hall_of_fame(hoftxt),
-                    cgi.escape(self._data.short_name_plural),
+                    html.escape(self._data.short_name_plural),
                     self.link_for_data_people('downloaded')))
         head_row_list = [self.html_tr_th_scores_list(['Given Name',
                                                       'Family Name',
@@ -712,28 +713,30 @@ class SiteGenerator:
                 e = p.event
                 year_text = ''
                 year_text += ('%s: '
-                              % self.link_for_event(e, cgi.escape(e.year)))
+                              % self.link_for_event(e, html.escape(e.year)))
                 cl = self.link_for_country_at_event(p.country,
-                                                    cgi.escape(p.country.name))
+                                                    html.escape(
+                                                        p.country.name))
                 year_text += '%s ' % cl
-                role_text = cgi.escape(p.primary_role)
+                role_text = html.escape(p.primary_role)
                 if p.is_contestant and p.awards_str:
-                    role_text += ': %s' % cgi.escape(p.awards_str)
+                    role_text += ': %s' % html.escape(p.awards_str)
                 if p.guide_for:
                     glist = sorted(p.guide_for, key=lambda x: x.sort_key)
                     gtlist = []
                     for c in glist:
                         cl = self.link_for_country_at_event(c,
-                                                            cgi.escape(c.name))
+                                                            html.escape(
+                                                                c.name))
                         gtlist.append(cl)
                     role_text += ': %s' % ', '.join(gtlist)
                 if p.other_roles:
                     rs = sorted(p.other_roles, key=coll_get_sort_key)
-                    role_text += ', %s' % cgi.escape(', '.join(rs))
+                    role_text += ', %s' % html.escape(', '.join(rs))
                 year_text += '(%s)' % role_text
                 pd_list.append(year_text)
-            row = [self.link_for_person(p.person, cgi.escape(p.given_name)),
-                   self.link_for_person(p.person, cgi.escape(p.family_name)),
+            row = [self.link_for_person(p.person, html.escape(p.given_name)),
+                   self.link_for_person(p.person, html.escape(p.family_name)),
                    ', '.join(pd_list)]
             body_row_list.append(self.html_tr_td_scores_list(row))
         text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
@@ -760,9 +763,9 @@ class SiteGenerator:
                              key=lambda x: x.sort_key_hall_of_fame)
         body_row_list = []
         for p in contestants:
-            row = [self.link_for_person(p, cgi.escape(p.given_name)),
-                   self.link_for_person(p, cgi.escape(p.family_name)),
-                   ', '.join([self.link_for_country(c, cgi.escape(c.code))
+            row = [self.link_for_person(p, html.escape(p.given_name)),
+                   self.link_for_person(p, html.escape(p.family_name)),
+                   ', '.join([self.link_for_country(c, html.escape(c.code))
                               for c in p.country_list]),
                    str(p.num_awards['Gold Medal']),
                    str(p.num_awards['Silver Medal']),
@@ -781,17 +784,17 @@ class SiteGenerator:
     def generate_one_event_summary(self, e):
         """Generate a summmary of one event."""
         text = ''
-        row_list = [['%s number' % cgi.escape(e.short_name), str(e.id)],
-                    ['Year', '%s%s' % (cgi.escape(e.year),
+        row_list = [['%s number' % html.escape(e.short_name), str(e.id)],
+                    ['Year', '%s%s' % (html.escape(e.year),
                                        self.home_page_link_for_event(e))],
                     ['Country',
                      self.link_for_country(e.host_country,
-                                           cgi.escape(e.host_country_name))],
-                    ['City', cgi.escape(e.host_city or '')],
-                    ['Start date', cgi.escape(date_to_ymd_iso(e.start_date))],
-                    ['End date', cgi.escape(date_to_ymd_iso(e.end_date))],
-                    ['Contact name', cgi.escape(e.contact_name or '')],
-                    ['Contact email', cgi.escape(e.contact_email or '')]]
+                                           html.escape(e.host_country_name))],
+                    ['City', html.escape(e.host_city or '')],
+                    ['Start date', html.escape(date_to_ymd_iso(e.start_date))],
+                    ['End date', html.escape(date_to_ymd_iso(e.end_date))],
+                    ['Contact name', html.escape(e.contact_name or '')],
+                    ['Contact email', html.escape(e.contact_email or '')]]
         if e.num_contestants:
             prob_marks = str(e.num_problems)
             prob_marks += (' (marked out of: %s)'
@@ -799,23 +802,23 @@ class SiteGenerator:
             if e.distinguish_official:
                 part_c_off = (' (%d %s)'
                               % (e.num_countries_official,
-                                 cgi.escape(self._cfg['official_desc_lc'])))
+                                 html.escape(self._cfg['official_desc_lc'])))
                 cont_off = (' (%d %s)'
                             % (e.num_contestants_official,
-                               cgi.escape(self._cfg['official_desc_lc'])))
+                               html.escape(self._cfg['official_desc_lc'])))
                 gold_off = (' (%d %s)'
                             % (e.num_awards_official['Gold Medal'],
-                               cgi.escape(self._cfg['official_desc_lc'])))
+                               html.escape(self._cfg['official_desc_lc'])))
                 silver_off = (' (%d %s)'
                               % (e.num_awards_official['Silver Medal'],
-                                 cgi.escape(self._cfg['official_desc_lc'])))
+                                 html.escape(self._cfg['official_desc_lc'])))
                 bronze_off = (' (%d %s)'
                               % (e.num_awards_official['Bronze Medal'],
-                                 cgi.escape(self._cfg['official_desc_lc'])))
+                                 html.escape(self._cfg['official_desc_lc'])))
                 if e.honourable_mentions_available:
                     hm_off = (' (%d %s)'
                               % (e.num_awards_official['Honourable Mention'],
-                                 cgi.escape(self._cfg['official_desc_lc'])))
+                                 html.escape(self._cfg['official_desc_lc'])))
                 else:
                     hm_off = ''
             else:
@@ -885,15 +888,16 @@ class SiteGenerator:
                         else:
                             desc = ''
                         text += ('<li>%s%s</li>\n'
-                                 % (self.html_a(cgi.escape(p.language), p.url),
-                                    cgi.escape(desc)))
+                                 % (self.html_a(html.escape(p.language),
+                                                p.url),
+                                    html.escape(desc)))
                     text += '</ul>\n'
-        title = cgi.escape(e.short_name_with_year_and_country)
+        title = html.escape(e.short_name_with_year_and_country)
         header = ('%s in %s'
-                  % (cgi.escape(e.short_name_with_year),
+                  % (html.escape(e.short_name_with_year),
                      self.link_for_country(
                          e.host_country,
-                         cgi.escape(e.host_country_name_in))))
+                         html.escape(e.host_country_name_in))))
         self.write_html_to_file(text, title, header, self.path_for_event(e))
 
     def generate_one_event_countries_summary(self, e):
@@ -901,17 +905,17 @@ class SiteGenerator:
         text = ''
         text += ('<p>Details of all countries at this %s may also be %s'
                  ' in CSV format.</p>\n'
-                 % (cgi.escape(e.short_name),
+                 % (html.escape(e.short_name),
                     self.link_for_event_countries_csv(e, 'downloaded')))
         head_row = ['Code', 'Name']
         if e.distinguish_official:
-            head_row.extend([cgi.escape(self._cfg['official_desc'])])
+            head_row.extend([html.escape(self._cfg['official_desc'])])
         head_row_list = [self.html_tr_th_list(head_row)]
         body_row_list = []
         countries = sorted(e.country_list, key=lambda x: x.sort_key)
         for c in countries:
-            row = [self.link_for_country_at_event(c, cgi.escape(c.code)),
-                   self.link_for_country_at_event(c, cgi.escape(c.name))]
+            row = [self.link_for_country_at_event(c, html.escape(c.code)),
+                   self.link_for_country_at_event(c, html.escape(c.name))]
             if e.distinguish_official:
                 row.extend([c.is_official and 'Yes' or 'No'])
             row = self.html_tr_td_list(row)
@@ -919,7 +923,7 @@ class SiteGenerator:
         text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
         text += '\n'
         title = ('Countries at %s'
-                 % cgi.escape(e.short_name_with_year_and_country))
+                 % html.escape(e.short_name_with_year_and_country))
         header = 'Countries at ' + self.link_for_event_and_host(e)
         self.write_html_to_file(text, title, header,
                                 self.path_for_event_countries(e))
@@ -932,16 +936,17 @@ class SiteGenerator:
             text = ''
             people = sorted(c.person_list, key=lambda x: x.sort_key)
             cl = self.link_for_country_at_event(c,
-                                                cgi.escape(c.name_with_code))
+                                                html.escape(c.name_with_code))
             text += '<h2>%s</h2>\n' % cl
             head_row_list = [self.html_tr_th_list(['Given Name', 'Family Name',
                                                    'Role'])]
             body_row_list = []
             for p in people:
                 row = self.html_tr_td_list(
-                    [self.link_for_person(p.person, cgi.escape(p.given_name)),
-                     self.link_for_person(p.person, cgi.escape(p.family_name)),
-                     cgi.escape(p.primary_role)])
+                    [self.link_for_person(p.person, html.escape(p.given_name)),
+                     self.link_for_person(p.person, html.escape(
+                         p.family_name)),
+                     html.escape(p.primary_role)])
                 body_row_list.append(row)
             text += self.html_table_thead_tbody_list(head_row_list,
                                                      body_row_list)
@@ -953,11 +958,11 @@ class SiteGenerator:
         text = ''
         text += ('<p>Details of all people at this %s may also be %s'
                  ' in CSV format.</p>\n'
-                 % (cgi.escape(e.short_name),
+                 % (html.escape(e.short_name),
                     self.link_for_event_people_csv(e, 'downloaded')))
         text += self.event_people_table(e)
         text += '\n'
-        title = 'People at ' + cgi.escape(e.short_name_with_year_and_country)
+        title = 'People at ' + html.escape(e.short_name_with_year_and_country)
         header = 'People at ' + self.link_for_event_and_host(e)
         self.write_html_to_file(text, title, header,
                                 self.path_for_event_people(e))
@@ -1008,9 +1013,9 @@ class SiteGenerator:
             def linker(person, text):
                 return text
         if show_code:
-            row.extend([linker(p.person, cgi.escape(p.contestant_code))])
+            row.extend([linker(p.person, html.escape(p.contestant_code))])
         if show_name:
-            row.extend([linker(p.person, cgi.escape(p.name))])
+            row.extend([linker(p.person, html.escape(p.name))])
         row.extend(scores_row)
         total_score_str = str(p.total_score)
         if not p.have_any_scores:
@@ -1020,7 +1025,7 @@ class SiteGenerator:
                                % (p.total_score, p.max_total_score))
         row.extend([total_score_str])
         if show_award:
-            row.extend([cgi.escape(p.awards_str)])
+            row.extend([html.escape(p.awards_str)])
         return self.html_tr_td_scores_list(row)
 
     def country_scoreboard_header(self, event, country):
@@ -1083,14 +1088,14 @@ class SiteGenerator:
         if show_year:
             row.append(
                 self.link_for_country_at_event(c,
-                                               cgi.escape(c.event.year)))
+                                               html.escape(c.event.year)))
         row.append(str(c.rank))
         if show_rank_official:
             row.append('' if c.rank_official is None else str(c.rank_official))
         if not show_year:
             row.append(
                 self.link_for_country_at_event(c,
-                                               cgi.escape(c.name_with_code)))
+                                               html.escape(c.name_with_code)))
         row.append(str(c.num_contestants))
         for i in range(c.event.num_problems):
             t = c.problem_totals[i]
@@ -1228,7 +1233,7 @@ class SiteGenerator:
                 text += ('<p>From %s teams: %s, %s,'
                          ' %s%s'
                          ' from %s total.</p>\n'
-                         % (cgi.escape(self._cfg['official_desc_lc']),
+                         % (html.escape(self._cfg['official_desc_lc']),
                             self.num_text_gold(
                                 e.num_awards_official['Gold Medal']),
                             self.num_text_silver(
@@ -1242,7 +1247,7 @@ class SiteGenerator:
             if e.distinguish_official:
                 off_text = (' (%d from %s teams)'
                             % (e.num_contestants_official,
-                               cgi.escape(self._cfg['official_desc_lc'])))
+                               html.escape(self._cfg['official_desc_lc'])))
             else:
                 off_text = ''
             text += ('<p>%s%s.</p>\n'
@@ -1253,7 +1258,7 @@ class SiteGenerator:
                     'Cumulative']
         if e.distinguish_official:
             head_row.extend([('Cumulative (%s)'
-                              % cgi.escape(self._cfg['official_desc_lc']))])
+                              % html.escape(self._cfg['official_desc_lc']))])
         head_row_list = [self.html_tr_th_scores_list(head_row)]
         body_row_list = []
         ctot = 0
@@ -1388,7 +1393,7 @@ class SiteGenerator:
         text += self.scoreboard_text(e)
 
         title = ('Scoreboard for %s'
-                 % cgi.escape(e.short_name_with_year_and_country))
+                 % html.escape(e.short_name_with_year_and_country))
         header = 'Scoreboard for %s' % self.link_for_event_and_host(e)
         self.write_html_to_file(text, title, header,
                                 self.path_for_event_scoreboard(e))
@@ -1513,9 +1518,9 @@ class SiteGenerator:
                 photo = self.html_img(width='150', alt='', src=p.photo_url)
             else:
                 photo = ''
-            row = [self.link_for_person(p.person, cgi.escape(p.given_name)),
-                   self.link_for_person(p.person, cgi.escape(p.family_name)),
-                   cgi.escape(p.primary_role)]
+            row = [self.link_for_person(p.person, html.escape(p.given_name)),
+                   self.link_for_person(p.person, html.escape(p.family_name)),
+                   html.escape(p.primary_role)]
             if show_photos:
                 row.append(photo)
             body_row_list.append(self.html_tr_td_list(row))
@@ -1553,10 +1558,10 @@ class SiteGenerator:
 
         title = ('%s at %s' % (c.name_with_code,
                                c.event.short_name_with_year_and_country))
-        title = cgi.escape(title)
+        title = html.escape(title)
         header = ('%s (%s) at %s'
-                  % (self.link_for_country(c.country, cgi.escape(c.name)),
-                     self.link_for_country(c.country, cgi.escape(c.code)),
+                  % (self.link_for_country(c.country, html.escape(c.name)),
+                     self.link_for_country(c.country, html.escape(c.code)),
                      self.link_for_event_and_host(c.event)))
         self.write_html_to_file(text, title, header,
                                 self.path_for_country_at_event(c))
@@ -1571,17 +1576,17 @@ class SiteGenerator:
         host = self.host_year_text(cd)
         if host:
             text += ('<p><strong>%s host</strong>: %s.</p>\n'
-                     % (cgi.escape(self._data.short_name), host))
+                     % (html.escape(self._data.short_name), host))
         year_list = []
         year_list_table = []
         for c in cd.participation_list:
             e = c.event
             year_text = ''
             cltxt = ('%s at %s'
-                     % (cgi.escape(c.name_with_code),
-                        cgi.escape(e.short_name_with_year)))
+                     % (html.escape(c.name_with_code),
+                        html.escape(e.short_name_with_year)))
             hl = self.link_for_country(e.host_country,
-                                       cgi.escape(e.host_country_name_in))
+                                       html.escape(e.host_country_name_in))
             year_text += ('<h2>%s in %s</h2>\n'
                           % (self.link_for_country_at_event(c, cltxt), hl))
             year_text += self.country_event_text(c, 'h3', False)
@@ -1597,7 +1602,7 @@ class SiteGenerator:
                                                      year_list_table)
             text += '\n'
         text += '\n'.join(year_list)
-        title = cgi.escape(cd.name_with_code)
+        title = html.escape(cd.name_with_code)
         self.write_html_to_file(text, title, title, self.path_for_country(cd))
 
     def person_event_scores_table(self, p, show_rank=True, show_code=True,
@@ -1624,23 +1629,23 @@ class SiteGenerator:
         for p in pd.participation_list:
             e = p.event
             year_text = ''
-            el = self.link_for_event(e, cgi.escape(e.short_name_with_year))
+            el = self.link_for_event(e, html.escape(e.short_name_with_year))
             year_text += '<h2>%s</h2>\n' % el
             year_text += '<table>\n<tr><td>\n'
             cl = self.link_for_country_at_event(p.country,
-                                                cgi.escape(p.country.name))
+                                                html.escape(p.country.name))
             year_rows = [['Country', cl],
-                         ['Given name', cgi.escape(p.given_name)],
-                         ['Family name', cgi.escape(p.family_name)],
-                         ['Primary role', cgi.escape(p.primary_role)]]
+                         ['Given name', html.escape(p.given_name)],
+                         ['Family name', html.escape(p.family_name)],
+                         ['Primary role', html.escape(p.primary_role)]]
             if p.other_roles:
                 rs = sorted(p.other_roles, key=coll_get_sort_key)
-                year_rows.append(['Other roles', cgi.escape(', '.join(rs))])
+                year_rows.append(['Other roles', html.escape(', '.join(rs))])
             if p.guide_for:
                 glist = sorted(p.guide_for, key=lambda x: x.sort_key)
                 gtlist = []
                 for c in glist:
-                    cl = self.link_for_country_at_event(c, cgi.escape(c.name))
+                    cl = self.link_for_country_at_event(c, html.escape(c.name))
                     gtlist.append(cl)
                 year_rows.append(['Guide for', ', '.join(gtlist)])
             if p.is_contestant and p.contestant_age is not None:
@@ -1675,9 +1680,9 @@ class SiteGenerator:
             text += '<p>Contestant ages are given on %s.</p>\n' % age_text
         elif age_desc_list:
             text += ('<p>Contestant ages are given on %s at each %s.</p>\n'
-                     % (cgi.escape(age_desc_list[0][0]),
-                        cgi.escape(self._data.short_name)))
-        title = cgi.escape(pd.name)
+                     % (html.escape(age_desc_list[0][0]),
+                        html.escape(self._data.short_name)))
+        title = html.escape(pd.name)
         header = title
         self.write_html_to_file(text, title, header, self.path_for_person(pd))
 

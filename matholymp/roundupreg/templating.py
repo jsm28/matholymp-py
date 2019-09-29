@@ -47,8 +47,8 @@ __all__ = ['people_from_country_internal', 'people_from_country',
            'show_bulk_csv_country']
 
 import base64
-import cgi
 import datetime
+import html
 import json
 
 from roundup.cgi.templating import HTMLItem
@@ -217,14 +217,13 @@ def country_travel_copy_options(db, country, person):
                 'this.form.elements["%s"].selectedIndex = i; }'
                 % (prop, prop, val, prop))
         prop_js = ';'.join(prop_js_list)
-        prop_js_esc = cgi.escape(prop_js, quote=True)
+        prop_js_esc = html.escape(prop_js)
         prop_js_submit = ('<input type="button"'
                           ' value="Copy travel details from %s %s"'
                           ' onclick="%s">'
-                          % (cgi.escape(db.person.get(person, 'given_name'),
-                                        quote=True),
-                             cgi.escape(db.person.get(person, 'family_name'),
-                                        quote=True), prop_js_esc))
+                          % (html.escape(db.person.get(person, 'given_name')),
+                             html.escape(db.person.get(person, 'family_name')),
+                             prop_js_esc))
         travel_list.append(prop_js_submit)
     return '\n'.join(travel_list)
 
@@ -301,14 +300,14 @@ def string_select(name, default_label, entry_list, selected):
             sel = 'selected="selected" '
             found_sel = True
         option_list.append('<option %svalue="%s">%s</option>'
-                           % (sel, cgi.escape(e_value, quote=True),
-                              cgi.escape(e_label)))
+                           % (sel, html.escape(e_value),
+                              html.escape(e_label)))
     if default_label:
         d_sel = ''
         if not found_sel:
             d_sel = 'selected="selected" '
         option_list.insert(0, ('<option %svalue="">%s</option>'
-                               % (d_sel, cgi.escape(default_label))))
+                               % (d_sel, html.escape(default_label))))
     return ('<select id="%s" name="%s">%s</select>'
             % (name, name, '\n'.join(option_list)))
 
@@ -452,7 +451,7 @@ def show_bulk_csv_country(db, form):
     """Return HTML text of bulk-country-registration CSV contents."""
     csv_data = bulk_csv_data(form)
     if isinstance(csv_data, str):
-        return '<p class="error-message">%s</p>' % cgi.escape(csv_data)
+        return '<p class="error-message">%s</p>' % html.escape(csv_data)
     file_data = csv_data[0]
     sitegen = RoundupSiteGenerator(db)
     sdata = static_site_event_group(db)
@@ -466,13 +465,13 @@ def show_bulk_csv_country(db, form):
     body_row_list = []
     for csv_row in file_data:
         out_row = []
-        out_row.append(cgi.escape(csv_row.get('Code', '')))
-        out_row.append(cgi.escape(csv_row.get('Name', '')))
+        out_row.append(html.escape(csv_row.get('Code', '')))
+        out_row.append(html.escape(csv_row.get('Name', '')))
         country_number, generic_url = bulk_csv_country_number_url(db, csv_row)
         country_link = ''
         if country_number is not None:
             if sdata and country_number in sdata.country_map:
-                country_link = sitegen.html_a(cgi.escape(
+                country_link = sitegen.html_a(html.escape(
                     sdata.country_map[country_number].name), generic_url)
             else:
                 # Either invalid country number (would normally have
@@ -481,9 +480,9 @@ def show_bulk_csv_country(db, form):
                 country_link = str(country_number)
         out_row.append(country_link)
         if dist_official:
-            out_row.append(cgi.escape(csv_row.get(official_desc, '')))
+            out_row.append(html.escape(csv_row.get(official_desc, '')))
         contact_emails = bulk_csv_contact_emails(csv_row)
-        out_row.append(cgi.escape(', '.join(contact_emails)))
+        out_row.append(html.escape(', '.join(contact_emails)))
         body_row_list.append(sitegen.html_tr_td_list(out_row))
     return sitegen.html_table_thead_tbody_list(head_row_list, body_row_list)
 

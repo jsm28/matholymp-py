@@ -35,8 +35,8 @@ __all__ = ['ScoreAction', 'RetireCountryAction', 'ScalePhotoAction',
            'ScoresRSSAction', 'BulkRegisterAction',
            'CountryBulkRegisterAction', 'register_actions']
 
-import cgi
 import collections
+import html
 import io
 import os
 
@@ -351,18 +351,18 @@ class ScoresRSSAction(Action):
                  ' xmlns:atom="http://www.w3.org/2005/Atom">\n')
         text += '  <channel>\n'
         text += ('    <title>%s %s%s Scores</title>\n'
-                 % (cgi.escape(short_name), cgi.escape(year),
-                    cgi.escape(title_extra)))
+                 % (html.escape(short_name), html.escape(year),
+                    html.escape(title_extra)))
         text += '    <link>%s</link>\n' % link_url
         text += ('    <description>%s %s%s Scores Live Feed</description>\n'
-                 % (cgi.escape(short_name), cgi.escape(year),
-                    cgi.escape(title_extra)))
+                 % (html.escape(short_name), html.escape(year),
+                    html.escape(title_extra)))
         text += '    <language>en-gb</language>\n'
         text += '    <docs>http://www.rssboard.org/rss-specification</docs>\n'
         text += ('    <atom:link href="%s" rel="self"'
                  ' type="application/rss+xml" />\n    '
-                 % cgi.escape((self.base + 'country' + url_id
-                               + '?@action=scores_rss'), quote=True))
+                 % html.escape((self.base + 'country' + url_id
+                                + '?@action=scores_rss')))
 
         rss_list = self.db.rss.list()
         rss_list = sorted(rss_list, key=int, reverse=True)

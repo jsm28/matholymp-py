@@ -34,7 +34,7 @@ content from within the Roundup-based registration system.
 
 __all__ = ['RoundupSiteGenerator']
 
-import cgi
+import html
 
 from matholymp.data import EventGroup
 from matholymp.roundupreg.roundupsource import RoundupDataSource
@@ -87,7 +87,7 @@ class RoundupSiteGenerator(RegSiteGenerator):
                 'value="scale_photo">'
                 '<input type="hidden" name="@csrf" value="%s">'
                 '<input type="submit" value="Scale down">'
-                '</form>' % (person.id, cgi.escape(nonce, quote=True)))
+                '</form>' % (person.id, html.escape(nonce)))
 
     def room_edit_field(self, p):
         """Return a form field to edit a person's room number."""
@@ -95,4 +95,4 @@ class RoundupSiteGenerator(RegSiteGenerator):
         return ('<input type="text" '
                 'size="10" '
                 'name="person%d@room_number" '
-                'value="%s">' % (p.person.id, cgi.escape(rn, quote=True)))
+                'value="%s">' % (p.person.id, html.escape(rn)))

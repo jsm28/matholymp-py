@@ -34,9 +34,9 @@ registration system.
 
 import base64
 import binascii
-import cgi
 import csv
 import datetime
+import html
 import re
 import time
 
@@ -327,8 +327,8 @@ def create_rss(db, title, description, **args):
                 '<description>%s</description>'
                 '<pubDate>%s</pubDate>'
                 '<guid isPermaLink="false">%s</guid>'
-                '</item>' % (cgi.escape(title), cgi.escape(description),
-                             cgi.escape(date_text), cgi.escape(rss_url)))
+                '</item>' % (html.escape(title), html.escape(description),
+                             html.escape(date_text), html.escape(rss_url)))
     db.rss.set(rss_id, text=rss_text)
 
 
