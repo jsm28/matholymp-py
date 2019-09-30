@@ -949,12 +949,11 @@ class RegSystemTestCase(unittest.TestCase):
         """Test that all page templates for existing items load without
         errors."""
         admin_session.create('arrival', {'name': 'Example Airport'})
-        flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.png', 'PNG')
+        flag_filename, dummy = self.gen_test_image(2, 2, 2, '.png', 'PNG')
         admin_session.create_country('DEF', 'Test Second Country',
                                      {'flag-1@content': flag_filename})
-        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
-                                                          'JPEG')
-        pdf_filename, pdf_bytes = self.gen_test_pdf()
+        photo_filename, dummy = self.gen_test_image(2, 2, 2, '.jpg', 'JPEG')
+        pdf_filename, dummy = self.gen_test_pdf()
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
                                     {'photo-1@content': photo_filename,
                                      'consent_form-1@content': pdf_filename})
@@ -2134,13 +2133,11 @@ class RegSystemTestCase(unittest.TestCase):
                                      {'expected_single_rooms': '1x'},
                                      error='Invalid expected number of '
                                      'single room requests')
-        flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.jpg',
-                                                        'JPEG')
+        flag_filename, dummy = self.gen_test_image(2, 2, 2, '.jpg', 'JPEG')
         admin_session.create_country('ABC', 'Test First Country',
                                      {'flag-1@content': flag_filename},
                                      error='Flags must be in PNG format')
-        flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.jpg',
-                                                        'PNG')
+        flag_filename, dummy = self.gen_test_image(2, 2, 2, '.jpg', 'PNG')
         admin_session.create_country('ABC', 'Test First Country',
                                      {'flag-1@content': flag_filename},
                                      error=r'Filename extension for flag '
@@ -2389,13 +2386,11 @@ class RegSystemTestCase(unittest.TestCase):
                            {'expected_single_rooms': '1x'},
                            error='Invalid expected number of single room '
                            'requests')
-        flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.jpg',
-                                                        'JPEG')
+        flag_filename, dummy = self.gen_test_image(2, 2, 2, '.jpg', 'JPEG')
         admin_session.edit('country', '3',
                            {'flag-1@content': flag_filename},
                            error='Flags must be in PNG format')
-        flag_filename, flag_bytes = self.gen_test_image(2, 2, 2, '.jpg',
-                                                        'PNG')
+        flag_filename, dummy = self.gen_test_image(2, 2, 2, '.jpg', 'PNG')
         admin_session.edit('country', '3',
                            {'flag-1@content': flag_filename},
                            error=r'Filename extension for flag must match '
@@ -4351,8 +4346,7 @@ class RegSystemTestCase(unittest.TestCase):
         """
         session = self.get_session()
         admin_session = self.get_session('admin')
-        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
-                                                          'JPEG')
+        photo_filename, dummy = self.gen_test_image(2, 2, 2, '.jpg', 'JPEG')
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
         admin_session.create_person(
@@ -6348,7 +6342,7 @@ class RegSystemTestCase(unittest.TestCase):
                                    'departure_time_hour': '13',
                                    'departure_time_minute': '59'},
                                   error='Departure time before arrival time')
-        photo_filename, photo_bytes = self.gen_test_pdf()
+        photo_filename, dummy = self.gen_test_pdf()
         admin_session.create_person('Test First Country', 'Contestant 1',
                                     {'photo-1@content': photo_filename},
                                     error='Photos must be in JPEG or PNG '
@@ -6357,8 +6351,7 @@ class RegSystemTestCase(unittest.TestCase):
                                   {'photo-1@content': photo_filename},
                                   error='Photos must be in JPEG or PNG '
                                   'format')
-        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
-                                                          'PNG')
+        photo_filename, dummy = self.gen_test_image(2, 2, 2, '.jpg', 'PNG')
         admin_session.create_person('Test First Country', 'Contestant 1',
                                     {'photo-1@content': photo_filename},
                                     error=r'Filename extension for photo must '
@@ -6367,8 +6360,7 @@ class RegSystemTestCase(unittest.TestCase):
                                   {'photo-1@content': photo_filename},
                                   error=r'Filename extension for photo must '
                                   r'match contents \(png\)')
-        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.png',
-                                                          'JPEG')
+        photo_filename, dummy = self.gen_test_image(2, 2, 2, '.png', 'JPEG')
         admin_session.create_person('Test First Country', 'Contestant 1',
                                     {'photo-1@content': photo_filename},
                                     error=r'Filename extension for photo must '
@@ -6377,7 +6369,7 @@ class RegSystemTestCase(unittest.TestCase):
                                   {'photo-1@content': photo_filename},
                                   error=r'Filename extension for photo must '
                                   r'match contents \(jpg\)')
-        cf_filename, cf_bytes = self.gen_test_image(2, 2, 2, '.png', 'PNG')
+        cf_filename, dummy = self.gen_test_image(2, 2, 2, '.png', 'PNG')
         admin_session.create_person('Test First Country', 'Contestant 1',
                                     {'consent_form-1@content': cf_filename},
                                     error='Consent forms must be in PDF '
@@ -6386,7 +6378,7 @@ class RegSystemTestCase(unittest.TestCase):
                                   {'consent_form-1@content': cf_filename},
                                   error='Consent forms must be in PDF '
                                   'format')
-        cf_filename, cf_bytes = self.gen_test_pdf('.png')
+        cf_filename, dummy = self.gen_test_pdf('.png')
         admin_session.create_person('Test First Country', 'Contestant 1',
                                     {'consent_form-1@content': cf_filename},
                                     error=r'Filename extension for consent '
@@ -6779,8 +6771,7 @@ class RegSystemTestCase(unittest.TestCase):
         """
         session = self.get_session()
         admin_session = self.get_session('admin')
-        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
-                                                          'JPEG')
+        photo_filename, dummy = self.gen_test_image(2, 2, 2, '.jpg', 'JPEG')
         admin_session.create_person(
             'XMO 2015 Staff', 'Coordinator',
             {'diet_consent': 'yes'},
@@ -7652,15 +7643,14 @@ class RegSystemTestCase(unittest.TestCase):
                           'departure_time_hour': '13',
                           'departure_time_minute': '59'},
                          error='Departure time before arrival time')
-        photo_filename, photo_bytes = self.gen_test_pdf()
+        photo_filename, dummy = self.gen_test_pdf()
         admin_session.edit('person', '4',
                            {'photo-1@content': photo_filename},
                            error='Photos must be in JPEG or PNG format')
         reg_session.edit('person', '4',
                          {'photo-1@content': photo_filename},
                          error='Photos must be in JPEG or PNG format')
-        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
-                                                          'PNG')
+        photo_filename, dummy = self.gen_test_image(2, 2, 2, '.jpg', 'PNG')
         admin_session.edit('person', '4',
                            {'photo-1@content': photo_filename},
                            error=r'Filename extension for photo must '
@@ -7669,8 +7659,7 @@ class RegSystemTestCase(unittest.TestCase):
                          {'photo-1@content': photo_filename},
                          error=r'Filename extension for photo must '
                          r'match contents \(png\)')
-        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.png',
-                                                          'JPEG')
+        photo_filename, dummy = self.gen_test_image(2, 2, 2, '.png', 'JPEG')
         admin_session.edit('person', '4',
                            {'photo-1@content': photo_filename},
                            error=r'Filename extension for photo must '
@@ -7679,14 +7668,14 @@ class RegSystemTestCase(unittest.TestCase):
                          {'photo-1@content': photo_filename},
                          error=r'Filename extension for photo must '
                          r'match contents \(jpg\)')
-        cf_filename, cf_bytes = self.gen_test_image(2, 2, 2, '.png', 'PNG')
+        cf_filename, dummy = self.gen_test_image(2, 2, 2, '.png', 'PNG')
         admin_session.edit('person', '4',
                            {'consent_form-1@content': cf_filename},
                            error='Consent forms must be in PDF format')
         reg_session.edit('person', '4',
                          {'consent_form-1@content': cf_filename},
                          error='Consent forms must be in PDF format')
-        cf_filename, cf_bytes = self.gen_test_pdf('.png')
+        cf_filename, dummy = self.gen_test_pdf('.png')
         admin_session.edit('person', '4',
                            {'consent_form-1@content': cf_filename},
                            error=r'Filename extension for consent '
@@ -8050,8 +8039,7 @@ class RegSystemTestCase(unittest.TestCase):
         """
         session = self.get_session()
         admin_session = self.get_session('admin')
-        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
-                                                          'JPEG')
+        photo_filename, dummy = self.gen_test_image(2, 2, 2, '.jpg', 'JPEG')
         admin_session.create_person(
             'XMO 2015 Staff', 'Coordinator',
             {'event_photos_consent': 'yes',
@@ -9188,8 +9176,8 @@ class RegSystemTestCase(unittest.TestCase):
         Test scaling down photo.
         """
         admin_session = self.get_session('admin')
-        photo_filename, photo_bytes = self.gen_test_image(1024, 1024, 2,
-                                                          '.jpg', 'JPEG')
+        photo_filename, dummy = self.gen_test_image(1024, 1024, 2,
+                                                    '.jpg', 'JPEG')
         admin_session.create_country_generic()
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
                                     {'photo-1@content': photo_filename})
@@ -9215,8 +9203,8 @@ class RegSystemTestCase(unittest.TestCase):
         Test scaling down photo: smaller configured maximum size.
         """
         admin_session = self.get_session('admin')
-        photo_filename, photo_bytes = self.gen_test_image(256, 256, 2,
-                                                          '.jpg', 'JPEG')
+        photo_filename, dummy = self.gen_test_image(256, 256, 2,
+                                                    '.jpg', 'JPEG')
         admin_session.create_country_generic()
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
                                     {'photo-1@content': photo_filename})
@@ -9242,8 +9230,8 @@ class RegSystemTestCase(unittest.TestCase):
         Test scaling down photo: PNG photo.
         """
         admin_session = self.get_session('admin')
-        photo_filename, photo_bytes = self.gen_test_image(256, 256, 2,
-                                                          '.png', 'PNG')
+        photo_filename, dummy = self.gen_test_image(256, 256, 2,
+                                                    '.png', 'PNG')
         admin_session.create_country_generic()
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
                                     {'photo-1@content': photo_filename})
@@ -9270,8 +9258,8 @@ class RegSystemTestCase(unittest.TestCase):
         small enough.
         """
         admin_session = self.get_session('admin')
-        photo_filename, photo_bytes = self.gen_test_image(1024, 256, 2,
-                                                          '.jpg', 'JPEG')
+        photo_filename, dummy = self.gen_test_image(1024, 256, 2,
+                                                    '.jpg', 'JPEG')
         admin_session.create_country_generic()
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
                                     {'photo-1@content': photo_filename})
@@ -9292,8 +9280,8 @@ class RegSystemTestCase(unittest.TestCase):
         main_form = admin_session.get_main_form()
         self.assertIsNotNone(main_form)
         # Similarly, for the other dimension.
-        photo_filename, photo_bytes = self.gen_test_image(256, 1024, 2,
-                                                          '.jpg', 'JPEG')
+        photo_filename, dummy = self.gen_test_image(256, 1024, 2,
+                                                    '.jpg', 'JPEG')
         admin_session.edit('person', '1', {'photo-1@content': photo_filename})
         # The status page should have the button to scale down the photo.
         admin_session.check_open_relative('person?@template=status')
@@ -9319,8 +9307,8 @@ class RegSystemTestCase(unittest.TestCase):
         making small enough.
         """
         admin_session = self.get_session('admin')
-        photo_filename, photo_bytes = self.gen_test_image(256, 256, 2,
-                                                          '.jpg', 'JPEG')
+        photo_filename, dummy = self.gen_test_image(256, 256, 2,
+                                                    '.jpg', 'JPEG')
         admin_session.create_country_generic()
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
                                     {'photo-1@content': photo_filename})
@@ -9347,8 +9335,8 @@ class RegSystemTestCase(unittest.TestCase):
         Test scaling down photo: greyscale image.
         """
         admin_session = self.get_session('admin')
-        photo_filename, photo_bytes = self.gen_test_image(512, 512, 2,
-                                                          '.jpg', 'JPEG', 'L')
+        photo_filename, dummy = self.gen_test_image(512, 512, 2,
+                                                    '.jpg', 'JPEG', 'L')
         admin_session.create_country_generic()
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
                                     {'photo-1@content': photo_filename})
@@ -9374,9 +9362,8 @@ class RegSystemTestCase(unittest.TestCase):
         Test scaling down photo: image with alpha channel.
         """
         admin_session = self.get_session('admin')
-        photo_filename, photo_bytes = self.gen_test_image(256, 256, 2,
-                                                          '.png', 'PNG',
-                                                          'RGBA')
+        photo_filename, dummy = self.gen_test_image(256, 256, 2,
+                                                    '.png', 'PNG', 'RGBA')
         admin_session.create_country_generic()
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
                                     {'photo-1@content': photo_filename})
@@ -9402,9 +9389,8 @@ class RegSystemTestCase(unittest.TestCase):
         Test scaling down photo: greyscale image with alpha channel.
         """
         admin_session = self.get_session('admin')
-        photo_filename, photo_bytes = self.gen_test_image(256, 256, 2,
-                                                          '.png', 'PNG',
-                                                          'LA')
+        photo_filename, dummy = self.gen_test_image(256, 256, 2,
+                                                    '.png', 'PNG', 'LA')
         admin_session.create_country_generic()
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
                                     {'photo-1@content': photo_filename})

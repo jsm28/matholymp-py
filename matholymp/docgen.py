@@ -702,7 +702,7 @@ class DocumentGenerator:
                             if 'English' not in country_langs[c]:
                                 country_langs[c].append('English')
                             country_langs[c].sort(key=coll_get_sort_key)
-                            for i in range(country_leader_counts[c]):
+                            for dummy in range(country_leader_counts[c]):
                                 for lang in country_langs[c]:
                                     lang_filename = lang_to_filename(lang)
                                     paper_text = self.one_paper_latex(
