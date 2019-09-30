@@ -598,7 +598,7 @@ class RoundupTestSession:
             value = data[key]
             select = form.find('select', attrs={'name': key})
             if select:
-                if not (isinstance(value, list) or isinstance(value, tuple)):
+                if not isinstance(value, (list, tuple)):
                     value = (value,)
                 new_value = []
                 for v in value:
