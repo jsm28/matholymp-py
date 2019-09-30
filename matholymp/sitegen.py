@@ -1725,10 +1725,10 @@ class SiteGenerator:
                 csv_out['Bronze Boundary'] = ''
             if self._data.honourable_mentions_available_varies:
                 csv_out['Honourable Mentions Available'] = \
-                    e.honourable_mentions_available and 'Yes' or 'No'
+                    'Yes' if e.honourable_mentions_available else 'No'
             if self._data.distinguish_official_varies:
                 csv_out['Distinguish Official Countries'] = \
-                    e.distinguish_official and 'Yes' or 'No'
+                    'Yes' if e.distinguish_official else 'No'
             if self._data.age_day_desc_varies:
                 csv_out['Age Day Description'] = e.age_day_desc
             if e.num_contestants:
@@ -1878,7 +1878,7 @@ class SiteGenerator:
         if distinguish_official:
             if c.event.distinguish_official:
                 csv_out[self._cfg['official_desc']] = \
-                    c.is_official and 'Yes' or 'No'
+                    'Yes' if c.is_official else 'No'
             else:
                 csv_out[self._cfg['official_desc']] = ''
         csv_out['Normal'] = 'Yes' if c.is_normal else 'No'

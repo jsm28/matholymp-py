@@ -68,12 +68,15 @@ class CSVDataSource(DataSource):
             e['Year'] = cfg['year']
             e['Number of Exams'] = str(cfg['num_exams'])
             e['Number of Problems'] = str(cfg['num_problems'])
-            e['Gold Boundary'] = (cfg['gold_boundary'] is not None
-                                  and str(cfg['gold_boundary']) or '')
-            e['Silver Boundary'] = (cfg['silver_boundary'] is not None
-                                    and str(cfg['silver_boundary']) or '')
-            e['Bronze Boundary'] = (cfg['bronze_boundary'] is not None
-                                    and str(cfg['bronze_boundary']) or '')
+            e['Gold Boundary'] = (str(cfg['gold_boundary'])
+                                  if cfg['gold_boundary'] is not None
+                                  else '')
+            e['Silver Boundary'] = (str(cfg['silver_boundary'])
+                                    if cfg['silver_boundary'] is not None
+                                    else '')
+            e['Bronze Boundary'] = (str(cfg['bronze_boundary'])
+                                    if cfg['bronze_boundary'] is not None
+                                    else '')
             marks_per_problem = cfg['marks_per_problem'].split()
             for i in range(int(cfg['num_problems'])):
                 e['P%d Max' % (i + 1)] = marks_per_problem[i]
