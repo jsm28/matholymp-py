@@ -184,7 +184,7 @@ def read_config_raw(file_name):
     """
     cfg = configparser.RawConfigParser()
     with open(file_name, 'r', encoding='utf-8') as cfg_file:
-        cfg.readfp(cfg_file)
+        cfg.read_file(cfg_file)
     return cfg
 
 
