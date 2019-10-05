@@ -31,6 +31,7 @@
 Tests for matholymp registration system.
 """
 
+import base64
 import codecs
 import os
 import os.path
@@ -674,6 +675,10 @@ class RoundupTestSession:
         self.create('country', data, error=error, mail=auto_user)
         if auto_user:
             mail_bin = self.last_mail_bin
+            if b'Content-Transfer-Encoding: base64' in mail_bin:
+                content_idx = mail_bin.index(b'\n\n') + 2
+                mail_bin = mail_bin[content_idx:]
+                mail_bin = base64.b64decode(mail_bin)
             username_idx = mail_bin.rindex(b'Username: ')
             mail_bin = mail_bin[username_idx:]
             mail_data = mail_bin.split(b'\n')
@@ -2902,6 +2907,12 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertIn(
             b'\nTO: DEF1@example.invalid, webmaster@example.invalid, '
             b'DEF2@example.invalid, DEF3@example.invalid\n',
+            admin_session.last_mail_bin)
+        # The non-ASCII name means a Content-Transfer-Encoding must be
+        # specified rather than attempting to send the mail as 8-bit
+        # (which fails when Roundup is run in an ASCII locale).
+        self.assertIn(
+            b'\nContent-Transfer-Encoding:',
             admin_session.last_mail_bin)
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv_public_only()

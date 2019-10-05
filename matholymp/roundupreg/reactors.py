@@ -100,7 +100,7 @@ def country_react(db, cl, nodeid, oldvalues):
                                   email_to,
                                   subject,
                                   (author_name, db.config.ADMIN_EMAIL))
-    msg.set_payload(email_text)
+    msg.set_payload(email_text, charset='utf-8')
     try:
         mailer.smtp_send(email_to, msg.as_string())
     except roundup.mailer.MessageSendError:
