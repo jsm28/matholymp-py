@@ -86,6 +86,7 @@ class MoScriptTestCase(unittest.TestCase):
         shutil.rmtree(self.temp_dir)
 
     def runTest(self):
+        """Run a script test."""
         returncode = 0
         if self.coverage:
             cov_dir = os.path.dirname(self.script_path)
