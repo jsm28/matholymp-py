@@ -381,6 +381,14 @@ class BulkRegisterAction(Action):
 
     """Base class for bulk registration actions."""
 
+    # Subclasses must set this.
+    required_classname = None
+
+    @staticmethod
+    def auditor(db, cl, nodeid, newvalues):
+        """Check validity of proposed item creation."""
+        raise NotImplementedError
+
     def handle(self):
         """Bulk register or check bulk registration data."""
         if self.client.env['REQUEST_METHOD'] != 'POST':
