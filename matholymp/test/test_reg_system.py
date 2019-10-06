@@ -279,7 +279,7 @@ class RoundupTestInstance:
                 os.close(read_fd)
                 os.write(write_fd, str(self.port).encode('utf-8'))
                 os.close(write_fd)
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 sys.stdout.flush()
                 sys.stderr.flush()
                 traceback.print_exc()
@@ -292,7 +292,7 @@ class RoundupTestInstance:
                 sys.stderr.flush()
                 print('Test server requested to exit')
                 os._exit(0)
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 sys.stdout.flush()
                 sys.stderr.flush()
                 traceback.print_exc()
