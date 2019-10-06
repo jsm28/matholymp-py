@@ -343,10 +343,8 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     require_value(db, cl, nodeid, newvalues, 'tshirt',
                   'No T-shirt size specified')
 
-    if db.matholymprole.get(primary_role, 'name').startswith('Contestant '):
-        is_contestant = True
-    else:
-        is_contestant = False
+    is_contestant = db.matholymprole.get(primary_role, 'name').startswith(
+        'Contestant ')
 
     # Contestants must have one of the permitted genders.
     if is_contestant:
