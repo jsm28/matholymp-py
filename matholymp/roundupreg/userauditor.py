@@ -61,8 +61,12 @@ from matholymp.roundupreg.auditorutil import require_value
 
 # regular expression thanks to: http://www.regular-expressions.info/email.html
 # this is the "99.99% solution for syntax only".
-_email_regexp = (r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*", r"(localhost|(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9]))")
-_email_rfc = re.compile('^' + _email_regexp[0] + '@' + _email_regexp[1] + '$', re.IGNORECASE)
+_email_regexp = (r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+"
+                 r"(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*",
+                 r"(localhost|(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+"
+                 r"[a-z0-9](?:[a-z0-9-]*[a-z0-9]))")
+_email_rfc = re.compile('^' + _email_regexp[0] + '@' + _email_regexp[1] + '$',
+                        re.IGNORECASE)
 
 
 def valid_address(address):
