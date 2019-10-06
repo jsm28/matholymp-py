@@ -244,7 +244,7 @@ def init_schema(env):
     db.security.addPermissionToRole('User', 'Web Access')
     db.security.addPermissionToRole('Anonymous', 'Web Access')
 
-    for cl in 'matholymprole',:
+    for cl in ('matholymprole',):
         db.security.addPermissionToRole('User', 'View', cl)
         db.security.addPermissionToRole('Anonymous', 'View', cl)
 
