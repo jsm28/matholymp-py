@@ -212,6 +212,7 @@ class RoundupTestInstance:
             # on exit.  Exit occurs both from this code and from
             # forked children handling requests, so _exit and fork
             # need to be wrapped.
+            # pylint: disable=import-outside-toplevel
             from coverage import Coverage
             cov_base = os.path.join(self.temp_dir, '.coverage.reg-system')
             self.cov = Coverage(data_file=cov_base, data_suffix=True)
@@ -772,6 +773,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.method_name = method_name
         method = getattr(self, method_name)
         self.config = getattr(method, 'config', {})
+        self.coverage = False
         super(RegSystemTestCase, self).__init__(method_name)
 
     def __str__(self):
@@ -793,6 +795,7 @@ class RegSystemTestCase(unittest.TestCase):
             s.close()
         self.instance.stop_server()
         if self.coverage:
+            # pylint: disable=import-outside-toplevel
             from coverage import Coverage
             cov_base = os.path.join(sys.path[0], '.coverage.reg-system')
             cov = Coverage(data_file=cov_base)
