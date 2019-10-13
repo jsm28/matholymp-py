@@ -736,8 +736,8 @@ class SiteGenerator:
                     role_text += ', %s' % html.escape(', '.join(rs))
                 year_text += '(%s)' % role_text
                 pd_list.append(year_text)
-            row = [self.link_for_person(p.person, html.escape(p.given_name)),
-                   self.link_for_person(p.person, html.escape(p.family_name)),
+            row = [self.link_for_person(pd, html.escape(pd.given_name)),
+                   self.link_for_person(pd, html.escape(pd.family_name)),
                    ', '.join(pd_list)]
             body_row_list.append(self.html_tr_td_scores_list(row))
         text += self.html_table_thead_tbody_list(head_row_list, body_row_list)
