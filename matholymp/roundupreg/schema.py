@@ -201,6 +201,7 @@ def init_schema(env):
                    generic_url=String(),
                    reuse_photo=Boolean(),
                    photo=Link('photo'),
+                   incomplete=Boolean(),
                    # Comma-separated scores on each problem.
                    scores=String(),
                    extra_awards=String(),
@@ -217,6 +218,7 @@ def init_schema(env):
                  username=String(),
                  password=Password(),
                  country=Link('country'),
+                 person=Link('person'),
                  address=String(),
                  realname=String(),
                  # Comma-separated string of Role names.

@@ -303,6 +303,11 @@ def audit_person_fields(db, cl, nodeid, newvalues):
             # are irrelevant if only scores are being changed.
             return
 
+    # Until bulk registration of people with partial data to be
+    # completed by self-registration is supported, this must always be
+    # False.
+    newvalues['incomplete'] = False
+
     # A country must be specified and ordinary users cannot create or
     # modify records for other countries.
     country = require_value(db, cl, nodeid, newvalues, 'country',
