@@ -718,12 +718,12 @@ class RoundupTestSession:
                     'tshirt': 'S'}
         self.create_defaults('person', data, defaults, error=error, mail=mail)
 
-    def edit(self, cls, entity_id, data, error=False, mail=False):
+    def edit(self, cls, entity_id, data, error=False, mail=False, status=None):
         """Edit some kind of entity through the corresponding form."""
         self.check_open_relative('%s%s' % (cls, entity_id))
         self.select_main_form()
         self.set(data)
-        self.check_submit_selected(error=error, mail=mail)
+        self.check_submit_selected(error=error, mail=mail, status=status)
 
     def enter_scores(self, country_name, country_code, problem, scores,
                      error=False):
@@ -10387,6 +10387,23 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv[0]['Badge Background'], 'generic')
         self.assertEqual(admin_csv[0]['Badge Outer Colour'], 'd22027')
         self.assertEqual(admin_csv[0]['Badge Inner Colour'], 'eb9984')
+
+    def test_user_edit_username(self):
+        """
+        Test errors from user editing their own username.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        # The username field would actually appear readonly in a
+        # browser.  Testing this way because the approach of
+        # temporarily changing roles, then changing back before
+        # submitting the form, runs into the Roundup check for
+        # conflicting edits to the same database item.
+        reg_session.edit('user', self.instance.userids['ABC_reg'],
+                         {'username': 'DEF_reg'},
+                         error='You do not have permission to edit',
+                         status=403)
 
 
 def _set_coverage(tests, coverage):

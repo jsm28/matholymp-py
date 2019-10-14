@@ -307,6 +307,9 @@ the registration system is not active.
   :file:`country.bulkconfirm.html`, while :file:`page.html` is updated
   accordingly.
 
+* Non-administrative registration system users can no longer change
+  their own usernames.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

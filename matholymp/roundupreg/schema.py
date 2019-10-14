@@ -262,7 +262,7 @@ def init_schema(env):
     db.security.addPermissionToRole('User', p)
     p = db.security.addPermission(
         name='Edit', klass='user', check=own_record,
-        properties=('username', 'password', 'address', 'realname'),
+        properties=('password', 'address', 'realname'),
         description='User is allowed to edit their own user details')
     db.security.addPermissionToRole('User', p)
 
