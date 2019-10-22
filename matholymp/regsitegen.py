@@ -461,9 +461,9 @@ class RegSiteGenerator(SiteGenerator):
                 row = [html.escape(p.country.name_with_code),
                        self.link_for_person(p.person, html.escape(p.name)),
                        html.escape(p.primary_role),
-                       html.escape(p.gender),
-                       html.escape(p.room_type),
-                       html.escape(p.room_share_with),
+                       html.escape(p.gender or ''),
+                       html.escape(p.room_type or ''),
+                       html.escape(p.room_share_with or ''),
                        self.room_edit_field(p)]
                 body_row_list.append(self.html_tr_td_list(row))
             rtext += self.html_table_thead_tbody_list(head_row_list,
