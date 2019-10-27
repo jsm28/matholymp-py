@@ -1990,6 +1990,68 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session.check_submit_selected(error='You do not have '
                                           'permission to retire', status=403)
 
+    def test_country_edit_substring(self):
+        """
+        Test country edit with name or code a substring of that for
+        another country.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        admin_session.create_country('MATC', 'Complete Mathsland')
+        admin_session.create_country('MATO', 'Compact Mathsland')
+        admin_session.edit('country', '4',
+                           {'code': 'MAT', 'name': 'Mathsland'})
+        expected_matc = {'XMO Number': '2', 'Country Number': '3',
+                         'Annual URL': self.instance.url + 'country3',
+                         'Code': 'MATC', 'Name': 'Complete Mathsland',
+                         'Flag URL': '',
+                         'Generic Number': '', 'Normal': 'Yes'}
+        expected_mat = {'XMO Number': '2', 'Country Number': '4',
+                        'Annual URL': self.instance.url + 'country4',
+                        'Code': 'MAT', 'Name': 'Mathsland',
+                        'Flag URL': '',
+                        'Generic Number': '', 'Normal': 'Yes'}
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        self.assertEqual(anon_csv,
+                         [expected_mat, expected_matc, expected_staff])
+        self.assertEqual(admin_csv,
+                         [expected_mat, expected_matc, expected_staff])
+
+    def test_country_create_substring(self):
+        """
+        Test country creation with name or code a substring of that
+        for another country.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        admin_session.create_country('MATC', 'Complete Mathsland')
+        admin_session.create_country('MAT', 'Mathsland')
+        expected_matc = {'XMO Number': '2', 'Country Number': '3',
+                         'Annual URL': self.instance.url + 'country3',
+                         'Code': 'MATC', 'Name': 'Complete Mathsland',
+                         'Flag URL': '',
+                         'Generic Number': '', 'Normal': 'Yes'}
+        expected_mat = {'XMO Number': '2', 'Country Number': '4',
+                        'Annual URL': self.instance.url + 'country4',
+                        'Code': 'MAT', 'Name': 'Mathsland',
+                        'Flag URL': '',
+                        'Generic Number': '', 'Normal': 'Yes'}
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        self.assertEqual(anon_csv,
+                         [expected_mat, expected_matc, expected_staff])
+        self.assertEqual(admin_csv,
+                         [expected_mat, expected_matc, expected_staff])
+
     def test_country_create_audit_errors(self):
         """
         Test errors from country creation auditor.

@@ -310,6 +310,12 @@ the registration system is not active.
 * Non-administrative registration system users can no longer change
   their own usernames.
 
+* The registration system now supports creating or editing a country
+  with a code that is a substring of that for another country.
+  (Previously this only worked if the country with the longer code was
+  created later and the one with the shorter code not edited after
+  that.)
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 
