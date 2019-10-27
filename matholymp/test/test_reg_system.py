@@ -9570,6 +9570,271 @@ class RegSystemTestCase(unittest.TestCase):
                                              'for',
                                              status=403)
 
+    @_with_config(require_passport_number='Yes', require_nationality='Yes',
+                  consent_ui='Yes')
+    def test_person_edit_selfreg(self):
+        """
+        Test editing people with self-registration accounts.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, photo_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                          'JPEG')
+        photo2_filename, photo2_bytes = self.gen_test_image(2, 2, 2, '.jpg',
+                                                            'JPEG')
+        cf_filename, cf_bytes = self.gen_test_pdf()
+        cf2_filename, cf2_bytes = self.gen_test_pdf()
+        admin_session.create('arrival', {'name': 'Example Airport'})
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        admin_session.create_person(
+            'Test First Country', 'Leader',
+            {'passport_number': '0',
+             'nationality': '0',
+             'event_photos_consent': 'no',
+             'diet_consent': 'no'})
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Guide',
+            {'passport_number': '0',
+             'nationality': '0',
+             'event_photos_consent': 'no',
+             'diet_consent': 'no'})
+        admin_session.create_user('selfreg_1', 'Test First Country',
+                                  'User,SelfRegister',
+                                  {'person': '1'})
+        admin_session.create_user('selfreg_2', 'XMO 2015 Staff',
+                                  'User,SelfRegister',
+                                  {'person': '2'})
+        selfreg_1_session = self.get_session('selfreg_1')
+        selfreg_2_session = self.get_session('selfreg_2')
+        # Self-registering users can edit most of their data.
+        selfreg_1_session.edit('person', '1',
+                               {'given_name': 'Edited given',
+                                'family_name': 'Edited family',
+                                'passport_given_name': 'Passport given',
+                                'passport_family_name': 'Passport family',
+                                'gender': 'Male',
+                                'date_of_birth_year': '1999',
+                                'date_of_birth_month': 'December',
+                                'date_of_birth_day': '31',
+                                'language_1': 'French',
+                                'tshirt': 'M',
+                                'diet': 'Vegan',
+                                'arrival_place': 'Example Airport',
+                                'arrival_date': '2 April 2015',
+                                'arrival_time_hour': '12',
+                                'arrival_time_minute': '34',
+                                'arrival_flight': 'ABC123',
+                                'departure_place': 'Example Airport',
+                                'departure_date': '3 April 2015',
+                                'departure_time_hour': '19',
+                                'departure_time_minute': '59',
+                                'departure_flight': 'DEF987',
+                                'room_type': 'Single room',
+                                'room_share_with': 'Someone',
+                                'generic_url':
+                                'https://www.example.invalid/people/person1/',
+                                'passport_number': '123',
+                                'nationality': 'Matholympian',
+                                'photo-1@content': photo_filename,
+                                'consent_form-1@content': cf_filename,
+                                'event_photos_consent': 'yes',
+                                'diet_consent': 'yes',
+                                'photo_consent':
+                                'Yes, for website and name badge'})
+        selfreg_2_session.edit('person', '2',
+                               {'given_name': 'Edited given 2',
+                                'family_name': 'Edited family 2',
+                                'passport_given_name': 'Passport given 2',
+                                'passport_family_name': 'Passport family 2',
+                                'gender': 'Non-binary',
+                                'date_of_birth_year': '1998',
+                                'date_of_birth_month': 'December',
+                                'date_of_birth_day': '31',
+                                'language_1': 'French',
+                                'language_2': 'English',
+                                'tshirt': 'M',
+                                'diet': 'Vegetarian',
+                                'arrival_place': 'Example Airport',
+                                'arrival_date': '2 April 2015',
+                                'arrival_time_hour': '13',
+                                'arrival_time_minute': '45',
+                                'arrival_flight': 'ABC124',
+                                'departure_place': 'Example Airport',
+                                'departure_date': '3 April 2015',
+                                'departure_time_hour': '18',
+                                'departure_time_minute': '48',
+                                'departure_flight': 'DEF986',
+                                'room_type': 'Single room',
+                                'room_share_with': 'Someone else',
+                                'generic_url':
+                                'https://www.example.invalid/people/person9/',
+                                'passport_number': '12345',
+                                'nationality': 'Matholympian also',
+                                'phone_number': '9876543210',
+                                'photo-1@content': photo2_filename,
+                                'consent_form-1@content': cf2_filename,
+                                'event_photos_consent': 'yes',
+                                'diet_consent': 'yes',
+                                'photo_consent':
+                                'Yes, for website and name badge'})
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        img2_url_csv = self.instance.url + 'photo2/photo.jpg'
+        cf_url_csv = self.instance.url + 'consent_form1/consent-form.pdf'
+        cf2_url_csv = self.instance.url + 'consent_form2/consent-form.pdf'
+        expected_leader = {'XMO Number': '2', 'Country Number': '3',
+                           'Person Number': '1',
+                           'Annual URL': self.instance.url + 'person1',
+                           'Country Name': 'Test First Country',
+                           'Country Code': 'ABC', 'Primary Role': 'Leader',
+                           'Other Roles': '', 'Guide For': '',
+                           'Contestant Code': '', 'Contestant Age': '',
+                           'Given Name': 'Edited given',
+                           'Family Name': 'Edited family',
+                           'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                           'P6': '', 'Total': '', 'Award': '',
+                           'Extra Awards': '', 'Photo URL': img_url_csv,
+                           'Generic Number': '1'}
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Person Number': '2',
+                          'Annual URL': self.instance.url + 'person2',
+                          'Country Name': 'XMO 2015 Staff',
+                          'Country Code': 'ZZA', 'Primary Role': 'Guide',
+                          'Other Roles': '',
+                          'Guide For': '',
+                          'Contestant Code': '', 'Contestant Age': '',
+                          'Given Name': 'Edited given 2',
+                          'Family Name': 'Edited family 2',
+                          'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                          'P6': '', 'Total': '', 'Award': '',
+                          'Extra Awards': '', 'Photo URL': img2_url_csv,
+                          'Generic Number': '9'}
+        expected_leader_admin = expected_leader.copy()
+        expected_staff_admin = expected_staff.copy()
+        expected_leader_admin.update(
+            {'Gender': 'Male', 'Date of Birth': '1999-12-31',
+             'Languages': 'French',
+             'Allergies and Dietary Requirements': 'Vegan',
+             'T-Shirt Size': 'M', 'Arrival Place': 'Example Airport',
+             'Arrival Date': '2015-04-02', 'Arrival Time': '12:34',
+             'Arrival Flight': 'ABC123', 'Departure Place': 'Example Airport',
+             'Departure Date': '2015-04-03', 'Departure Time': '19:59',
+             'Departure Flight': 'DEF987', 'Room Type': 'Single room',
+             'Share Room With': 'Someone', 'Room Number': '',
+             'Phone Number': '', 'Badge Photo URL': img_url_csv,
+             'Badge Background': 'generic', 'Badge Outer Colour': 'd22027',
+             'Badge Inner Colour': 'eb9984', 'Consent Form URL': cf_url_csv,
+             'Passport or Identity Card Number': '123',
+             'Nationality': 'Matholympian',
+             'Passport Given Name': 'Passport given',
+             'Passport Family Name': 'Passport family',
+             'Event Photos Consent': 'Yes'})
+        expected_staff_admin.update(
+            {'Gender': 'Non-binary', 'Date of Birth': '1998-12-31',
+             'Languages': 'French,English',
+             'Allergies and Dietary Requirements': 'Vegetarian',
+             'T-Shirt Size': 'M', 'Arrival Place': 'Example Airport',
+             'Arrival Date': '2015-04-02', 'Arrival Time': '13:45',
+             'Arrival Flight': 'ABC124', 'Departure Place': 'Example Airport',
+             'Departure Date': '2015-04-03', 'Departure Time': '18:48',
+             'Departure Flight': 'DEF986', 'Room Type': 'Single room',
+             'Share Room With': 'Someone else', 'Room Number': '',
+             'Phone Number': '9876543210', 'Badge Photo URL': img2_url_csv,
+             'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
+             'Badge Inner Colour': '9c95cc', 'Consent Form URL': cf2_url_csv,
+             'Passport or Identity Card Number': '12345',
+             'Nationality': 'Matholympian also',
+             'Passport Given Name': 'Passport given 2',
+             'Passport Family Name': 'Passport family 2',
+             'Event Photos Consent': 'Yes'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        selfreg_1_csv = selfreg_1_session.get_people_csv()
+        selfreg_2_csv = selfreg_2_session.get_people_csv()
+        self.assertEqual(anon_csv,
+                         [expected_leader, expected_staff])
+        self.assertEqual(admin_csv,
+                         [expected_leader_admin, expected_staff_admin])
+        self.assertEqual(reg_csv,
+                         [expected_leader, expected_staff])
+        self.assertEqual(selfreg_1_csv,
+                         [expected_leader, expected_staff])
+        self.assertEqual(selfreg_2_csv,
+                         [expected_leader, expected_staff])
+        # Check the images from the URLs in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        reg_bytes = reg_session.get_bytes(img_url_csv)
+        selfreg_1_bytes = selfreg_1_session.get_bytes(img_url_csv)
+        selfreg_2_bytes = selfreg_2_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, photo_bytes)
+        self.assertEqual(admin_bytes, photo_bytes)
+        self.assertEqual(reg_bytes, photo_bytes)
+        self.assertEqual(selfreg_1_bytes, photo_bytes)
+        self.assertEqual(selfreg_2_bytes, photo_bytes)
+        anon_bytes = session.get_bytes(img2_url_csv)
+        admin_bytes = admin_session.get_bytes(img2_url_csv)
+        reg_bytes = reg_session.get_bytes(img2_url_csv)
+        selfreg_1_bytes = selfreg_1_session.get_bytes(img2_url_csv)
+        selfreg_2_bytes = selfreg_2_session.get_bytes(img2_url_csv)
+        self.assertEqual(anon_bytes, photo2_bytes)
+        self.assertEqual(admin_bytes, photo2_bytes)
+        self.assertEqual(reg_bytes, photo2_bytes)
+        self.assertEqual(selfreg_1_bytes, photo2_bytes)
+        self.assertEqual(selfreg_2_bytes, photo2_bytes)
+        # Check the consent forms from the URL in the .csv file.
+        admin_bytes = admin_session.get_bytes(cf_url_csv)
+        selfreg_1_bytes = selfreg_1_session.get_bytes(cf_url_csv)
+        self.assertEqual(admin_bytes, cf_bytes)
+        self.assertEqual(selfreg_1_bytes, cf_bytes)
+        # The form is not accessible by the other self-registration user.
+        selfreg_2_session.check_open(cf_url_csv,
+                                     error='You are not allowed to view this '
+                                     'file',
+                                     status=403)
+        admin_bytes = admin_session.get_bytes(cf2_url_csv)
+        selfreg_2_bytes = selfreg_2_session.get_bytes(cf2_url_csv)
+        self.assertEqual(admin_bytes, cf2_bytes)
+        self.assertEqual(selfreg_2_bytes, cf2_bytes)
+        # The form is not accessible by the other self-registration user.
+        selfreg_1_session.check_open(cf2_url_csv,
+                                     error='You are not allowed to view this '
+                                     'file',
+                                     status=403)
+        # Another self-registration user from the same country cannot
+        # access the form either.
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Guide',
+            {'passport_number': '0',
+             'nationality': '0',
+             'event_photos_consent': 'no',
+             'diet_consent': 'no'})
+        admin_session.create_user('selfreg_3', 'XMO 2015 Staff',
+                                  'User,SelfRegister',
+                                  {'person': '3'})
+        selfreg_3_session = self.get_session('selfreg_3')
+        selfreg_3_session.check_open(cf2_url_csv,
+                                     error='You are not allowed to view this '
+                                     'file',
+                                     status=403)
+        # Changing consent has that effect for photos.
+        selfreg_2_session.check_open(self.instance.url)
+        selfreg_2_session.edit('person', '2',
+                               {'photo_consent': 'Yes, for name badge only'})
+        selfreg_2_bytes = selfreg_2_session.get_bytes(img2_url_csv)
+        self.assertEqual(selfreg_2_bytes, photo2_bytes)
+        selfreg_3_session.check_open(img2_url_csv,
+                                     error='You are not allowed to view this '
+                                     'file',
+                                     status=403)
+
     def test_person_score(self):
         """
         Test entering scores and CSV file of scores.

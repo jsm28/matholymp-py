@@ -388,8 +388,12 @@ def has_consent_for_photo(db, person):
 
 def required_person_fields(db):
     """Return the list of fields required for registered people."""
-    req = ['country', 'given_name', 'family_name', 'gender', 'primary_role',
-           'language_1', 'tshirt']
+    req = ['given_name', 'family_name', 'gender', 'language_1', 'tshirt']
+    # Accounts that cannot create people but can edit them get forms
+    # without editable country or primary_name.
+    if db.security.hasPermission('Create', db.getuid(), classname='person'):
+        req.append('country')
+        req.append('primary_role')
     if require_dob(db):
         req.append('date_of_birth_year')
         req.append('date_of_birth_month')

@@ -316,6 +316,10 @@ the registration system is not active.
   created later and the one with the shorter code not edited after
   that.)
 
+* In preparation for supporting bulk registration of participants with
+  associated self-registration accounts, :file:`user.item.html` has
+  been updated.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

@@ -305,14 +305,22 @@ def init_schema(env):
     db.security.addPermissionToRole('User', p)
     db.security.addPermissionToRole('Anonymous', p)
 
-    # Registering users can view and edit person records if the person is
-    # from their own country.  Staff records are expected to be edited by
-    # adminstrative users so not all relevant fields are accessible here.
-    # All users can view certain person details, but not for retired people.
+    # Registering users can view, edit and create person records if
+    # the person is from their own country.  Staff records are
+    # expected to be edited by adminstrative users so not all relevant
+    # fields are accessible here.  All users can view certain person
+    # details, but not for retired people.
     db.security.addRole(name='Register', description='Registering people')
+
+    # Self-registering users can view and edit their own person record
+    # (which must be from their own country), but cannot create person
+    # records and have no special privileges regarding records of
+    # other people.
+    db.security.addRole(name='SelfRegister', description='Registering self')
 
     for cl in ('gender', 'tshirt', 'language', 'arrival', 'room_type'):
         db.security.addPermissionToRole('Register', 'View', cl)
+        db.security.addPermissionToRole('SelfRegister', 'View', cl)
 
     def own_country_person(db, userid, itemid):
         """Determine whether the userid matches the country of the person
@@ -320,38 +328,55 @@ def init_schema(env):
         return (db.user.get(userid, 'country')
                 == db.person.get(itemid, 'country'))
 
+    def own_person(db, userid, itemid):
+        """Determine whether the userid matches the person being accessed."""
+        return db.user.get(userid, 'person') == itemid
+
     p = db.security.addPermission(name='View', klass='person',
                                   check=own_country_person)
     db.security.addPermissionToRole('Register', p)
-    person_reg_props = ['country', 'given_name', 'family_name', 'gender',
-                        'date_of_birth_year', 'date_of_birth_month',
-                        'date_of_birth_day', 'primary_role',
-                        'diet', 'tshirt', 'arrival_place',
-                        'arrival_date', 'arrival_time_hour',
-                        'arrival_time_minute', 'arrival_flight',
-                        'departure_place', 'departure_date',
-                        'departure_time_hour', 'departure_time_minute',
-                        'departure_flight', 'room_type', 'room_share_with',
-                        'generic_url', 'reuse_photo', 'photo']
+    p = db.security.addPermission(name='View', klass='person',
+                                  check=own_person)
+    db.security.addPermissionToRole('SelfRegister', p)
+    person_common_reg_props = ['given_name', 'family_name', 'gender',
+                               'date_of_birth_year', 'date_of_birth_month',
+                               'date_of_birth_day',
+                               'diet', 'tshirt', 'arrival_place',
+                               'arrival_date', 'arrival_time_hour',
+                               'arrival_time_minute', 'arrival_flight',
+                               'departure_place', 'departure_date',
+                               'departure_time_hour', 'departure_time_minute',
+                               'departure_flight', 'room_type',
+                               'room_share_with', 'generic_url', 'reuse_photo',
+                               'photo']
     if have_consent_forms(db):
-        person_reg_props.append('consent_form')
+        person_common_reg_props.append('consent_form')
     if have_consent_ui(db):
-        person_reg_props.append('event_photos_consent')
-        person_reg_props.append('photo_consent')
-        person_reg_props.append('diet_consent')
+        person_common_reg_props.append('event_photos_consent')
+        person_common_reg_props.append('photo_consent')
+        person_common_reg_props.append('diet_consent')
     if have_passport_numbers(db):
-        person_reg_props.append('passport_number')
+        person_common_reg_props.append('passport_number')
     if have_nationality(db):
-        person_reg_props.append('nationality')
+        person_common_reg_props.append('nationality')
     if have_passport_numbers(db) and have_nationality(db):
-        person_reg_props.append('passport_given_name')
-        person_reg_props.append('passport_family_name')
+        person_common_reg_props.append('passport_given_name')
+        person_common_reg_props.append('passport_family_name')
     for i in get_language_numbers(db):
-        person_reg_props.append('language_%d' % i)
+        person_common_reg_props.append('language_%d' % i)
+    person_reg_props = person_common_reg_props.copy()
+    person_reg_props.append('country')
+    person_reg_props.append('primary_role')
+    person_selfreg_props = person_common_reg_props.copy()
+    person_selfreg_props.append('phone_number')
     p = db.security.addPermission(name='Edit', klass='person',
                                   check=own_country_person,
                                   properties=person_reg_props)
     db.security.addPermissionToRole('Register', p)
+    p = db.security.addPermission(name='Edit', klass='person',
+                                  check=own_person,
+                                  properties=person_selfreg_props)
+    db.security.addPermissionToRole('SelfRegister', p)
     p = db.security.addPermission(name='Create', klass='person',
                                   properties=person_reg_props)
     db.security.addPermissionToRole('Register', p)
@@ -392,6 +417,8 @@ def init_schema(env):
     # they just uploaded and ones for people from their country (even
     # the old ones).
     db.security.addPermissionToRole('Register', 'Create', 'photo')
+    # Self-registering users can create and see their own photos.
+    db.security.addPermissionToRole('SelfRegister', 'Create', 'photo')
 
     def own_country_photo(db, userid, itemid):
         """Determine whether the userid matches the country of the photo being
@@ -405,14 +432,29 @@ def init_schema(env):
         return (user_country == file_country
                 or (file_country is None and userid == file_creator))
 
+    def own_person_photo(db, userid, itemid):
+        """Determine whether the userid matches the person of the photo being
+        accessed."""
+        user_person = db.user.get(userid, 'person')
+        file_person = db.photo.get(itemid, 'person')
+        file_creator = db.photo.get(itemid, 'creator')
+        return (user_person == file_person
+                or (file_person is None and userid == file_creator))
+
     p = db.security.addPermission(name='View', klass='photo',
                                   check=own_country_photo)
     db.security.addPermissionToRole('Register', p)
+    p = db.security.addPermission(name='View', klass='photo',
+                                  check=own_person_photo)
+    db.security.addPermissionToRole('SelfRegister', p)
 
     # Registering users can create consent forms, and view them only
     # when from their own country or created by that user (the latter
     # as a case for access before the person is set).
     db.security.addPermissionToRole('Register', 'Create', 'consent_form')
+    # Self-registering users can create and see their own consent
+    # forms.
+    db.security.addPermissionToRole('SelfRegister', 'Create', 'consent_form')
 
     def own_country_consent_form(db, userid, itemid):
         """Determine whether the userid matches the country of the consent
@@ -426,9 +468,21 @@ def init_schema(env):
         return (user_country == file_country
                 or (file_country is None and userid == file_creator))
 
+    def own_person_consent_form(db, userid, itemid):
+        """Determine whether the userid matches the person of the consent
+        form being accessed."""
+        user_person = db.user.get(userid, 'person')
+        file_person = db.consent_form.get(itemid, 'person')
+        file_creator = db.consent_form.get(itemid, 'creator')
+        return (user_person == file_person
+                or (file_person is None and userid == file_creator))
+
     p = db.security.addPermission(name='View', klass='consent_form',
                                   check=own_country_consent_form)
     db.security.addPermissionToRole('Register', p)
+    p = db.security.addPermission(name='View', klass='consent_form',
+                                  check=own_person_consent_form)
+    db.security.addPermissionToRole('SelfRegister', p)
 
     def own_country(db, userid, itemid):
         """Determine whether the userid matches the country being accessed."""
@@ -488,6 +542,7 @@ def init_schema(env):
     # permitted.
     p = db.security.addPermission(name='RegisterPhone')
     db.security.addPermissionToRole('Admin', p)
+    db.security.addPermissionToRole('SelfRegister', p)
 
     # Permission to register room types not otherwise allowed (e.g.,
     # to request a single room for a contestant if that is not

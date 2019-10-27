@@ -65,6 +65,10 @@ define="edit_ok context/is_edit_ok"
   <td tal:content="structure python:context.country.menu(html_kwargs =
   { 'id': 'country' })">country</td>
  </tr>
+ <tr tal:define="name string:person; label string:Person (self-registration accounts only); value context/person; edit_ok edit_ok" tal:condition="python:(context.is_edit_ok() and request.user.hasPermission('Omnivident'))">
+  <th metal:use-macro="th_label">Person (self-registration accounts only)</th>
+  <td><input name="person" metal:use-macro="normal_input"></td>
+ </tr>
  <tr tal:define="name string:username; label string:Login Name; value context/username">
    <th metal:use-macro="th_label">Login Name</th>
    <td><input metal:use-macro="src_input"></td>
