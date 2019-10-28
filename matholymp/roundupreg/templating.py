@@ -44,7 +44,7 @@ __all__ = ['people_from_country_internal', 'people_from_country',
            'score_country_select', 'required_person_fields',
            'register_templating_utils', 'show_prereg_sidebar',
            'show_prereg_reminder', 'bulk_csv_contents',
-           'show_bulk_csv_country']
+           'show_bulk_csv_country', 'required_user_fields']
 
 import base64
 import datetime
@@ -491,6 +491,17 @@ def show_bulk_csv_country(db, form):
     return sitegen.html_table_thead_tbody_list(head_row_list, body_row_list)
 
 
+def required_user_fields(db):
+    """Return the list of fields required for registered users."""
+    req = ['address']
+    # Accounts that cannot create users but can edit their own user
+    # get forms without editable country or username.
+    if db.security.hasPermission('Create', db.getuid(), classname='user'):
+        req.append('country')
+        req.append('username')
+    return req
+
+
 def register_templating_utils(instance):
     """Register functions for use from page templates with Roundup."""
     instance.registerUtil('distinguish_official', distinguish_official)
@@ -537,3 +548,4 @@ def register_templating_utils(instance):
     instance.registerUtil('show_prereg_reminder', show_prereg_reminder)
     instance.registerUtil('bulk_csv_contents', bulk_csv_contents)
     instance.registerUtil('show_bulk_csv_country', show_bulk_csv_country)
+    instance.registerUtil('required_user_fields', required_user_fields)

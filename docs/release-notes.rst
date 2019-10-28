@@ -320,6 +320,9 @@ the registration system is not active.
   associated self-registration accounts, :file:`user.item.html` has
   been updated.
 
+* :file:`user.item.html` has been updated to avoid warnings when
+  non-administrative users edit their own user records.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

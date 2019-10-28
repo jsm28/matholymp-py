@@ -43,7 +43,7 @@ define="edit_ok context/is_edit_ok"
 
 <form method="POST"
       name="itemSynopsis"
-      tal:define="required python:'country username address'.split()"
+      tal:define="required python:utils.required_user_fields(db._db)"
       enctype="multipart/form-data"
       tal:attributes="action context/designator;
       onSubmit python:'return checkRequiredFields(\'%s\')'%'\', \''.join(required);
@@ -125,7 +125,7 @@ define="edit_ok context/is_edit_ok"
   <td>
    &nbsp;
    <input type="hidden" name="@template" value="item">
-   <input type="hidden" name="@required" value="country,username,address"
+   <input type="hidden" name="@required"
           tal:attributes="value python:','.join(required)">
   </td>
   <td><input type="submit" value="save" tal:replace="structure context/submit"><!--submit button here-->
