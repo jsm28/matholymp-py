@@ -1,8 +1,8 @@
 diff --git a/roundup/cgi/client.py b/roundup/cgi/client.py
-index a774a35c..f1f7c6dd 100644
+index a4a6fd4b..b6b6d4f2 100644
 --- a/roundup/cgi/client.py
 +++ b/roundup/cgi/client.py
-@@ -1877,6 +1877,8 @@ class Client:
+@@ -1983,6 +1983,8 @@ class Client:
          """
          try:
              call(*args, **kwargs)

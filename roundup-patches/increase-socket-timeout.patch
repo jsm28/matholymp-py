@@ -1,5 +1,5 @@
 diff --git a/roundup/scripts/roundup_server.py b/roundup/scripts/roundup_server.py
-index b424ec49..58c322b7 100644
+index 9fec88bc..c8168865 100644
 --- a/roundup/scripts/roundup_server.py
 +++ b/roundup/scripts/roundup_server.py
 @@ -724,7 +724,7 @@ class ServerConfig(configuration.Config):
