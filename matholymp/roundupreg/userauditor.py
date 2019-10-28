@@ -68,6 +68,8 @@ _email_regexp = (r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+"
 _email_rfc = re.compile('^' + _email_regexp[0] + '@' + _email_regexp[1] + '$',
                         re.IGNORECASE)
 
+_valid_username = re.compile('^[a-z0-9_@!%.+-]+$', re.IGNORECASE)
+
 
 def valid_address(address):
     """Check validity of an email address."""
@@ -79,8 +81,15 @@ def audit_user_fields(db, cl, nodeid, newvalues):
 
         - email address is syntactically valid
         - roles specified exist
+        - username matches A-z0-9_-.@!+% (email symbols)
         - country is specified
     """
+
+    if 'username' in newvalues:
+        if not _valid_username.match(newvalues['username']):
+            raise ValueError("Username/Login Name must consist only of the "
+                             "letters a-z (any case), digits 0-9 and the "
+                             "symbols: @._-!+%")
 
     if 'address' in newvalues:
         address = newvalues['address']
