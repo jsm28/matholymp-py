@@ -69,7 +69,7 @@ define="edit_ok context/is_edit_ok"
   <th metal:use-macro="th_label">Person (self-registration accounts only)</th>
   <td><input name="person" metal:use-macro="normal_input"></td>
  </tr>
- <tr tal:define="name string:username; label string:Login Name; value context/username">
+ <tr tal:define="name string:username; label string:Login Name; value context/username; edit_ok context/username/is_edit_ok">
    <th metal:use-macro="th_label">Login Name</th>
    <td><input metal:use-macro="src_input"></td>
  </tr>
