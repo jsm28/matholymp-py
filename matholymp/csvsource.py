@@ -259,7 +259,9 @@ class CSVDataSource(DataSource):
                                   'generic_id': 'Generic Number'}
 
     _person_event_attr_map_bool_none = {'event_photos_consent':
-                                        'Event Photos Consent'}
+                                        'Event Photos Consent',
+                                        'basic_data_missing':
+                                        'Basic Data Missing'}
 
     def person_event_get_attr(self, person_id, country_id, event_id, name):
         if name == '_country_ids':

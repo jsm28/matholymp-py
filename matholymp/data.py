@@ -1606,6 +1606,14 @@ class PersonEvent:
         not collected.
         """)
 
+    basic_data_missing = _PersonEventPropertyDS(
+        'basic_data_missing',
+        """
+        Whether basic, normally required, data may be missing for this
+        person at this event (where an incomplete registration of the
+        person has been done to be completed by self-registration).
+        """)
+
     def _get_sort_key(self):
         return (self.event.id,
                 coll_get_sort_key(self.country.code),

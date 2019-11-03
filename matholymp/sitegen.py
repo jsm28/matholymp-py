@@ -1995,7 +1995,7 @@ class SiteGenerator:
                          'Badge Inner Colour', 'Consent Form URL',
                          'Passport or Identity Card Number', 'Nationality',
                          'Passport Given Name', 'Passport Family Name',
-                         'Event Photos Consent'])
+                         'Event Photos Consent', 'Basic Data Missing'])
         return cols
 
     def person_csv_data(self, p, num_problems=None, distinguish_official=None,
@@ -2104,6 +2104,12 @@ class SiteGenerator:
                 csv_out['Event Photos Consent'] = ('Yes'
                                                    if p.event_photos_consent
                                                    else 'No')
+            if p.basic_data_missing is None:
+                csv_out['Basic Data Missing'] = ''
+            else:
+                csv_out['Basic Data Missing'] = ('Yes'
+                                                 if p.basic_data_missing
+                                                 else 'No')
         return csv_out
 
     def generate_people_csv(self):
