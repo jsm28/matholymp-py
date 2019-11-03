@@ -9846,6 +9846,286 @@ class RegSystemTestCase(unittest.TestCase):
                                      'file',
                                      status=403)
 
+    @_with_config(require_passport_number='Yes', require_nationality='Yes',
+                  require_diet='Yes', consent_ui='Yes')
+    def test_person_incomplete(self):
+        """
+        Test people with incomplete registrations.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create('arrival', {'name': 'Example Airport'})
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'@required': '',
+             'incomplete': 'yes',
+             'gender': None,
+             'date_of_birth_year': None,
+             'date_of_birth_month': None,
+             'date_of_birth_day': None,
+             'language_1': None,
+             'tshirt': None})
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Guide',
+            {'@required': '',
+             'incomplete': 'yes',
+             'gender': None,
+             'date_of_birth_year': None,
+             'date_of_birth_month': None,
+             'date_of_birth_day': None,
+             'language_1': None,
+             'tshirt': None})
+        admin_session.create_user('selfreg_1', 'Test First Country',
+                                  'User,SelfRegister',
+                                  {'person': '1'})
+        admin_session.create_user('selfreg_2', 'XMO 2015 Staff',
+                                  'User,SelfRegister',
+                                  {'person': '2'})
+        selfreg_1_session = self.get_session('selfreg_1')
+        selfreg_2_session = self.get_session('selfreg_2')
+        # Incomplete registrations do not have defaults of diet or
+        # room type.
+        expected_cont = {'XMO Number': '2', 'Country Number': '3',
+                         'Person Number': '1',
+                         'Annual URL': self.instance.url + 'person1',
+                         'Country Name': 'Test First Country',
+                         'Country Code': 'ABC', 'Primary Role': 'Contestant 1',
+                         'Other Roles': '', 'Guide For': '',
+                         'Contestant Code': 'ABC1', 'Contestant Age': '',
+                         'Given Name': 'Given 1', 'Family Name': 'Family 1',
+                         'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                         'P6': '', 'Total': '0', 'Award': '',
+                         'Extra Awards': '', 'Photo URL': '',
+                         'Generic Number': ''}
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Person Number': '2',
+                          'Annual URL': self.instance.url + 'person2',
+                          'Country Name': 'XMO 2015 Staff',
+                          'Country Code': 'ZZA', 'Primary Role': 'Guide',
+                          'Other Roles': '', 'Guide For': '',
+                          'Contestant Code': '', 'Contestant Age': '',
+                          'Given Name': 'Given 2', 'Family Name': 'Family 2',
+                          'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                          'P6': '', 'Total': '', 'Award': '',
+                          'Extra Awards': '', 'Photo URL': '',
+                          'Generic Number': ''}
+        expected_cont_admin = expected_cont.copy()
+        expected_staff_admin = expected_staff.copy()
+        expected_cont_admin.update(
+            {'Gender': '', 'Date of Birth': '', 'Languages': '',
+             'Allergies and Dietary Requirements': '',
+             'T-Shirt Size': '', 'Arrival Place': '',
+             'Arrival Date': '', 'Arrival Time': '',
+             'Arrival Flight': '', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': '',
+             'Share Room With': '', 'Room Number': '',
+             'Phone Number': '', 'Badge Photo URL': '',
+             'Badge Background': 'generic', 'Badge Outer Colour': '7ab558',
+             'Badge Inner Colour': 'c9deb0', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Passport Given Name': 'Given 1',
+             'Passport Family Name': 'Family 1',
+             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+        expected_staff_admin.update(
+            {'Gender': '', 'Date of Birth': '', 'Languages': '',
+             'Allergies and Dietary Requirements': '',
+             'T-Shirt Size': '', 'Arrival Place': '',
+             'Arrival Date': '', 'Arrival Time': '',
+             'Arrival Flight': '', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': '',
+             'Share Room With': '', 'Room Number': '',
+             'Phone Number': '', 'Badge Photo URL': '',
+             'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
+             'Badge Inner Colour': '9c95cc', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Passport Given Name': 'Given 2',
+             'Passport Family Name': 'Family 2',
+             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        selfreg_1_csv = selfreg_1_session.get_people_csv()
+        selfreg_2_csv = selfreg_2_session.get_people_csv()
+        self.assertEqual(anon_csv,
+                         [expected_cont, expected_staff])
+        self.assertEqual(admin_csv,
+                         [expected_cont_admin, expected_staff_admin])
+        self.assertEqual(reg_csv,
+                         [expected_cont, expected_staff])
+        self.assertEqual(selfreg_1_csv,
+                         [expected_cont, expected_staff])
+        self.assertEqual(selfreg_2_csv,
+                         [expected_cont, expected_staff])
+        # Registration and self-registration users cannot edit those
+        # people without completing the incomplete data.
+        reg_session.edit('person', '1',
+                         {'@required': '',
+                          'arrival_place': 'Example Airport'},
+                         error='No gender specified')
+        selfreg_1_session.edit('person', '1',
+                               {'@required': '',
+                                'arrival_place': 'Example Airport'},
+                               error='No gender specified')
+        selfreg_2_session.edit('person', '2',
+                               {'@required': '',
+                                'arrival_place': 'Example Airport'},
+                               error='No gender specified')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        selfreg_1_csv = selfreg_1_session.get_people_csv()
+        selfreg_2_csv = selfreg_2_session.get_people_csv()
+        self.assertEqual(anon_csv,
+                         [expected_cont, expected_staff])
+        self.assertEqual(admin_csv,
+                         [expected_cont_admin, expected_staff_admin])
+        self.assertEqual(reg_csv,
+                         [expected_cont, expected_staff])
+        self.assertEqual(selfreg_1_csv,
+                         [expected_cont, expected_staff])
+        self.assertEqual(selfreg_2_csv,
+                         [expected_cont, expected_staff])
+        # Administrative users can edit those people without
+        # completing the incomplete data.
+        admin_session.edit('person', '1',
+                           {'arrival_place': 'Example Airport'})
+        expected_cont_admin['Arrival Place'] = 'Example Airport'
+        admin_session.edit('person', '2',
+                           {'departure_place': 'Example Airport'})
+        expected_staff_admin['Departure Place'] = 'Example Airport'
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        selfreg_1_csv = selfreg_1_session.get_people_csv()
+        selfreg_2_csv = selfreg_2_session.get_people_csv()
+        self.assertEqual(anon_csv,
+                         [expected_cont, expected_staff])
+        self.assertEqual(admin_csv,
+                         [expected_cont_admin, expected_staff_admin])
+        self.assertEqual(reg_csv,
+                         [expected_cont, expected_staff])
+        self.assertEqual(selfreg_1_csv,
+                         [expected_cont, expected_staff])
+        self.assertEqual(selfreg_2_csv,
+                         [expected_cont, expected_staff])
+        # Registration and self-registration users can edit those
+        # people if they do complete the incomplete data.
+        reg_session.edit('person', '1',
+                         {'gender': 'Female',
+                          'date_of_birth_year': '2000',
+                          'date_of_birth_month': 'November',
+                          'date_of_birth_day': '3',
+                          'language_1': 'English',
+                          'tshirt': 'S',
+                          'diet': 'Food',
+                          'passport_number': '987',
+                          'nationality': 'Matholympian',
+                          'event_photos_consent': 'no',
+                          'diet_consent': 'yes',
+                          'photo_consent': 'Yes, for website and name badge'})
+        expected_cont['Contestant Age'] = '14'
+        expected_cont_admin.update(
+            {'Contestant Age': '14', 'Gender': 'Female',
+             'Date of Birth': '2000-11-03', 'Languages': 'English',
+             'Allergies and Dietary Requirements': 'Food',
+             'T-Shirt Size': 'S', 'Room Type': 'Shared room',
+             'Passport or Identity Card Number': '987',
+             'Nationality': 'Matholympian',
+             'Event Photos Consent': 'No', 'Basic Data Missing': 'No'})
+        selfreg_2_session.edit('person', '2',
+                               {'gender': 'Male',
+                                'date_of_birth_year': '2000',
+                                'date_of_birth_month': 'January',
+                                'date_of_birth_day': '31',
+                                'language_1': 'French',
+                                'tshirt': 'M',
+                                'diet': 'Less food',
+                                'passport_number': '9876',
+                                'nationality': 'Matholympianish',
+                                'event_photos_consent': 'yes',
+                                'diet_consent': 'yes',
+                                'photo_consent':
+                                'Yes, for website and name badge'})
+        expected_staff_admin.update(
+            {'Gender': 'Male', 'Date of Birth': '2000-01-31',
+             'Languages': 'French',
+             'Allergies and Dietary Requirements': 'Less food',
+             'T-Shirt Size': 'M', 'Room Type': 'Shared room',
+             'Passport or Identity Card Number': '9876',
+             'Nationality': 'Matholympianish',
+             'Event Photos Consent': 'Yes', 'Basic Data Missing': 'No'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        selfreg_1_csv = selfreg_1_session.get_people_csv()
+        selfreg_2_csv = selfreg_2_session.get_people_csv()
+        self.assertEqual(anon_csv,
+                         [expected_cont, expected_staff])
+        self.assertEqual(admin_csv,
+                         [expected_cont_admin, expected_staff_admin])
+        self.assertEqual(reg_csv,
+                         [expected_cont, expected_staff])
+        self.assertEqual(selfreg_1_csv,
+                         [expected_cont, expected_staff])
+        self.assertEqual(selfreg_2_csv,
+                         [expected_cont, expected_staff])
+        # Creation with certain details missing is still an error.
+        admin_session.create('person',
+                             {'@required': '',
+                              'incomplete': 'yes',
+                              'primary_role': 'Leader',
+                              'given_name': 'Given',
+                              'family_name': 'Family',
+                              'gender': 'Female',
+                              'language_1': 'English',
+                              'tshirt': 'S'},
+                             error='No country specified')
+        admin_session.create_person('Test First Country', 'Contestant 2',
+                                    {'@required': '',
+                                     'incomplete': 'yes',
+                                     'given_name': None},
+                                    error='No given name specified')
+        admin_session.create_person('Test First Country', 'Contestant 2',
+                                    {'@required': '',
+                                     'incomplete': 'yes',
+                                     'family_name': None},
+                                    error='No family name specified')
+        admin_session.create('person',
+                             {'@required': '',
+                              'incomplete': 'yes',
+                              'country': 'Test First Country',
+                              'given_name': 'Given',
+                              'family_name': 'Family',
+                              'gender': 'Female',
+                              'language_1': 'English',
+                              'tshirt': 'S'},
+                             error='No primary role specified')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        selfreg_1_csv = selfreg_1_session.get_people_csv()
+        selfreg_2_csv = selfreg_2_session.get_people_csv()
+        self.assertEqual(anon_csv,
+                         [expected_cont, expected_staff])
+        self.assertEqual(admin_csv,
+                         [expected_cont_admin, expected_staff_admin])
+        self.assertEqual(reg_csv,
+                         [expected_cont, expected_staff])
+        self.assertEqual(selfreg_1_csv,
+                         [expected_cont, expected_staff])
+        self.assertEqual(selfreg_2_csv,
+                         [expected_cont, expected_staff])
+
     def test_person_score(self):
         """
         Test entering scores and CSV file of scores.

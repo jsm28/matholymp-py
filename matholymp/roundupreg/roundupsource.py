@@ -237,7 +237,10 @@ class RoundupDataSource(DataSource):
             return self._db.person.get(person_id, 'diet') or None
         elif name == 'room_type':
             room_type = self._db.person.get(person_id, 'room_type')
-            return self._db.room_type.get(room_type, 'name')
+            if room_type is None:
+                return None
+            else:
+                return self._db.room_type.get(room_type, 'name')
         elif name == 'room_share_with':
             return self._db.person.get(person_id, 'room_share_with') or None
         elif name == 'room_number':
@@ -256,7 +259,10 @@ class RoundupDataSource(DataSource):
             return generic_id
         elif name == 'gender':
             gender = self._db.person.get(person_id, 'gender')
-            return self._db.gender.get(gender, 'name')
+            if gender is None:
+                return None
+            else:
+                return self._db.gender.get(gender, 'name')
         elif name == 'date_of_birth':
             return person_date_of_birth(self._db, person_id)
         elif name == 'passport_number':
@@ -281,7 +287,10 @@ class RoundupDataSource(DataSource):
                     or self._db.person.get(person_id, 'family_name'))
         elif name == 'tshirt':
             tshirt = self._db.person.get(person_id, 'tshirt')
-            return self._db.tshirt.get(tshirt, 'name')
+            if tshirt is None:
+                return None
+            else:
+                return self._db.tshirt.get(tshirt, 'name')
         elif name == 'arrival_place':
             arrival_place = self._db.person.get(person_id, 'arrival_place')
             if arrival_place is None:

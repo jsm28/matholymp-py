@@ -203,6 +203,8 @@ def person_date_of_birth(db, person):
 def contestant_age(db, person):
     """Return the age of a contestant on the configured day."""
     date1 = person_date_of_birth(db, person)
+    if date1 is None:
+        return None
     date2 = date_from_ymd_iso('age day date',
                               db.config.ext['MATHOLYMP_AGE_DAY_DATE'])
     return age_on_date(date1, date2)

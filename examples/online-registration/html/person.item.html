@@ -92,7 +92,7 @@ please inform the people you register of this information.
 
 <form method="POST"
       name="itemSynopsis"
-      tal:define="required python:utils.required_person_fields(db._db)"
+      tal:define="required python:utils.required_person_fields(db._db, context.id)"
       enctype="multipart/form-data"
       tal:attributes="action context/designator;
       onSubmit python:'return checkRequiredFields(\'%s\')'%'\', \''.join(required);
@@ -477,10 +477,10 @@ select the appropriate options.  You must select &ldquo;Yes&rdquo; or
  </tr>
  <tr tal:define="name string:event_photos_consent; label string:Permission for photos during event?; value context/event_photos_consent; edit_ok edit_ok">
   <th class="required" metal:use-macro="th_label">Permission for photos during event?</th>
-  <tal:if condition="context/id">
+  <tal:if condition="python:context.id and db._db.person.get(context.id, 'event_photos_consent') is not None">
    <td tal:content="structure context/event_photos_consent/field">event_photos_consent</td>
   </tal:if>
-  <tal:if condition="not:context/id">
+  <tal:if condition="python:not (context.id and db._db.person.get(context.id, 'event_photos_consent') is not None)">
    <td><input type="radio" name="event_photos_consent" value="yes">Yes<input type="radio" name="event_photos_consent" value="no">No</td>
   </tal:if>
  </tr>
@@ -517,12 +517,21 @@ select the appropriate options.  You must select &ldquo;Yes&rdquo; or
  </tr>
  <tr tal:define="name string:diet_consent; label string:Permission for this information?; value context/diet_consent; edit_ok edit_ok">
   <th class="required" metal:use-macro="th_label">Permission for this information?</th>
-  <tal:if condition="context/id">
+  <tal:if condition="python:context.id and db._db.person.get(context.id, 'diet_consent') is not None">
    <td tal:content="structure context/diet_consent/field">diet_consent</td>
   </tal:if>
-  <tal:if condition="not:context/id">
+  <tal:if condition="python:not (context.id and db._db.person.get(context.id, 'diet_consent') is not None)">
    <td><input type="radio" name="diet_consent" value="yes">Yes<input type="radio" name="diet_consent" value="no">No</td>
   </tal:if>
+ </tr>
+</tal:block>
+</tal:block>
+
+<tal:block tal:condition="context/is_edit_ok">
+<tal:block tal:condition="python:utils.show_incomplete(db._db, context.id)">
+ <tr tal:define="name string:incomplete; label string:Incomplete registration?; value context/incomplete; edit_ok edit_ok">
+  <th class="required" metal:use-macro="th_label">Incomplete registration?</th>
+  <td tal:content="structure context/incomplete/field">incomplete</td>
  </tr>
 </tal:block>
 </tal:block>
@@ -530,6 +539,9 @@ select the appropriate options.  You must select &ldquo;Yes&rdquo; or
  <tr tal:condition="edit_ok">
   <td>
    &nbsp;
+<tal:block tal:condition="python:not utils.show_incomplete(db._db, context.id)">
+<input type="hidden" name="incomplete" value="no">
+</tal:block>
    <input type="hidden" name="@template" value="item">
    <input type="hidden" name="@required"
           tal:attributes="value python:','.join(required)">

@@ -49,14 +49,14 @@ def get_new_value(db, cl, nodeid, newvalues, prop):
     return cl.get(nodeid, prop)
 
 
-def require_value(db, cl, nodeid, newvalues, prop, error):
+def require_value(db, cl, nodeid, newvalues, prop, error, override=False):
     """
     Require a property to have a nonempty value, restoring a previous
     value from the database if an attempt is made to empty it; return
     that value.
     """
     value = get_new_value(db, cl, nodeid, newvalues, prop)
-    if value:
+    if value or override:
         return value
     if nodeid is None:
         raise ValueError(error)

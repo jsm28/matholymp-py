@@ -41,7 +41,7 @@ __all__ = ['people_from_country_internal', 'people_from_country',
            'registration_status_country', 'edit_rooms', 'show_consent_form_ui',
            'has_consent_for_photo', 'string_select', 'date_of_birth_select',
            'arrdep_date_select', 'arrdep_time_select', 'photo_consent_select',
-           'score_country_select', 'required_person_fields',
+           'score_country_select', 'show_incomplete', 'required_person_fields',
            'register_templating_utils', 'show_prereg_sidebar',
            'show_prereg_reminder', 'bulk_csv_contents',
            'show_bulk_csv_country', 'required_user_fields']
@@ -386,31 +386,54 @@ def has_consent_for_photo(db, person):
     return db.person.get(person, 'photo_consent') == 'yes'
 
 
-def required_person_fields(db):
+def show_incomplete(db, person):
+    """
+    Return whether to show the interface for editing an incomplete
+    registration.
+    """
+    # Incomplete registrations should only be created through bulk
+    # registration.  However, once one has been created, it may be
+    # useful for administrative users to make further edits to it
+    # while it remains incomplete, before self-registration has been
+    # done for that person.
+    if person is None:
+        return False
+    if not db.security.hasPermission('RegisterIncomplete', db.getuid()):
+        return False
+    return db.person.get(person, 'incomplete')
+
+
+def required_person_fields(db, person):
     """Return the list of fields required for registered people."""
-    req = ['given_name', 'family_name', 'gender', 'language_1', 'tshirt']
+    incomplete = show_incomplete(db, person)
+    req = ['given_name', 'family_name']
     # Accounts that cannot create people but can edit them get forms
     # without editable country or primary_name.
     if db.security.hasPermission('Create', db.getuid(), classname='person'):
         req.append('country')
         req.append('primary_role')
-    if require_dob(db):
-        req.append('date_of_birth_year')
-        req.append('date_of_birth_month')
-        req.append('date_of_birth_day')
-    if have_consent_ui(db):
-        # event_photos_consent and diet_consent not listed here
-        # because the JavaScript support for checking required fields
-        # are set (taken unmodified from Roundup) does not support
-        # radio-button fields (it requires a single <input> with an
-        # appropriate id, which must have a value).
-        req.append('photo_consent')
-    if have_passport_numbers(db):
-        req.append('passport_number')
-    if have_nationality(db):
-        req.append('nationality')
-    if require_diet(db):
-        req.append('diet')
+    if not incomplete:
+        req.append('gender')
+        req.append('language_1')
+        req.append('tshirt')
+        if require_dob(db):
+            req.append('date_of_birth_year')
+            req.append('date_of_birth_month')
+            req.append('date_of_birth_day')
+        if have_consent_ui(db):
+            # event_photos_consent and diet_consent not listed here
+            # because the JavaScript support for checking required
+            # fields are set (taken unmodified from Roundup) does not
+            # support radio-button fields (it requires a single
+            # <input> with an appropriate id, which must have a
+            # value).
+            req.append('photo_consent')
+        if have_passport_numbers(db):
+            req.append('passport_number')
+        if have_nationality(db):
+            req.append('nationality')
+        if require_diet(db):
+            req.append('diet')
     return req
 
 
@@ -543,6 +566,7 @@ def register_templating_utils(instance):
     instance.registerUtil('arrdep_time_select', arrdep_time_select)
     instance.registerUtil('photo_consent_select', photo_consent_select)
     instance.registerUtil('score_country_select', score_country_select)
+    instance.registerUtil('show_incomplete', show_incomplete)
     instance.registerUtil('required_person_fields', required_person_fields)
     instance.registerUtil('show_prereg_sidebar', show_prereg_sidebar)
     instance.registerUtil('show_prereg_reminder', show_prereg_reminder)

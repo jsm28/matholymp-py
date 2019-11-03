@@ -317,8 +317,8 @@ the registration system is not active.
   that.)
 
 * In preparation for supporting bulk registration of participants with
-  associated self-registration accounts, :file:`user.item.html` has
-  been updated.
+  associated self-registration accounts, :file:`user.item.html` and
+  :file:`person.item.html` have been updated.
 
 * :file:`user.item.html` has been updated to avoid warnings when
   non-administrative users edit their own user records.

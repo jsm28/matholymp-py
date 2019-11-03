@@ -348,7 +348,7 @@ def init_schema(env):
                                'departure_time_hour', 'departure_time_minute',
                                'departure_flight', 'room_type',
                                'room_share_with', 'generic_url', 'reuse_photo',
-                               'photo']
+                               'photo', 'incomplete']
     if have_consent_forms(db):
         person_common_reg_props.append('consent_form')
     if have_consent_ui(db):
@@ -548,6 +548,11 @@ def init_schema(env):
     # to request a single room for a contestant if that is not
     # normally permitted).
     p = db.security.addPermission(name='RegisterAnyRoomType')
+    db.security.addPermissionToRole('Admin', p)
+
+    # Permission to register someone or edit their registration
+    # without providing all the normally required data.
+    p = db.security.addPermission(name='RegisterIncomplete')
     db.security.addPermissionToRole('Admin', p)
 
     # Permission to edit countries in general, rather than just a

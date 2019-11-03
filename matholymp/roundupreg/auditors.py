@@ -305,10 +305,15 @@ def audit_person_fields(db, cl, nodeid, newvalues):
             # are irrelevant if only scores are being changed.
             return
 
-    # Until bulk registration of people with partial data to be
-    # completed by self-registration is supported, this must always be
-    # False.
-    newvalues['incomplete'] = False
+    # Only some users can make incomplete registrations.
+    allow_incomplete = get_new_value(db, cl, nodeid, newvalues, 'incomplete')
+    if allow_incomplete is None:
+        allow_incomplete = False
+        newvalues['incomplete'] = False
+    if (allow_incomplete
+        and not db.security.hasPermission('RegisterIncomplete', userid)):
+        allow_incomplete = False
+        newvalues['incomplete'] = False
 
     # A country must be specified and ordinary users cannot create or
     # modify records for other countries.
@@ -336,7 +341,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
 
     # A gender must be specified.
     gender = require_value(db, cl, nodeid, newvalues, 'gender',
-                           'No gender specified')
+                           'No gender specified', allow_incomplete)
 
     # A primary role must be specified.
     primary_role = require_value(db, cl, nodeid, newvalues, 'primary_role',
@@ -344,17 +349,17 @@ def audit_person_fields(db, cl, nodeid, newvalues):
 
     # A first language must be specified.
     require_value(db, cl, nodeid, newvalues, 'language_1',
-                  'No first language specified')
+                  'No first language specified', allow_incomplete)
 
     # A T-shirt size must be specified.
     require_value(db, cl, nodeid, newvalues, 'tshirt',
-                  'No T-shirt size specified')
+                  'No T-shirt size specified', allow_incomplete)
 
     is_contestant = db.matholymprole.get(primary_role, 'name').startswith(
         'Contestant ')
 
     # Contestants must have one of the permitted genders.
-    if is_contestant:
+    if is_contestant and gender is not None:
         req_genders = db.config.ext['MATHOLYMP_CONTESTANT_GENDERS'].split(',')
         req_genders = [g.strip() for g in req_genders]
         req_genders = [g for g in req_genders if g != '']
@@ -368,7 +373,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     # in the regulations.  To avoid problems generating CSV files,
     # dates of birth, if specified for other people, must not be too
     # old for python's strftime.
-    dob_required = is_contestant or require_dob(db)
+    dob_required = (is_contestant or require_dob(db)) and not allow_incomplete
     dob_year = get_new_value(db, cl, nodeid, newvalues, 'date_of_birth_year')
     dob_month = get_new_value(db, cl, nodeid, newvalues, 'date_of_birth_month')
     dob_day = get_new_value(db, cl, nodeid, newvalues, 'date_of_birth_day')
@@ -411,18 +416,24 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         # check date.
         if date_of_birth >= get_sanity_date_of_birth(db):
             raise ValueError('Participant implausibly young')
-    if is_contestant:
-        if date_of_birth < get_earliest_date_of_birth_contestant(db):
-            raise ValueError('Contestant too old')
+        if is_contestant:
+            if date_of_birth < get_earliest_date_of_birth_contestant(db):
+                raise ValueError('Contestant too old')
 
     # If consent information is collected, it is required.
     if have_consent_ui(db):
         event_photos_consent = get_new_value(db, cl, nodeid, newvalues,
                                              'event_photos_consent')
-        if event_photos_consent is None:
+        if event_photos_consent is None and not allow_incomplete:
             raise ValueError('No choice of consent for photos specified')
         photo_consent = get_new_value(db, cl, nodeid, newvalues,
                                       'photo_consent')
+        if allow_incomplete and photo_consent is None:
+            # When allowing incomplete data, allow None here if no
+            # photo provided, which is equivalent to treating it as
+            # not_applicable without actually setting it to
+            # not_applicable in the database.
+            photo_consent = 'not_applicable'
         if photo_consent not in ('not_applicable', 'no', 'badge_only', 'yes'):
             raise ValueError('No choice of consent for registration photo '
                              'specified')
@@ -438,28 +449,36 @@ def audit_person_fields(db, cl, nodeid, newvalues):
                 del newvalues['photo']
         diet_consent = get_new_value(db, cl, nodeid, newvalues,
                                      'diet_consent')
-        if diet_consent is None:
+        if diet_consent is None and not allow_incomplete:
             raise ValueError('No choice of consent for allergies and dietary '
                              'requirements information specified')
         if not diet_consent:
-            # Remove any dietary requirements information specified,
-            # now or previously.
-            newvalues['diet'] = 'Unknown'
+            # Leave a blank diet value if diet consent is blank and
+            # incomplete data allowed.
+            if not (allow_incomplete
+                    and diet_consent is None
+                    and get_new_value(db, cl, nodeid,
+                                      newvalues, 'diet') is None):
+                # Remove any dietary requirements information
+                # specified, now or previously.
+                newvalues['diet'] = 'Unknown'
 
     # If passport numbers are collected, they are required.
     if have_passport_numbers(db):
         require_value(db, cl, nodeid, newvalues, 'passport_number',
-                      'No passport or identity card number specified')
+                      'No passport or identity card number specified',
+                      allow_incomplete)
 
     # If nationalities are collected, they are required.
     if have_nationality(db):
         require_value(db, cl, nodeid, newvalues, 'nationality',
-                      'No nationality specified')
+                      'No nationality specified', allow_incomplete)
 
     # Dietary requirements may be required.
     if require_diet(db):
         require_value(db, cl, nodeid, newvalues, 'diet',
-                      'Allergies and dietary requirements not specified')
+                      'Allergies and dietary requirements not specified',
+                      allow_incomplete)
 
     # Start with blank scores for contestants - and for other people
     # in case someone is first registered with another role then
@@ -482,9 +501,10 @@ def audit_person_fields(db, cl, nodeid, newvalues):
                 if dep_time < arr_time:
                     raise ValueError('Departure time before arrival time')
 
-    # If no room type is specified, use the default for the role.
+    # If no room type is specified, use the default for the role, but
+    # leave it unspecified when incomplete data is allowed.
     room_type = get_new_value(db, cl, nodeid, newvalues, 'room_type')
-    if room_type is None:
+    if room_type is None and not allow_incomplete:
         room_type = db.matholymprole.get(primary_role, 'default_room_type')
         newvalues['room_type'] = room_type
 

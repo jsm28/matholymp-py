@@ -223,6 +223,9 @@ class RegSiteGenerator(SiteGenerator):
 
         missing_list = []
 
+        if p.basic_data_missing:
+            missing_list.append('basic data')
+
         if consent_forms_date is not None and p.consent_form_url is None:
             if p.date_of_birth is not None:
                 if p.date_of_birth >= consent_forms_date:
