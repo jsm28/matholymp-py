@@ -104,10 +104,12 @@ class MoScriptTestCase(unittest.TestCase):
                 args.extend(['-m', 'coverage', 'run'])
             args.append(self.script_path)
             args.extend(self.args)
-            output = subprocess.check_output(args,
-                                             cwd=self.out_dir,
-                                             env=env,
-                                             stderr=subprocess.STDOUT)
+            output = subprocess.run(args,
+                                    cwd=self.out_dir,
+                                    env=env,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.STDOUT,
+                                    check=True).stdout
         except subprocess.CalledProcessError as e:
             returncode = e.returncode
             output = e.output

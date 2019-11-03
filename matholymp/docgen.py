@@ -153,15 +153,14 @@ class DocumentGenerator:
 
     def pdflatex_file(self, output_file_name):
         """Run pdflatex on a (generated) LaTeX file."""
-        with open(os.devnull, 'r') as nullin:
-            env = dict(os.environ)
-            env['TEXINPUTS'] = os.pathsep.join([self._problems_dir,
-                                                self._templates_dir,
-                                                ''])
-            subprocess.check_call(['pdflatex', output_file_name],
-                                  stdin=nullin,
-                                  cwd=self._out_dir,
-                                  env=env)
+        env = dict(os.environ)
+        env['TEXINPUTS'] = os.pathsep.join([self._problems_dir,
+                                            self._templates_dir,
+                                            ''])
+        subprocess.run(['pdflatex', output_file_name],
+                       stdin=subprocess.DEVNULL,
+                       cwd=self._out_dir,
+                       env=env, check=True)
 
     def pdflatex_cleanup(self, output_file_base):
         """Clean up .aux and .log files from running pdflatex."""

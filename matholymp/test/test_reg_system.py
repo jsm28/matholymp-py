@@ -109,9 +109,9 @@ def gen_pdf_file(dirname, suffix):
                 '\\end{document}\n'
                 % rand_text)
     write_text_to_file(tex_text, tex_file)
-    with open(os.devnull, 'w+') as devnull:
-        subprocess.check_call(['pdflatex', tex_file], cwd=dirname,
-                              stdin=devnull, stdout=devnull, stderr=devnull)
+    subprocess.run(['pdflatex', tex_file], cwd=dirname,
+                   stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                   stderr=subprocess.DEVNULL, check=True)
     pdf_file = os.path.join(dirname, 'test.pdf')
     ret_file = os.path.join(dirname, 'test%s' % suffix)
     if ret_file != pdf_file:
