@@ -99,7 +99,7 @@ def main():
     docgen = DocumentGenerator(config_data, event_data, templates_dir,
                                cmdline_data['problems_directory'],
                                cmdline_data['input_directory'],
-                               cmdline_data['output_directory'])
+                               cmdline_data['output_directory'], True)
 
     gen_id = cmdline_data['id']
     bg = cmdline_data['background']

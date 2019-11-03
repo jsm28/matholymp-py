@@ -78,7 +78,7 @@ class DocumentGenerator:
     """
 
     def __init__(self, cfg, event, templates_dir, problems_dir, data_dir,
-                 out_dir):
+                 out_dir, print_tex_output):
         """
         Initialise a DocumentGenerator from the given configuration
         information, Event and directories.
@@ -95,6 +95,7 @@ class DocumentGenerator:
         self._cache_drafts_src_dir = os.path.join(self._cache_dir,
                                                   'drafts-src')
         self._langs_num_pages = {}
+        self._print_tex_output = print_tex_output
 
     def text_to_latex(self, text):
         """Convert text into a form suitable for LaTeX input."""
@@ -157,10 +158,17 @@ class DocumentGenerator:
         env['TEXINPUTS'] = os.pathsep.join([self._problems_dir,
                                             self._templates_dir,
                                             ''])
-        subprocess.run(['pdflatex', output_file_name],
-                       stdin=subprocess.DEVNULL,
-                       cwd=self._out_dir,
-                       env=env, check=True)
+        results = subprocess.run(  # pylint: disable=subprocess-run-check
+            ['pdflatex', output_file_name],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            cwd=self._out_dir,
+            env=env)
+        output = results.stdout.decode('ascii', errors='backslashreplace')
+        if self._print_tex_output:
+            print(output, end='')
+        results.check_returncode()
 
     def pdflatex_cleanup(self, output_file_base):
         """Clean up .aux and .log files from running pdflatex."""
