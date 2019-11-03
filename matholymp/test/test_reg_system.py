@@ -786,7 +786,8 @@ class RegSystemTestCase(unittest.TestCase):
 
     def setUp(self):
         self.sessions = []
-        self.temp_dir = tempfile.mkdtemp()
+        self.temp_dir_td = tempfile.TemporaryDirectory()
+        self.temp_dir = self.temp_dir_td.name
         self.instance = RoundupTestInstance(sys.path[0], self.temp_dir,
                                             self.config, self.coverage)
 
@@ -802,7 +803,7 @@ class RegSystemTestCase(unittest.TestCase):
             cov.load()
             cov.combine(data_paths=[self.temp_dir])
             cov.save()
-        shutil.rmtree(self.temp_dir)
+        self.temp_dir_td.cleanup()
 
     def get_session(self, username=None):
         """Get a session for the specified username."""

@@ -78,12 +78,13 @@ class MoScriptTestCase(unittest.TestCase):
         super(MoScriptTestCase, self).__init__(method_name)
 
     def setUp(self):
-        self.temp_dir = tempfile.mkdtemp()
+        self.temp_dir_td = tempfile.TemporaryDirectory()
+        self.temp_dir = self.temp_dir_td.name
         self.out_dir = os.path.join(self.temp_dir, 'out')
         shutil.copytree(self.in_dir, self.out_dir)
 
     def tearDown(self):
-        shutil.rmtree(self.temp_dir)
+        self.temp_dir_td.cleanup()
 
     def runTest(self):
         """

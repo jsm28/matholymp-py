@@ -269,8 +269,5 @@ def main():
     parser.add_argument('input_directory', help='directory with input data')
     args = vars(parser.parse_args())
 
-    temp_dir = tempfile.mkdtemp()
-    try:
+    with tempfile.TemporaryDirectory() as temp_dir:
         _import_from_dir(os.getcwd(), args['input_directory'], temp_dir)
-    finally:
-        shutil.rmtree(temp_dir)
