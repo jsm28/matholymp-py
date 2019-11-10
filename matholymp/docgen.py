@@ -43,7 +43,8 @@ from PyPDF2 import PdfFileReader
 
 from matholymp.collate import coll_get_sort_key
 from matholymp.fileutil import read_utf8_csv, make_dirs_for_file, \
-    write_text_to_file, read_text_from_file, read_config, remove_if_exists
+    write_text_to_file, read_text_from_file, read_config, remove_if_exists, \
+    file_extension
 from matholymp.regdata import lang_to_filename
 
 __all__ = ['read_docgen_config', 'DocumentGenerator']
@@ -94,6 +95,8 @@ class DocumentGenerator:
                                                   'papers-tex')
         self._cache_drafts_src_dir = os.path.join(self._cache_dir,
                                                   'drafts-src')
+        self._cache_images_dir = os.path.join(self._cache_dir, 'images')
+        self._cache_images_rel = os.path.join('cache', 'images')
         self._langs_num_pages = {}
         self._print_tex_output = print_tex_output
 
@@ -155,9 +158,14 @@ class DocumentGenerator:
     def pdflatex_file(self, output_file_name):
         """Run pdflatex on a (generated) LaTeX file."""
         env = dict(os.environ)
-        env['TEXINPUTS'] = os.pathsep.join([self._problems_dir,
-                                            self._templates_dir,
-                                            ''])
+        latex_dirs = []
+        if self._problems_dir is not None:
+            # No problems directory is available for online document
+            # generation from the registration system.
+            latex_dirs.append(self._problems_dir)
+        latex_dirs.append(self._templates_dir)
+        latex_dirs.append('')
+        env['TEXINPUTS'] = os.pathsep.join(latex_dirs)
         results = subprocess.run(  # pylint: disable=subprocess-run-check
             ['pdflatex', output_file_name],
             stdin=subprocess.DEVNULL,
@@ -219,6 +227,28 @@ class DocumentGenerator:
             raise ValueError('Person %d not a contestant' % p.person.id)
         return p
 
+    def adjust_image_path(self, filename, url, new_name):
+        """Return a local path to an image with suitable filename extension."""
+        url_ext = file_extension(url)
+        if filename.endswith('.%s' % url_ext):
+            return filename
+        # Copy the file to a location with a known-good extension for
+        # inclusion in LaTeX documents.  A relative path must be
+        # returned to avoid problems when a random temporary directory
+        # name includes '_'.
+        cache_image_name_only = '%s.%s' % (new_name, url_ext)
+        cache_image_name = os.path.join(self._cache_images_dir,
+                                        cache_image_name_only)
+        cache_image_rel = os.path.join(self._cache_images_rel,
+                                       cache_image_name_only)
+        if (os.access(cache_image_name, os.F_OK)
+            and filecmp.cmp(filename, cache_image_name)):
+            return cache_image_rel
+        remove_if_exists(cache_image_name)
+        make_dirs_for_file(cache_image_name)
+        shutil.copyfile(filename, cache_image_name)
+        return cache_image_rel
+
     def country_flag(self, country):
         """Return the local path to the flag for a given country, empty for a
         country given as None."""
@@ -227,7 +257,8 @@ class DocumentGenerator:
         flag_filename = country.flag_filename
         if flag_filename is None:
             return ''
-        return flag_filename
+        return self.adjust_image_path(flag_filename, country.flag_url,
+                                      'flag%d' % country.country.id)
 
     def room_list_text(self, person):
         """
@@ -296,7 +327,9 @@ class DocumentGenerator:
         if photo_filename is None:
             template_fields['photo'] = ''
         else:
-            template_fields['photo'] = photo_filename
+            template_fields['photo'] = self.adjust_image_path(
+                photo_filename, person.badge_photo_url,
+                'photo%d' % person_id)
 
         template_fields['name'] = person.name
 

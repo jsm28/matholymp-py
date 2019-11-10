@@ -67,8 +67,9 @@ matholymp:
   :ref:`roundup-patches` for more details of those patches.
 
 * `PyPDF2 <https://mstamy2.github.io/PyPDF2/>`_ (used in generating
-  PDF documents from registration system data; not needed if that part
-  of matholymp is not used).
+  PDF documents from registration system data, and also required in
+  the registration system whether document generation is used or not;
+  not needed if those parts of matholymp are not used).
 
 * `Pillow <https://python-pillow.org/>`_, built with support for JPEG
   and PNG files (used in the registration system; not needed if that

@@ -32,22 +32,30 @@
 __all__ = ['ScoreAction', 'RetireCountryAction', 'ScalePhotoAction',
            'CountryCSVAction', 'ScoresCSVAction', 'PeopleCSVAction',
            'MedalBoundariesCSVAction', 'FlagsZIPAction', 'PhotosZIPAction',
-           'ScoresRSSAction', 'BulkRegisterAction',
+           'ScoresRSSAction', 'NameBadgeAction', 'BulkRegisterAction',
            'CountryBulkRegisterAction', 'register_actions']
 
 import collections
+import email
 import html
 import io
 import os
+import os.path
+import subprocess
+import tempfile
 
 from PIL import Image
 from roundup.cgi.actions import Action
 from roundup.cgi.exceptions import Unauthorised
 from roundup.exceptions import Reject
+import roundup.mailer
 
+from matholymp.data import EventGroup
+from matholymp.docgen import read_docgen_config, DocumentGenerator
 from matholymp.fileutil import boolean_states
 from matholymp.roundupreg.auditors import audit_country_fields
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
+from matholymp.roundupreg.roundupsource import RoundupDataSource
 from matholymp.roundupreg.rounduputil import distinguish_official, \
     get_marks_per_problem, scores_from_str, person_is_contestant, \
     contestant_code, scores_final, valid_country_problem, valid_int_str, \
@@ -377,6 +385,67 @@ class ScoresRSSAction(Action):
         return text
 
 
+class NameBadgeAction(Action):
+
+    """Action to generate a person's name badge."""
+
+    name = 'generate the name badge for'
+    permissionType = 'GenerateNameBadges'
+
+    def handle(self):
+        """Generate a person's name badge."""
+        if self.nodeid is None:
+            raise ValueError('No id specified to generate name badge for')
+        if self.classname != 'person':
+            raise ValueError('Name badges can only be generated for people')
+        docgen_path = self.db.config.ext['MATHOLYMP_DOCGEN_DIRECTORY']
+        if not docgen_path:
+            raise ValueError('Online badge generation not enabled')
+        docgen_path = os.path.join(self.db.config.TRACKER_HOME, docgen_path)
+        use_background = self.db.config.ext['MATHOLYMP_BADGE_USE_BACKGROUND']
+        use_background = boolean_states[use_background.lower()]
+        event_group = EventGroup(RoundupDataSource(self.db))
+        event = event_group.event_list[0]
+        config_data = read_docgen_config(docgen_path)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            docgen = DocumentGenerator(config_data, event,
+                                       os.path.join(docgen_path, 'templates'),
+                                       None, None, temp_dir, False)
+            person = event.person_map[int(self.nodeid)][0]
+            try:
+                docgen.generate_badge(person, use_background)
+                badge_filename = 'badge-person%s.pdf' % self.nodeid
+                self.client.setHeader('Content-Type', 'application/pdf')
+                self.client.setHeader('Content-Disposition',
+                                      'attachment; filename=%s'
+                                      % badge_filename)
+                badge_path = os.path.join(temp_dir, badge_filename)
+                with open(badge_path, 'rb') as badge_file:
+                    return badge_file.read()
+            except subprocess.CalledProcessError as e:
+                # Report this error both to the admin and to the web
+                # client.
+                mailer = roundup.mailer.Mailer(self.db.config)
+                msg = mailer.get_standard_message()
+                msg['Message-Id'] = email.utils.make_msgid('matholymp.badge')
+                mailer.set_message_attributes(
+                    msg,
+                    [self.db.config.ADMIN_EMAIL],
+                    'Name badge generation error for person %s' % self.nodeid)
+                msg_text = ('LaTeX errors:\n\n%s\n'
+                            % e.stdout.decode('utf-8',
+                                              errors='backslashreplace'))
+                msg.set_payload(msg_text, charset='utf-8')
+                try:
+                    mailer.smtp_send([self.db.config.ADMIN_EMAIL],
+                                     msg.as_string())
+                except roundup.mailer.MessageSendError:
+                    pass
+                self.client.setHeader('Content-Type',
+                                      'text/plain; charset=UTF-8')
+                return e.stdout
+
+
 class BulkRegisterAction(Action):
 
     """Base class for bulk registration actions."""
@@ -555,4 +624,5 @@ def register_actions(instance):
     instance.registerAction('photos_zip', PhotosZIPAction)
     instance.registerAction('consent_forms_zip', ConsentFormsZIPAction)
     instance.registerAction('scores_rss', ScoresRSSAction)
+    instance.registerAction('name_badge', NameBadgeAction)
     instance.registerAction('country_bulk_register', CountryBulkRegisterAction)

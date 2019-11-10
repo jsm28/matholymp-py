@@ -323,6 +323,15 @@ the registration system is not active.
 * :file:`user.item.html` has been updated to avoid warnings when
   non-administrative users edit their own user records.
 
+* Name badges can be generated online from the registration system.  A
+  new configuration variable ``matholymp_docgen_directory`` must be
+  specified in :file:`extensions/config.ini` for the registration
+  system; this gives the location of the directory with
+  :file:`documentgen.cfg`, or is empty if that directory is not
+  available, in which case online badge generation is not supported.
+  A new variable ``matholymp_badge_use_background`` must also be
+  specified.  :file:`person.item.html` is updated accordingly.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

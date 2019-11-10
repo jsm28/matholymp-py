@@ -555,6 +555,10 @@ def init_schema(env):
     p = db.security.addPermission(name='RegisterIncomplete')
     db.security.addPermissionToRole('Admin', p)
 
+    # Permission to generate name badges online.
+    p = db.security.addPermission(name='GenerateNameBadges')
+    db.security.addPermissionToRole('Admin', p)
+
     # Permission to edit countries in general, rather than just a
     # limited subset of properties.  This is only used to control
     # whether the interface is shown to edit various fields, not for

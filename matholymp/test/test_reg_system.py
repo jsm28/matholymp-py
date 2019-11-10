@@ -190,6 +190,19 @@ class RoundupTestInstance:
                     os.makedirs(os.path.dirname(image_file))
                     gen_image_file(2, 2, 2, image_file, 'JPEG')
             subst_files.extend([countries_csv, people_csv])
+        if config and 'docgen_directory' in config:
+            # Construct a document generation directory.  We assume it
+            # is to be called 'docgen' relative to the Roundup
+            # instance.
+            self.docgen_example_dir = os.path.join(top_dir, 'examples',
+                                                   'document-generation')
+            self.docgen_dir = os.path.join(self.instance_dir, 'docgen')
+            shutil.copytree(self.docgen_example_dir, self.docgen_dir)
+            # We don't create a badge background PDF here, to allow
+            # testing the case where it is missing, but some tests
+            # need to create one.
+            self.docgen_badge_background_pdf = os.path.join(
+                self.docgen_dir, 'templates', 'lanyard-generic.pdf')
         os.makedirs(os.path.join(self.instance_dir, 'db'))
         self.passwords = {'admin': roundup.password.generatePassword()}
         self.userids = {'admin': '1'}
@@ -202,6 +215,10 @@ class RoundupTestInstance:
                              '\nmatholymp_static_site_directory = '
                              '/some/where\n',
                              '\nmatholymp_static_site_directory =\n')
+        replace_text_in_file(self.ext_config_ini,
+                             '\nmatholymp_docgen_directory = '
+                             '/some/where\n',
+                             '\nmatholymp_docgen_directory =\n')
         if config:
             cfg = read_config_raw(self.ext_config_ini)
             for key, value in config.items():
@@ -337,6 +354,7 @@ class RoundupTestSession:
         self.instance = instance
         self.b = mechanicalsoup.StatefulBrowser(raise_on_404=True)
         self.last_mail_bin = None
+        self.last_mail_dec = None
         self.num_people = 0
         self.check_open(self.instance.url)
         if username is not None:
@@ -373,7 +391,14 @@ class RoundupTestSession:
                 mail_generated = mail_size > old_mail_size
                 if mail_generated:
                     with open(self.instance.mail_file, 'rb') as f:
-                        self.last_mail_bin = f.read()[old_mail_size:]
+                        mail_bin = f.read()[old_mail_size:]
+                        self.last_mail_bin = mail_bin
+                        if b'Content-Transfer-Encoding: base64' in mail_bin:
+                            content_idx = mail_bin.index(b'\n\n') + 2
+                            mail_bin = mail_bin[content_idx:]
+                            self.last_mail_dec = base64.b64decode(mail_bin)
+                        else:
+                            self.last_mail_dec = mail_bin
                 if mail and not mail_generated:
                     raise ValueError('request failed to generate mail')
                 elif mail_generated and not mail:
@@ -675,14 +700,10 @@ class RoundupTestSession:
         auto_user = 'contact_email' in data and not error
         self.create('country', data, error=error, mail=auto_user)
         if auto_user:
-            mail_bin = self.last_mail_bin
-            if b'Content-Transfer-Encoding: base64' in mail_bin:
-                content_idx = mail_bin.index(b'\n\n') + 2
-                mail_bin = mail_bin[content_idx:]
-                mail_bin = base64.b64decode(mail_bin)
-            username_idx = mail_bin.rindex(b'Username: ')
-            mail_bin = mail_bin[username_idx:]
-            mail_data = mail_bin.split(b'\n')
+            mail_dec = self.last_mail_dec
+            username_idx = mail_dec.rindex(b'Username: ')
+            mail_dec = mail_dec[username_idx:]
+            mail_data = mail_dec.split(b'\n')
             username_str = mail_data[0][len(b'Username: '):]
             password_str = mail_data[1]
             if not password_str.startswith(b'Password: '):
@@ -10561,6 +10582,100 @@ class RegSystemTestCase(unittest.TestCase):
                                           'medal_boundaries_csv',
                                           error='Node id specified for CSV '
                                           'generation')
+
+    @_with_config(docgen_directory='docgen', badge_use_background='No')
+    def test_person_name_badge(self):
+        """
+        Test online name badge creation.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        admin_session.check_open_relative('person1')
+        admin_session.b.select_form(
+            admin_session.get_main().find_all('form')[2])
+        badge_response = admin_session.check_submit_selected(html=False)
+        self.assertEqual(badge_response.headers['content-type'],
+                         'application/pdf')
+        self.assertEqual(badge_response.headers['content-disposition'],
+                         'attachment; filename=badge-person1.pdf')
+        self.assertTrue(badge_response.content.startswith(b'%PDF-'))
+
+    @_with_config(docgen_directory='docgen')
+    def test_person_name_badge_background(self):
+        """
+        Test online name badge creation, with background.
+        """
+        pdf_filename, dummy = self.gen_test_pdf()
+        shutil.copyfile(pdf_filename,
+                        self.instance.docgen_badge_background_pdf)
+        admin_session = self.get_session('admin')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        # Also test badge naming for person other than person 1 here.
+        admin_session.create_person('XMO 2015 Staff', 'Problem Selection')
+        admin_session.check_open_relative('person2')
+        admin_session.b.select_form(
+            admin_session.get_main().find_all('form')[2])
+        badge_response = admin_session.check_submit_selected(html=False)
+        self.assertEqual(badge_response.headers['content-type'],
+                         'application/pdf')
+        self.assertEqual(badge_response.headers['content-disposition'],
+                         'attachment; filename=badge-person2.pdf')
+        self.assertTrue(badge_response.content.startswith(b'%PDF-'))
+
+    @_with_config(docgen_directory='docgen')
+    def test_person_name_badge_errors(self):
+        """
+        Test errors from online name badge creation.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        admin_session.check_open_relative('person1')
+        form = admin_session.get_main().find_all('form')[2]
+        form['action'] = 'person'
+        admin_session.b.select_form(form)
+        admin_session.check_submit_selected(error='No id specified to '
+                                            'generate name badge for')
+        admin_session.check_open_relative('person1')
+        form = admin_session.get_main().find_all('form')[2]
+        form['action'] = 'country1'
+        admin_session.b.select_form(form)
+        admin_session.check_submit_selected(error='Name badges can only be '
+                                            'generated for people')
+        admin_session.check_open_relative('person1')
+        form = admin_session.get_main().find_all('form')[2]
+        admin_session.b.select_form(form)
+        # The error here is that this test is configured to use a
+        # background but none is available.
+        badge_response = admin_session.check_submit_selected(html=False,
+                                                             mail=True)
+        self.assertEqual(badge_response.headers['content-type'],
+                         'text/plain; charset=UTF-8')
+        self.assertIn(b'lanyard-generic.pdf', badge_response.content)
+        self.assertIn(b'lanyard-generic.pdf', admin_session.last_mail_dec)
+
+    def test_person_name_badge_none(self):
+        """
+        Test online name badge creation disabled.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        admin_session.check_open_relative('person1')
+        form_list = admin_session.get_main().find_all('form')
+        self.assertEqual(len(form_list), 2)
+        # Modify the previous form to use the name_badge action to
+        # test the error when no document generation directory is
+        # configured.
+        form = form_list[1]
+        submit = form.find('input', type='submit')
+        self.assertEqual(submit['value'],
+                         'Remove this person (requires confirmation)')
+        admin_session.b.select_form(form)
+        admin_session.b.get_current_form().set('@action', 'name_badge',
+                                               force=True)
+        # The error is that this test is configured to use a
+        # background but none is available.
+        admin_session.check_submit_selected(error='Online badge generation '
+                                            'not enabled')
 
     def test_event_create_audit_errors(self):
         """
