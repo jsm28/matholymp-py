@@ -36,7 +36,6 @@ __all__ = ['ScoreAction', 'RetireCountryAction', 'ScalePhotoAction',
            'CountryBulkRegisterAction', 'register_actions']
 
 import collections
-import email
 import html
 import io
 import os
@@ -48,12 +47,12 @@ from PIL import Image
 from roundup.cgi.actions import Action
 from roundup.cgi.exceptions import Unauthorised
 from roundup.exceptions import Reject
-import roundup.mailer
 
 from matholymp.data import EventGroup
 from matholymp.docgen import read_docgen_config, DocumentGenerator
 from matholymp.fileutil import boolean_states
 from matholymp.roundupreg.auditors import audit_country_fields
+from matholymp.roundupreg.roundupemail import send_email
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.roundupsource import RoundupDataSource
 from matholymp.roundupreg.rounduputil import distinguish_official, \
@@ -425,22 +424,13 @@ class NameBadgeAction(Action):
             except subprocess.CalledProcessError as e:
                 # Report this error both to the admin and to the web
                 # client.
-                mailer = roundup.mailer.Mailer(self.db.config)
-                msg = mailer.get_standard_message()
-                msg['Message-Id'] = email.utils.make_msgid('matholymp.badge')
-                mailer.set_message_attributes(
-                    msg,
-                    [self.db.config.ADMIN_EMAIL],
-                    'Name badge generation error for person %s' % self.nodeid)
                 msg_text = ('LaTeX errors:\n\n%s\n'
                             % e.stdout.decode('utf-8',
                                               errors='backslashreplace'))
-                msg.set_payload(msg_text, charset='utf-8')
-                try:
-                    mailer.smtp_send([self.db.config.ADMIN_EMAIL],
-                                     msg.as_string())
-                except roundup.mailer.MessageSendError:
-                    pass
+                send_email(self.db, [],
+                           ('Name badge generation error for person %s'
+                            % self.nodeid),
+                           msg_text, 'badge')
                 self.client.setHeader('Content-Type',
                                       'text/plain; charset=UTF-8')
                 return e.stdout

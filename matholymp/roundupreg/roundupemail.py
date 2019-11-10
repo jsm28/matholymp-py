@@ -1,4 +1,4 @@
-# Initialise matholymp.roundupreg subpackage.
+# Email sending for Roundup registration system for matholymp package.
 
 # Copyright 2014-2019 Joseph Samuel Myers.
 
@@ -27,11 +27,32 @@
 # combination shall include the source code for the parts of OpenSSL
 # used as well as that of the covered work.
 
-"""
-The matholymp.roundupreg package implements a registration system
-based on Roundup.
-"""
+"""This module provides email support for the Roundup registration system."""
 
-__all__ = ['actions', 'auditors', 'auditorutil', 'cache', 'initial_data',
-           'reactors', 'roundupemail', 'roundupsitegen', 'roundupsource',
-           'rounduputil', 'schema', 'staticsite', 'templating', 'userauditor']
+__all__ = ['send_email']
+
+import email
+
+import roundup.mailer
+
+
+def send_email(db, email_to, subject, body, msgid_frag):
+    """Send an email, ignoring errors."""
+    short_name = db.config.ext['MATHOLYMP_SHORT_NAME']
+    year = db.config.ext['MATHOLYMP_YEAR']
+    author_name = '%s %s registration' % (short_name, year)
+    mailer = roundup.mailer.Mailer(db.config)
+    # Roundup's standard_message function does not set a Message-ID,
+    # so go through the steps it takes but with one added.
+    msg = mailer.get_standard_message()
+    msg['Message-Id'] = email.utils.make_msgid('matholymp.' + msgid_frag)
+    email_to = email_to + [db.config.ADMIN_EMAIL]
+    mailer.set_message_attributes(msg,
+                                  email_to,
+                                  subject,
+                                  (author_name, db.config.ADMIN_EMAIL))
+    msg.set_payload(body, charset='utf-8')
+    try:
+        mailer.smtp_send(email_to, msg.as_string())
+    except roundup.mailer.MessageSendError:
+        pass

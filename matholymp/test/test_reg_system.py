@@ -1083,9 +1083,9 @@ class RegSystemTestCase(unittest.TestCase):
                                       '  DEF3@example.invalid \n\n'
                                       'DEF5@example.invalid'})
         self.assertIn(
-            b'\nTO: DEF@example.invalid, webmaster@example.invalid, '
-            b'DEF2@example.invalid, DEF3@example.invalid, '
-            b'DEF5@example.invalid\n',
+            b'\nTO: DEF@example.invalid, DEF2@example.invalid, '
+            b'DEF3@example.invalid, DEF5@example.invalid, '
+            b'webmaster@example.invalid\n',
             admin_session.last_mail_bin)
 
     def test_country_csv(self):
@@ -2992,8 +2992,8 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.select_main_form()
         admin_session.check_submit_selected(mail=True)
         self.assertIn(
-            b'\nTO: DEF1@example.invalid, webmaster@example.invalid, '
-            b'DEF2@example.invalid, DEF3@example.invalid\n',
+            b'\nTO: DEF1@example.invalid, DEF2@example.invalid, '
+            b'DEF3@example.invalid, webmaster@example.invalid\n',
             admin_session.last_mail_bin)
         # The non-ASCII name means a Content-Transfer-Encoding must be
         # specified rather than attempting to send the mail as 8-bit
@@ -3076,8 +3076,8 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.select_main_form()
         admin_session.check_submit_selected(mail=True)
         self.assertIn(
-            b'\nTO: DEF1@example.invalid, webmaster@example.invalid, '
-            b'DEF2@example.invalid, DEF3@example.invalid\n',
+            b'\nTO: DEF1@example.invalid, DEF2@example.invalid, '
+            b'DEF3@example.invalid, webmaster@example.invalid\n',
             admin_session.last_mail_bin)
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv_public_only()
@@ -3134,8 +3134,8 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.select_main_form()
         admin_session.check_submit_selected(mail=True)
         self.assertIn(
-            b'\nTO: DEF1@example.invalid, webmaster@example.invalid, '
-            b'DEF2@example.invalid, DEF3@example.invalid\n',
+            b'\nTO: DEF1@example.invalid, DEF2@example.invalid, '
+            b'DEF3@example.invalid, webmaster@example.invalid\n',
             admin_session.last_mail_bin)
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv_public_only()

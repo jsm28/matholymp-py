@@ -32,14 +32,13 @@
 __all__ = ['country_react', 'person_react', 'scoreboard_react',
            'register_reactors']
 
-import email
 import os.path
 
-import roundup.mailer
 import roundup.password
 
 from matholymp.fileutil import read_text_from_file
 from matholymp.roundupreg.cache import invalidate_cache
+from matholymp.roundupreg.roundupemail import send_email
 from matholymp.roundupreg.rounduputil import have_consent_forms
 
 
@@ -88,23 +87,8 @@ def country_react(db, cl, nodeid, oldvalues):
     short_name = db.config.ext['MATHOLYMP_SHORT_NAME']
     year = db.config.ext['MATHOLYMP_YEAR']
     subject = '%s %s registration (%s)' % (short_name, year, country_name)
-    author_name = '%s %s registration' % (short_name, year)
-    mailer = roundup.mailer.Mailer(db.config)
-    # Roundup's standard_message function does not set a Message-ID,
-    # so go through the steps it takes but with one added.
-    msg = mailer.get_standard_message()
-    msg['Message-Id'] = email.utils.make_msgid('matholymp.' + country_code)
-    email_to = [email_addr, db.config.ADMIN_EMAIL]
-    email_to.extend(email_extra)
-    mailer.set_message_attributes(msg,
-                                  email_to,
-                                  subject,
-                                  (author_name, db.config.ADMIN_EMAIL))
-    msg.set_payload(email_text, charset='utf-8')
-    try:
-        mailer.smtp_send(email_to, msg.as_string())
-    except roundup.mailer.MessageSendError:
-        pass
+    send_email(db, [email_addr] + email_extra, subject, email_text,
+               country_code)
 
 
 def person_react(db, cl, nodeid, oldvalues):
