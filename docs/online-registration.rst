@@ -81,6 +81,11 @@ files:
   collecting information about consent for certain uses of personal
   data should be removed.
 
+* :file:`extensions/email-template-self-reg` (a similar template for
+  emails sent automatically to participants registered using the bulk
+  registration mechanism, if a contact email address is specified when
+  doing so).
+
 * :file:`html/page.html` (you may wish to make this file match the
   overall page style used for the static site, although this is not
   required; at least, the stylesheet and shortcut icon URLs will need
@@ -228,7 +233,11 @@ Registering staff
 ^^^^^^^^^^^^^^^^^
 
 Staff can be registered, using an administrative account, in the
-special country automatically created for them.
+special country automatically created for them.  This can be done in
+bulk, including creating self-registration accounts and sending
+details of them by email to specified addresses, by uploading a CSV
+file (:guilabel:`Bulk register participants`).  Otherwise, staff can
+be registered individually.
 
 Monitoring registration
 ^^^^^^^^^^^^^^^^^^^^^^^

@@ -44,7 +44,8 @@ __all__ = ['people_from_country_internal', 'people_from_country',
            'score_country_select', 'show_incomplete', 'required_person_fields',
            'register_templating_utils', 'show_prereg_sidebar',
            'show_prereg_reminder', 'bulk_csv_contents',
-           'show_bulk_csv_country', 'required_user_fields']
+           'show_bulk_csv_country', 'show_bulk_csv_country_link_from_code',
+           'show_bulk_csv_person', 'required_user_fields']
 
 import base64
 import datetime
@@ -66,7 +67,7 @@ from matholymp.roundupreg.rounduputil import distinguish_official, \
     get_arrdep_bounds, person_is_contestant, contestant_code, pn_score, \
     scores_final, any_scores_missing, country_has_contestants, \
     valid_country_problem, bulk_csv_data, bulk_csv_contact_emails, \
-    bulk_csv_country_number_url
+    bulk_csv_country_number_url, bulk_csv_person_number_url
 from matholymp.roundupreg.staticsite import static_site_event_group
 
 
@@ -514,6 +515,65 @@ def show_bulk_csv_country(db, form):
     return sitegen.html_table_thead_tbody_list(head_row_list, body_row_list)
 
 
+def show_bulk_csv_country_link_from_code(db, sitegen, code):
+    """
+    Return HTML text of a link to a country, given its code from
+    bulk-person-registration CSV contents.
+    """
+    countries_with_code = db.country.filter(
+        None, {}, exact_match_spec={'code': code})
+    if len(countries_with_code) == 1:
+        country_id = countries_with_code[0]
+        country_name = html.escape(db.country.get(country_id, 'name'))
+        return sitegen.link_for_country_at_event(
+            sitegen.event.country_map[int(country_id)], country_name)
+    else:
+        return html.escape(code)
+
+
+def show_bulk_csv_person(db, form):
+    """Return HTML text of bulk-person-registration CSV contents."""
+    csv_data = bulk_csv_data(form, ('Other Roles', 'Guide For Codes'))
+    if isinstance(csv_data, str):
+        return '<p class="error-message">%s</p>' % html.escape(csv_data)
+    file_data = csv_data[0]
+    sitegen = RoundupSiteGenerator(db)
+    sdata = static_site_event_group(db)
+    columns = ['Given Name', 'Family Name', 'Country', 'Primary Role',
+               'Other Roles', 'Guide For', 'Previous Participation']
+    columns.append('Contact Emails')
+    head_row_list = [sitegen.html_tr_th_list(columns)]
+    body_row_list = []
+    for csv_row in file_data:
+        out_row = []
+        out_row.append(html.escape(csv_row.get('Given Name', '')))
+        out_row.append(html.escape(csv_row.get('Family Name', '')))
+        country_code = csv_row.get('Country Code', '')
+        out_row.append(show_bulk_csv_country_link_from_code(db, sitegen,
+                                                            country_code))
+        out_row.append(html.escape(csv_row.get('Primary Role', '')))
+        out_row.append(html.escape(', '.join(csv_row.get('Other Roles', []))))
+        guide_for_codes = csv_row.get('Guide For Codes', [])
+        out_row.append(', '.join(show_bulk_csv_country_link_from_code(
+            db, sitegen, country_code) for country_code in guide_for_codes))
+        person_number, generic_url = bulk_csv_person_number_url(db, csv_row)
+        person_link = ''
+        if person_number is not None:
+            if sdata and person_number in sdata.person_map:
+                person_link = sitegen.html_a(html.escape(
+                    sdata.person_map[person_number].name), generic_url)
+            else:
+                # Either invalid person number (would normally have
+                # been detected by auditor) or no static site data
+                # available.
+                person_link = str(person_number)
+        out_row.append(person_link)
+        contact_emails = bulk_csv_contact_emails(csv_row)
+        out_row.append(html.escape(', '.join(contact_emails)))
+        body_row_list.append(sitegen.html_tr_td_list(out_row))
+    return sitegen.html_table_thead_tbody_list(head_row_list, body_row_list)
+
+
 def required_user_fields(db):
     """Return the list of fields required for registered users."""
     req = ['address']
@@ -572,4 +632,5 @@ def register_templating_utils(instance):
     instance.registerUtil('show_prereg_reminder', show_prereg_reminder)
     instance.registerUtil('bulk_csv_contents', bulk_csv_contents)
     instance.registerUtil('show_bulk_csv_country', show_bulk_csv_country)
+    instance.registerUtil('show_bulk_csv_person', show_bulk_csv_person)
     instance.registerUtil('required_user_fields', required_user_fields)

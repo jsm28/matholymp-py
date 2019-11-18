@@ -570,6 +570,10 @@ def init_schema(env):
     p = db.security.addPermission(name='BulkRegisterCountry')
     db.security.addPermissionToRole('Admin', p)
 
+    # Permission to register participants by bulk CSV upload.
+    p = db.security.addPermission(name='BulkRegisterPerson')
+    db.security.addPermissionToRole('Admin', p)
+
     # Viewing registration status pages (whether for everyone, or just
     # for one's own country) has its own permission.
     p = db.security.addPermission(name='RegistrationStatus')

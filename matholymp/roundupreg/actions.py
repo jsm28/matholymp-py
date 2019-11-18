@@ -33,7 +33,8 @@ __all__ = ['ScoreAction', 'RetireCountryAction', 'ScalePhotoAction',
            'CountryCSVAction', 'ScoresCSVAction', 'PeopleCSVAction',
            'MedalBoundariesCSVAction', 'FlagsZIPAction', 'PhotosZIPAction',
            'ScoresRSSAction', 'NameBadgeAction', 'BulkRegisterAction',
-           'CountryBulkRegisterAction', 'register_actions']
+           'CountryBulkRegisterAction', 'PersonBulkRegisterAction',
+           'register_actions']
 
 import collections
 import html
@@ -47,11 +48,13 @@ from PIL import Image
 from roundup.cgi.actions import Action
 from roundup.cgi.exceptions import Unauthorised
 from roundup.exceptions import Reject
+import roundup.password
 
 from matholymp.data import EventGroup
 from matholymp.docgen import read_docgen_config, DocumentGenerator
-from matholymp.fileutil import boolean_states
-from matholymp.roundupreg.auditors import audit_country_fields
+from matholymp.fileutil import read_text_from_file, boolean_states
+from matholymp.roundupreg.auditors import audit_country_fields, \
+    audit_person_fields
 from matholymp.roundupreg.roundupemail import send_email
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.roundupsource import RoundupDataSource
@@ -59,7 +62,8 @@ from matholymp.roundupreg.rounduputil import distinguish_official, \
     get_marks_per_problem, scores_from_str, person_is_contestant, \
     contestant_code, scores_final, valid_country_problem, valid_int_str, \
     create_rss, bulk_csv_data, bulk_csv_contact_emails, \
-    bulk_csv_country_number_url
+    bulk_csv_country_number_url, bulk_csv_person_number_url, country_from_code
+from matholymp.roundupreg.userauditor import valid_address
 
 
 class ScoreAction(Action):
@@ -456,7 +460,7 @@ class BulkRegisterAction(Action):
             raise ValueError('Invalid class for bulk registration')
         if self.nodeid is not None:
             raise ValueError('Node id specified for bulk registration')
-        csv_data = bulk_csv_data(self.form)
+        csv_data = bulk_csv_data(self.form, self.get_comma_sep_columns())
         if isinstance(csv_data, str):
             self.client.add_error_message(csv_data)
             return
@@ -514,11 +518,12 @@ class BulkRegisterAction(Action):
             self.client.template = 'bulkconfirm'
         else:
             self.client.template = 'index'
-            for item in item_data:
+            for csv_row, item in zip(file_data, item_data):
                 item_id = item_class.create(**item)
                 self.db.commit()
                 self.client.add_ok_message('%s%s created'
                                            % (self.classname, item_id))
+                self.act_after_create(item_id, item, csv_row)
 
     def get_required_columns(self):
         """Return the list of columns that must have nonempty values."""
@@ -540,11 +545,18 @@ class BulkRegisterAction(Action):
         """Return the mapping of boolean column names to property names."""
         return {}
 
+    def get_comma_sep_columns(self):
+        """Return the list of columns with comma-separated values."""
+        return ()
+
     def map_csv_data(self, row, newvalues):
         """Convert CSV data into item properties in class-specific way."""
 
     def adjust_after_audit(self, row, newvalues):
         """Adjust item properties after call to auditor."""
+
+    def act_after_create(self, item_id, item, csv_row):
+        """Act after the creation of a new item."""
 
 
 class CountryBulkRegisterAction(BulkRegisterAction):
@@ -601,6 +613,108 @@ class CountryBulkRegisterAction(BulkRegisterAction):
         newvalues['reuse_flag'] = True
 
 
+class PersonBulkRegisterAction(BulkRegisterAction):
+
+    """Action to bulk register participants from a CSV file."""
+
+    name = 'bulk register'
+    permissionType = 'BulkRegisterPerson'
+    required_classname = 'person'
+    auditor = staticmethod(audit_person_fields)
+
+    def get_required_columns(self):
+        req_cols = ['Given Name', 'Family Name', 'Country Code',
+                    'Primary Role']
+        return req_cols
+
+    def get_unique_columns(self):
+        # Person Number is not actually checked by other code to be
+        # unique, but multiple people corresponding to the same past
+        # person is an error, so check it here.
+        return ('Person Number',)
+
+    def get_default_values(self):
+        return {'incomplete': True,
+                'reuse_photo': False}
+
+    def get_str_column_map(self):
+        return {'Given Name': 'given_name', 'Family Name': 'family_name'}
+
+    def get_comma_sep_columns(self):
+        return ('Other Roles', 'Guide For Codes')
+
+    def map_csv_data(self, row, newvalues):
+        dummy_number, generic_url = bulk_csv_person_number_url(self.db, row)
+        if generic_url:
+            newvalues['generic_url'] = generic_url
+        newvalues['country'] = country_from_code(self.db, row['Country Code'])
+        # Because the checks for uniqueness of certain roles from
+        # non-staff countries are not applied here, do not allow bulk
+        # registration of non-staff to avoid possible errors arising
+        # only part way through the creation of person records.
+        if self.db.country.get(newvalues['country'], 'is_normal'):
+            raise ValueError('non-staff country specified')
+        primary_role = row['Primary Role']
+        try:
+            newvalues['primary_role'] = self.db.matholymprole.lookup(
+                primary_role)
+        except KeyError:
+            raise ValueError('unknown role %s' % primary_role)
+        if 'Other Roles' in row:
+            newvalues['other_roles'] = []
+            for role in row['Other Roles']:
+                try:
+                    role_id = self.db.matholymprole.lookup(role)
+                    newvalues['other_roles'].append(role_id)
+                except KeyError:
+                    raise ValueError('unknown role %s' % role)
+        if 'Guide For Codes' in row:
+            newvalues['guide_for'] = []
+            for code in row['Guide For Codes']:
+                newvalues['guide_for'].append(country_from_code(self.db, code))
+        contact_list = bulk_csv_contact_emails(row)
+        for email in contact_list:
+            if not valid_address(email):
+                raise ValueError('Email address syntax is invalid')
+
+    def adjust_after_audit(self, row, newvalues):
+        # reuse_photo is set to false until the auditor is called, to
+        # avoid creating photo items when only doing initial
+        # validation, then to True afterwards.
+        newvalues['reuse_photo'] = True
+
+    def act_after_create(self, item_id, item, csv_row):
+        contact_list = bulk_csv_contact_emails(csv_row)
+        if contact_list:
+            # Create the self-registration account.
+            username = 'selfreg_%s' % item_id
+            if self.db.user.stringFind(username=username):
+                return
+            realname = '%s %s' % (item['given_name'], item['family_name'])
+            pw = roundup.password.generatePassword()
+            self.db.user.create(username=username, realname=realname,
+                                password=roundup.password.Password(pw),
+                                address=contact_list[0],
+                                country=item['country'], person=item_id,
+                                roles='User,SelfRegister')
+            self.db.commit()
+            template_path = os.path.join(self.db.config.TRACKER_HOME,
+                                         'extensions',
+                                         'email-template-self-reg')
+            template_text = read_text_from_file(template_path)
+            email_text = template_text % {'role': csv_row['Primary Role'],
+                                          'id': item_id,
+                                          'username': username,
+                                          'password': pw}
+            short_name = self.db.config.ext['MATHOLYMP_SHORT_NAME']
+            year = self.db.config.ext['MATHOLYMP_YEAR']
+            subject = '%s %s registration (%s, %s)' % (short_name, year,
+                                                       realname,
+                                                       csv_row['Primary Role'])
+            send_email(self.db, contact_list, subject, email_text,
+                       'selfreg%s' % item_id)
+
+
 def register_actions(instance):
     """Register the matholymp actions with Roundup."""
     instance.registerAction('score', ScoreAction)
@@ -616,3 +730,4 @@ def register_actions(instance):
     instance.registerAction('scores_rss', ScoresRSSAction)
     instance.registerAction('name_badge', NameBadgeAction)
     instance.registerAction('country_bulk_register', CountryBulkRegisterAction)
+    instance.registerAction('person_bulk_register', PersonBulkRegisterAction)

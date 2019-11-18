@@ -316,9 +316,19 @@ the registration system is not active.
   created later and the one with the shorter code not edited after
   that.)
 
-* In preparation for supporting bulk registration of participants with
-  associated self-registration accounts, :file:`user.item.html` and
-  :file:`person.item.html` have been updated.
+* Staff participants can be registered in bulk by uploading a CSV file
+  of basic person details, with associated self-registration accounts
+  being automatically created and emails being sent to those
+  participants to request that they complete the remaining details,
+  rather than an administrative user needing to fill in an online form
+  for each person being registered.  :file:`page.html`,
+  :file:`user.item.html` and :file:`person.item.html` have been
+  updated accordingly; there are new templates
+  :file:`person.bulkregister.html` and
+  :file:`person.bulkconfirm.html`.  A new file
+  :file:`extensions/email-template-self-reg` is also needed to provide
+  a template for the emails sent to such participants; an example is
+  provided.
 
 * :file:`user.item.html` has been updated to avoid warnings when
   non-administrative users edit their own user records.

@@ -42,8 +42,8 @@ import time
 
 from matholymp.datetimeutil import date_from_ymd_str, date_from_ymd_iso, \
     age_on_date
-from matholymp.fileutil import read_utf8_csv_bytes, boolean_states, \
-    file_format_contents, file_extension
+from matholymp.fileutil import read_utf8_csv_bytes, comma_split, \
+    boolean_states, file_format_contents, file_extension
 
 __all__ = ['distinguish_official', 'get_consent_forms_date_str',
            'get_consent_forms_date', 'have_consent_forms', 'have_consent_ui',
@@ -58,7 +58,8 @@ __all__ = ['distinguish_official', 'get_consent_forms_date_str',
            'valid_country_problem', 'valid_int_str', 'create_rss',
            'db_file_format_contents', 'db_file_extension', 'db_file_url',
            'bulk_csv_data', 'bulk_csv_contact_emails',
-           'bulk_csv_country_number_url']
+           'bulk_csv_country_number_url', 'bulk_csv_person_number_url',
+           'country_from_code']
 
 
 def distinguish_official(db):
@@ -372,7 +373,7 @@ def db_file_url(db, cls, kind, file_id):
     return url
 
 
-def bulk_csv_data(form):
+def bulk_csv_data(form, comma_sep_fields=()):
     """
     Return the rows of an uploaded CSV file, in a tuple with a boolean
     for whether just to check the results or act on them, or a string
@@ -409,11 +410,21 @@ def bulk_csv_data(form):
             row[key] = row[key].strip()
             if row[key] == '':
                 del row[key]
+            elif key in comma_sep_fields:
+                # Convert comma-separated fields into lists.  Entries
+                # in such lists must be unique.
+                try:
+                    sub_row = comma_split(row[key])
+                except (ValueError, csv.Error) as exc:
+                    return str(exc)
+                row[key] = [val.strip() for val in sub_row]
+                if len(row[key]) != len(set(row[key])):
+                    return 'duplicate entries in %s' % key
     return (file_data, check_only)
 
 
 def bulk_csv_contact_emails(row):
-    """Return main and extra contact emails from an uploaded countries CSV."""
+    """Return main and extra contact emails from an uploaded CSV."""
     contact_email = row.get('Contact Email 1', '')
     if contact_email:
         contact_list = [contact_email]
@@ -438,3 +449,27 @@ def bulk_csv_country_number_url(db, row):
                 '%scountries/country%s/' % (gubase, country_number))
     else:
         return None, None
+
+
+def bulk_csv_person_number_url(db, row):
+    """
+    Return the person number and previous participation URL for a
+    bulk-registered person.
+    """
+    person_number = row.get('Person Number', '')
+    if person_number and valid_int_str(person_number, None):
+        gubase = db.config.ext['MATHOLYMP_GENERIC_URL_BASE']
+        return (int(person_number),
+                '%speople/person%s/' % (gubase, person_number))
+    else:
+        return None, None
+
+
+def country_from_code(db, code):
+    """Return the country with a given code, where there must be one."""
+    countries_with_code = db.country.filter(
+        None, {}, exact_match_spec={'code': code})
+    if len(countries_with_code) == 1:
+        return countries_with_code[0]
+    else:
+        raise ValueError('country %s not registered' % code)

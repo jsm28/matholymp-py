@@ -1,0 +1,26 @@
+You have been registered as a particpant at XMO 2015 in the role of
+%(role)s.
+
+Please go to:
+
+https://www.example.org/registration/2015/person%(id)s
+
+to complete your registration.
+
+Your username and password are:
+
+Username: %(username)s
+Password: %(password)s
+
+In case of difficulties with the registration system, please contact
+me.  For other issues, please contact Admin Name
+<admin.name@example.org>.
+
+Information about how personal data of registered participants is used
+is available at:
+
+https://www.example.org/data-protection/
+
+-- 
+XMO IT - Some Name
+webmaster@example.org

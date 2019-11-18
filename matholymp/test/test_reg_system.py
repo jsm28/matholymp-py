@@ -885,12 +885,13 @@ class RegSystemTestCase(unittest.TestCase):
             m = re.match(r'([a-z_]+)\.([a-z_]+)\.html\Z', t)
             if not m:
                 continue
-            # country.bulkconfirm.html should given an error, if an
-            # admin user, unless used with an upload of a CSV file.
-            # person.scoreenter.html should give an error, if able to
-            # enter scores, unless country and problem are specified.
+            # country.bulkconfirm.html and person.bulkconfirm.html
+            # should given an error, if an admin user, unless used
+            # with an upload of a CSV file.  person.scoreenter.html
+            # should give an error, if able to enter scores, unless
+            # country and problem are specified.
             error = ((can_score and t == 'person.scoreenter.html')
-                     or (admin_user and t == 'country.bulkconfirm.html'))
+                     or (admin_user and t.endswith('.bulkconfirm.html')))
             login = ((m.group(1) in forbid_classes or t in forbid_templates)
                      and t not in allow_templates)
             session.check_open_relative('%s?@template=%s'
@@ -921,6 +922,8 @@ class RegSystemTestCase(unittest.TestCase):
         forbid_templates = {'country.bulkconfirm.html',
                             'country.bulkregister.html',
                             'country.retireconfirm.html',
+                            'person.bulkconfirm.html',
+                            'person.bulkregister.html',
                             'person.retireconfirm.html',
                             'person.rooms.html',
                             'person.scoreenter.html',
@@ -945,6 +948,8 @@ class RegSystemTestCase(unittest.TestCase):
                             'country.bulkregister.html',
                             'country.prereg.html',
                             'country.retireconfirm.html',
+                            'person.bulkconfirm.html',
+                            'person.bulkregister.html',
                             'person.retireconfirm.html',
                             'person.rooms.html',
                             'person.status.html'}
@@ -966,6 +971,8 @@ class RegSystemTestCase(unittest.TestCase):
                             'country.bulkregister.html',
                             'country.prereg.html',
                             'country.retireconfirm.html',
+                            'person.bulkconfirm.html',
+                            'person.bulkregister.html',
                             'person.retireconfirm.html',
                             'person.rooms.html',
                             'person.scoreenter.html',
@@ -10676,6 +10683,645 @@ class RegSystemTestCase(unittest.TestCase):
         # background but none is available.
         admin_session.check_submit_selected(error='Online badge generation '
                                             'not enabled')
+
+    def test_person_bulk_register(self):
+        """
+        Test bulk registration of people.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        admin_session.create_country('DEF', 'Test Second Country')
+        reg_session = self.get_session('ABC_reg')
+        reg2_session = self.get_session('DEF_reg')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        reg2_csv = reg2_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        self.assertEqual(reg2_csv, [])
+        csv_cols = ['Person Number', 'Given Name', 'Family Name', 'Ignore',
+                    'Country Code', 'Primary Role', 'Other Roles',
+                    'Guide For Codes', 'Contact Email 1', 'Contact Email 2']
+        csv_in = [{'Person Number': '123',
+                   'Given Name': 'Given One  ',
+                   'Family Name': '  Family One',
+                   'Ignore': 'Random text',
+                   'Country Code': 'ZZA',
+                   'Primary Role': 'Coordinator',
+                   'Other Roles': 'Jury Chair,Problem Selection'},
+                  {'Given Name': ' Test\u00fd',
+                   'Family Name': 'Test',
+                   'Country Code': 'ZZA',
+                   'Primary Role': 'Guide',
+                   'Guide For Codes': 'ABC,DEF',
+                   'Contact Email 1': 'DEF1@example.invalid',
+                   'Contact Email 2': 'DEF2@example.invalid'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.check_submit_selected(mail=True)
+        self.assertIn(
+            b'\nTO: DEF1@example.invalid, DEF2@example.invalid, '
+            b'webmaster@example.invalid\n',
+            admin_session.last_mail_bin)
+        # The non-ASCII name means a Content-Transfer-Encoding must be
+        # specified rather than attempting to send the mail as 8-bit
+        # (which fails when Roundup is run in an ASCII locale).
+        self.assertIn(
+            b'\nContent-Transfer-Encoding:',
+            admin_session.last_mail_bin)
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        reg2_csv = reg2_session.get_people_csv()
+        expected_p1 = {'XMO Number': '2', 'Country Number': '1',
+                       'Person Number': '1',
+                       'Annual URL': self.instance.url + 'person1',
+                       'Country Name': 'XMO 2015 Staff',
+                       'Country Code': 'ZZA', 'Primary Role': 'Coordinator',
+                       'Other Roles': 'Jury Chair,Problem Selection',
+                       'Guide For': '',
+                       'Contestant Code': '', 'Contestant Age': '',
+                       'Given Name': 'Given One', 'Family Name': 'Family One',
+                       'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                       'P6': '', 'Total': '', 'Award': '',
+                       'Extra Awards': '', 'Photo URL': '',
+                       'Generic Number': '123'}
+        expected_p2 = {'XMO Number': '2', 'Country Number': '1',
+                       'Person Number': '2',
+                       'Annual URL': self.instance.url + 'person2',
+                       'Country Name': 'XMO 2015 Staff',
+                       'Country Code': 'ZZA', 'Primary Role': 'Guide',
+                       'Other Roles': '',
+                       'Guide For': 'Test First Country,Test Second Country',
+                       'Contestant Code': '', 'Contestant Age': '',
+                       'Given Name': 'Test\u00fd', 'Family Name': 'Test',
+                       'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                       'P6': '', 'Total': '', 'Award': '',
+                       'Extra Awards': '', 'Photo URL': '',
+                       'Generic Number': ''}
+        expected_p1_admin = expected_p1.copy()
+        expected_p2_admin = expected_p2.copy()
+        expected_p1_admin.update(
+            {'Gender': '', 'Date of Birth': '', 'Languages': '',
+             'Allergies and Dietary Requirements': '',
+             'T-Shirt Size': '', 'Arrival Place': '',
+             'Arrival Date': '', 'Arrival Time': '',
+             'Arrival Flight': '', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': '',
+             'Share Room With': '', 'Room Number': '',
+             'Phone Number': '', 'Badge Photo URL': '',
+             'Badge Background': 'generic', 'Badge Outer Colour': 'f78b11',
+             'Badge Inner Colour': 'fccc8f', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Passport Given Name': 'Given One',
+             'Passport Family Name': 'Family One',
+             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+        expected_p2_admin.update(
+            {'Gender': '', 'Date of Birth': '', 'Languages': '',
+             'Allergies and Dietary Requirements': '',
+             'T-Shirt Size': '', 'Arrival Place': '',
+             'Arrival Date': '', 'Arrival Time': '',
+             'Arrival Flight': '', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': '',
+             'Share Room With': '', 'Room Number': '',
+             'Phone Number': '', 'Badge Photo URL': '',
+             'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
+             'Badge Inner Colour': '9c95cc', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Passport Given Name': 'Test\u00fd',
+             'Passport Family Name': 'Test',
+             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+        self.assertEqual(anon_csv, [expected_p1, expected_p2])
+        self.assertEqual(admin_csv, [expected_p1_admin, expected_p2_admin])
+        self.assertEqual(reg_csv, [expected_p1, expected_p2])
+        self.assertEqual(reg2_csv, [expected_p1, expected_p2])
+        # Test without BOM in CSV file.
+        csv_in = [{'Given Name': 'Test\u00fd',
+                   'Family Name': 'Doe',
+                   'Country Code': 'ZZA',
+                   'Primary Role': 'Guide'}]
+        csv_filename = self.gen_test_csv_no_bom(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.check_submit_selected()
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        reg2_csv = reg2_session.get_people_csv()
+        expected_p3 = {'XMO Number': '2', 'Country Number': '1',
+                       'Person Number': '3',
+                       'Annual URL': self.instance.url + 'person3',
+                       'Country Name': 'XMO 2015 Staff',
+                       'Country Code': 'ZZA', 'Primary Role': 'Guide',
+                       'Other Roles': '',
+                       'Guide For': '',
+                       'Contestant Code': '', 'Contestant Age': '',
+                       'Given Name': 'Test\u00fd', 'Family Name': 'Doe',
+                       'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                       'P6': '', 'Total': '', 'Award': '',
+                       'Extra Awards': '', 'Photo URL': '',
+                       'Generic Number': ''}
+        expected_p3_admin = expected_p3.copy()
+        expected_p3_admin.update(
+            {'Gender': '', 'Date of Birth': '', 'Languages': '',
+             'Allergies and Dietary Requirements': '',
+             'T-Shirt Size': '', 'Arrival Place': '',
+             'Arrival Date': '', 'Arrival Time': '',
+             'Arrival Flight': '', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': '',
+             'Share Room With': '', 'Room Number': '',
+             'Phone Number': '', 'Badge Photo URL': '',
+             'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
+             'Badge Inner Colour': '9c95cc', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Passport Given Name': 'Test\u00fd',
+             'Passport Family Name': 'Doe',
+             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+        self.assertEqual(anon_csv, [expected_p1, expected_p3, expected_p2])
+        self.assertEqual(admin_csv,
+                         [expected_p1_admin, expected_p3_admin,
+                          expected_p2_admin])
+        self.assertEqual(reg_csv, [expected_p1, expected_p3, expected_p2])
+        self.assertEqual(reg2_csv, [expected_p1, expected_p3, expected_p2])
+
+    @_with_config(static_site_directory='static-site')
+    def test_person_bulk_register_static(self):
+        """
+        Test bulk registration of people, photos available on static site.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        admin_session.create_country('DEF', 'Test Second Country')
+        reg_session = self.get_session('ABC_reg')
+        reg2_session = self.get_session('DEF_reg')
+        photo_bytes = self.instance.static_site_bytes(
+            'people/person1/photo1.jpg')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        reg2_csv = reg2_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        self.assertEqual(reg2_csv, [])
+        csv_cols = ['Person Number', 'Given Name', 'Family Name', 'Ignore',
+                    'Country Code', 'Primary Role', 'Other Roles',
+                    'Guide For Codes', 'Contact Email 1', 'Contact Email 2']
+        csv_in = [{'Person Number': '1',
+                   'Given Name': 'Given One  ',
+                   'Family Name': '  Family One',
+                   'Ignore': 'Random text',
+                   'Country Code': 'ZZA',
+                   'Primary Role': 'Coordinator',
+                   'Other Roles': 'Jury Chair,Problem Selection'},
+                  {'Person Number': '3',
+                   'Given Name': ' Test\u00fd',
+                   'Family Name': 'Test',
+                   'Country Code': 'ZZA',
+                   'Primary Role': 'Guide',
+                   'Guide For Codes': 'ABC,DEF',
+                   'Contact Email 1': 'DEF1@example.invalid',
+                   'Contact Email 2': 'DEF2@example.invalid'},
+                  {'Given Name': 'Test\u00fd',
+                   'Family Name': 'Doe',
+                   'Country Code': 'ZZA',
+                   'Primary Role': 'Guide'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.check_submit_selected(mail=True)
+        self.assertIn(
+            b'\nTO: DEF1@example.invalid, DEF2@example.invalid, '
+            b'webmaster@example.invalid\n',
+            admin_session.last_mail_bin)
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        reg2_csv = reg2_session.get_people_csv()
+        img_url_csv = self.instance.url + 'photo1/photo.jpg'
+        expected_p1 = {'XMO Number': '2', 'Country Number': '1',
+                       'Person Number': '1',
+                       'Annual URL': self.instance.url + 'person1',
+                       'Country Name': 'XMO 2015 Staff',
+                       'Country Code': 'ZZA', 'Primary Role': 'Coordinator',
+                       'Other Roles': 'Jury Chair,Problem Selection',
+                       'Guide For': '',
+                       'Contestant Code': '', 'Contestant Age': '',
+                       'Given Name': 'Given One', 'Family Name': 'Family One',
+                       'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                       'P6': '', 'Total': '', 'Award': '',
+                       'Extra Awards': '', 'Photo URL': img_url_csv,
+                       'Generic Number': '1'}
+        expected_p2 = {'XMO Number': '2', 'Country Number': '1',
+                       'Person Number': '2',
+                       'Annual URL': self.instance.url + 'person2',
+                       'Country Name': 'XMO 2015 Staff',
+                       'Country Code': 'ZZA', 'Primary Role': 'Guide',
+                       'Other Roles': '',
+                       'Guide For': 'Test First Country,Test Second Country',
+                       'Contestant Code': '', 'Contestant Age': '',
+                       'Given Name': 'Test\u00fd', 'Family Name': 'Test',
+                       'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                       'P6': '', 'Total': '', 'Award': '',
+                       'Extra Awards': '', 'Photo URL': '',
+                       'Generic Number': '3'}
+        expected_p3 = {'XMO Number': '2', 'Country Number': '1',
+                       'Person Number': '3',
+                       'Annual URL': self.instance.url + 'person3',
+                       'Country Name': 'XMO 2015 Staff',
+                       'Country Code': 'ZZA', 'Primary Role': 'Guide',
+                       'Other Roles': '',
+                       'Guide For': '',
+                       'Contestant Code': '', 'Contestant Age': '',
+                       'Given Name': 'Test\u00fd', 'Family Name': 'Doe',
+                       'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                       'P6': '', 'Total': '', 'Award': '',
+                       'Extra Awards': '', 'Photo URL': '',
+                       'Generic Number': ''}
+        expected_p1_admin = expected_p1.copy()
+        expected_p2_admin = expected_p2.copy()
+        expected_p3_admin = expected_p3.copy()
+        expected_p1_admin.update(
+            {'Gender': '', 'Date of Birth': '', 'Languages': '',
+             'Allergies and Dietary Requirements': '',
+             'T-Shirt Size': '', 'Arrival Place': '',
+             'Arrival Date': '', 'Arrival Time': '',
+             'Arrival Flight': '', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': '',
+             'Share Room With': '', 'Room Number': '',
+             'Phone Number': '', 'Badge Photo URL': img_url_csv,
+             'Badge Background': 'generic', 'Badge Outer Colour': 'f78b11',
+             'Badge Inner Colour': 'fccc8f', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Passport Given Name': 'Given One',
+             'Passport Family Name': 'Family One',
+             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+        expected_p2_admin.update(
+            {'Gender': '', 'Date of Birth': '', 'Languages': '',
+             'Allergies and Dietary Requirements': '',
+             'T-Shirt Size': '', 'Arrival Place': '',
+             'Arrival Date': '', 'Arrival Time': '',
+             'Arrival Flight': '', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': '',
+             'Share Room With': '', 'Room Number': '',
+             'Phone Number': '', 'Badge Photo URL': '',
+             'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
+             'Badge Inner Colour': '9c95cc', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Passport Given Name': 'Test\u00fd',
+             'Passport Family Name': 'Test',
+             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+        expected_p3_admin.update(
+            {'Gender': '', 'Date of Birth': '', 'Languages': '',
+             'Allergies and Dietary Requirements': '',
+             'T-Shirt Size': '', 'Arrival Place': '',
+             'Arrival Date': '', 'Arrival Time': '',
+             'Arrival Flight': '', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': '',
+             'Share Room With': '', 'Room Number': '',
+             'Phone Number': '', 'Badge Photo URL': '',
+             'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
+             'Badge Inner Colour': '9c95cc', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Passport Given Name': 'Test\u00fd',
+             'Passport Family Name': 'Doe',
+             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+        self.assertEqual(anon_csv, [expected_p1, expected_p3, expected_p2])
+        self.assertEqual(admin_csv,
+                         [expected_p1_admin, expected_p3_admin,
+                          expected_p2_admin])
+        self.assertEqual(reg_csv, [expected_p1, expected_p3, expected_p2])
+        self.assertEqual(reg2_csv, [expected_p1, expected_p3, expected_p2])
+        # Check the image from the URL in the .csv file.
+        anon_bytes = session.get_bytes(img_url_csv)
+        admin_bytes = admin_session.get_bytes(img_url_csv)
+        self.assertEqual(anon_bytes, photo_bytes)
+        self.assertEqual(admin_bytes, photo_bytes)
+
+    def test_person_bulk_register_errors(self):
+        """
+        Test errors from bulk registration of people.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        # Register a person so a node id can be used in a subsequent
+        # test.
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        anon_csv_orig = session.get_people_csv()
+        admin_csv_orig = admin_session.get_people_csv()
+        # Error using bulk registration via GET request.
+        admin_session.check_open_relative(
+            'person?@action=person_bulk_register',
+            error='Invalid request')
+        # Errors applying action to bad class or with id specified
+        # (requires modifying the form to exercise).
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        form = admin_session.get_main_form()
+        form['action'] = 'country'
+        admin_session.set({'@template': 'index'})
+        admin_session.check_submit_selected(error='Invalid class for bulk '
+                                            'registration')
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        form = admin_session.get_main_form()
+        form['action'] = 'person1'
+        admin_session.set({'@template': 'item'})
+        admin_session.check_submit_selected(error='Node id specified for bulk '
+                                            'registration')
+        # Errors missing uploaded CSV data.
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        form = admin_session.get_main_form()
+        csv_file_input = form.find('input', attrs={'name': 'csv_file'})
+        csv_file_input.extract()
+        admin_session.check_submit_selected(error='no CSV file uploaded')
+        # Errors with CSV data of wrong type.
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        form = admin_session.get_main_form()
+        csv_file_input = form.find('input', attrs={'name': 'csv_file'})
+        csv_file_input.extract()
+        admin_session.b.new_control('text', 'csv_file', 'some text')
+        admin_session.check_submit_selected(error='csv_file not an uploaded '
+                                            'file')
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        form = admin_session.get_main_form()
+        csv_file_input = form.find('input', attrs={'name': 'csv_file'})
+        csv_file_input.extract()
+        admin_session.b.new_control('file', 'csv_contents', '')
+        csv_filename = self.gen_test_csv([{'Test': 'text'}], ['Test'])
+        admin_session.set({'csv_contents': csv_filename})
+        admin_session.check_submit_selected(error='csv_contents an uploaded '
+                                            'file')
+        # Errors with encoding of CSV data.
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        form = admin_session.get_main_form()
+        csv_file_input = form.find('input', attrs={'name': 'csv_file'})
+        csv_file_input.extract()
+        admin_session.b.new_control('text', 'csv_contents', '\u00ff')
+        # error='.' used for cases where the error message comes from
+        # the standard Python library, to avoid depending on the exact
+        # text of such errors.
+        admin_session.check_submit_selected(error='.')
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        form = admin_session.get_main_form()
+        csv_file_input = form.find('input', attrs={'name': 'csv_file'})
+        csv_file_input.extract()
+        admin_session.b.new_control('text', 'csv_contents', '!')
+        admin_session.check_submit_selected(error='.')
+        temp_file = tempfile.NamedTemporaryFile(suffix='.csv',
+                                                dir=self.temp_dir,
+                                                delete=False)
+        csv_filename = temp_file.name
+        temp_file.close()
+        write_bytes_to_file(b'\xff', csv_filename)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='.')
+        # Errors with content, where the uploaded file is a valid CSV
+        # file.
+        csv_cols = ['Person Number', 'Given Name', 'Family Name', 'Ignore',
+                    'Country Code', 'Primary Role', 'Other Roles',
+                    'Guide For Codes', 'Contact Email 1', 'Contact Email 2']
+        csv_in = [{'Person Number': '123',
+                   'Given Name': 'Test',
+                   'Family Name': 'Test',
+                   'Ignore': 'Random text',
+                   'Country Code': 'ZZA',
+                   'Primary Role': 'Coordinator'},
+                  {'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'Coordinator'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(
+            error="'Given Name' missing in row 2")
+        csv_in = [{'Person Number': '123',
+                   'Given Name': 'Test',
+                   'Family Name': 'Test',
+                   'Ignore': 'Random text',
+                   'Country Code': 'ZZA',
+                   'Primary Role': 'Coordinator'},
+                  {'Given Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'Coordinator'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(
+            error="'Family Name' missing in row 2")
+        csv_in = [{'Person Number': '123',
+                   'Given Name': 'Test',
+                   'Family Name': 'Test',
+                   'Ignore': 'Random text',
+                   'Country Code': 'ZZA',
+                   'Primary Role': 'Coordinator'},
+                  {'Given Name': 'Test', 'Family Name': 'Test',
+                   'Primary Role': 'Coordinator'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(
+            error="'Country Code' missing in row 2")
+        csv_in = [{'Person Number': '123',
+                   'Given Name': 'Test',
+                   'Family Name': 'Test',
+                   'Ignore': 'Random text',
+                   'Country Code': 'ZZA',
+                   'Primary Role': 'Coordinator'},
+                  {'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(
+            error="'Primary Role' missing in row 2")
+        csv_in = [{'Person Number': '123',
+                   'Given Name': 'Test',
+                   'Family Name': 'Test',
+                   'Country Code': 'ZZA',
+                   'Primary Role': 'Coordinator'},
+                  {'Person Number': '123',
+                   'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'Coordinator'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error="'Person Number' duplicate "
+                                            "value in row 2")
+        # Errors from auditor.
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'Coordinator',
+                   'Person Number': '0'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(
+            error=r'row 1: example\.invalid URLs for previous participation '
+            r'must be in the form https://www\.example\.invalid/people/'
+            r'personN/')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZN', 'Primary Role': 'Coordinator'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: Invalid country')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'Leader'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: Staff must have '
+                                            'administrative roles')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'Coordinator',
+                   'Other Roles': 'Leader'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: Staff must have '
+                                            'administrative roles')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'Coordinator',
+                   'Guide For Codes': 'ABC'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: People with this '
+                                            'role may not guide a country')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'Guide',
+                   'Guide For Codes': 'ZZA'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: May only guide '
+                                            'normal countries')
+        # Error for unknown country.
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZB', 'Primary Role': 'Coordinator'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: country ZZB not '
+                                            'registered')
+        # Error for non-staff country.
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ABC', 'Primary Role': 'Leader'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: non-staff country '
+                                            'specified')
+        # Error for unknown role (primary or other).
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'Bad role'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: unknown role Bad '
+                                            'role')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'Coordinator',
+                   'Other Roles': 'Jury Chair,Random'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: unknown role Random')
+        # Error for guiding unknown country.
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'Guide',
+                   'Guide For Codes': 'ABC,DEF'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: country DEF not '
+                                            'registered')
+        # Error for bad email address.
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'Coordinator',
+                   'Contact Email 1': 'invalid email'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: Email address '
+                                            'syntax is invalid')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(anon_csv, anon_csv_orig)
+        self.assertEqual(admin_csv, admin_csv_orig)
+
+    @_with_config(static_site_directory='static-site')
+    def test_person_bulk_register_errors_static(self):
+        """
+        Test errors from bulk registration of people, static site checks.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        csv_cols = ['Person Number', 'Given Name', 'Family Name',
+                    'Country Code', 'Primary Role']
+        csv_in = [{'Given Name': 'Given One',
+                   'Family Name': 'Family One',
+                   'Country Code': 'ZZA',
+                   'Primary Role': 'Coordinator'},
+                  {'Person Number': '12345',
+                   'Given Name': 'Test',
+                   'Family Name': 'Test',
+                   'Country Code': 'ZZA',
+                   'Primary Role': 'Guide'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(
+            error=r'row 2: example\.invalid URL for previous participation '
+            r'not valid')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
 
     def test_event_create_audit_errors(self):
         """

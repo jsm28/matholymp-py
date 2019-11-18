@@ -86,6 +86,9 @@ columns string:id;
     <a tal:attributes="href python:'person?@template=item&country=' +
     request.user.country.id">Register new participant</a><br>
    </span>
+   <span tal:condition="python:request.user.hasPermission('BulkRegisterPerson')">
+    <a href="person?@template=bulkregister" i18n:translate="">Bulk register participants</a><br>
+   </span>
    <span tal:condition="python:request.user.hasPermission('Edit', 'matholymprole')">
     <a href="matholymprole"  i18n:translate="">Role List</a><br>
    </span>
