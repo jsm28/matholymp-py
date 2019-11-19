@@ -106,7 +106,7 @@ the registration system is not active.
 
 * The example :file:`extensions/email-template-new-user` for the
   registration system has been extended to discuss more cases of which
-  organizers should be contacted for certain issues.
+  organisers should be contacted for certain issues.
 
 * :file:`person.item.html` now says explicitly that names should be
   entered in the form they should appear on the website and name
@@ -341,6 +341,10 @@ the registration system is not active.
   available, in which case online badge generation is not supported.
   A new variable ``matholymp_badge_use_background`` must also be
   specified.  :file:`person.item.html` is updated accordingly.
+
+* :file:`country.item.html`, :file:`person.item.html` and
+  :file:`user.item.html` have been updated to use more consistent
+  spelling.
 
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
