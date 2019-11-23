@@ -11288,6 +11288,25 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.set({'csv_file': csv_filename})
         admin_session.check_submit_selected(error='row 1: Email address '
                                             'syntax is invalid')
+        # Error for duplicate entries in Other Roles or Guide For Codes.
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'Coordinator',
+                   'Other Roles': 'Jury Chair,Jury Chair'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='duplicate entries in Other '
+                                            'Roles')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'Guide',
+                   'Guide For Codes': 'ABC,ABC'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='duplicate entries in Guide '
+                                            'For Codes')
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         self.assertEqual(anon_csv, anon_csv_orig)
