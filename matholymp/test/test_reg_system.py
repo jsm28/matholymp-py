@@ -10640,14 +10640,14 @@ class RegSystemTestCase(unittest.TestCase):
         form = admin_session.get_main().find_all('form')[2]
         form['action'] = 'person'
         admin_session.b.select_form(form)
-        admin_session.check_submit_selected(error='No id specified to '
-                                            'generate name badge for')
+        admin_session.check_submit_selected(error='No id specified for '
+                                            'document generation')
         admin_session.check_open_relative('person1')
         form = admin_session.get_main().find_all('form')[2]
         form['action'] = 'country1'
         admin_session.b.select_form(form)
-        admin_session.check_submit_selected(error='Name badges can only be '
-                                            'generated for people')
+        admin_session.check_submit_selected(error='Invalid class for document '
+                                            'generation')
         admin_session.check_open_relative('person1')
         form = admin_session.get_main().find_all('form')[2]
         admin_session.b.select_form(form)
@@ -10681,7 +10681,7 @@ class RegSystemTestCase(unittest.TestCase):
                                                force=True)
         # The error is that this test is configured to use a
         # background but none is available.
-        admin_session.check_submit_selected(error='Online badge generation '
+        admin_session.check_submit_selected(error='Online document generation '
                                             'not enabled')
 
     def test_person_bulk_register(self):

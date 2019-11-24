@@ -32,9 +32,9 @@
 __all__ = ['ScoreAction', 'RetireCountryAction', 'ScalePhotoAction',
            'CountryCSVAction', 'ScoresCSVAction', 'PeopleCSVAction',
            'MedalBoundariesCSVAction', 'FlagsZIPAction', 'PhotosZIPAction',
-           'ScoresRSSAction', 'NameBadgeAction', 'BulkRegisterAction',
-           'CountryBulkRegisterAction', 'PersonBulkRegisterAction',
-           'register_actions']
+           'ScoresRSSAction', 'DocumentGenerateAction', 'NameBadgeAction',
+           'BulkRegisterAction', 'CountryBulkRegisterAction',
+           'PersonBulkRegisterAction', 'register_actions']
 
 import collections
 import html
@@ -388,25 +388,31 @@ class ScoresRSSAction(Action):
         return text
 
 
-class NameBadgeAction(Action):
+class DocumentGenerateAction(Action):
 
-    """Action to generate a person's name badge."""
+    """Base class for document generation actions."""
 
-    name = 'generate the name badge for'
-    permissionType = 'GenerateNameBadges'
+    # Subclasses must set this.
+    required_classname = None
+
+    def generate_document(self, docgen, event):
+        """Do the actual document generation."""
+        raise NotImplementedError
+
+    def document_filename(self):
+        """Return the filename of the generated PDF document."""
+        raise NotImplementedError
 
     def handle(self):
-        """Generate a person's name badge."""
+        """Generate a document."""
+        if self.classname != self.required_classname:
+            raise ValueError('Invalid class for document generation')
         if self.nodeid is None:
-            raise ValueError('No id specified to generate name badge for')
-        if self.classname != 'person':
-            raise ValueError('Name badges can only be generated for people')
+            raise ValueError('No id specified for document generation')
         docgen_path = self.db.config.ext['MATHOLYMP_DOCGEN_DIRECTORY']
         if not docgen_path:
-            raise ValueError('Online badge generation not enabled')
+            raise ValueError('Online document generation not enabled')
         docgen_path = os.path.join(self.db.config.TRACKER_HOME, docgen_path)
-        use_background = self.db.config.ext['MATHOLYMP_BADGE_USE_BACKGROUND']
-        use_background = boolean_states[use_background.lower()]
         event_group = EventGroup(RoundupDataSource(self.db))
         event = event_group.event_list[0]
         config_data = read_docgen_config(docgen_path)
@@ -414,17 +420,16 @@ class NameBadgeAction(Action):
             docgen = DocumentGenerator(config_data, event,
                                        os.path.join(docgen_path, 'templates'),
                                        None, None, temp_dir, False)
-            person = event.person_map[int(self.nodeid)][0]
             try:
-                docgen.generate_badge(person, use_background)
-                badge_filename = 'badge-person%s.pdf' % self.nodeid
+                self.generate_document(docgen, event)
+                doc_filename = self.document_filename()
                 self.client.setHeader('Content-Type', 'application/pdf')
                 self.client.setHeader('Content-Disposition',
                                       'attachment; filename=%s'
-                                      % badge_filename)
-                badge_path = os.path.join(temp_dir, badge_filename)
-                with open(badge_path, 'rb') as badge_file:
-                    return badge_file.read()
+                                      % doc_filename)
+                doc_path = os.path.join(temp_dir, doc_filename)
+                with open(doc_path, 'rb') as doc_file:
+                    return doc_file.read()
             except subprocess.CalledProcessError as e:
                 # Report this error both to the admin and to the web
                 # client.
@@ -432,12 +437,30 @@ class NameBadgeAction(Action):
                             % e.stdout.decode('utf-8',
                                               errors='backslashreplace'))
                 send_email(self.db, [],
-                           ('Name badge generation error for person %s'
-                            % self.nodeid),
-                           msg_text, 'badge')
+                           ('Document generation error for %s %s'
+                            % (self.classname, self.nodeid)),
+                           msg_text, 'docgen')
                 self.client.setHeader('Content-Type',
                                       'text/plain; charset=UTF-8')
                 return e.stdout
+
+
+class NameBadgeAction(DocumentGenerateAction):
+
+    """Action to generate a person's name badge."""
+
+    name = 'generate the name badge for'
+    permissionType = 'GenerateNameBadges'
+    required_classname = 'person'
+
+    def generate_document(self, docgen, event):
+        person = event.person_map[int(self.nodeid)][0]
+        use_background = self.db.config.ext['MATHOLYMP_BADGE_USE_BACKGROUND']
+        use_background = boolean_states[use_background.lower()]
+        docgen.generate_badge(person, use_background)
+
+    def document_filename(self):
+        return 'badge-person%s.pdf' % self.nodeid
 
 
 class BulkRegisterAction(Action):
