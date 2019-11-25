@@ -593,6 +593,23 @@ select the appropriate options.  You must select &ldquo;Yes&rdquo; or
 </tal:block>
 </tal:block>
 
+<tal:block tal:condition="context/id">
+<tal:block tal:condition="python:not db._db.person.is_retired(context.id)">
+<tal:block tal:condition="python:db._db.config.ext['MATHOLYMP_DOCGEN_DIRECTORY'] and request.user.hasPermission('GenerateVisaLetters')">
+<form method="GET" tal:attributes="action context/designator">
+<table class="form">
+<tr>
+<td>
+<input type="hidden" name="@action" value="visa_letter">
+<input type="submit" value="Generate visa invitation letter">
+</td>
+</tr>
+</table>
+</form>
+</tal:block>
+</tal:block>
+</tal:block>
+
 <tal:block tal:condition="context/photo">
 <tal:block tal:condition="python:utils.has_consent_for_photo(db._db, context.id) or (context.is_edit_ok() and context.photo_consent.plain() == 'badge_only')">
 <p tal:condition="python:utils.have_consent_ui(db._db) and context.photo_consent.plain() == 'badge_only'">The following photo is for use on name badges and is not public on the website.</p>
