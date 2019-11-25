@@ -113,7 +113,12 @@ def date_to_ymd_iso(date):
 
 
 def date_to_name(date):
-    """Return the English (day month year) name of a date."""
+    """
+    Return the English (day month year) name of a date.  The date may
+    be None, in which case the empty string is returned.
+    """
+    if date is None:
+        return ''
     return '%d %s %d' % (date.day, month_name(date.month), date.year)
 
 

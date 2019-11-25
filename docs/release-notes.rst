@@ -346,6 +346,10 @@ the registration system is not active.
   :file:`user.item.html` have been updated to use more consistent
   spelling.
 
+* Visa invitation letters can be generated using
+  :command:`mo-document-generate`.  A new document generation template
+  :file:`visa-letter-template.tex` is used for this purpose.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

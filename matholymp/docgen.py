@@ -42,6 +42,7 @@ import subprocess
 from PyPDF2 import PdfFileReader
 
 from matholymp.collate import coll_get_sort_key
+from matholymp.datetimeutil import date_to_name
 from matholymp.fileutil import read_utf8_csv, make_dirs_for_file, \
     write_text_to_file, read_text_from_file, read_config, remove_if_exists, \
     file_extension
@@ -412,6 +413,20 @@ class DocumentGenerator:
         else:
             p = self.get_person_by_id(person_id)
             self.generate_badge(p, use_background)
+
+    def generate_visa_letter(self, person_id):
+        """Generate all visa letters requested by the command line."""
+        p = self.get_person_by_id(person_id)
+        template_file_base = 'visa-letter-template'
+        template_fields = {'given_name': p.passport_given_name,
+                           'family_name': p.passport_family_name,
+                           'nationality': p.nationality or '',
+                           'passport_number': p.passport_number or '',
+                           'gender': p.gender or '',
+                           'date_of_birth': date_to_name(p.date_of_birth)}
+        output_file_base = 'visa-letter-person' + person_id
+        self.subst_and_pdflatex(template_file_base, output_file_base,
+                                template_fields, [])
 
     def generate_desk_labels(self, person_id):
         """Generate all desk labels requested by the command line."""
