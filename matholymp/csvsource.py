@@ -275,14 +275,14 @@ class CSVDataSource(DataSource):
                 s = None
             return s
         if name in CSVDataSource._person_event_attr_map_date:
-            k = CSVDataSource._person_event_attr_map_str[name]
+            k = CSVDataSource._person_event_attr_map_date[name]
             s = self._people[event_id][person_id][country_id][k]
             if s == '':
                 return None
             else:
                 return date_from_ymd_iso(k, s)
         if name in CSVDataSource._person_event_attr_map_time:
-            k = CSVDataSource._person_event_attr_map_str[name]
+            k = CSVDataSource._person_event_attr_map_time[name]
             s = self._people[event_id][person_id][country_id][k]
             if s == '':
                 return None
