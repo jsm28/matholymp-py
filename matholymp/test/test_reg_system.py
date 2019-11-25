@@ -10679,8 +10679,6 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.b.select_form(form)
         admin_session.b.get_current_form().set('@action', 'name_badge',
                                                force=True)
-        # The error is that this test is configured to use a
-        # background but none is available.
         admin_session.check_submit_selected(error='Online document generation '
                                             'not enabled')
 
