@@ -473,7 +473,8 @@ class InvitationLetterAction(DocumentGenerateAction):
     required_classname = 'person'
 
     def generate_document(self, docgen, event):
-        docgen.generate_invitation_letter(self.nodeid)
+        person = event.person_map[int(self.nodeid)][0]
+        docgen.generate_invitation_letter(person)
 
     def document_filename(self):
         return 'invitation-letter-person%s.pdf' % self.nodeid

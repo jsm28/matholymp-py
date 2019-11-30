@@ -121,6 +121,10 @@ To generate an invitation letter for a given person::
 
    mo-document-generate invitation-letter *number*
 
+To generate invitation letters for all participants:
+
+   mo-document-generate invitation-letter all
+
 Desk labels
 ^^^^^^^^^^^
 

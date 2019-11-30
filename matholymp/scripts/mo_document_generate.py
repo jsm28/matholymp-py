@@ -106,7 +106,7 @@ def main():
     if cmdline_data['type'] == 'badge':
         docgen.generate_badges(gen_id, bg)
     elif cmdline_data['type'] == 'invitation-letter':
-        docgen.generate_invitation_letter(gen_id)
+        docgen.generate_invitation_letters(gen_id)
     elif cmdline_data['type'] == 'desk-label':
         docgen.generate_desk_labels(gen_id)
     elif cmdline_data['type'] == 'award-certificate':
