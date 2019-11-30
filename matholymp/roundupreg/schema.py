@@ -559,8 +559,8 @@ def init_schema(env):
     p = db.security.addPermission(name='GenerateNameBadges')
     db.security.addPermissionToRole('Admin', p)
 
-    # Permission to generate visa invitation letters online.
-    p = db.security.addPermission(name='GenerateVisaLetters')
+    # Permission to generate invitation letters online.
+    p = db.security.addPermission(name='GenerateInvitationLetters')
     db.security.addPermissionToRole('Admin', p)
 
     # Permission to edit countries in general, rather than just a

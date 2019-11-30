@@ -114,12 +114,12 @@ subdirectories of :file:`data/photos/` not corresponding to any photo
 from the registration system and edit :file:`people.csv` to enter
 values in the Photo URL column that cause those photos to be selected.
 
-Visa invitation letters
-^^^^^^^^^^^^^^^^^^^^^^^
+Invitation letters
+^^^^^^^^^^^^^^^^^^
 
 To generate an invitation letter for a given person::
 
-   mo-document-generate visa-letter *number*
+   mo-document-generate invitation-letter *number*
 
 Desk labels
 ^^^^^^^^^^^

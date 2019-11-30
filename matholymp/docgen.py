@@ -414,17 +414,17 @@ class DocumentGenerator:
             p = self.get_person_by_id(person_id)
             self.generate_badge(p, use_background)
 
-    def generate_visa_letter(self, person_id):
-        """Generate all visa letters requested by the command line."""
+    def generate_invitation_letter(self, person_id):
+        """Generate all invitation letters requested by the command line."""
         p = self.get_person_by_id(person_id)
-        template_file_base = 'visa-letter-template'
+        template_file_base = 'invitation-letter-template'
         template_fields = {'given_name': p.passport_given_name,
                            'family_name': p.passport_family_name,
                            'nationality': p.nationality or '',
                            'passport_number': p.passport_number or '',
                            'gender': p.gender or '',
                            'date_of_birth': date_to_name(p.date_of_birth)}
-        output_file_base = 'visa-letter-person' + person_id
+        output_file_base = 'invitation-letter-person' + person_id
         self.subst_and_pdflatex(template_file_base, output_file_base,
                                 template_fields, [])
 

@@ -33,7 +33,7 @@ __all__ = ['ScoreAction', 'RetireCountryAction', 'ScalePhotoAction',
            'CountryCSVAction', 'ScoresCSVAction', 'PeopleCSVAction',
            'MedalBoundariesCSVAction', 'FlagsZIPAction', 'PhotosZIPAction',
            'ScoresRSSAction', 'DocumentGenerateAction', 'NameBadgeAction',
-           'VisaLetterAction', 'BulkRegisterAction',
+           'InvitationLetterAction', 'BulkRegisterAction',
            'CountryBulkRegisterAction', 'PersonBulkRegisterAction',
            'register_actions']
 
@@ -464,19 +464,19 @@ class NameBadgeAction(DocumentGenerateAction):
         return 'badge-person%s.pdf' % self.nodeid
 
 
-class VisaLetterAction(DocumentGenerateAction):
+class InvitationLetterAction(DocumentGenerateAction):
 
-    """Action to generate a person's visa invitation."""
+    """Action to generate a person's invitation letter."""
 
-    name = 'generate the visa invitation letter for'
-    permissionType = 'GenerateVisaLetters'
+    name = 'generate the invitation letter for'
+    permissionType = 'GenerateInvitationLetters'
     required_classname = 'person'
 
     def generate_document(self, docgen, event):
-        docgen.generate_visa_letter(self.nodeid)
+        docgen.generate_invitation_letter(self.nodeid)
 
     def document_filename(self):
-        return 'visa-letter-person%s.pdf' % self.nodeid
+        return 'invitation-letter-person%s.pdf' % self.nodeid
 
 
 class BulkRegisterAction(Action):
@@ -768,6 +768,6 @@ def register_actions(instance):
     instance.registerAction('consent_forms_zip', ConsentFormsZIPAction)
     instance.registerAction('scores_rss', ScoresRSSAction)
     instance.registerAction('name_badge', NameBadgeAction)
-    instance.registerAction('visa_letter', VisaLetterAction)
+    instance.registerAction('invitation_letter', InvitationLetterAction)
     instance.registerAction('country_bulk_register', CountryBulkRegisterAction)
     instance.registerAction('person_bulk_register', PersonBulkRegisterAction)

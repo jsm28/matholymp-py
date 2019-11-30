@@ -10683,26 +10683,26 @@ class RegSystemTestCase(unittest.TestCase):
                                             'not enabled')
 
     @_with_config(docgen_directory='docgen')
-    def test_person_visa_letter(self):
+    def test_person_invitation_letter(self):
         """
-        Test online visa letter creation.
+        Test online invitation letter creation.
         """
         admin_session = self.get_session('admin')
         admin_session.create_person('XMO 2015 Staff', 'Coordinator')
         admin_session.check_open_relative('person1')
         admin_session.b.select_form(
             admin_session.get_main().find_all('form')[3])
-        visa_response = admin_session.check_submit_selected(html=False)
-        self.assertEqual(visa_response.headers['content-type'],
+        invitation_response = admin_session.check_submit_selected(html=False)
+        self.assertEqual(invitation_response.headers['content-type'],
                          'application/pdf')
-        self.assertEqual(visa_response.headers['content-disposition'],
-                         'attachment; filename=visa-letter-person1.pdf')
-        self.assertTrue(visa_response.content.startswith(b'%PDF-'))
+        self.assertEqual(invitation_response.headers['content-disposition'],
+                         'attachment; filename=invitation-letter-person1.pdf')
+        self.assertTrue(invitation_response.content.startswith(b'%PDF-'))
 
     @_with_config(docgen_directory='docgen')
-    def test_person_visa_letter_errors(self):
+    def test_person_invitation_letter_errors(self):
         """
-        Test errors from online visa letter creation.
+        Test errors from online invitation letter creation.
         """
         admin_session = self.get_session('admin')
         admin_session.create_person('XMO 2015 Staff', 'Coordinator')
@@ -10722,33 +10722,33 @@ class RegSystemTestCase(unittest.TestCase):
         form = admin_session.get_main().find_all('form')[3]
         admin_session.b.select_form(form)
         with open(os.path.join(self.instance.docgen_dir, 'templates',
-                               'visa-letter-template.tex'), 'w') as f:
+                               'invitation-letter-template.tex'), 'w') as f:
             f.write(r'\notavalidlatexdocument')
-        visa_response = admin_session.check_submit_selected(html=False,
-                                                            mail=True)
-        self.assertEqual(visa_response.headers['content-type'],
+        invitation_response = admin_session.check_submit_selected(html=False,
+                                                                  mail=True)
+        self.assertEqual(invitation_response.headers['content-type'],
                          'text/plain; charset=UTF-8')
-        self.assertIn(b'notavalidlatexdocument', visa_response.content)
+        self.assertIn(b'notavalidlatexdocument', invitation_response.content)
         self.assertIn(b'notavalidlatexdocument', admin_session.last_mail_dec)
 
-    def test_person_visa_letter_none(self):
+    def test_person_invitation_letter_none(self):
         """
-        Test online visa letter creation disabled.
+        Test online invitation letter creation disabled.
         """
         admin_session = self.get_session('admin')
         admin_session.create_person('XMO 2015 Staff', 'Coordinator')
         admin_session.check_open_relative('person1')
         form_list = admin_session.get_main().find_all('form')
         self.assertEqual(len(form_list), 2)
-        # Modify the previous form to use the visa_letter action to
-        # test the error when no document generation directory is
+        # Modify the previous form to use the invitation_letter action
+        # to test the error when no document generation directory is
         # configured.
         form = form_list[1]
         submit = form.find('input', type='submit')
         self.assertEqual(submit['value'],
                          'Remove this person (requires confirmation)')
         admin_session.b.select_form(form)
-        admin_session.b.get_current_form().set('@action', 'visa_letter',
+        admin_session.b.get_current_form().set('@action', 'invitation_letter',
                                                force=True)
         admin_session.check_submit_selected(error='Online document generation '
                                             'not enabled')

@@ -295,7 +295,7 @@ the registration system is not active.
 * When the registration system is configured to collect passport
   numbers and nationality information, it also asks for participants'
   names as in their passports if different from the names given for
-  the website and name badges and needed for visa invitation letters.
+  the website and name badges and needed for invitation letters.
   :file:`person.item.html` is updated accordingly.
 
 * Countries can be registered in bulk by uploading a CSV file of
@@ -346,10 +346,10 @@ the registration system is not active.
   :file:`user.item.html` have been updated to use more consistent
   spelling.
 
-* Visa invitation letters can be generated using
+* Invitation letters can be generated using
   :command:`mo-document-generate`, and online from the registration
   system.  A new document generation template
-  :file:`visa-letter-template.tex` is used for this purpose.
+  :file:`invitation-letter-template.tex` is used for this purpose.
 
 Version 2018.02.0 (11 February 2018)
 ------------------------------------

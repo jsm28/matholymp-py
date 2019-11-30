@@ -166,11 +166,12 @@ please inform the people you register of this information.
 
 <tal:block tal:condition="python:utils.have_passport_numbers(db._db) and utils.have_nationality(db._db)">
  <tr tal:condition="context/is_edit_ok">
-  <td colspan="2">If a visa invitation letter is required for this
-  participant, and the name on their passport is not the same as
-  that given above for use on the website and their name badge, please
-  enter their name here exactly as it appears in their passport with
-  passport number and nationality given above.</td>
+  <td colspan="2">If an official invitation letter is required for
+  this participant (e.g. for a visa application), and the name on
+  their passport is not the same as that given above for use on the
+  website and their name badge, please enter their name here exactly
+  as it appears in their passport with passport number and nationality
+  given above.</td>
  </tr>
  <tr tal:condition="context/is_edit_ok"
      tal:define="name string:passport_given_name; label string:Given name (as in passport); value context/passport_given_name; edit_ok edit_ok">
@@ -595,13 +596,13 @@ select the appropriate options.  You must select &ldquo;Yes&rdquo; or
 
 <tal:block tal:condition="context/id">
 <tal:block tal:condition="python:not db._db.person.is_retired(context.id)">
-<tal:block tal:condition="python:db._db.config.ext['MATHOLYMP_DOCGEN_DIRECTORY'] and request.user.hasPermission('GenerateVisaLetters')">
+<tal:block tal:condition="python:db._db.config.ext['MATHOLYMP_DOCGEN_DIRECTORY'] and request.user.hasPermission('GenerateInvitationLetters')">
 <form method="GET" tal:attributes="action context/designator">
 <table class="form">
 <tr>
 <td>
-<input type="hidden" name="@action" value="visa_letter">
-<input type="submit" value="Generate visa invitation letter">
+<input type="hidden" name="@action" value="invitation_letter">
+<input type="submit" value="Generate invitation letter">
 </td>
 </tr>
 </table>
