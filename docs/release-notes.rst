@@ -350,6 +350,7 @@ the registration system is not active.
   :command:`mo-document-generate`, and online from the registration
   system.  A new document generation template
   :file:`invitation-letter-template.tex` is used for this purpose.
+  :file:`person.item.html` is updated accordingly.
 
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
