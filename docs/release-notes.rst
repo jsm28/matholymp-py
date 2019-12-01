@@ -359,7 +359,11 @@ the registration system is not active.
 
 * Some page templates for the registration system are changed to fix
   HTML validation errors.  The affected templates are
-  :file:`dpage.html` and :file:`page.html`.
+  :file:`country.index.html`, :file:`dpage.html`, :file:`page.html`,
+  :file:`person.index.html`, :file:`person.rooms.html`,
+  :file:`person.scoreboard.html`, :file:`person.scoredisplay.html`,
+  :file:`person.scoreenter.html`, :file:`person.scoreselect.html` and
+  :file:`person.status.html`.	      
 
 Version 2018.02.0 (11 February 2018)
 ------------------------------------

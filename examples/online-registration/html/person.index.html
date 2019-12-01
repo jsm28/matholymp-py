@@ -13,7 +13,7 @@
  and request.user.hasRole('Anonymous')"
  i18n:translate="">Please login with your username and password.</span>
 
-<span tal:condition="context/is_view_ok">
+<tal:block tal:condition="context/is_view_ok">
 
 <p tal:condition="context/is_view_ok">The details of registered people
   may also be <a href="person?@action=people_csv">downloaded in UTF-8
@@ -56,7 +56,7 @@
 
 <tal:block tal:replace="structure python:utils.all_people_table(db._db)" />
 
-</span>
+</tal:block>
 
 </td>
 

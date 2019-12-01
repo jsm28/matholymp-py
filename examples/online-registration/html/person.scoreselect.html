@@ -15,7 +15,7 @@
  and request.user.hasRole('Anonymous')"
  i18n:translate="">Please login with your username and password.</span>
 
-<span tal:condition="python:request.user.hasPermission('Score')">
+<tal:block tal:condition="python:request.user.hasPermission('Score')">
 
 <form method="GET"
       name="itemSynopsis"
@@ -53,7 +53,7 @@
 
 </form>
 
-</span>
+</tal:block>
 
 </td>
 

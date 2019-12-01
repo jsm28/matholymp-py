@@ -14,18 +14,18 @@
  and request.user.hasRole('Anonymous')"
  i18n:translate="">Please login with your username and password.</span>
 
-<span tal:condition="python:request.user.hasPermission('Omnivident')">
+<tal:block tal:condition="python:request.user.hasPermission('Omnivident')">
 
 <tal:block tal:replace="structure python:utils.registration_status(db._db, utils.anti_csrf_nonce())" />
 
-</span>
+</tal:block>
 
-<span tal:condition="python:request.user.hasPermission('RegistrationStatus')
-                     and not request.user.hasPermission('Omnivident')">
+<tal:block tal:condition="python:request.user.hasPermission('RegistrationStatus')
+			  and not request.user.hasPermission('Omnivident')">
 
 <tal:block tal:replace="structure python:utils.registration_status_country(db._db, db._db.user.get(request.user.id, 'country'))" />
 
-</span>
+</tal:block>
 
 </td>
 

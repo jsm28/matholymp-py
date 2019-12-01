@@ -14,7 +14,7 @@
  and request.user.hasRole('Anonymous')"
  i18n:translate="">Please login with your username and password.</span>
 
-<span tal:condition="python:request.user.hasPermission('BulkRegisterPerson')">
+<tal:block tal:condition="python:request.user.hasPermission('BulkRegisterPerson')">
 
 <form method="POST"
       name="itemSynopsis"
@@ -69,7 +69,7 @@ registration.
 
 </form>
 
-</span>
+</tal:block>
 
 </td>
 

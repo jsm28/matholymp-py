@@ -14,7 +14,7 @@
  and request.user.hasRole('Anonymous')"
  i18n:translate="">Please login with your username and password.</span>
 
-<span tal:condition="python:request.user.hasPermission('BulkRegisterCountry')">
+<tal:block tal:condition="python:request.user.hasPermission('BulkRegisterCountry')">
 
 <p>Check these country details carefully.  If OK, click to complete
 bulk registration; if not OK, try uploading a fixed CSV file.</p>
@@ -39,7 +39,7 @@ bulk registration; if not OK, try uploading a fixed CSV file.</p>
 </table>
 </form>
 
-</span>
+</tal:block>
 
 </td>
 

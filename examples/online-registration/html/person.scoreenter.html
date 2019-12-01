@@ -14,17 +14,17 @@
  and request.user.hasRole('Anonymous')"
  i18n:translate="">Please login with your username and password.</span>
 
-<span tal:condition="python:request.user.hasPermission('Score')">
+<tal:block tal:condition="python:request.user.hasPermission('Score')">
 
-<span tal:condition="python:not utils.valid_country_problem(db._db,
-		     request.form)">
+<tal:block tal:condition="python:not utils.valid_country_problem(db._db,
+			  request.form)">
 <p class="error-message">Invalid country or
   problem, <a href="person?@template=scoreselect">please enter
   another</a>.</p>
-</span>
+</tal:block>
 
-<span tal:condition="python:utils.valid_country_problem(db._db,
-		     request.form)">
+<tal:block tal:condition="python:utils.valid_country_problem(db._db,
+			  request.form)">
 
 <h2 tal:content="python:'Entering scores for ' +
 		 db._db.country.getnode(request.form['country'].value).name
@@ -73,9 +73,9 @@
 </table>
 </form>
 
-</span>
+</tal:block>
 
-</span>
+</tal:block>
 
 </td>
 

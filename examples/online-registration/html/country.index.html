@@ -13,7 +13,7 @@
  and request.user.hasRole('Anonymous')"
  i18n:translate="">Please login with your username and password.</span>
 
-<span tal:condition="context/is_view_ok">
+<tal:block tal:condition="context/is_view_ok">
 
 <p>The list of countries may also be
   <a href="country?@action=country_csv">downloaded in UTF-8 CSV
@@ -23,7 +23,7 @@
   <a href="country?@action=flags_zip">ZIP file of country flags</a> is
   also available.</p>
 
-</span>
+</tal:block>
 
 <table width="100%" tal:condition="context/is_view_ok" class="list">
 <tr>

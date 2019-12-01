@@ -14,7 +14,7 @@
  and request.user.hasRole('Anonymous')"
  i18n:translate="">Please login with your username and password.</span>
 
-<span tal:condition="python:request.user.hasPermission('EditRooms')">
+<tal:block tal:condition="python:request.user.hasPermission('EditRooms')">
 
 <p>After entering or editing room numbers, use the &lsquo;Save changes
 to room numbers&rsquo; button to save the changes and view the results
@@ -34,7 +34,7 @@ sorted by room number.</p>
 <input type="submit" value="Save changes to room numbers">
 </form>
 
-</span>
+</tal:block>
 
 </td>
 

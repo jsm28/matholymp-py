@@ -19,7 +19,7 @@
  and request.user.hasRole('Anonymous')"
  i18n:translate="">Please login with your username and password.</span>
 
-<span tal:condition="context/is_view_ok">
+<tal:block tal:condition="context/is_view_ok">
 
 <p tal:condition="context/is_view_ok">The table of scores may also
   be <a href="person?@action=scores_csv">downloaded in UTF-8 CSV
@@ -28,7 +28,7 @@
 
 <tal:block tal:replace="structure python:utils.scoreboard(db._db, request.user.hasPermission('Score'))" />
 
-</span>
+</tal:block>
 
 </td>
 
