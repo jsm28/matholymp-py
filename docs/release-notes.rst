@@ -365,6 +365,10 @@ the registration system is not active.
   :file:`person.scoreenter.html`, :file:`person.scoreselect.html` and
   :file:`person.status.html`.	      
 
+* The example :file:`dpage.html` and :file:`page.html` for the
+  registration system are changed to use an HTML 5 DOCTYPE and specify
+  ``lang="en"`` on the ``html`` tag.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 
