@@ -430,6 +430,9 @@ the registration system is not active.
   photos, so matching the lists in the static site which does not have
   such ZIP files, unless logged in administratively.
 
+* The example :file:`page.html` for the registration system is changed
+  to make the division between links in the sidebar clearer.
+
 Version 2017.05.0 (1 May 2017)
 ------------------------------
 

@@ -29,112 +29,117 @@ columns string:id;
 
  <div class="sidebar">
 
-  <p tal:condition="python:request.user.hasPermission('View', 'country')" class="classblock">
-   <b i18n:translate="">Quick links</b><br>
-   <span tal:condition="python:request.user.hasPermission('View', 'country')
-                            or request.user.hasPermission('Edit', 'country')">
-    <a href="country"  i18n:translate="">Country List</a><br>
-   <span tal:condition="python:request.user.hasPermission('View', 'person')
-                            or request.user.hasPermission('Edit', 'person')">
-    <a href="person"  i18n:translate="">List registered participants</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('View', 'person')
-                            or request.user.hasPermission('Edit', 'person')">
-    <a href="person?@template=scoreboard"  i18n:translate="">Scoreboard</a><br>
-   </span>
-   </span>
-   <b i18n:translate="">Administration</b><br>
-   <span tal:condition="python:request.user.hasPermission('Edit', None)">
-    <a href="home?@template=classlist" i18n:translate="">Class List</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('Create', 'user')">
-    <a href="user"  i18n:translate="">User List</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('Create', 'user')">
-    <a href="user?@template=item" i18n:translate="">Add User</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('Create', 'country')">
-    <a href="country?@template=item" i18n:translate="">Add Country</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('BulkRegisterCountry')">
-    <a href="country?@template=bulkregister" i18n:translate="">Bulk register countries</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('RegistrationStatus')">
-    <a href="person?@template=status" i18n:translate="">Registration Status</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('EditRooms')">
-    <a href="person?@template=rooms" i18n:translate="">View and edit room allocations</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('Score')">
-    <a href="person?@template=scoreselect"  i18n:translate="">Enter scores</a><br>
-   </span>
-   <span tal:condition="python:utils.show_prereg_sidebar(db._db, request.user.id)">
-    <a tal:attributes="href python:'country%s?@template=prereg' % request.user.country.id" i18n:translate="">Confirm expected numbers of participants and single room requests</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('Create',
-			'person') and
-			request.user.hasPermission('RegisterAllCountries')">
-    <a href="person?@template=item">Register new participant</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('Create',
-			'person') and not
-			request.user.hasPermission('RegisterAllCountries')
-			and not (db._db.event.get('1',
-			'preregistration_enabled') and not
-			request.user.hasPermission('RegisterAnyTime')
-			and not db._db.event.get('1', 'registration_enabled'))">
+   <h2 i18n:translate="">Quick links</h2>
+   <ul>
+   <li tal:condition="python:request.user.hasPermission('View', 'country')
+                      or request.user.hasPermission('Edit', 'country')">
+    <a href="country" i18n:translate="">Country List</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('View', 'person')
+                      or request.user.hasPermission('Edit', 'person')">
+    <a href="person" i18n:translate="">List registered participants</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('View', 'person')
+                      or request.user.hasPermission('Edit', 'person')">
+    <a href="person?@template=scoreboard"  i18n:translate="">Scoreboard</a>
+   </li>
+   </ul>
+
+  <div tal:condition="python:request.user.username != 'anonymous'">
+   <h2 i18n:translate="">Administration</h2>
+   <ul>
+   <li tal:condition="python:request.user.hasPermission('Edit', None)">
+    <a href="home?@template=classlist" i18n:translate="">Class List</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('Create', 'user')">
+    <a href="user"  i18n:translate="">User List</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('Create', 'user')">
+    <a href="user?@template=item" i18n:translate="">Add User</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('Create', 'country')">
+    <a href="country?@template=item" i18n:translate="">Add Country</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('BulkRegisterCountry')">
+    <a href="country?@template=bulkregister" i18n:translate="">Bulk register countries</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('RegistrationStatus')">
+    <a href="person?@template=status" i18n:translate="">Registration Status</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('EditRooms')">
+    <a href="person?@template=rooms" i18n:translate="">View and edit room allocations</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('Score')">
+    <a href="person?@template=scoreselect"  i18n:translate="">Enter scores</a>
+   </li>
+   <li tal:condition="python:utils.show_prereg_sidebar(db._db, request.user.id)">
+    <a tal:attributes="href python:'country%s?@template=prereg' % request.user.country.id" i18n:translate="">Confirm expected numbers of participants and single room requests</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('Create',
+		      'person') and
+		      request.user.hasPermission('RegisterAllCountries')">
+    <a href="person?@template=item">Register new participant</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('Create',
+		      'person') and not
+		      request.user.hasPermission('RegisterAllCountries')
+		      and not (db._db.event.get('1',
+		      'preregistration_enabled') and not
+		      request.user.hasPermission('RegisterAnyTime')
+		      and not db._db.event.get('1', 'registration_enabled'))">
     <a tal:attributes="href python:'person?@template=item&country=' +
-    request.user.country.id">Register new participant</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('BulkRegisterPerson')">
-    <a href="person?@template=bulkregister" i18n:translate="">Bulk register participants</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('Edit', 'matholymprole')">
-    <a href="matholymprole"  i18n:translate="">Role List</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('Create', 'matholymprole')">
-    <a href="matholymprole?@template=item" i18n:translate="">Add Role</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('Edit', 'tshirt')">
-    <a href="tshirt"  i18n:translate="">T-shirt Size List</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('Create', 'tshirt')">
-    <a href="tshirt?@template=item" i18n:translate="">Add T-shirt Size</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('Edit', 'language')">
-    <a href="language"  i18n:translate="">Language List</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('Create', 'language')">
-    <a href="language?@template=item" i18n:translate="">Add Language</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('Edit', 'arrival')">
-    <a href="arrival"  i18n:translate="">Arrival/Departure Point List</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('Create', 'arrival')">
-    <a href="arrival?@template=item" i18n:translate="">Add Arrival/Departure Point</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('Edit', 'room_type')">
-    <a href="room_type"  i18n:translate="">Room Type List</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('Create', 'room_type')">
-    <a href="room_type?@template=item" i18n:translate="">Add Room Type</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('Edit', 'badge_type')">
-    <a href="badge_type"  i18n:translate="">Badge Type List</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('Create', 'badge_type')">
-    <a href="badge_type?@template=item" i18n:translate="">Add Badge Type</a><br>
-   </span>
-   <span tal:condition="python:request.user.hasPermission('Edit', 'event')">
+		       request.user.country.id">Register new participant</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('BulkRegisterPerson')">
+    <a href="person?@template=bulkregister" i18n:translate="">Bulk register participants</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('Edit', 'matholymprole')">
+    <a href="matholymprole"  i18n:translate="">Role List</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('Create', 'matholymprole')">
+    <a href="matholymprole?@template=item" i18n:translate="">Add Role</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('Edit', 'tshirt')">
+    <a href="tshirt"  i18n:translate="">T-shirt Size List</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('Create', 'tshirt')">
+    <a href="tshirt?@template=item" i18n:translate="">Add T-shirt Size</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('Edit', 'language')">
+    <a href="language"  i18n:translate="">Language List</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('Create', 'language')">
+    <a href="language?@template=item" i18n:translate="">Add Language</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('Edit', 'arrival')">
+    <a href="arrival"  i18n:translate="">Arrival/Departure Point List</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('Create', 'arrival')">
+    <a href="arrival?@template=item" i18n:translate="">Add Arrival/Departure Point</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('Edit', 'room_type')">
+    <a href="room_type"  i18n:translate="">Room Type List</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('Create', 'room_type')">
+    <a href="room_type?@template=item" i18n:translate="">Add Room Type</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('Edit', 'badge_type')">
+    <a href="badge_type"  i18n:translate="">Badge Type List</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('Create', 'badge_type')">
+    <a href="badge_type?@template=item" i18n:translate="">Add Badge Type</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('Edit', 'event')">
     <a href="event1"  i18n:translate="">Set medal boundaries or
-    disable registration</a><br>
-   </span>
-  </p>
+    disable registration</a>
+   </li>
+   </ul>
+  </div>
 
   <form method="POST" tal:condition="python:request.user.username=='anonymous'"
         tal:attributes="action request/base">
-   <p class="userblock">
-    <b i18n:translate="">Login</b><br>
+    <h2 i18n:translate="">Login</h2>
+    <p class="userblock">
     <b i18n:translate="">User name</b><br>
     <input size="10" name="__login_name"><br>
     <b i18n:translate="">Password</b><br>
@@ -159,16 +164,20 @@ columns string:id;
    </p>
   </form>
 
-  <p class="userblock" tal:condition="python:request.user.username != 'anonymous'">
-   <b i18n:translate="">Hello, <span i18n:name="user"
-    tal:replace="python:request.user.username.plain(escape=1)">username</span></b><br>
-   <a href="#" tal:attributes="href string:user${request/user/id}"
-    i18n:translate="">Your Details</a><br>
-   <a href="#" tal:attributes="href python:request.indexargs_url('',
-       {'@action':'logout'})" i18n:translate="">Logout</a><br>
-    This site uses cookies to track logged-in users.  Please log out
-    when you have finished registering people.<br>
-  </p>
+  <div tal:condition="python:request.user.username != 'anonymous'">
+   <h2 i18n:translate="">Hello, <span i18n:name="user"
+    tal:replace="python:request.user.username.plain(escape=1)">username</span></h2>
+   <ul>
+   <li><a href="#" tal:attributes="href string:user${request/user/id}"
+    i18n:translate="">Your Details</a></li>
+   <li><a href="#" tal:attributes="href python:request.indexargs_url('',
+       {'@action':'logout'})" i18n:translate="">Logout</a></li>
+   </ul>
+   <p class="userblock">
+     This site uses cookies to track logged-in users.  Please log out
+     when you have finished registering people.<br>
+   </p>
+  </div>
  </div>
 </td>
 <td id="xmo-main">
