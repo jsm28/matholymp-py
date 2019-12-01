@@ -357,6 +357,10 @@ the registration system is not active.
 * The example :file:`page.html` for the registration system is changed
   to make the division between links in the sidebar clearer.
 
+* Some page templates for the registration system are changed to fix
+  HTML validation errors.  The affected templates are
+  :file:`dpage.html` and :file:`page.html`.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 
