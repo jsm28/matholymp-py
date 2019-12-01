@@ -340,7 +340,8 @@ the registration system is not active.
   :file:`documentgen.cfg`, or is empty if that directory is not
   available, in which case online badge generation is not supported.
   A new variable ``matholymp_badge_use_background`` must also be
-  specified.  :file:`person.item.html` is updated accordingly.
+  specified.  :file:`person.item.html` and :file:`person.index.html`
+  are updated accordingly.
 
 * :file:`country.item.html`, :file:`person.item.html` and
   :file:`user.item.html` have been updated to use more consistent
@@ -350,7 +351,8 @@ the registration system is not active.
   :command:`mo-document-generate`, and online from the registration
   system.  A new document generation template
   :file:`invitation-letter-template.tex` is used for this purpose.
-  :file:`person.item.html` is updated accordingly.
+  :file:`person.item.html` and :file:`person.index.html` are updated
+  :file:accordingly.
 
 Version 2018.02.0 (11 February 2018)
 ------------------------------------

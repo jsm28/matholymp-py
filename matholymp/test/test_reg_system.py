@@ -33,6 +33,7 @@ Tests for matholymp registration system.
 
 import base64
 import codecs
+import io
 import os
 import os.path
 import random
@@ -10638,12 +10639,6 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_person('XMO 2015 Staff', 'Coordinator')
         admin_session.check_open_relative('person1')
         form = admin_session.get_main().find_all('form')[2]
-        form['action'] = 'person'
-        admin_session.b.select_form(form)
-        admin_session.check_submit_selected(error='No id specified for '
-                                            'document generation')
-        admin_session.check_open_relative('person1')
-        form = admin_session.get_main().find_all('form')[2]
         form['action'] = 'country1'
         admin_session.b.select_form(form)
         admin_session.check_submit_selected(error='Invalid class for document '
@@ -10682,6 +10677,105 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.check_submit_selected(error='Online document generation '
                                             'not enabled')
 
+    @_with_config(docgen_directory='docgen', badge_use_background='No')
+    def test_person_name_badge_zip(self):
+        """
+        Test online name badge zip creation.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        admin_session.create_person('XMO 2015 Staff', 'Problem Selection')
+        admin_session.check_open_relative('person')
+        admin_session.select_main_form()
+        zip_response = admin_session.check_submit_selected(html=False)
+        self.assertEqual(zip_response.headers['content-type'],
+                         'application/zip')
+        self.assertEqual(zip_response.headers['content-disposition'],
+                         'attachment; filename=badges.zip')
+        zip_io = io.BytesIO(zip_response.content)
+        zip_zip = zipfile.ZipFile(zip_io, 'r')
+        zip_contents = [f.filename for f in zip_zip.infolist()]
+        expected_contents = ['badges/badge-person1.pdf',
+                             'badges/badge-person2.pdf']
+        self.assertEqual(zip_contents, expected_contents)
+        self.assertTrue(zip_zip.read('badges/badge-person1.pdf').startswith(
+            b'%PDF-'))
+        self.assertTrue(zip_zip.read('badges/badge-person2.pdf').startswith(
+            b'%PDF-'))
+        zip_zip.close()
+
+    @_with_config(docgen_directory='docgen')
+    def test_person_name_badge_zip_background(self):
+        """
+        Test online name badge zip creation, with background.
+        """
+        pdf_filename, dummy = self.gen_test_pdf()
+        shutil.copyfile(pdf_filename,
+                        self.instance.docgen_badge_background_pdf)
+        admin_session = self.get_session('admin')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        admin_session.create_person('XMO 2015 Staff', 'Problem Selection')
+        admin_session.check_open_relative('person')
+        admin_session.select_main_form()
+        zip_response = admin_session.check_submit_selected(html=False)
+        self.assertEqual(zip_response.headers['content-type'],
+                         'application/zip')
+        self.assertEqual(zip_response.headers['content-disposition'],
+                         'attachment; filename=badges.zip')
+        zip_io = io.BytesIO(zip_response.content)
+        zip_zip = zipfile.ZipFile(zip_io, 'r')
+        zip_contents = [f.filename for f in zip_zip.infolist()]
+        expected_contents = ['badges/badge-person1.pdf',
+                             'badges/badge-person2.pdf']
+        self.assertEqual(zip_contents, expected_contents)
+        self.assertTrue(zip_zip.read('badges/badge-person1.pdf').startswith(
+            b'%PDF-'))
+        self.assertTrue(zip_zip.read('badges/badge-person2.pdf').startswith(
+            b'%PDF-'))
+        zip_zip.close()
+
+    @_with_config(docgen_directory='docgen')
+    def test_person_name_badge_zip_errors(self):
+        """
+        Test errors from online name badge zip creation.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        admin_session.create_person('XMO 2015 Staff', 'Problem Selection')
+        admin_session.check_open_relative('person')
+        admin_session.select_main_form()
+        # The error here is that this test is configured to use a
+        # background but none is available.
+        zip_response = admin_session.check_submit_selected(html=False,
+                                                           mail=True)
+        self.assertEqual(zip_response.headers['content-type'],
+                         'text/plain; charset=UTF-8')
+        self.assertIn(b'lanyard-generic.pdf', zip_response.content)
+        self.assertIn(b'lanyard-generic.pdf', admin_session.last_mail_dec)
+
+    def test_person_name_badge_zip_none(self):
+        """
+        Test online name badge zip creation disabled.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        admin_session.check_open_relative('person1')
+        form_list = admin_session.get_main().find_all('form')
+        self.assertEqual(len(form_list), 2)
+        # Modify the previous form to use the name_badge action to
+        # test the error when no document generation directory is
+        # configured, and to try to create a zip file.
+        form = form_list[1]
+        form['action'] = 'person'
+        submit = form.find('input', type='submit')
+        self.assertEqual(submit['value'],
+                         'Remove this person (requires confirmation)')
+        admin_session.b.select_form(form)
+        admin_session.b.get_current_form().set('@action', 'name_badge',
+                                               force=True)
+        admin_session.check_submit_selected(error='Online document generation '
+                                            'not enabled')
+
     @_with_config(docgen_directory='docgen')
     def test_person_invitation_letter(self):
         """
@@ -10706,12 +10800,6 @@ class RegSystemTestCase(unittest.TestCase):
         """
         admin_session = self.get_session('admin')
         admin_session.create_person('XMO 2015 Staff', 'Coordinator')
-        admin_session.check_open_relative('person1')
-        form = admin_session.get_main().find_all('form')[3]
-        form['action'] = 'person'
-        admin_session.b.select_form(form)
-        admin_session.check_submit_selected(error='No id specified for '
-                                            'document generation')
         admin_session.check_open_relative('person1')
         form = admin_session.get_main().find_all('form')[3]
         form['action'] = 'country1'
@@ -10744,6 +10832,81 @@ class RegSystemTestCase(unittest.TestCase):
         # to test the error when no document generation directory is
         # configured.
         form = form_list[1]
+        submit = form.find('input', type='submit')
+        self.assertEqual(submit['value'],
+                         'Remove this person (requires confirmation)')
+        admin_session.b.select_form(form)
+        admin_session.b.get_current_form().set('@action', 'invitation_letter',
+                                               force=True)
+        admin_session.check_submit_selected(error='Online document generation '
+                                            'not enabled')
+
+    @_with_config(docgen_directory='docgen')
+    def test_person_invitation_letter_zip(self):
+        """
+        Test online invitation letter zip creation.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        admin_session.create_person('XMO 2015 Staff', 'Problem Selection')
+        admin_session.check_open_relative('person')
+        admin_session.b.select_form(
+            admin_session.get_main().find_all('form')[1])
+        zip_response = admin_session.check_submit_selected(html=False)
+        self.assertEqual(zip_response.headers['content-type'],
+                         'application/zip')
+        self.assertEqual(zip_response.headers['content-disposition'],
+                         'attachment; filename=invitation-letters.zip')
+        zip_io = io.BytesIO(zip_response.content)
+        zip_zip = zipfile.ZipFile(zip_io, 'r')
+        zip_contents = [f.filename for f in zip_zip.infolist()]
+        expected_contents = [
+            'invitation-letters/invitation-letter-person1.pdf',
+            'invitation-letters/invitation-letter-person2.pdf']
+        self.assertEqual(zip_contents, expected_contents)
+        self.assertTrue(zip_zip.read(
+            'invitation-letters/invitation-letter-person1.pdf').startswith(
+                b'%PDF-'))
+        self.assertTrue(zip_zip.read(
+            'invitation-letters/invitation-letter-person2.pdf').startswith(
+                b'%PDF-'))
+        zip_zip.close()
+
+    @_with_config(docgen_directory='docgen')
+    def test_person_invitation_letter_zip_errors(self):
+        """
+        Test errors from online invitation letter zip creation.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        admin_session.create_person('XMO 2015 Staff', 'Problem Selection')
+        admin_session.check_open_relative('person')
+        admin_session.b.select_form(
+            admin_session.get_main().find_all('form')[1])
+        with open(os.path.join(self.instance.docgen_dir, 'templates',
+                               'invitation-letter-template.tex'), 'w') as f:
+            f.write(r'\notavalidlatexdocument')
+        zip_response = admin_session.check_submit_selected(html=False,
+                                                           mail=True)
+        self.assertEqual(zip_response.headers['content-type'],
+                         'text/plain; charset=UTF-8')
+        self.assertIn(b'notavalidlatexdocument', zip_response.content)
+        self.assertIn(b'notavalidlatexdocument', admin_session.last_mail_dec)
+
+    def test_person_invitation_letter_zip_none(self):
+        """
+        Test online invitation letter zip creation disabled.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        admin_session.check_open_relative('person1')
+        form_list = admin_session.get_main().find_all('form')
+        self.assertEqual(len(form_list), 2)
+        # Modify the previous form to use the invitation_letter action
+        # to test the error when no document generation directory is
+        # configured, and to try to create a zip file.
+        form = form_list[1]
+        form['action'] = 'person'
         submit = form.find('input', type='submit')
         self.assertEqual(submit['value'],
                          'Remove this person (requires confirmation)')

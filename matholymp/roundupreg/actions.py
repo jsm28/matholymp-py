@@ -44,6 +44,7 @@ import os
 import os.path
 import subprocess
 import tempfile
+import zipfile
 
 from PIL import Image
 from roundup.cgi.actions import Action
@@ -396,7 +397,7 @@ class DocumentGenerateAction(Action):
     # Subclasses must set this.
     required_classname = None
 
-    def generate_document(self, docgen, event):
+    def generate_documents(self, docgen):
         """Do the actual document generation."""
         raise NotImplementedError
 
@@ -404,12 +405,22 @@ class DocumentGenerateAction(Action):
         """Return the filename of the generated PDF document."""
         raise NotImplementedError
 
+    def document_list(self, event):
+        """Return the list of generated PDF documents."""
+        raise NotImplementedError
+
+    def zip_filename(self):
+        """Return the filename of the generated zip file."""
+        raise NotImplementedError
+
+    def zip_dirname(self):
+        """Return the directory name in the generated zip file."""
+        raise NotImplementedError
+
     def handle(self):
         """Generate a document."""
         if self.classname != self.required_classname:
             raise ValueError('Invalid class for document generation')
-        if self.nodeid is None:
-            raise ValueError('No id specified for document generation')
         docgen_path = self.db.config.ext['MATHOLYMP_DOCGEN_DIRECTORY']
         if not docgen_path:
             raise ValueError('Online document generation not enabled')
@@ -422,15 +433,32 @@ class DocumentGenerateAction(Action):
                                        os.path.join(docgen_path, 'templates'),
                                        None, None, temp_dir, False)
             try:
-                self.generate_document(docgen, event)
-                doc_filename = self.document_filename()
-                self.client.setHeader('Content-Type', 'application/pdf')
-                self.client.setHeader('Content-Disposition',
-                                      'attachment; filename=%s'
-                                      % doc_filename)
-                doc_path = os.path.join(temp_dir, doc_filename)
-                with open(doc_path, 'rb') as doc_file:
-                    return doc_file.read()
+                self.generate_documents(docgen)
+                if self.nodeid is None:
+                    zip_filename = self.zip_filename()
+                    self.client.setHeader('Content-Type', 'application/zip')
+                    self.client.setHeader('Content-Disposition',
+                                          'attachment; filename=%s'
+                                          % zip_filename)
+                    output = io.BytesIO()
+                    zip_file = zipfile.ZipFile(output, 'w', zipfile.ZIP_STORED)
+                    zip_dir = self.zip_dirname()
+                    for doc_filename in self.document_list(event):
+                        zip_file.write(os.path.join(temp_dir, doc_filename),
+                                       '%s/%s' % (zip_dir, doc_filename))
+                    zip_file.close()
+                    zip_bytes = output.getvalue()
+                    output.close()
+                    return zip_bytes
+                else:
+                    doc_filename = self.document_filename()
+                    self.client.setHeader('Content-Type', 'application/pdf')
+                    self.client.setHeader('Content-Disposition',
+                                          'attachment; filename=%s'
+                                          % doc_filename)
+                    doc_path = os.path.join(temp_dir, doc_filename)
+                    with open(doc_path, 'rb') as doc_file:
+                        return doc_file.read()
             except subprocess.CalledProcessError as e:
                 # Report this error both to the admin and to the web
                 # client.
@@ -439,7 +467,10 @@ class DocumentGenerateAction(Action):
                                               errors='backslashreplace'))
                 send_email(self.db, [],
                            ('Document generation error for %s %s'
-                            % (self.classname, self.nodeid)),
+                            % (self.classname,
+                               self.nodeid
+                               if self.nodeid is not None
+                               else 'all')),
                            msg_text, 'docgen')
                 self.client.setHeader('Content-Type',
                                       'text/plain; charset=UTF-8')
@@ -448,36 +479,57 @@ class DocumentGenerateAction(Action):
 
 class NameBadgeAction(DocumentGenerateAction):
 
-    """Action to generate a person's name badge."""
+    """Action to generate a person's, or everyone's name badge."""
 
     name = 'generate the name badge for'
     permissionType = 'GenerateNameBadges'
     required_classname = 'person'
 
-    def generate_document(self, docgen, event):
-        person = event.person_map[int(self.nodeid)][0]
+    def generate_documents(self, docgen):
         use_background = self.db.config.ext['MATHOLYMP_BADGE_USE_BACKGROUND']
         use_background = boolean_states[use_background.lower()]
-        docgen.generate_badge(person, use_background)
+        docgen.generate_badges(
+            self.nodeid if self.nodeid is not None else 'all',
+            use_background)
 
     def document_filename(self):
         return 'badge-person%s.pdf' % self.nodeid
 
+    def document_list(self, event):
+        return ['badge-person%d.pdf' % p.person.id
+                for p in sorted(event.person_list, key=lambda x: x.sort_key)]
+
+    def zip_filename(self):
+        return 'badges.zip'
+
+    def zip_dirname(self):
+        return 'badges'
+
 
 class InvitationLetterAction(DocumentGenerateAction):
 
-    """Action to generate a person's invitation letter."""
+    """Action to generate a person's, or everyone's, invitation letter."""
 
     name = 'generate the invitation letter for'
     permissionType = 'GenerateInvitationLetters'
     required_classname = 'person'
 
-    def generate_document(self, docgen, event):
-        person = event.person_map[int(self.nodeid)][0]
-        docgen.generate_invitation_letter(person)
+    def generate_documents(self, docgen):
+        docgen.generate_invitation_letters(
+            self.nodeid if self.nodeid is not None else 'all')
 
     def document_filename(self):
         return 'invitation-letter-person%s.pdf' % self.nodeid
+
+    def document_list(self, event):
+        return ['invitation-letter-person%d.pdf' % p.person.id
+                for p in sorted(event.person_list, key=lambda x: x.sort_key)]
+
+    def zip_filename(self):
+        return 'invitation-letters.zip'
+
+    def zip_dirname(self):
+        return 'invitation-letters'
 
 
 class BulkRegisterAction(Action):
