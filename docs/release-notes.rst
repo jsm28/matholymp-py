@@ -354,6 +354,9 @@ the registration system is not active.
   :file:`person.item.html` and :file:`person.index.html` are updated
   :file:accordingly.
 
+* The example :file:`page.html` for the registration system is changed
+  to make the division between links in the sidebar clearer.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 
@@ -429,9 +432,6 @@ the registration system is not active.
   for the registration system no longer link to ZIP files of flags and
   photos, so matching the lists in the static site which does not have
   such ZIP files, unless logged in administratively.
-
-* The example :file:`page.html` for the registration system is changed
-  to make the division between links in the sidebar clearer.
 
 Version 2017.05.0 (1 May 2017)
 ------------------------------
