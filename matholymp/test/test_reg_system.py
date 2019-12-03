@@ -10654,6 +10654,19 @@ class RegSystemTestCase(unittest.TestCase):
                          'text/plain; charset=UTF-8')
         self.assertIn(b'lanyard-generic.pdf', badge_response.content)
         self.assertIn(b'lanyard-generic.pdf', admin_session.last_mail_dec)
+        # Permission error (requires user to have valid form, then
+        # have permissions removed, then try submitting it).
+        admin_session.create_user('admin2', 'XMO 2015 Staff', 'Admin')
+        admin2_session = self.get_session('admin2')
+        admin2_session.check_open_relative('person1')
+        form = admin2_session.get_main().find_all('form')[2]
+        admin2_session.b.select_form(form)
+        admin_session.edit('user', self.instance.userids['admin2'],
+                           {'roles': 'User,Score'})
+        admin2_session.check_submit_selected(error='You do not have '
+                                             'permission to generate the name '
+                                             'badge for',
+                                             status=403)
 
     def test_person_name_badge_none(self):
         """
@@ -10818,6 +10831,19 @@ class RegSystemTestCase(unittest.TestCase):
                          'text/plain; charset=UTF-8')
         self.assertIn(b'notavalidlatexdocument', invitation_response.content)
         self.assertIn(b'notavalidlatexdocument', admin_session.last_mail_dec)
+        # Permission error (requires user to have valid form, then
+        # have permissions removed, then try submitting it).
+        admin_session.create_user('admin2', 'XMO 2015 Staff', 'Admin')
+        admin2_session = self.get_session('admin2')
+        admin2_session.check_open_relative('person1')
+        form = admin2_session.get_main().find_all('form')[3]
+        admin2_session.b.select_form(form)
+        admin_session.edit('user', self.instance.userids['admin2'],
+                           {'roles': 'User,Score'})
+        admin2_session.check_submit_selected(error='You do not have '
+                                             'permission to generate the '
+                                             'invitation letter for',
+                                             status=403)
 
     def test_person_invitation_letter_none(self):
         """
