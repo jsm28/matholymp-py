@@ -122,7 +122,8 @@ def init_schema(env):
                        name=String(),
                        background_name=String(),
                        colour_outer=String(),
-                       colour_inner=String())
+                       colour_inner=String(),
+                       colour_text=String())
     badge_type.setkey('name')
 
     matholymprole = Class(db, 'matholymprole',

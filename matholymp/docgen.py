@@ -323,6 +323,8 @@ class DocumentGenerator:
             person.badge_colour_outer)
         template_fields['colour_inner'] = self.colour_to_latex(
             person.badge_colour_inner)
+        template_fields['colour_text'] = self.colour_to_latex(
+            person.badge_colour_text)
 
         photo_filename = person.badge_photo_filename
         if photo_filename is None:

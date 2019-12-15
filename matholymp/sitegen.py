@@ -1992,7 +1992,8 @@ class SiteGenerator:
                          'Departure Flight', 'Room Type', 'Share Room With',
                          'Room Number', 'Phone Number', 'Badge Photo URL',
                          'Badge Background', 'Badge Outer Colour',
-                         'Badge Inner Colour', 'Consent Form URL',
+                         'Badge Inner Colour', 'Badge Text Colour',
+                         'Consent Form URL',
                          'Passport or Identity Card Number', 'Nationality',
                          'Passport Given Name', 'Passport Family Name',
                          'Event Photos Consent', 'Basic Data Missing'])
@@ -2092,6 +2093,7 @@ class SiteGenerator:
             csv_out['Badge Background'] = p.badge_background or ''
             csv_out['Badge Outer Colour'] = p.badge_colour_outer or ''
             csv_out['Badge Inner Colour'] = p.badge_colour_inner or ''
+            csv_out['Badge Text Colour'] = p.badge_colour_text or ''
             csv_out['Consent Form URL'] = p.consent_form_url or ''
             csv_out['Passport or Identity Card Number'] = (p.passport_number
                                                            or '')

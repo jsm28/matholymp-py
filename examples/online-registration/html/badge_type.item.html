@@ -43,7 +43,7 @@ define="edit_ok context/is_edit_ok"
 
 <form method="POST"
       name="itemSynopsis"
-      tal:define="required python:'name background_name colour_outer colour_inner'.split()"
+      tal:define="required python:'name background_name colour_outer colour_inner colour_text'.split()"
       enctype="multipart/form-data"
       tal:attributes="action context/designator;
       onSubmit python:'return checkRequiredFields(\'%s\')'%'\', \''.join(required);
@@ -81,10 +81,15 @@ define="edit_ok context/is_edit_ok"
   <td><input name="colour_inner" metal:use-macro="normal_input"></td>
  </tr>
 
+ <tr tal:define="name string:colour_text; label string:Text colour; value context/colour_text; edit_ok edit_ok">
+  <th class="required" metal:use-macro="th_label">Text colour</th>
+  <td><input name="colour_text" metal:use-macro="normal_input"></td>
+ </tr>
+
  <tr tal:condition="context/is_edit_ok">
   <td colspan="2">Colours are specified as six-character RGB
   hexadecimal values.  The inner colour is for the background against
-  which the role name is printed in black; the outer colour is for
+  which the role name is printed in the text colour; the outer colour is for
   blocks of solid colour to either side of that.</td>
  </tr>
 
@@ -92,7 +97,7 @@ define="edit_ok context/is_edit_ok"
   <td>
    &nbsp;
    <input type="hidden" name="@template" value="item">
-   <input type="hidden" name="@required" value="name,background_name,colour_outer,colour_inner"
+   <input type="hidden" name="@required" value="name,background_name,colour_outer,colour_inner,colour_text"
           tal:attributes="value python:','.join(required)">
   </td>
   <td><input type="submit" value="save" tal:replace="structure context/submit"><!--submit button here-->
@@ -106,7 +111,7 @@ define="edit_ok context/is_edit_ok"
   <table style="border-style: none; border-collapse: collapse">
     <tr>
       <td tal:attributes="style python:'height: 19.5mm;; width: 20mm;; background-color: #%s' % context.colour_outer.plain()">&nbsp;</td>
-      <td tal:attributes="style python:'height: 19.5mm;; width: 102mm;; font-size: 10mm;; text-align: center;; background-color: #%s' % context.colour_inner.plain()">Role name</td>
+      <td tal:attributes="style python:'height: 19.5mm;; width: 102mm;; font-size: 10mm;; text-align: center;; background-color: #%s;; color: #%s' % (context.colour_inner.plain(), context.colour_text.plain())">Role name</td>
       <td tal:attributes="style python:'height: 19.5mm;; width: 20mm;; background-color: #%s' % context.colour_outer.plain()">&nbsp;</td>
     </tr>
   </table>

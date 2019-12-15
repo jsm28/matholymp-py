@@ -3600,7 +3600,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': 'Some Other Person', 'Room Number': '987',
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '7ab558',
-             'Badge Inner Colour': 'c9deb0', 'Consent Form URL': '',
+             'Badge Inner Colour': 'c9deb0', 'Badge Text Colour': '000000',
+             'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
@@ -3616,7 +3617,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': '', 'Room Number': '', 'Phone Number': '',
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': 'd22027', 'Badge Inner Colour': 'eb9984',
-             'Consent Form URL': '', 'Passport or Identity Card Number': '',
+             'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 2',
              'Passport Family Name': 'Family 2', 'Event Photos Consent': '',
              'Basic Data Missing': 'No'})
@@ -3631,7 +3633,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': '', 'Room Number': '',
              'Phone Number': '9876543210', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
-             'Badge Inner Colour': '9c95cc', 'Consent Form URL': '',
+             'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
+             'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 3',
              'Passport Family Name': 'Family 3', 'Event Photos Consent': '',
@@ -3695,7 +3698,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
-             'Consent Form URL': '', 'Passport or Identity Card Number': '',
+             'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
              'Basic Data Missing': 'No'})
@@ -3755,7 +3759,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
-             'Consent Form URL': '',
+             'Badge Text Colour': '000000', 'Consent Form URL': '',
              'Passport or Identity Card Number': '123456789',
              'Nationality': '', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
@@ -3816,7 +3820,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
-             'Consent Form URL': '', 'Passport or Identity Card Number': '',
+             'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '',
              'Nationality': 'Matholympian', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
              'Basic Data Missing': 'No'})
@@ -3878,7 +3883,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
-             'Consent Form URL': '',
+             'Badge Text Colour': '000000', 'Consent Form URL': '',
              'Passport or Identity Card Number': '123456789',
              'Nationality': 'Matholympian', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
@@ -3941,7 +3946,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': '', 'Room Number': '', 'Phone Number': '',
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
-             'Consent Form URL': '',
+             'Badge Text Colour': '000000', 'Consent Form URL': '',
              'Passport or Identity Card Number': '123456790',
              'Nationality': 'Other-olympian', 'Passport Given Name': 'Random',
              'Passport Family Name': 'Randomer', 'Event Photos Consent': '',
@@ -4005,7 +4010,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
-             'Consent Form URL': '', 'Passport or Identity Card Number': '',
+             'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1',
              'Event Photos Consent': 'Yes', 'Basic Data Missing': 'No'})
@@ -4069,7 +4075,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
-             'Consent Form URL': '', 'Passport or Identity Card Number': '',
+             'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 2',
              'Passport Family Name': 'Family 2', 'Event Photos Consent': 'No',
              'Basic Data Missing': 'No'})
@@ -4139,7 +4146,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Room Type': 'Shared room', 'Share Room With': '',
              'Room Number': '', 'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '7ab558',
-             'Badge Inner Colour': 'c9deb0', 'Consent Form URL': '',
+             'Badge Inner Colour': 'c9deb0', 'Badge Text Colour': '000000',
+             'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
@@ -4238,7 +4246,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': '', 'Room Number': '', 'Phone Number': '',
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '2a3e92', 'Badge Inner Colour': '9c95cc',
-             'Consent Form URL': '', 'Passport or Identity Card Number': '',
+             'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
              'Basic Data Missing': 'No'})
@@ -9770,7 +9779,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': 'Someone', 'Room Number': '',
              'Phone Number': '', 'Badge Photo URL': img_url_csv,
              'Badge Background': 'generic', 'Badge Outer Colour': 'd22027',
-             'Badge Inner Colour': 'eb9984', 'Consent Form URL': cf_url_csv,
+             'Badge Inner Colour': 'eb9984', 'Badge Text Colour': '000000',
+             'Consent Form URL': cf_url_csv,
              'Passport or Identity Card Number': '123',
              'Nationality': 'Matholympian',
              'Passport Given Name': 'Passport given',
@@ -9788,7 +9798,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': 'Someone else', 'Room Number': '',
              'Phone Number': '9876543210', 'Badge Photo URL': img2_url_csv,
              'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
-             'Badge Inner Colour': '9c95cc', 'Consent Form URL': cf2_url_csv,
+             'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
+             'Consent Form URL': cf2_url_csv,
              'Passport or Identity Card Number': '12345',
              'Nationality': 'Matholympian also',
              'Passport Given Name': 'Passport given 2',
@@ -9960,7 +9971,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': '', 'Room Number': '',
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '7ab558',
-             'Badge Inner Colour': 'c9deb0', 'Consent Form URL': '',
+             'Badge Inner Colour': 'c9deb0', 'Badge Text Colour': '000000',
+             'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1',
@@ -9976,7 +9988,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': '', 'Room Number': '',
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
-             'Badge Inner Colour': '9c95cc', 'Consent Form URL': '',
+             'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
+             'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 2',
              'Passport Family Name': 'Family 2',
@@ -11037,7 +11050,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': '', 'Room Number': '',
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': 'f78b11',
-             'Badge Inner Colour': 'fccc8f', 'Consent Form URL': '',
+             'Badge Inner Colour': 'fccc8f', 'Badge Text Colour': '000000',
+             'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given One',
              'Passport Family Name': 'Family One',
@@ -11053,7 +11067,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': '', 'Room Number': '',
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
-             'Badge Inner Colour': '9c95cc', 'Consent Form URL': '',
+             'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
+             'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Test\u00fd',
              'Passport Family Name': 'Test',
@@ -11103,7 +11118,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': '', 'Room Number': '',
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
-             'Badge Inner Colour': '9c95cc', 'Consent Form URL': '',
+             'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
+             'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Test\u00fd',
              'Passport Family Name': 'Doe',
@@ -11227,7 +11243,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': '', 'Room Number': '',
              'Phone Number': '', 'Badge Photo URL': img_url_csv,
              'Badge Background': 'generic', 'Badge Outer Colour': 'f78b11',
-             'Badge Inner Colour': 'fccc8f', 'Consent Form URL': '',
+             'Badge Inner Colour': 'fccc8f', 'Badge Text Colour': '000000',
+             'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given One',
              'Passport Family Name': 'Family One',
@@ -11243,7 +11260,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': '', 'Room Number': '',
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
-             'Badge Inner Colour': '9c95cc', 'Consent Form URL': '',
+             'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
+             'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Test\u00fd',
              'Passport Family Name': 'Test',
@@ -11259,7 +11277,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Share Room With': '', 'Room Number': '',
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
-             'Badge Inner Colour': '9c95cc', 'Consent Form URL': '',
+             'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
+             'Consent Form URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Test\u00fd',
              'Passport Family Name': 'Doe',
@@ -11862,6 +11881,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv[0]['Badge Background'], 'generic')
         self.assertEqual(admin_csv[0]['Badge Outer Colour'], '7ab558')
         self.assertEqual(admin_csv[0]['Badge Inner Colour'], 'c9deb0')
+        self.assertEqual(admin_csv[0]['Badge Text Colour'], '000000')
 
     def test_badge_type_create_audit_errors(self):
         """
@@ -11872,42 +11892,64 @@ class RegSystemTestCase(unittest.TestCase):
                              {'name': 'Random',
                               'background_name': '/../hack',
                               'colour_outer': 'ffffff',
-                              'colour_inner': 'ffffff'},
+                              'colour_inner': 'ffffff',
+                              'colour_text': '000000'},
                              error="Background names must contain only "
                              "alphanumerics, '.', '_' and '-'")
         admin_session.create('badge_type',
                              {'name': 'Random',
                               'background_name': 'random',
                               'colour_outer': '00000g',
-                              'colour_inner': 'ffffff'},
+                              'colour_inner': 'ffffff',
+                              'colour_text': '000000'},
                              error='Outer colour not six hexadecimal '
                              'characters')
         admin_session.create('badge_type',
                              {'name': 'Random',
                               'background_name': 'random',
                               'colour_outer': '000',
-                              'colour_inner': 'ffffff'},
+                              'colour_inner': 'ffffff',
+                              'colour_text': '000000'},
                              error='Outer colour not six hexadecimal '
                              'characters')
         admin_session.create('badge_type',
                              {'name': 'Random',
                               'background_name': 'random',
                               'colour_outer': '000000',
-                              'colour_inner': 'gfffff'},
+                              'colour_inner': 'gfffff',
+                              'colour_text': '000000'},
                              error='Inner colour not six hexadecimal '
                              'characters')
         admin_session.create('badge_type',
                              {'name': 'Random',
                               'background_name': 'random',
                               'colour_outer': '000000',
-                              'colour_inner': 'fffff'},
+                              'colour_inner': 'fffff',
+                              'colour_text': '000000'},
                              error='Inner colour not six hexadecimal '
+                             'characters')
+        admin_session.create('badge_type',
+                             {'name': 'Random',
+                              'background_name': 'random',
+                              'colour_outer': '000000',
+                              'colour_inner': '000000',
+                              'colour_text': 'gfffff'},
+                             error='Text colour not six hexadecimal '
+                             'characters')
+        admin_session.create('badge_type',
+                             {'name': 'Random',
+                              'background_name': 'random',
+                              'colour_outer': '000000',
+                              'colour_inner': '000000',
+                              'colour_text': 'fffff'},
+                             error='Text colour not six hexadecimal '
                              'characters')
         admin_session.create('badge_type',
                              {'name': 'Random',
                               'background_name': 'a-z.A-Z.0_9OK',
                               'colour_outer': 'FeDcBa',
-                              'colour_inner': '987654'})
+                              'colour_inner': '987654',
+                              'colour_text': '3210Ab'})
 
     def test_badge_type_create_audit_errors_missing(self):
         """
@@ -11917,27 +11959,38 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create('badge_type',
                              {'background_name': 'random',
                               'colour_outer': 'ffffff',
-                              'colour_inner': 'ffffff'},
+                              'colour_inner': 'ffffff',
+                              'colour_text': '000000'},
                              error='Required badge_type property name not '
                              'supplied')
         admin_session.create('badge_type',
                              {'name': 'Random',
                               'colour_outer': 'ffffff',
-                              'colour_inner': 'ffffff'},
+                              'colour_inner': 'ffffff',
+                              'colour_text': '000000'},
                              error='Required badge_type property '
                              'background_name not supplied')
         admin_session.create('badge_type',
                              {'name': 'Random',
                               'background_name': 'random',
-                              'colour_inner': 'ffffff'},
+                              'colour_inner': 'ffffff',
+                              'colour_text': '000000'},
                              error='Required badge_type property '
                              'colour_outer not supplied')
         admin_session.create('badge_type',
                              {'name': 'Random',
                               'background_name': 'random',
-                              'colour_outer': 'ffffff'},
+                              'colour_outer': 'ffffff',
+                              'colour_text': '000000'},
                              error='Required badge_type property '
                              'colour_inner not supplied')
+        admin_session.create('badge_type',
+                             {'name': 'Random',
+                              'background_name': 'random',
+                              'colour_outer': 'ffffff',
+                              'colour_inner': 'ffffff'},
+                             error='Required badge_type property '
+                             'colour_text not supplied')
         # The above errors are generic Roundup ones that rely on
         # @required being sent by the browser, so must not be relied
         # upon to maintain required properties of data since the
@@ -11947,26 +12000,37 @@ class RegSystemTestCase(unittest.TestCase):
                              {'@required': '',
                               'background_name': 'random',
                               'colour_outer': 'ffffff',
-                              'colour_inner': 'ffffff'},
+                              'colour_inner': 'ffffff',
+                              'colour_text': '000000'},
                              error='No badge type name specified')
         admin_session.create('badge_type',
                              {'@required': '',
                               'name': 'Random',
                               'colour_outer': 'ffffff',
-                              'colour_inner': 'ffffff'},
+                              'colour_inner': 'ffffff',
+                              'colour_text': '000000'},
                              error='No background name specified')
         admin_session.create('badge_type',
                              {'@required': '',
                               'name': 'Random',
                               'background_name': 'random',
-                              'colour_inner': 'ffffff'},
+                              'colour_inner': 'ffffff',
+                              'colour_text': '000000'},
                              error='No outer colour specified')
         admin_session.create('badge_type',
                              {'@required': '',
                               'name': 'Random',
                               'background_name': 'random',
-                              'colour_outer': 'ffffff'},
+                              'colour_outer': 'ffffff',
+                              'colour_text': '000000'},
                              error='No inner colour specified')
+        admin_session.create('badge_type',
+                             {'@required': '',
+                              'name': 'Random',
+                              'background_name': 'random',
+                              'colour_outer': 'ffffff',
+                              'colour_inner': 'ffffff'},
+                             error='No text colour specified')
 
     def test_badge_type_edit_audit_errors(self):
         """
@@ -11990,10 +12054,17 @@ class RegSystemTestCase(unittest.TestCase):
                            {'colour_inner': 'fffff'},
                            error='Inner colour not six hexadecimal characters')
         admin_session.edit('badge_type', '1',
+                           {'colour_text': 'gfffff'},
+                           error='Text colour not six hexadecimal characters')
+        admin_session.edit('badge_type', '1',
+                           {'colour_text': 'fffff'},
+                           error='Text colour not six hexadecimal characters')
+        admin_session.edit('badge_type', '1',
                            {'name': 'Random',
                             'background_name': 'a-z.A-Z.0_9OK',
                             'colour_outer': 'FeDcBa',
-                            'colour_inner': '987654'})
+                            'colour_inner': '987654',
+                            'colour_text': '0123Da'})
 
     def test_badge_type_edit_audit_errors_missing(self):
         """
@@ -12017,6 +12088,10 @@ class RegSystemTestCase(unittest.TestCase):
                            {'colour_inner': ''},
                            error='Required badge_type property colour_inner '
                            'not supplied')
+        admin_session.edit('badge_type', '1',
+                           {'colour_text': ''},
+                           error='Required badge_type property colour_text '
+                           'not supplied')
         # With @required not sent, the auditor restores the previous
         # values.
         admin_session.edit('badge_type', '1',
@@ -12031,6 +12106,9 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.edit('badge_type', '1',
                            {'@required': '',
                             'colour_inner': ''})
+        admin_session.edit('badge_type', '1',
+                           {'@required': '',
+                            'colour_text': ''})
         # Badge type 1 is Leader.
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
@@ -12044,6 +12122,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv[0]['Badge Background'], 'generic')
         self.assertEqual(admin_csv[0]['Badge Outer Colour'], 'd22027')
         self.assertEqual(admin_csv[0]['Badge Inner Colour'], 'eb9984')
+        self.assertEqual(admin_csv[0]['Badge Text Colour'], '000000')
 
     def test_user_edit_username(self):
         """

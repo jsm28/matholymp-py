@@ -137,55 +137,68 @@ def init_data(env):
     badge_type_leader = badge_type.create(name='Leader',
                                           background_name='generic',
                                           colour_outer='d22027',
-                                          colour_inner='eb9984')
+                                          colour_inner='eb9984',
+                                          colour_text='000000')
     badge_type_deputy = badge_type.create(name='Deputy Leader',
                                           background_name='generic',
                                           colour_outer='fff200',
-                                          colour_inner='fffa99')
+                                          colour_inner='fffa99',
+                                          colour_text='000000')
     badge_type_contestant = badge_type.create(name='Contestant',
                                               background_name='generic',
                                               colour_outer='7ab558',
-                                              colour_inner='c9deb0')
+                                              colour_inner='c9deb0',
+                                              colour_text='000000')
     badge_type_obsa = badge_type.create(name='Observer with Leader',
                                         background_name='generic',
                                         colour_outer='8b0000',
-                                        colour_inner='cd5c5c')
+                                        colour_inner='cd5c5c',
+                                        colour_text='000000')
     badge_type_obsb = badge_type.create(name='Observer with Deputy',
                                         background_name='generic',
                                         colour_outer='ffd700',
-                                        colour_inner='ffef99')
+                                        colour_inner='ffef99',
+                                        colour_text='000000')
     badge_type_obsc = badge_type.create(name='Observer with Contestants',
                                         background_name='generic',
                                         colour_outer='1d8042',
-                                        colour_inner='97c79c')
+                                        colour_inner='97c79c',
+                                        colour_text='000000')
     badge_type_guide = badge_type.create(name='Guide',
                                          background_name='generic',
                                          colour_outer='2a3e92',
-                                         colour_inner='9c95cc')
+                                         colour_inner='9c95cc',
+                                         colour_text='000000')
     badge_type_chiefguide = badge_type.create(name='Chief Guide',
                                               background_name='generic',
                                               colour_outer='2a3e92',
-                                              colour_inner='9c95cc')
+                                              colour_inner='9c95cc',
+                                              colour_text='000000')
     badge_type_coordinator = badge_type.create(name='Coordinator',
                                                background_name='generic',
                                                colour_outer='f78b11',
-                                               colour_inner='fccc8f')
+                                               colour_inner='fccc8f',
+                                               colour_text='000000')
     badge_type_invigilator = badge_type.create(name='Invigilator',
                                                background_name='generic',
                                                colour_outer='d32395',
-                                               colour_inner='eca3d3')
+                                               colour_inner='eca3d3',
+                                               colour_text='000000')
     badge_type_crew = badge_type.create(name='Crew',
                                         background_name='generic',
                                         colour_outer='800080',
-                                        colour_inner='dda0dd')
+                                        colour_inner='dda0dd',
+                                        colour_text='000000')
     badge_type_guest = badge_type.create(name='Guest',
                                          background_name='generic',
                                          colour_outer='a9a9a9',
-                                         colour_inner='dcdcdc')
+                                         colour_inner='dcdcdc',
+                                         colour_text='000000')
     badge_type_organiser = badge_type.create(name='Organiser',
                                              background_name='generic',
                                              colour_outer='231f20',
-                                             colour_inner='a7a6a6')
+                                             colour_inner='a7a6a6',
+                                             colour_text='000000')
 
     # Create standard roles for olympiad participants.
     props_most_admin = rt_props_nc.copy()

@@ -678,6 +678,11 @@ def audit_badge_type_fields(db, cl, nodeid, newvalues):
     if not re.match('^[0-9a-fA-F]{6}\\Z', colour):
         raise ValueError('Inner colour not six hexadecimal characters')
 
+    colour = require_value(db, cl, nodeid, newvalues, 'colour_text',
+                           'No text colour specified')
+    if not re.match('^[0-9a-fA-F]{6}\\Z', colour):
+        raise ValueError('Text colour not six hexadecimal characters')
+
 
 def register_auditors(db):
     """Register the matholymp auditors with Roundup."""

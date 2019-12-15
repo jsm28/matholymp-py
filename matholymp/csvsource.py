@@ -228,6 +228,7 @@ class CSVDataSource(DataSource):
                                   'badge_background': 'Badge Background',
                                   'badge_colour_outer': 'Badge Outer Colour',
                                   'badge_colour_inner': 'Badge Inner Colour',
+                                  'badge_colour_text': 'Badge Text Colour',
                                   'diet': 'Allergies and Dietary Requirements',
                                   'room_type': 'Room Type',
                                   'room_share_with': 'Share Room With',

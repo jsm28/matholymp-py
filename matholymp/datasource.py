@@ -115,14 +115,14 @@ class DataSource:
         given_name, family_name, problem_scores, total_score, award,
         extra_awards, photo_url, photo_filename, badge_photo_url,
         badge_photo_filename, badge_background, badge_colour_outer,
-        badge_colour_inner, consent_form_url, consent_form_filename,
-        languages, diet, room_type, room_share_with, room_number,
-        phone_number, generic_id, gender, date_of_birth,
-        passport_number, nationality, passport_given_name,
-        passport_family_name, tshirt, arrival_place, arrival_date,
-        arrival_time, arrival_flight, departure_place, departure_date,
-        departure_time, departure_flight, event_photos_consent,
-        basic_data_missing.
+        badge_colour_inner, badge_colour_text, consent_form_url,
+        consent_form_filename, languages, diet, room_type,
+        room_share_with, room_number, phone_number, generic_id,
+        gender, date_of_birth, passport_number, nationality,
+        passport_given_name, passport_family_name, tshirt,
+        arrival_place, arrival_date, arrival_time, arrival_flight,
+        departure_place, departure_date, departure_time,
+        departure_flight, event_photos_consent, basic_data_missing.
         """
         raise NotImplementedError
 
