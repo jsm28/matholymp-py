@@ -3418,6 +3418,32 @@ class RegSystemTestCase(unittest.TestCase):
                                     expected_staff])
         self.assertEqual(admin_csv, [expected_abc, expected_def,
                                      expected_staff])
+        # Permission error (requires user to have valid form, then
+        # have permissions removed, then try submitting it).
+        admin_session.create_user('admin2', 'XMO 2015 Staff', 'Admin')
+        admin2_session = self.get_session('admin2')
+        csv_in = [{'Code': 'GHI', 'Name': 'Test Third Country'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin2_session.check_open_relative('country?@template=bulkregister')
+        admin2_session.select_main_form()
+        admin2_session.set({'csv_file': csv_filename})
+        admin_session.edit('user', self.instance.userids['admin2'],
+                           {'roles': 'User,Score'})
+        admin2_session.check_submit_selected(error='You do not have '
+                                             'permission to bulk register',
+                                             status=403)
+        admin_session.edit('user', self.instance.userids['admin2'],
+                           {'roles': 'Admin'})
+        admin2_session.check_open_relative('country?@template=bulkregister')
+        admin2_session.select_main_form()
+        admin2_session.set({'csv_file': csv_filename})
+        admin2_session.check_submit_selected()
+        admin2_session.select_main_form()
+        admin_session.edit('user', self.instance.userids['admin2'],
+                           {'roles': 'User,Score'})
+        admin2_session.check_submit_selected(error='You do not have '
+                                             'permission to bulk register',
+                                             status=403)
 
     @_with_config(distinguish_official='Yes')
     def test_country_bulk_register_errors_official(self):
@@ -11588,6 +11614,33 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_people_csv()
         self.assertEqual(anon_csv, anon_csv_orig)
         self.assertEqual(admin_csv, admin_csv_orig)
+        # Permission error (requires user to have valid form, then
+        # have permissions removed, then try submitting it).
+        admin_session.create_user('admin2', 'XMO 2015 Staff', 'Admin')
+        admin2_session = self.get_session('admin2')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'Coordinator'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin2_session.check_open_relative('person?@template=bulkregister')
+        admin2_session.select_main_form()
+        admin2_session.set({'csv_file': csv_filename})
+        admin_session.edit('user', self.instance.userids['admin2'],
+                           {'roles': 'User,Score'})
+        admin2_session.check_submit_selected(error='You do not have '
+                                             'permission to bulk register',
+                                             status=403)
+        admin_session.edit('user', self.instance.userids['admin2'],
+                           {'roles': 'Admin'})
+        admin2_session.check_open_relative('person?@template=bulkregister')
+        admin2_session.select_main_form()
+        admin2_session.set({'csv_file': csv_filename})
+        admin2_session.check_submit_selected()
+        admin2_session.select_main_form()
+        admin_session.edit('user', self.instance.userids['admin2'],
+                           {'roles': 'User,Score'})
+        admin2_session.check_submit_selected(error='You do not have '
+                                             'permission to bulk register',
+                                             status=403)
 
     @_with_config(static_site_directory='static-site')
     def test_person_bulk_register_errors_static(self):
