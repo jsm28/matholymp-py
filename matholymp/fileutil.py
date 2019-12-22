@@ -60,7 +60,7 @@ def read_utf8_csv(csv_file_name):
         return rows
 
 
-def read_utf8_csv_bytes(csv_file_bytes):
+def read_utf8_csv_bytes(csv_file_bytes, delimiter=','):
     """
     Read the contents of a UTF-8 CSV file (with BOM), given as byte
     contents, into an array of dictionaries.
@@ -69,12 +69,12 @@ def read_utf8_csv_bytes(csv_file_bytes):
     csv_bytes_file = io.TextIOWrapper(csv_bytes_file_b,
                                       encoding='utf-8-sig',
                                       newline='')
-    csv_reader = csv.DictReader(csv_bytes_file)
+    csv_reader = csv.DictReader(csv_bytes_file, delimiter=delimiter)
     rows = [row for row in csv_reader]
     return rows
 
 
-def write_utf8_csv_bytes(rows, keys):
+def write_utf8_csv_bytes(rows, keys, delimiter=','):
     """
     Return the byte contents of a UTF-8 CSV file (with BOM) from an
     array of dictionaries.
@@ -84,7 +84,8 @@ def write_utf8_csv_bytes(rows, keys):
                                       encoding='utf-8-sig',
                                       newline='')
     csv_file_writer = csv.DictWriter(csv_bytes_file, keys,
-                                     extrasaction='raise', dialect='excel')
+                                     extrasaction='raise', dialect='excel',
+                                     delimiter=delimiter)
     csv_file_writer.writeheader()
     csv_file_writer.writerows(rows)
     csv_bytes_file.flush()
@@ -93,9 +94,10 @@ def write_utf8_csv_bytes(rows, keys):
     return csv_bytes
 
 
-def write_utf8_csv(csv_file_name, rows, keys):
+def write_utf8_csv(csv_file_name, rows, keys, delimiter=','):
     """Write a UTF-8 CSV file (with BOM) from an array of dictionaries."""
-    write_bytes_to_file(write_utf8_csv_bytes(rows, keys), csv_file_name)
+    write_bytes_to_file(write_utf8_csv_bytes(rows, keys, delimiter=delimiter),
+                        csv_file_name)
 
 
 def comma_join(val_list):

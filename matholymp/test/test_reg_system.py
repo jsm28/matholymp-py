@@ -855,14 +855,14 @@ class RegSystemTestCase(unittest.TestCase):
             contents = f.read()
         return filename, contents
 
-    def gen_test_csv(self, rows, keys):
+    def gen_test_csv(self, rows, keys, delimiter=','):
         """Generate a CSV file with specified contents."""
         temp_file = tempfile.NamedTemporaryFile(suffix='.csv',
                                                 dir=self.temp_dir,
                                                 delete=False)
         filename = temp_file.name
         temp_file.close()
-        write_utf8_csv(filename, rows, keys)
+        write_utf8_csv(filename, rows, keys, delimiter=delimiter)
         return filename
 
     def gen_test_csv_no_bom(self, rows, keys):
@@ -3172,6 +3172,65 @@ class RegSystemTestCase(unittest.TestCase):
         admin_bytes = admin_session.get_bytes(img_url_csv)
         self.assertEqual(anon_bytes, flag_bytes)
         self.assertEqual(admin_bytes, flag_bytes)
+
+    def test_country_bulk_register_semicolon(self):
+        """
+        Test bulk registration of countries, semicolon separator used.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
+        csv_cols = ['Country Number', 'Name', 'Ignore', 'Code',
+                    'Contact Email 1', 'Contact Email 2', 'Contact Email 3']
+        csv_in = [{'Country Number': '123',
+                   'Name': 'Test First Country  ',
+                   'Ignore': 'Random text',
+                   'Code': 'ABC'},
+                  {'Name': ' Test Second Countr\u00fd',
+                   'Code': 'DEF',
+                   'Contact Email 1': 'DEF1@example.invalid',
+                   'Contact Email 2': 'DEF2@example.invalid',
+                   'Contact Email 3': 'DEF3@example.invalid'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols, delimiter=';')
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename, 'csv_delimiter': ';'})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.check_submit_selected(mail=True)
+        self.assertIn(
+            b'\nTO: DEF1@example.invalid, DEF2@example.invalid, '
+            b'DEF3@example.invalid, webmaster@example.invalid\n',
+            admin_session.last_mail_bin)
+        # The non-ASCII name means a Content-Transfer-Encoding must be
+        # specified rather than attempting to send the mail as 8-bit
+        # (which fails when Roundup is run in an ASCII locale).
+        self.assertIn(
+            b'\nContent-Transfer-Encoding:',
+            admin_session.last_mail_bin)
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '', 'Generic Number': '123',
+                        'Normal': 'Yes'}
+        expected_def = {'XMO Number': '2', 'Country Number': '4',
+                        'Annual URL': self.instance.url + 'country4',
+                        'Code': 'DEF', 'Name': 'Test Second Countr\u00fd',
+                        'Flag URL': '', 'Generic Number': '',
+                        'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_def,
+                                    expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_def,
+                                     expected_staff])
 
     def test_country_bulk_register_errors(self):
         """
@@ -11320,6 +11379,129 @@ class RegSystemTestCase(unittest.TestCase):
         admin_bytes = admin_session.get_bytes(img_url_csv)
         self.assertEqual(anon_bytes, photo_bytes)
         self.assertEqual(admin_bytes, photo_bytes)
+
+    def test_person_bulk_register_semicolon(self):
+        """
+        Test bulk registration of people, semicolon delimiter used.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        admin_session.create_country('DEF', 'Test Second Country')
+        reg_session = self.get_session('ABC_reg')
+        reg2_session = self.get_session('DEF_reg')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        reg2_csv = reg2_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        self.assertEqual(reg2_csv, [])
+        csv_cols = ['Person Number', 'Given Name', 'Family Name', 'Ignore',
+                    'Country Code', 'Primary Role', 'Other Roles',
+                    'Guide For Codes', 'Contact Email 1', 'Contact Email 2']
+        csv_in = [{'Person Number': '123',
+                   'Given Name': 'Given One  ',
+                   'Family Name': '  Family One',
+                   'Ignore': 'Random text',
+                   'Country Code': 'ZZA',
+                   'Primary Role': 'Coordinator',
+                   'Other Roles': 'Jury Chair,Problem Selection'},
+                  {'Given Name': ' Test\u00fd',
+                   'Family Name': 'Test',
+                   'Country Code': 'ZZA',
+                   'Primary Role': 'Guide',
+                   'Guide For Codes': 'ABC,DEF',
+                   'Contact Email 1': 'DEF1@example.invalid',
+                   'Contact Email 2': 'DEF2@example.invalid'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols, delimiter=';')
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename, 'csv_delimiter': ';'})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.check_submit_selected(mail=True)
+        self.assertIn(
+            b'\nTO: DEF1@example.invalid, DEF2@example.invalid, '
+            b'webmaster@example.invalid\n',
+            admin_session.last_mail_bin)
+        # The non-ASCII name means a Content-Transfer-Encoding must be
+        # specified rather than attempting to send the mail as 8-bit
+        # (which fails when Roundup is run in an ASCII locale).
+        self.assertIn(
+            b'\nContent-Transfer-Encoding:',
+            admin_session.last_mail_bin)
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        reg2_csv = reg2_session.get_people_csv()
+        expected_p1 = {'XMO Number': '2', 'Country Number': '1',
+                       'Person Number': '1',
+                       'Annual URL': self.instance.url + 'person1',
+                       'Country Name': 'XMO 2015 Staff',
+                       'Country Code': 'ZZA', 'Primary Role': 'Coordinator',
+                       'Other Roles': 'Jury Chair,Problem Selection',
+                       'Guide For': '',
+                       'Contestant Code': '', 'Contestant Age': '',
+                       'Given Name': 'Given One', 'Family Name': 'Family One',
+                       'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                       'P6': '', 'Total': '', 'Award': '',
+                       'Extra Awards': '', 'Photo URL': '',
+                       'Generic Number': '123'}
+        expected_p2 = {'XMO Number': '2', 'Country Number': '1',
+                       'Person Number': '2',
+                       'Annual URL': self.instance.url + 'person2',
+                       'Country Name': 'XMO 2015 Staff',
+                       'Country Code': 'ZZA', 'Primary Role': 'Guide',
+                       'Other Roles': '',
+                       'Guide For': 'Test First Country,Test Second Country',
+                       'Contestant Code': '', 'Contestant Age': '',
+                       'Given Name': 'Test\u00fd', 'Family Name': 'Test',
+                       'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                       'P6': '', 'Total': '', 'Award': '',
+                       'Extra Awards': '', 'Photo URL': '',
+                       'Generic Number': ''}
+        expected_p1_admin = expected_p1.copy()
+        expected_p2_admin = expected_p2.copy()
+        expected_p1_admin.update(
+            {'Gender': '', 'Date of Birth': '', 'Languages': '',
+             'Allergies and Dietary Requirements': '',
+             'T-Shirt Size': '', 'Arrival Place': '',
+             'Arrival Date': '', 'Arrival Time': '',
+             'Arrival Flight': '', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': '',
+             'Share Room With': '', 'Room Number': '',
+             'Phone Number': '', 'Badge Photo URL': '',
+             'Badge Background': 'generic', 'Badge Outer Colour': 'f78b11',
+             'Badge Inner Colour': 'fccc8f', 'Badge Text Colour': '000000',
+             'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Passport Given Name': 'Given One',
+             'Passport Family Name': 'Family One',
+             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+        expected_p2_admin.update(
+            {'Gender': '', 'Date of Birth': '', 'Languages': '',
+             'Allergies and Dietary Requirements': '',
+             'T-Shirt Size': '', 'Arrival Place': '',
+             'Arrival Date': '', 'Arrival Time': '',
+             'Arrival Flight': '', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': '',
+             'Share Room With': '', 'Room Number': '',
+             'Phone Number': '', 'Badge Photo URL': '',
+             'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
+             'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
+             'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Passport Given Name': 'Test\u00fd',
+             'Passport Family Name': 'Test',
+             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+        self.assertEqual(anon_csv, [expected_p1, expected_p2])
+        self.assertEqual(admin_csv, [expected_p1_admin, expected_p2_admin])
+        self.assertEqual(reg_csv, [expected_p1, expected_p2])
+        self.assertEqual(reg2_csv, [expected_p1, expected_p2])
 
     def test_person_bulk_register_errors(self):
         """

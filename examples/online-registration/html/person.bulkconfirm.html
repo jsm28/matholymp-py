@@ -29,6 +29,8 @@ bulk registration; if not OK, try uploading a fixed CSV file.</p>
 <td>
 <input type="hidden" name="@template" value="bulkregister">
 <input type="hidden" name="@action" value="person_bulk_register">
+<input type="hidden" name="csv_delimiter"
+       tal:attributes="value python:utils.bulk_csv_delimiter(request.form)">
 <input type="hidden" name="csv_contents"
        tal:attributes="value python:utils.bulk_csv_contents(request.form)">
 <input name="@csrf" type="hidden"

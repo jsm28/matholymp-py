@@ -57,7 +57,7 @@ __all__ = ['distinguish_official', 'get_consent_forms_date_str',
            'scores_final', 'any_scores_missing', 'country_has_contestants',
            'valid_country_problem', 'valid_int_str', 'create_rss',
            'db_file_format_contents', 'db_file_extension', 'db_file_url',
-           'bulk_csv_data', 'bulk_csv_contact_emails',
+           'bulk_csv_delimiter', 'bulk_csv_data', 'bulk_csv_contact_emails',
            'bulk_csv_country_number_url', 'bulk_csv_person_number_url',
            'country_from_code']
 
@@ -373,6 +373,15 @@ def db_file_url(db, cls, kind, file_id):
     return url
 
 
+def bulk_csv_delimiter(form):
+    """Return the delimiter of a previously uploaded CSV file."""
+    if 'csv_delimiter' in form:
+        delimiter = form['csv_delimiter'].value
+        if delimiter in (',', ';'):
+            return delimiter
+    return ','
+
+
 def bulk_csv_data(form, comma_sep_fields=()):
     """
     Return the rows of an uploaded CSV file, in a tuple with a boolean
@@ -399,8 +408,9 @@ def bulk_csv_data(form, comma_sep_fields=()):
             return str(exc)
     else:
         return 'no CSV file uploaded'
+    delimiter = bulk_csv_delimiter(form)
     try:
-        file_data = read_utf8_csv_bytes(file_bytes)
+        file_data = read_utf8_csv_bytes(file_bytes, delimiter=delimiter)
     except (UnicodeError, csv.Error) as exc:
         return str(exc)
     # For user convenience, strip leading and trailing whitespace

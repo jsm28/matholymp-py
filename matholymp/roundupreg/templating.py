@@ -66,8 +66,9 @@ from matholymp.roundupreg.rounduputil import distinguish_official, \
     get_sanity_date_of_birth, person_date_of_birth, contestant_age, \
     get_arrdep_bounds, person_is_contestant, contestant_code, pn_score, \
     scores_final, any_scores_missing, country_has_contestants, \
-    valid_country_problem, bulk_csv_data, bulk_csv_contact_emails, \
-    bulk_csv_country_number_url, bulk_csv_person_number_url
+    valid_country_problem, bulk_csv_delimiter, bulk_csv_data, \
+    bulk_csv_contact_emails, bulk_csv_country_number_url, \
+    bulk_csv_person_number_url
 from matholymp.roundupreg.staticsite import static_site_event_group
 
 
@@ -631,6 +632,7 @@ def register_templating_utils(instance):
     instance.registerUtil('show_prereg_sidebar', show_prereg_sidebar)
     instance.registerUtil('show_prereg_reminder', show_prereg_reminder)
     instance.registerUtil('bulk_csv_contents', bulk_csv_contents)
+    instance.registerUtil('bulk_csv_delimiter', bulk_csv_delimiter)
     instance.registerUtil('show_bulk_csv_country', show_bulk_csv_country)
     instance.registerUtil('show_bulk_csv_person', show_bulk_csv_person)
     instance.registerUtil('required_user_fields', required_user_fields)
