@@ -1,6 +1,6 @@
-# Initialise matholymp.roundupreg subpackage.
+# Lock file support for Roundup registration system for matholymp package.
 
-# Copyright 2014-2019 Joseph Samuel Myers.
+# Copyright 2017-2019 Joseph Samuel Myers.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,11 +28,35 @@
 # used as well as that of the covered work.
 
 """
-The matholymp.roundupreg package implements a registration system
-based on Roundup.
+This module provides lock file support for the Roundup registration
+system.
 """
 
-__all__ = ['actions', 'auditors', 'auditorutil', 'cache', 'initial_data',
-           'lockfile', 'reactors', 'roundupemail', 'roundupsitegen',
-           'roundupsource', 'rounduputil', 'schema', 'staticsite',
-           'templating', 'userauditor']
+__all__ = ['can_lock', 'with_lock_file']
+
+import contextlib
+
+# This locking implementation depends on a Unix-like operating system.
+# (a) It uses fcntl.  (b) fcntl semantics mean the lock is lost as
+# soon as any file descriptor for the file is closed, which works when
+# each query is served in a forked subprocess but may not work on an
+# operating system where threads are used.
+try:
+    import fcntl
+    can_lock = True
+except ImportError:
+    can_lock = False
+
+
+@contextlib.contextmanager
+def with_lock_file(file):
+    """Run code with a lock file active.
+
+    If locking is not supported, runs without a lock; if this is not
+    OK, the caller must check for whether locking is supported."""
+    if can_lock:
+        with open(file, 'w') as lock_file:
+            fcntl.lockf(lock_file, fcntl.LOCK_EX)
+            yield
+    else:
+        yield

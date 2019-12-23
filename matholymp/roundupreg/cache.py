@@ -38,19 +38,11 @@ import os
 import os.path
 
 # This caching implementation depends on a Unix-like operating system.
-# (a) It uses fcntl.  (b) It may remove the file marking the cache
-# invalid while another process has it open, which may not work on
-# some operating systems.  (c) fcntl semantics mean the lock is lost
-# as soon as any file descriptor for the file is closed, which works
-# when each query is served in a forked subprocess but may not work on
-# an operating system where threads are used.
-_can_cache = True
-try:
-    import fcntl
-except ImportError:
-    _can_cache = False
+# It may remove the file marking the cache invalid while another
+# process has it open, which may not work on some operating systems.
 
 from matholymp.fileutil import write_text_to_file, read_text_from_file
+from matholymp.roundupreg.lockfile import can_lock, with_lock_file
 
 
 def _cache_path(db, name, suffix):
@@ -66,14 +58,13 @@ def _invalid_path(db, name):
 
 def cached_text(db, name, force_regen, gen_func):
     """Return text that can be cached, generating it if necessary."""
-    if not _can_cache:
+    if not can_lock:
         return gen_func(db)
     file_path = _cache_path(db, name, 'current')
     tmp_path = _cache_path(db, name, 'tmp')
     invalid_path = _invalid_path(db, name)
     lock_path = _cache_path(db, name, 'lock')
-    with open(lock_path, 'w') as lock_file:
-        fcntl.lockf(lock_file, fcntl.LOCK_EX)
+    with with_lock_file(lock_path):
         invalid_exists = os.access(invalid_path, os.F_OK)
         if invalid_exists:
             force_regen = True
