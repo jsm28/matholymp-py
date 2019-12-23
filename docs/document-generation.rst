@@ -134,6 +134,11 @@ you can change the template to print them in some other way)::
 
    mo-document-generate desk-label all
 
+This prints labels in a default order (all Contestants 1, then all
+Contestants 2, and so on).  The :samp:`--exam-order {file}` option may
+be used to specify a text file listing contestant codes if a different
+order is required.
+
 Checklist of languages
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -187,6 +192,11 @@ competition)::
 
    mo-document-generate --day 1 paper all
    mo-document-generate --day 2 paper all
+
+This prints papers in a default order (all Contestants 1, then all
+Contestants 2, and so on).  The :samp:`--exam-order {file}` option may
+be used to specify a text file listing contestant codes if a different
+order is required.
 
 For final papers for the website (if papers are being printed with
 pre-printed backgrounds, use both commands, otherwise just the first

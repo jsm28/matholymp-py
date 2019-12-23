@@ -438,12 +438,17 @@ class DocumentGenerator:
             p = self.get_person_by_id(person_id)
             self.generate_invitation_letter(p)
 
-    def generate_desk_labels(self, person_id):
+    def generate_desk_labels(self, person_id, exam_order):
         """Generate all desk labels requested by the command line."""
         template_file_base = 'desk-label-template'
         if person_id == 'all':
-            contestants = sorted(self._event.contestant_list,
-                                 key=lambda x: x.sort_key_exams)
+            if exam_order is None:
+                contestants = sorted(self._event.contestant_list,
+                                     key=lambda x: x.sort_key_exams)
+            else:
+                contestants = sorted(
+                    self._event.contestant_list,
+                    key=lambda x: exam_order[x.contestant_code])
             output_file_base = 'desk-labels'
         else:
             p = self.get_contestant_by_id(person_id)
@@ -613,7 +618,7 @@ class DocumentGenerator:
                 pages_list.append(paper)
             return '%\n'.join(pages_list)
 
-    def generate_papers(self, person_id, day_opt, use_background):
+    def generate_papers(self, person_id, day_opt, use_background, exam_order):
         """Generate all papers requested by the command line."""
         template_file_base = 'paper-template'
 
@@ -654,7 +659,13 @@ class DocumentGenerator:
         new_drafts_only = False
         if person_id == 'all':
             contestants = self._event.contestant_list
-            contestants = sorted(contestants, key=lambda x: x.sort_key_exams)
+            if exam_order is None:
+                contestants = sorted(contestants,
+                                     key=lambda x: x.sort_key_exams)
+            else:
+                contestants = sorted(
+                    contestants,
+                    key=lambda x: exam_order[x.contestant_code])
             languages = []
             output_file_base = 'papers' + day_text
         elif person_id == 'all-languages':

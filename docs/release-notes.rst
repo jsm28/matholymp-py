@@ -369,6 +369,12 @@ the registration system is not active.
   registration system are changed to use an HTML 5 DOCTYPE and specify
   ``lang="en"`` on the ``html`` tag.
 
+* :command:`mo-document-generate` now supports a ``--exam-order``
+  option that may be used to specify a text file with a list of
+  contestant codes, if papers or labels for contestant codes are to be
+  printed in an order other than the default (all Contestants 1, then
+  all Contestants 2, and so on).
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

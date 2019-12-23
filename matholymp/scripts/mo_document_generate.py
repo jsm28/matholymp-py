@@ -51,7 +51,7 @@ import matholymp
 from matholymp.data import EventGroup
 from matholymp.docgen import read_docgen_config, DocumentGenerator
 from matholymp.csvsource import CSVDataSource
-from matholymp.fileutil import read_utf8_csv
+from matholymp.fileutil import read_utf8_csv, read_text_from_file
 
 __all__ = ['main']
 
@@ -71,6 +71,8 @@ def main():
                         help='directory for output files')
     parser.add_argument('--problems-directory', help='directory for problems')
     parser.add_argument('--day', help='day for papers')
+    parser.add_argument('--exam-order',
+                        help='file with order of contestants for exams')
     parser.add_argument('type', help='type of document to output')
     parser.add_argument('id', help='object for which to output the document,'
                         ' or \'all\'')
@@ -101,6 +103,14 @@ def main():
                                cmdline_data['input_directory'],
                                cmdline_data['output_directory'], True)
 
+    if cmdline_data['exam_order']:
+        code_list = read_text_from_file(cmdline_data['exam_order'])
+        exam_order = {}
+        for idx, code in enumerate(code_list.split()):
+            exam_order[code] = idx
+    else:
+        exam_order = None
+
     gen_id = cmdline_data['id']
     bg = cmdline_data['background']
     if cmdline_data['type'] == 'badge':
@@ -108,13 +118,13 @@ def main():
     elif cmdline_data['type'] == 'invitation-letter':
         docgen.generate_invitation_letters(gen_id)
     elif cmdline_data['type'] == 'desk-label':
-        docgen.generate_desk_labels(gen_id)
+        docgen.generate_desk_labels(gen_id, exam_order)
     elif cmdline_data['type'] == 'award-certificate':
         docgen.generate_award_certs(gen_id, bg)
     elif cmdline_data['type'] == 'participation-certificate':
         docgen.generate_part_certs(gen_id, bg)
     elif cmdline_data['type'] == 'paper':
-        docgen.generate_papers(gen_id, cmdline_data['day'], bg)
+        docgen.generate_papers(gen_id, cmdline_data['day'], bg, exam_order)
     elif cmdline_data['type'] == 'language-list':
         docgen.generate_language_list()
     elif cmdline_data['type'] == 'coord-form':
