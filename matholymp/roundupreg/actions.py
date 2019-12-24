@@ -46,7 +46,6 @@ import subprocess
 import tempfile
 import zipfile
 
-from PIL import Image
 from roundup.cgi.actions import Action
 from roundup.cgi.exceptions import Unauthorised
 from roundup.exceptions import Reject
@@ -55,6 +54,7 @@ import roundup.password
 from matholymp.data import EventGroup
 from matholymp.docgen import read_docgen_config, DocumentGenerator
 from matholymp.fileutil import read_text_from_file, boolean_states
+from matholymp.images import open_image_no_alpha, scale_image_to_size_jpeg
 from matholymp.roundupreg.auditors import audit_country_fields, \
     audit_person_fields
 from matholymp.roundupreg.roundupemail import send_email
@@ -185,25 +185,11 @@ class ScalePhotoAction(Action):
         cur_size_bytes = os.stat(filename).st_size
         if cur_size_bytes <= max_size_bytes:
             raise ValueError('This photo is already small enough')
-        photo_orig = Image.open(filename)
-        if photo_orig.mode not in ('RGB', 'L'):
-            # Convert to RGB, removing any alpha channel.
-            if (photo_orig.mode in ('RGBA', 'LA')
-                or (photo_orig.mode == 'P'
-                    and 'transparency' in photo_orig.info)):
-                photo_orig = photo_orig.convert('RGBA')
-                background = Image.new('RGBA', photo_orig.size,
-                                       (255, 255, 255, 255))
-                photo_orig = Image.alpha_composite(background, photo_orig)
-            photo_orig = photo_orig.convert('RGB')
+        photo_orig = open_image_no_alpha(filename)
         size_xy = photo_orig.size
         scale_factor = 1
         while size_xy[0] >= min_photo_dimen and size_xy[1] >= min_photo_dimen:
-            photo_scaled = photo_orig.resize(size_xy, Image.LANCZOS)
-            photo_out = io.BytesIO()
-            photo_scaled.save(photo_out, format='JPEG', quality=90)
-            photo_bytes = photo_out.getvalue()
-            photo_out.close()
+            photo_bytes = scale_image_to_size_jpeg(photo_orig, size_xy)
             if len(photo_bytes) <= max_size_bytes:
                 photo_data = {'name': 'photo-smaller.jpg',
                               'type': 'image/jpeg',
