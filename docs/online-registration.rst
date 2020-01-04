@@ -86,6 +86,11 @@ files:
   registration mechanism, if a contact email address is specified when
   doing so).
 
+* :file:`extensions/email-template-invitation-change` (a similar
+  template for emails sent automatically to organisers when personal
+  details used in invitation letters are changed after such a letter
+  has been generated online).
+
 * :file:`html/page.html` (you may wish to make this file match the
   overall page style used for the static site, although this is not
   required; at least, the stylesheet and shortcut icon URLs will need

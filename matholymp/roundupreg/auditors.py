@@ -34,11 +34,14 @@ __all__ = ['audit_event_fields', 'audit_file_format', 'audit_country_fields',
            'audit_matholymprole_fields', 'audit_badge_type_fields',
            'register_auditors']
 
+import os.path
 import re
 
 from matholymp.datetimeutil import date_from_ymd_str, date_from_ymd_iso, \
     time_from_hhmm_str
+from matholymp.fileutil import read_text_from_file
 from matholymp.roundupreg.auditorutil import get_new_value, require_value
+from matholymp.roundupreg.roundupemail import send_email
 from matholymp.roundupreg.rounduputil import have_consent_forms, \
     have_consent_ui, have_passport_numbers, have_nationality, require_diet, \
     require_dob, get_num_problems, get_marks_per_problem, \
@@ -338,10 +341,10 @@ def audit_person_fields(db, cl, nodeid, newvalues):
                              ' registered participants')
 
     # Given and family names must be specified.
-    require_value(db, cl, nodeid, newvalues, 'given_name',
-                  'No given name specified')
-    require_value(db, cl, nodeid, newvalues, 'family_name',
-                  'No family name specified')
+    given_name = require_value(db, cl, nodeid, newvalues, 'given_name',
+                               'No given name specified')
+    family_name = require_value(db, cl, nodeid, newvalues, 'family_name',
+                                'No family name specified')
 
     # A gender must be specified.
     gender = require_value(db, cl, nodeid, newvalues, 'gender',
@@ -350,6 +353,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     # A primary role must be specified.
     primary_role = require_value(db, cl, nodeid, newvalues, 'primary_role',
                                  'No primary role specified')
+    primary_role_name = db.matholymprole.get(primary_role, 'name')
 
     # A first language must be specified.
     require_value(db, cl, nodeid, newvalues, 'language_1',
@@ -359,8 +363,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     require_value(db, cl, nodeid, newvalues, 'tshirt',
                   'No T-shirt size specified', allow_incomplete)
 
-    is_contestant = db.matholymprole.get(primary_role, 'name').startswith(
-        'Contestant ')
+    is_contestant = primary_role_name.startswith('Contestant ')
 
     # Contestants must have one of the permitted genders.
     if is_contestant and gender is not None:
@@ -615,7 +618,6 @@ def audit_person_fields(db, cl, nodeid, newvalues):
 
         # Non-observer roles for normal countries are uniquely named:
         # there must be no more than one Leader, Contestant 2 etc.
-        primary_role_name = db.matholymprole.get(primary_role, 'name')
         if not primary_role_name.startswith('Observer '):
             people = db.person.filter(None,
                                       {'primary_role': primary_role,
@@ -641,6 +643,48 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         phone_number = ''
     if phone_number != '' and is_normal:
         raise ValueError('Phone numbers may only be entered for staff')
+
+    # Send email for details changed after an invitation letter has
+    # been generated.  Logically this might belong in the reactor
+    # rather than the auditor, but details of what changed are more
+    # readily available here; the reactor receives the full set of old
+    # property values, whether or not changed, and would need to look
+    # up new values and compare.
+    if (nodeid is not None
+        and get_new_value(db, cl, nodeid, newvalues,
+                          'invitation_letter_generated')):
+        # The following data may be used in invitation letters.
+        invitation_letter_keys = {'given_name', 'family_name',
+                                  'passport_given_name',
+                                  'passport_family_name',
+                                  'nationality', 'passport_number',
+                                  'gender', 'date_of_birth_year',
+                                  'date_of_birth_month',
+                                  'date_of_birth_day'}
+        for k in list(invitation_letter_keys):
+            if k not in newvalues:
+                invitation_letter_keys.remove(k)
+        if invitation_letter_keys:
+            template_path = os.path.join(db.config.TRACKER_HOME, 'extensions',
+                                         'email-template-invitation-change')
+            template_text = read_text_from_file(template_path)
+            name = '%s %s' % (given_name, family_name)
+            country_name = db.country.get(country, 'name')
+            email_text = template_text % {'id': nodeid,
+                                          'name': name,
+                                          'country': country_name,
+                                          'role': primary_role_name,
+                                          'properties': ', '.join(
+                                              sorted(invitation_letter_keys))}
+            short_name = db.config.ext['MATHOLYMP_SHORT_NAME']
+            year = db.config.ext['MATHOLYMP_YEAR']
+            subject = ('%s %s personal details change (%s, %s)'
+                       % (short_name, year, name, country_name))
+            email_addrs = db.config.ext['MATHOLYMP_INVITATION_LETTER_EMAIL']
+            email_addrs = email_addrs.split(',')
+            email_addrs = [addr.strip() for addr in email_addrs]
+            email_addrs = [addr for addr in email_addrs if addr != '']
+            send_email(db, email_addrs, subject, email_text, 'invchange')
 
 
 def audit_matholymprole_fields(db, cl, nodeid, newvalues):

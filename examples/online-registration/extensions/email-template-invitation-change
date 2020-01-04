@@ -1,0 +1,13 @@
+Personal details of the following XMO 2015 participant have been
+changed after an invitation letter was generated online.
+
+https://www.example.org/registration/2015/person%(id)s
+
+Name: %(name)s
+Country: %(country)s
+Role: %(role)s
+Details changed: %(properties)s
+
+-- 
+XMO IT - Some Name
+webmaster@example.org

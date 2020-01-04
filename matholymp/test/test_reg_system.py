@@ -10887,13 +10887,16 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.check_submit_selected(error='Online document generation '
                                             'not enabled')
 
-    @_with_config(docgen_directory='docgen')
+    @_with_config(docgen_directory='docgen', require_passport_number='Yes',
+                  require_nationality='Yes')
     def test_person_invitation_letter(self):
         """
         Test online invitation letter creation.
         """
         admin_session = self.get_session('admin')
-        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                    {'passport_number': '123454321',
+                                     'nationality': 'Matholympian'})
         admin_session.check_open_relative('person1')
         admin_session.b.select_form(
             admin_session.get_main().find_all('form')[3])
@@ -10903,6 +10906,44 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(invitation_response.headers['content-disposition'],
                          'attachment; filename=invitation-letter-person1.pdf')
         self.assertTrue(invitation_response.content.startswith(b'%PDF-'))
+        # Changing relevant details after an invitation letter was
+        # generated results in an email being sent; changing
+        # irrelevant details does not.
+        admin_session.edit('person', '1',
+                           {'given_name': 'Changed Given'},
+                           mail=True)
+        self.assertIn(
+            b'TO: admin@example.invalid, webmaster@example.invalid\n',
+            admin_session.last_mail_bin)
+        admin_session.edit('person', '1',
+                           {'tshirt': 'M'})
+        admin_session.edit('person', '1',
+                           {'family_name': 'Changed Family'},
+                           mail=True)
+        admin_session.edit('person', '1',
+                           {'passport_given_name': 'Changed Passport Given'},
+                           mail=True)
+        admin_session.edit('person', '1',
+                           {'passport_family_name': 'Changed Passport Family'},
+                           mail=True)
+        admin_session.edit('person', '1',
+                           {'nationality': 'Other'},
+                           mail=True)
+        admin_session.edit('person', '1',
+                           {'passport_number': '987654321'},
+                           mail=True)
+        admin_session.edit('person', '1',
+                           {'gender': 'Male'},
+                           mail=True)
+        admin_session.edit('person', '1',
+                           {'date_of_birth_year': '1999'},
+                           mail=True)
+        admin_session.edit('person', '1',
+                           {'date_of_birth_month': 'February'},
+                           mail=True)
+        admin_session.edit('person', '1',
+                           {'date_of_birth_day': '2'},
+                           mail=True)
 
     @_with_config(docgen_directory='docgen')
     def test_person_invitation_letter_errors(self):
@@ -10965,14 +11006,19 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.check_submit_selected(error='Online document generation '
                                             'not enabled')
 
-    @_with_config(docgen_directory='docgen')
+    @_with_config(docgen_directory='docgen', require_passport_number='Yes',
+                  require_nationality='Yes')
     def test_person_invitation_letter_zip(self):
         """
         Test online invitation letter zip creation.
         """
         admin_session = self.get_session('admin')
-        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
-        admin_session.create_person('XMO 2015 Staff', 'Problem Selection')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                    {'passport_number': '123454321',
+                                     'nationality': 'Matholympian'})
+        admin_session.create_person('XMO 2015 Staff', 'Problem Selection',
+                                    {'passport_number': '543212345',
+                                     'nationality': 'Matholympian'})
         admin_session.check_open_relative('person')
         admin_session.b.select_form(
             admin_session.get_main().find_all('form')[1])
@@ -10995,6 +11041,44 @@ class RegSystemTestCase(unittest.TestCase):
             'invitation-letters/invitation-letter-person2.pdf').startswith(
                 b'%PDF-'))
         zip_zip.close()
+        # Changing relevant details after an invitation letter was
+        # generated results in an email being sent; changing
+        # irrelevant details does not.
+        admin_session.edit('person', '1',
+                           {'given_name': 'Changed Given'},
+                           mail=True)
+        self.assertIn(
+            b'TO: admin@example.invalid, webmaster@example.invalid\n',
+            admin_session.last_mail_bin)
+        admin_session.edit('person', '2',
+                           {'tshirt': 'M'})
+        admin_session.edit('person', '1',
+                           {'family_name': 'Changed Family'},
+                           mail=True)
+        admin_session.edit('person', '2',
+                           {'passport_given_name': 'Changed Passport Given'},
+                           mail=True)
+        admin_session.edit('person', '1',
+                           {'passport_family_name': 'Changed Passport Family'},
+                           mail=True)
+        admin_session.edit('person', '2',
+                           {'nationality': 'Other'},
+                           mail=True)
+        admin_session.edit('person', '1',
+                           {'passport_number': '987654321'},
+                           mail=True)
+        admin_session.edit('person', '2',
+                           {'gender': 'Male'},
+                           mail=True)
+        admin_session.edit('person', '1',
+                           {'date_of_birth_year': '1999'},
+                           mail=True)
+        admin_session.edit('person', '2',
+                           {'date_of_birth_month': 'February'},
+                           mail=True)
+        admin_session.edit('person', '1',
+                           {'date_of_birth_day': '2'},
+                           mail=True)
 
     @_with_config(docgen_directory='docgen')
     def test_person_invitation_letter_zip_errors(self):
