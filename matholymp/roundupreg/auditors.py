@@ -315,6 +315,10 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         allow_incomplete = False
         newvalues['incomplete'] = False
 
+    # Initially, an invitation letter has not been generated.
+    if nodeid is None:
+        newvalues['invitation_letter_generated'] = False
+
     # A country must be specified and ordinary users cannot create or
     # modify records for other countries.
     country = require_value(db, cl, nodeid, newvalues, 'country',

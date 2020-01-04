@@ -503,6 +503,12 @@ class InvitationLetterAction(DocumentGenerateAction):
     def generate_documents(self, docgen):
         docgen.generate_invitation_letters(
             self.nodeid if self.nodeid is not None else 'all')
+        if self.nodeid is None:
+            for nodeid in self.db.person.list():
+                self.db.person.set(nodeid, invitation_letter_generated=True)
+        else:
+            self.db.person.set(self.nodeid, invitation_letter_generated=True)
+        self.db.commit()
 
     def document_filename(self):
         return 'invitation-letter-person%s.pdf' % self.nodeid

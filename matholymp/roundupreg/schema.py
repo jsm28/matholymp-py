@@ -203,6 +203,7 @@ def init_schema(env):
                    reuse_photo=Boolean(),
                    photo=Link('photo'),
                    incomplete=Boolean(),
+                   invitation_letter_generated=Boolean(),
                    # Comma-separated scores on each problem.
                    scores=String(),
                    extra_awards=String(),
