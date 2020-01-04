@@ -261,7 +261,8 @@ class RegSiteGenerator(SiteGenerator):
     def missing_extra_roles_text(self, c):
         """
         Return a description of people not registered, or unexpectedly
-        registered, for a country.
+        registered, or with unexpected single room requests, for a
+        country.
         """
         if c.expected_numbers_confirmed:
             ret_text = ''
@@ -271,6 +272,7 @@ class RegSiteGenerator(SiteGenerator):
                         '<strong>%s</strong>.</p>\n'
                         % html.escape(c.name_with_code))
         expected_roles = dict(c.expected_roles)
+        expected_single_rooms = c.expected_single_rooms
         person_list = c.person_list
         if not person_list:
             ret_text += ('<p>No participants registered from'
@@ -278,8 +280,11 @@ class RegSiteGenerator(SiteGenerator):
                          % html.escape(c.name_with_code))
         else:
             have_roles = collections.defaultdict(int)
+            have_single_rooms = 0
             for p in person_list:
                 have_roles[p.primary_role] += 1
+                if p.room_type == 'Single room':
+                    have_single_rooms += 1
                 if p.primary_role not in expected_roles:
                     expected_roles[p.primary_role] = 0
             missing_roles = []
@@ -306,6 +311,14 @@ class RegSiteGenerator(SiteGenerator):
                              '<strong>%s</strong>: %s.</p>\n'
                              % (html.escape(c.name_with_code),
                                 html.escape(', '.join(extra_roles))))
+            if have_single_rooms < expected_single_rooms and not missing_roles:
+                ret_text += ('<p>Fewer single room requests than expected '
+                             'from <strong>%s</strong>.</p>\n'
+                             % html.escape(c.name_with_code))
+            if have_single_rooms > expected_single_rooms:
+                ret_text += ('<p>More single room requests than expected '
+                             'from <strong>%s</strong>.</p>\n'
+                             % html.escape(c.name_with_code))
         return ret_text
 
     def missing_person_details_text(self, people, consent_forms_date,

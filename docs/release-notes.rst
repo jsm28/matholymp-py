@@ -245,7 +245,9 @@ the registration system is not active.
   enabling or disabling registering details of participants.  The
   registration status page shows whether these numbers have not yet
   been confirmed for a given country, and uses them in determining
-  whether any expected participants have not yet been registered.
+  whether any expected participants have not yet been registered,
+  whether unexpected participants have been registered, and whether
+  there are more or fewer single room requests than expected.
   :file:`country.item.html`, :file:`event.item.html`,
   :file:`person.item.html` and :file:`page.html` are updated
   accordingly, as is :file:`extensions/email-template-new-user`; a new
