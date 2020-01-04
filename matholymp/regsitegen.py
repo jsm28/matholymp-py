@@ -258,8 +258,11 @@ class RegSiteGenerator(SiteGenerator):
 
         return missing_list
 
-    def missing_roles_text(self, c):
-        """Return a description of people not registered for a country."""
+    def missing_extra_roles_text(self, c):
+        """
+        Return a description of people not registered, or unexpectedly
+        registered, for a country.
+        """
         if c.expected_numbers_confirmed:
             ret_text = ''
         else:
@@ -267,7 +270,7 @@ class RegSiteGenerator(SiteGenerator):
                         'room requests not yet confirmed for '
                         '<strong>%s</strong>.</p>\n'
                         % html.escape(c.name_with_code))
-        expected_roles = c.expected_roles
+        expected_roles = dict(c.expected_roles)
         person_list = c.person_list
         if not person_list:
             ret_text += ('<p>No participants registered from'
@@ -277,7 +280,10 @@ class RegSiteGenerator(SiteGenerator):
             have_roles = collections.defaultdict(int)
             for p in person_list:
                 have_roles[p.primary_role] += 1
+                if p.primary_role not in expected_roles:
+                    expected_roles[p.primary_role] = 0
             missing_roles = []
+            extra_roles = []
             for role in sorted(expected_roles.keys()):
                 missing = expected_roles[role] - have_roles[role]
                 if missing > 0:
@@ -285,11 +291,21 @@ class RegSiteGenerator(SiteGenerator):
                         missing_roles.append('%s (x%d)' % (role, missing))
                     else:
                         missing_roles.append(role)
+                elif missing < 0:
+                    if missing < -1:
+                        extra_roles.append('%s (x%d)' % (role, -missing))
+                    else:
+                        extra_roles.append(role)
             if missing_roles:
                 ret_text += ('<p>Not registered from <strong>%s</strong>:'
                              ' %s.</p>\n'
                              % (html.escape(c.name_with_code),
                                 html.escape(', '.join(missing_roles))))
+            if extra_roles:
+                ret_text += ('<p>Unexpectedly registered from '
+                             '<strong>%s</strong>: %s.</p>\n'
+                             % (html.escape(c.name_with_code),
+                                html.escape(', '.join(extra_roles))))
         return ret_text
 
     def missing_person_details_text(self, people, consent_forms_date,
@@ -353,7 +369,7 @@ class RegSiteGenerator(SiteGenerator):
         text += '<h2>Action needed by participating countries</h2>\n'
 
         for c in normal_countries:
-            text += self.missing_roles_text(c)
+            text += self.missing_extra_roles_text(c)
 
         text += self.missing_person_details_text(normal_people,
                                                  consent_forms_date,
@@ -433,7 +449,7 @@ class RegSiteGenerator(SiteGenerator):
         """Return the text of the registration status page for one country."""
         people = sorted(country.person_list, key=lambda x: x.sort_key)
         text = ''
-        text += self.missing_roles_text(country)
+        text += self.missing_extra_roles_text(country)
 
         text += self.missing_person_details_text(people, consent_forms_date,
                                                  have_consent_ui, False)
