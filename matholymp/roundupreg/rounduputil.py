@@ -295,7 +295,7 @@ def valid_country_problem(db, form):
     num_problems = get_num_problems(db)
     country = form['country'].value
     problem = form['problem'].value
-    if not re.match('^[1-9][0-9]*\\Z', problem):
+    if not re.fullmatch('[1-9][0-9]*', problem):
         return False
     if int(problem) > num_problems:
         return False
@@ -309,7 +309,7 @@ def valid_int_str(int_str, max_val):
     max_val inclusive.  If max_val is None, there is no upper bound on
     allowed values.
     """
-    if int_str != '0' and not re.match('^[1-9][0-9]*\\Z', int_str):
+    if int_str != '0' and not re.fullmatch('[1-9][0-9]*', int_str):
         return False
     if max_val is None:
         return True

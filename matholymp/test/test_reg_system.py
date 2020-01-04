@@ -883,7 +883,7 @@ class RegSystemTestCase(unittest.TestCase):
         for t in sorted(os.listdir(self.instance.html_dir)):
             if t.startswith('_generic') or not t.endswith('.html'):
                 continue
-            m = re.match(r'([a-z_]+)\.([a-z_]+)\.html\Z', t)
+            m = re.fullmatch(r'([a-z_]+)\.([a-z_]+)\.html', t)
             if not m:
                 continue
             # country.bulkconfirm.html and person.bulkconfirm.html
@@ -1002,7 +1002,7 @@ class RegSystemTestCase(unittest.TestCase):
         for t in sorted(os.listdir(self.instance.html_dir)):
             if t.startswith('_generic') or not t.endswith('.item.html'):
                 continue
-            m = re.match(r'([a-z_]+)\.([a-z_]+)\.html\Z', t)
+            m = re.fullmatch(r'([a-z_]+)\.([a-z_]+)\.html', t)
             if not m:
                 continue
             login = m.group(1) in forbid_classes

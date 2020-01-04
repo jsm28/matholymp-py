@@ -44,11 +44,11 @@ def date_from_ymd_str(desc, year, month, day):
     Return a date object for the given year, month and day, given as
     strings (month and day must be exactly two digits).
     """
-    if not re.match('^[0-9]{1,}\\Z', year):
+    if not re.fullmatch('[0-9]{1,}', year):
         raise ValueError('%s: invalid year' % desc)
-    if not re.match('^[0-9]{2}\\Z', month):
+    if not re.fullmatch('[0-9]{2}', month):
         raise ValueError('%s: invalid month' % desc)
-    if not re.match('^[0-9]{2}\\Z', day):
+    if not re.fullmatch('[0-9]{2}', day):
         raise ValueError('%s: invalid day' % desc)
     year = int(year)
     month = int(month)
@@ -65,7 +65,7 @@ def date_from_ymd_str(desc, year, month, day):
 
 def date_from_ymd_iso(desc, date_str):
     """Return a date object for the given ISO yyyy-mm-dd string."""
-    m = re.match('^([0-9]{1,})-([0-9]{2})-([0-9]{2})\\Z', date_str)
+    m = re.fullmatch('([0-9]{1,})-([0-9]{2})-([0-9]{2})', date_str)
     if not m:
         raise ValueError('%s: bad date' % desc)
     year = m.group(1)
@@ -136,9 +136,9 @@ def time_from_hhmm_str(desc, hour, minute):
     Return a time object for the given hour and minute, given as
     strings (exactly two digits).
     """
-    if not re.match('^[0-9]{2}\\Z', hour):
+    if not re.fullmatch('[0-9]{2}', hour):
         raise ValueError('%s: invalid hour' % desc)
-    if not re.match('^[0-9]{2}\\Z', minute):
+    if not re.fullmatch('[0-9]{2}', minute):
         raise ValueError('%s: invalid minute' % desc)
     hour = int(hour)
     minute = int(minute)
@@ -154,7 +154,7 @@ def time_from_hhmm_str(desc, hour, minute):
 
 def time_from_hhmm_iso(desc, time_str):
     """Return a time object for the given ISO hh:mm string."""
-    m = re.match('^([0-9]{2}):([0-9]{2})\\Z', time_str)
+    m = re.fullmatch('([0-9]{2}):([0-9]{2})', time_str)
     if not m:
         raise ValueError('%s: bad time' % desc)
     hour = m.group(1)

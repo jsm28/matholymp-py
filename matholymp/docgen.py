@@ -205,7 +205,7 @@ class DocumentGenerator:
         Given that the selected id must represent a valid person, return
         that person.
         """
-        id_numeric = re.match('^[0-9]+\\Z', person_id)
+        id_numeric = re.fullmatch('[0-9]+', person_id)
         if person_id == '':
             raise ValueError('Empty person identifier')
         elif person_id in self._event.contestant_map:

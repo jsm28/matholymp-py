@@ -116,7 +116,7 @@ def audit_country_fields(db, cl, nodeid, newvalues):
     """Make sure country properties are valid."""
     code = require_value(db, cl, nodeid, newvalues, 'code',
                          'No country code specified')
-    if not re.match('^[A-Z]+\\Z', code):
+    if not re.fullmatch('[A-Z]+', code):
         raise ValueError('Country codes must be all capital letters')
     countries_with_code = db.country.filter(None, {},
                                             exact_match_spec={'code': code})
@@ -220,7 +220,7 @@ def audit_country_fields(db, cl, nodeid, newvalues):
         guok = False
         if generic_url.startswith(gubase):
             generic_url = generic_url[len(gubase):]
-            m = re.match('^([1-9][0-9]*)/\\Z', generic_url)
+            m = re.fullmatch('([1-9][0-9]*)/', generic_url)
             if m:
                 guok = True
                 sdata = static_site_event_group(db)
@@ -561,7 +561,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         guok = False
         if generic_url.startswith(gubase):
             generic_url = generic_url[len(gubase):]
-            m = re.match('^([1-9][0-9]*)/\\Z', generic_url)
+            m = re.fullmatch('([1-9][0-9]*)/', generic_url)
             if m:
                 guok = True
                 sdata = static_site_event_group(db)
@@ -664,23 +664,23 @@ def audit_badge_type_fields(db, cl, nodeid, newvalues):
                                     'background_name',
                                     'No background name specified')
     # Verify background name is safe for inclusion in file names.
-    if not re.match('^[A-Za-z0-9._-]+\\Z', background_name):
+    if not re.fullmatch('[A-Za-z0-9._-]+', background_name):
         raise ValueError("Background names must contain only alphanumerics, "
                          "'.', '_' and '-'")
 
     colour = require_value(db, cl, nodeid, newvalues, 'colour_outer',
                            'No outer colour specified')
-    if not re.match('^[0-9a-fA-F]{6}\\Z', colour):
+    if not re.fullmatch('[0-9a-fA-F]{6}', colour):
         raise ValueError('Outer colour not six hexadecimal characters')
 
     colour = require_value(db, cl, nodeid, newvalues, 'colour_inner',
                            'No inner colour specified')
-    if not re.match('^[0-9a-fA-F]{6}\\Z', colour):
+    if not re.fullmatch('[0-9a-fA-F]{6}', colour):
         raise ValueError('Inner colour not six hexadecimal characters')
 
     colour = require_value(db, cl, nodeid, newvalues, 'colour_text',
                            'No text colour specified')
-    if not re.match('^[0-9a-fA-F]{6}\\Z', colour):
+    if not re.fullmatch('[0-9a-fA-F]{6}', colour):
         raise ValueError('Text colour not six hexadecimal characters')
 
 
