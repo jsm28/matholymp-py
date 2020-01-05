@@ -59,7 +59,7 @@ __all__ = ['distinguish_official', 'get_consent_forms_date_str',
            'db_file_format_contents', 'db_file_extension', 'db_file_url',
            'bulk_csv_delimiter', 'bulk_csv_data', 'bulk_csv_contact_emails',
            'bulk_csv_country_number_url', 'bulk_csv_person_number_url',
-           'country_from_code']
+           'country_from_code', 'invitation_letter_register']
 
 
 def distinguish_official(db):
@@ -483,3 +483,12 @@ def country_from_code(db, code):
         return countries_with_code[0]
     else:
         raise ValueError('country %s not registered' % code)
+
+
+def invitation_letter_register(db):
+    """
+    Return whether registering users can generate invitation letters
+    for participants from their country.
+    """
+    dist_off = db.config.ext['MATHOLYMP_INVITATION_LETTER_REGISTER']
+    return boolean_states[dist_off.lower()]

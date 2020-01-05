@@ -41,7 +41,7 @@
 </form>
 </tal:block>
 
-<tal:block tal:condition="python:db._db.config.ext['MATHOLYMP_DOCGEN_DIRECTORY'] and request.user.hasPermission('GenerateInvitationLetters')">
+<tal:block tal:condition="python:db._db.config.ext['MATHOLYMP_DOCGEN_DIRECTORY'] and request.user.hasPermission('GenerateInvitationLettersZip')">
 <form method="GET" tal:attributes="action context/designator">
 <table class="form">
 <tr>

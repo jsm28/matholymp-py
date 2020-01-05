@@ -56,7 +56,7 @@
 
 from matholymp.roundupreg.rounduputil import distinguish_official, \
     have_consent_forms, have_consent_ui, have_passport_numbers, \
-    have_nationality, get_language_numbers
+    have_nationality, get_language_numbers, invitation_letter_register
 
 __all__ = ['init_schema']
 
@@ -564,6 +564,13 @@ def init_schema(env):
     # Permission to generate invitation letters online.
     p = db.security.addPermission(name='GenerateInvitationLetters')
     db.security.addPermissionToRole('Admin', p)
+    p = db.security.addPermission(name='GenerateInvitationLettersZip')
+    db.security.addPermissionToRole('Admin', p)
+
+    if invitation_letter_register(db):
+        p = db.security.addPermission(name='GenerateInvitationLetters',
+                                      klass='person', check=own_country_person)
+        db.security.addPermissionToRole('Register', p)
 
     # Permission to edit countries in general, rather than just a
     # limited subset of properties.  This is only used to control

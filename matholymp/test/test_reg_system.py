@@ -10946,6 +10946,25 @@ class RegSystemTestCase(unittest.TestCase):
                            mail=True)
 
     @_with_config(docgen_directory='docgen')
+    def test_person_invitation_letter_register(self):
+        """
+        Test online invitation letter creation with registering user.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        reg_session.create_person('Test First Country', 'Contestant 2')
+        reg_session.check_open_relative('person1')
+        reg_session.b.select_form(
+            reg_session.get_main().find_all('form')[1])
+        invitation_response = reg_session.check_submit_selected(html=False)
+        self.assertEqual(invitation_response.headers['content-type'],
+                         'application/pdf')
+        self.assertEqual(invitation_response.headers['content-disposition'],
+                         'attachment; filename=invitation-letter-person1.pdf')
+        self.assertTrue(invitation_response.content.startswith(b'%PDF-'))
+
+    @_with_config(docgen_directory='docgen')
     def test_person_invitation_letter_errors(self):
         """
         Test errors from online invitation letter creation.
@@ -10983,6 +11002,20 @@ class RegSystemTestCase(unittest.TestCase):
                                              'permission to generate the '
                                              'invitation letter for',
                                              status=403)
+        # Similarly, with a registering user.
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.edit('user', self.instance.userids['ABC_reg'],
+                           {'roles': 'Admin'})
+        reg_session.check_open_relative('person1')
+        form = reg_session.get_main().find_all('form')[3]
+        reg_session.b.select_form(form)
+        admin_session.edit('user', self.instance.userids['ABC_reg'],
+                           {'roles': 'User,Register'})
+        reg_session.check_submit_selected(error='You do not have '
+                                          'permission to generate the '
+                                          'invitation letter for',
+                                          status=403)
 
     def test_person_invitation_letter_none(self):
         """
@@ -11005,6 +11038,27 @@ class RegSystemTestCase(unittest.TestCase):
                                                force=True)
         admin_session.check_submit_selected(error='Online document generation '
                                             'not enabled')
+
+    @_with_config(docgen_directory='docgen', invitation_letter_register='No')
+    def test_person_invitation_letter_register_none(self):
+        """
+        Test online invitation letter creation by registering user disabled.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        reg_session.create_person('Test First Country', 'Contestant 2')
+        admin_session.edit('user', self.instance.userids['ABC_reg'],
+                           {'roles': 'Admin'})
+        reg_session.check_open_relative('person1')
+        form = reg_session.get_main().find_all('form')[3]
+        reg_session.b.select_form(form)
+        admin_session.edit('user', self.instance.userids['ABC_reg'],
+                           {'roles': 'User,Register'})
+        reg_session.check_submit_selected(error='You do not have '
+                                          'permission to generate the '
+                                          'invitation letter for',
+                                          status=403)
 
     @_with_config(docgen_directory='docgen', require_passport_number='Yes',
                   require_nationality='Yes')
@@ -11088,6 +11142,21 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session = self.get_session('admin')
         admin_session.create_person('XMO 2015 Staff', 'Coordinator')
         admin_session.create_person('XMO 2015 Staff', 'Problem Selection')
+        # Test permission error with a registering user.
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.edit('user', self.instance.userids['ABC_reg'],
+                           {'roles': 'Admin'})
+        reg_session.check_open_relative('person')
+        form = reg_session.get_main().find_all('form')[1]
+        reg_session.b.select_form(form)
+        admin_session.edit('user', self.instance.userids['ABC_reg'],
+                           {'roles': 'User,Register'})
+        reg_session.check_submit_selected(error='You do not have '
+                                          'permission to generate the '
+                                          'invitation letter for',
+                                          status=403)
+        # Test error from LaTeX.
         admin_session.check_open_relative('person')
         admin_session.b.select_form(
             admin_session.get_main().find_all('form')[1])

@@ -354,9 +354,10 @@ the registration system is not active.
   system.  A new document generation template
   :file:`invitation-letter-template.tex` is used for this purpose.
   :file:`person.item.html` and :file:`person.index.html` are updated
-  :file:accordingly.  A new variable
-  ``matholymp_invitation_letter_email`` must also be specified for the
-  registration system.  A new file
+  :file:accordingly.  New variables
+  ``matholymp_invitation_letter_email`` and
+  ``matholymp_invitation_letter_register`` must also be specified for
+  the registration system.  A new file
   :file:`extensions/email-template-invitation-change` is also needed
   to provide a template for the emails sent when personal details used
   in such letters are changed after such a letter has been generated

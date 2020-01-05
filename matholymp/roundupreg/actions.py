@@ -382,6 +382,7 @@ class DocumentGenerateAction(Action):
 
     # Subclasses must set this.
     required_classname = None
+    zip_permission_type = None
 
     def generate_documents(self, docgen):
         """Do the actual document generation."""
@@ -407,6 +408,21 @@ class DocumentGenerateAction(Action):
         """Generate a document."""
         if self.classname != self.required_classname:
             raise ValueError('Invalid class for document generation')
+        # The default Roundup checks for generic actions do not look
+        # at the itemid and do not allow for being more restrictive
+        # for the case of no itemid, so make those checks here.
+        if (self.nodeid is None
+            and self.zip_permission_type != self.permissionType):
+            if not self.hasPermission(self.zip_permission_type,
+                                      classname=self.classname):
+                raise Unauthorised('You do not have permission to %s the '
+                                   '%s class' % (self.name, self.classname))
+        if self.nodeid is not None:
+            if not self.hasPermission(self.permissionType,
+                                      classname=self.classname,
+                                      itemid=self.nodeid):
+                raise Unauthorised('You do not have permission to %s the '
+                                   '%s class' % (self.name, self.classname))
         docgen_path = self.db.config.ext['MATHOLYMP_DOCGEN_DIRECTORY']
         if not docgen_path:
             raise ValueError('Online document generation not enabled')
@@ -470,6 +486,7 @@ class NameBadgeAction(DocumentGenerateAction):
     name = 'generate the name badge for'
     permissionType = 'GenerateNameBadges'
     required_classname = 'person'
+    zip_permission_type = 'GenerateNameBadges'
 
     def generate_documents(self, docgen):
         use_background = self.db.config.ext['MATHOLYMP_BADGE_USE_BACKGROUND']
@@ -499,6 +516,7 @@ class InvitationLetterAction(DocumentGenerateAction):
     name = 'generate the invitation letter for'
     permissionType = 'GenerateInvitationLetters'
     required_classname = 'person'
+    zip_permission_type = 'GenerateInvitationLettersZip'
 
     def generate_documents(self, docgen):
         docgen.generate_invitation_letters(

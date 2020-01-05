@@ -596,7 +596,7 @@ select the appropriate options.  You must select &ldquo;Yes&rdquo; or
 
 <tal:block tal:condition="context/id">
 <tal:block tal:condition="python:not db._db.person.is_retired(context.id)">
-<tal:block tal:condition="python:db._db.config.ext['MATHOLYMP_DOCGEN_DIRECTORY'] and request.user.hasPermission('GenerateInvitationLetters')">
+<tal:block tal:condition="python:db._db.config.ext['MATHOLYMP_DOCGEN_DIRECTORY'] and request.user.hasPermission('GenerateInvitationLetters', 'person', None, context.id)">
 <form method="GET" tal:attributes="action context/designator">
 <table class="form">
 <tr>
