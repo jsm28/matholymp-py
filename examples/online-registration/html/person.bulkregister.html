@@ -36,6 +36,7 @@ CSV files must be encoded in UTF-8 (BOM optional). They may contain
 the following columns, in any order: Person Number (optional), Given
 Name (required), Family Name (required), Country Code (required),
 Primary Role (required), Other Roles (optional), Guide For Codes
+(optional), Allergies and Dietary Requirements
 (optional)<tal:block tal:condition="python:utils.have_consent_ui(db._db)">,
 Event Photos Consent (optional), Photo Consent (optional), Allergies
 and Dietary Requirements Consent (optional)</tal:block>.  In addition,

@@ -541,7 +541,8 @@ def show_bulk_csv_person(db, form):
     sitegen = RoundupSiteGenerator(db)
     sdata = static_site_event_group(db)
     columns = ['Given Name', 'Family Name', 'Country', 'Primary Role',
-               'Other Roles', 'Guide For', 'Previous Participation']
+               'Other Roles', 'Guide For', 'Previous Participation',
+               'Allergies and Dietary Requirements']
     if have_consent_ui(db):
         columns.extend(['Event Photos Consent', 'Photo Consent',
                         'Allergies and Dietary Requirements Consent'])
@@ -572,6 +573,8 @@ def show_bulk_csv_person(db, form):
                 # available.
                 person_link = str(person_number)
         out_row.append(person_link)
+        out_row.append(html.escape(csv_row.get(
+            'Allergies and Dietary Requirements', '')))
         if have_consent_ui(db):
             out_row.append(html.escape(csv_row.get('Event Photos Consent',
                                                    '')))

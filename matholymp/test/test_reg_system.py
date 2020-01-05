@@ -11213,7 +11213,8 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(reg2_csv, [])
         csv_cols = ['Person Number', 'Given Name', 'Family Name', 'Ignore',
                     'Country Code', 'Primary Role', 'Other Roles',
-                    'Guide For Codes', 'Contact Email 1', 'Contact Email 2']
+                    'Guide For Codes', 'Allergies and Dietary Requirements',
+                    'Contact Email 1', 'Contact Email 2']
         csv_in = [{'Person Number': '123',
                    'Given Name': 'Given One  ',
                    'Family Name': '  Family One',
@@ -11226,6 +11227,7 @@ class RegSystemTestCase(unittest.TestCase):
                    'Country Code': 'ZZA',
                    'Primary Role': 'Guide',
                    'Guide For Codes': 'ABC,DEF',
+                   'Allergies and Dietary Requirements': 'Vegetarian',
                    'Contact Email 1': 'DEF1@example.invalid',
                    'Contact Email 2': 'DEF2@example.invalid'}]
         csv_filename = self.gen_test_csv(csv_in, csv_cols)
@@ -11296,7 +11298,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
         expected_p2_admin.update(
             {'Gender': '', 'Date of Birth': '', 'Languages': '',
-             'Allergies and Dietary Requirements': '',
+             'Allergies and Dietary Requirements': 'Vegetarian',
              'T-Shirt Size': '', 'Arrival Place': '',
              'Arrival Date': '', 'Arrival Time': '',
              'Arrival Flight': '', 'Departure Place': '',
@@ -11386,8 +11388,9 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv, [])
         self.assertEqual(reg_csv, [])
         csv_cols = ['Person Number', 'Given Name', 'Family Name',
-                    'Country Code', 'Primary Role', 'Event Photos Consent',
-                    'Photo Consent',
+                    'Country Code', 'Primary Role',
+                    'Allergies and Dietary Requirements',
+                    'Event Photos Consent', 'Photo Consent',
                     'Allergies and Dietary Requirements Consent']
         csv_in = [{'Person Number': '123',
                    'Given Name': 'Given One  ',
@@ -11396,7 +11399,16 @@ class RegSystemTestCase(unittest.TestCase):
                    'Primary Role': 'Coordinator',
                    'Event Photos Consent': 'Yes',
                    'Photo Consent': 'badge_only',
-                   'Allergies and Dietary Requirements Consent': 'No'}]
+                   'Allergies and Dietary Requirements Consent': 'No'},
+                  {'Person Number': '124',
+                   'Given Name': 'Given Two  ',
+                   'Family Name': '  Family Two',
+                   'Country Code': 'ZZA',
+                   'Primary Role': 'Jury Chair',
+                   'Event Photos Consent': 'Yes',
+                   'Photo Consent': 'yes',
+                   'Allergies and Dietary Requirements': 'Pescetarian',
+                   'Allergies and Dietary Requirements Consent': 'Yes'}]
         csv_filename = self.gen_test_csv(csv_in, csv_cols)
         admin_session.check_open_relative('person?@template=bulkregister')
         admin_session.select_main_form()
@@ -11420,7 +11432,21 @@ class RegSystemTestCase(unittest.TestCase):
                        'P6': '', 'Total': '', 'Award': '',
                        'Extra Awards': '', 'Photo URL': '',
                        'Generic Number': '123'}
+        expected_p2 = {'XMO Number': '2', 'Country Number': '1',
+                       'Person Number': '2',
+                       'Annual URL': self.instance.url + 'person2',
+                       'Country Name': 'XMO 2015 Staff',
+                       'Country Code': 'ZZA', 'Primary Role': 'Jury Chair',
+                       'Other Roles': '',
+                       'Guide For': '',
+                       'Contestant Code': '', 'Contestant Age': '',
+                       'Given Name': 'Given Two', 'Family Name': 'Family Two',
+                       'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                       'P6': '', 'Total': '', 'Award': '',
+                       'Extra Awards': '', 'Photo URL': '',
+                       'Generic Number': '124'}
         expected_p1_admin = expected_p1.copy()
+        expected_p2_admin = expected_p2.copy()
         expected_p1_admin.update(
             {'Gender': '', 'Date of Birth': '', 'Languages': '',
              'Allergies and Dietary Requirements': 'Unknown',
@@ -11438,9 +11464,26 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Given Name': 'Given One',
              'Passport Family Name': 'Family One',
              'Event Photos Consent': 'Yes', 'Basic Data Missing': 'Yes'})
-        self.assertEqual(anon_csv, [expected_p1])
-        self.assertEqual(admin_csv, [expected_p1_admin])
-        self.assertEqual(reg_csv, [expected_p1])
+        expected_p2_admin.update(
+            {'Gender': '', 'Date of Birth': '', 'Languages': '',
+             'Allergies and Dietary Requirements': 'Pescetarian',
+             'T-Shirt Size': '', 'Arrival Place': '',
+             'Arrival Date': '', 'Arrival Time': '',
+             'Arrival Flight': '', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': '',
+             'Share Room With': '', 'Room Number': '',
+             'Phone Number': '', 'Badge Photo URL': '',
+             'Badge Background': 'generic', 'Badge Outer Colour': '231f20',
+             'Badge Inner Colour': 'a7a6a6', 'Badge Text Colour': '000000',
+             'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Passport Given Name': 'Given Two',
+             'Passport Family Name': 'Family Two',
+             'Event Photos Consent': 'Yes', 'Basic Data Missing': 'Yes'})
+        self.assertEqual(anon_csv, [expected_p1, expected_p2])
+        self.assertEqual(admin_csv, [expected_p1_admin, expected_p2_admin])
+        self.assertEqual(reg_csv, [expected_p1, expected_p2])
 
     @_with_config(static_site_directory='static-site')
     def test_person_bulk_register_static(self):
