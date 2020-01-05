@@ -61,10 +61,11 @@ from matholymp.roundupreg.roundupemail import send_email
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.roundupsource import RoundupDataSource
 from matholymp.roundupreg.rounduputil import distinguish_official, \
-    get_marks_per_problem, scores_from_str, person_is_contestant, \
-    contestant_code, scores_final, valid_country_problem, valid_int_str, \
-    create_rss, bulk_csv_data, bulk_csv_contact_emails, \
-    bulk_csv_country_number_url, bulk_csv_person_number_url, country_from_code
+    have_consent_ui, get_marks_per_problem, scores_from_str, \
+    person_is_contestant, contestant_code, scores_final, \
+    valid_country_problem, valid_int_str, create_rss, bulk_csv_data, \
+    bulk_csv_contact_emails, bulk_csv_country_number_url, \
+    bulk_csv_person_number_url, country_from_code
 from matholymp.roundupreg.userauditor import valid_address
 
 
@@ -740,7 +741,18 @@ class PersonBulkRegisterAction(BulkRegisterAction):
                 'reuse_photo': False}
 
     def get_str_column_map(self):
-        return {'Given Name': 'given_name', 'Family Name': 'family_name'}
+        col_map = {'Given Name': 'given_name', 'Family Name': 'family_name'}
+        if have_consent_ui(self.db):
+            col_map['Photo Consent'] = 'photo_consent'
+        return col_map
+
+    def get_bool_column_map(self):
+        if have_consent_ui(self.db):
+            return {'Event Photos Consent': 'event_photos_consent',
+                    'Allergies and Dietary Requirements Consent':
+                    'diet_consent'}
+        else:
+            return {}
 
     def get_comma_sep_columns(self):
         return ('Other Roles', 'Guide For Codes')

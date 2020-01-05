@@ -11369,6 +11369,79 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(reg_csv, [expected_p1, expected_p3, expected_p2])
         self.assertEqual(reg2_csv, [expected_p1, expected_p3, expected_p2])
 
+    @_with_config(consent_ui='Yes')
+    def test_person_bulk_register_consent_ui(self):
+        """
+        Test bulk registration of people, consent information collected.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        admin_session.create_country('DEF', 'Test Second Country')
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        csv_cols = ['Person Number', 'Given Name', 'Family Name',
+                    'Country Code', 'Primary Role', 'Event Photos Consent',
+                    'Photo Consent',
+                    'Allergies and Dietary Requirements Consent']
+        csv_in = [{'Person Number': '123',
+                   'Given Name': 'Given One  ',
+                   'Family Name': '  Family One',
+                   'Country Code': 'ZZA',
+                   'Primary Role': 'Coordinator',
+                   'Event Photos Consent': 'Yes',
+                   'Photo Consent': 'badge_only',
+                   'Allergies and Dietary Requirements Consent': 'No'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.check_submit_selected()
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        expected_p1 = {'XMO Number': '2', 'Country Number': '1',
+                       'Person Number': '1',
+                       'Annual URL': self.instance.url + 'person1',
+                       'Country Name': 'XMO 2015 Staff',
+                       'Country Code': 'ZZA', 'Primary Role': 'Coordinator',
+                       'Other Roles': '',
+                       'Guide For': '',
+                       'Contestant Code': '', 'Contestant Age': '',
+                       'Given Name': 'Given One', 'Family Name': 'Family One',
+                       'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                       'P6': '', 'Total': '', 'Award': '',
+                       'Extra Awards': '', 'Photo URL': '',
+                       'Generic Number': '123'}
+        expected_p1_admin = expected_p1.copy()
+        expected_p1_admin.update(
+            {'Gender': '', 'Date of Birth': '', 'Languages': '',
+             'Allergies and Dietary Requirements': 'Unknown',
+             'T-Shirt Size': '', 'Arrival Place': '',
+             'Arrival Date': '', 'Arrival Time': '',
+             'Arrival Flight': '', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': '',
+             'Share Room With': '', 'Room Number': '',
+             'Phone Number': '', 'Badge Photo URL': '',
+             'Badge Background': 'generic', 'Badge Outer Colour': 'f78b11',
+             'Badge Inner Colour': 'fccc8f', 'Badge Text Colour': '000000',
+             'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Passport Given Name': 'Given One',
+             'Passport Family Name': 'Family One',
+             'Event Photos Consent': 'Yes', 'Basic Data Missing': 'Yes'})
+        self.assertEqual(anon_csv, [expected_p1])
+        self.assertEqual(admin_csv, [expected_p1_admin])
+        self.assertEqual(reg_csv, [expected_p1])
+
     @_with_config(static_site_directory='static-site')
     def test_person_bulk_register_static(self):
         """
@@ -11976,6 +12049,57 @@ class RegSystemTestCase(unittest.TestCase):
         admin2_session.check_submit_selected(error='You do not have '
                                              'permission to bulk register',
                                              status=403)
+
+    @_with_config(consent_ui='Yes')
+    def test_person_bulk_register_errors_consent_ui(self):
+        """
+        Test errors from bulk registration of people, consent
+        information collected.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        # Errors with content, where the uploaded file is a valid CSV
+        # file.
+        csv_cols = ['Person Number', 'Given Name', 'Family Name',
+                    'Country Code', 'Primary Role', 'Event Photos Consent',
+                    'Photo Consent',
+                    'Allergies and Dietary Requirements Consent']
+        # Errors from auditor.
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'Coordinator',
+                   'Photo Consent': 'invalid'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(
+            error=r'row 1: No choice of consent for registration photo '
+            r'specified')
+        # Errors for bad boolean consent information.
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'Coordinator',
+                   'Event Photos Consent': 'Maybe'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error="'Event Photos Consent' bad "
+                                            "value in row 1")
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'Coordinator',
+                   'Allergies and Dietary Requirements Consent': 'Maybe'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error="'Allergies and Dietary "
+                                            "Requirements Consent' bad value "
+                                            "in row 1")
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
 
     @_with_config(static_site_directory='static-site')
     def test_person_bulk_register_errors_static(self):
