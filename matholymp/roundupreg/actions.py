@@ -742,7 +742,8 @@ class PersonBulkRegisterAction(BulkRegisterAction):
 
     def get_str_column_map(self):
         col_map = {'Given Name': 'given_name', 'Family Name': 'family_name',
-                   'Allergies and Dietary Requirements': 'diet'}
+                   'Allergies and Dietary Requirements': 'diet',
+                   'Phone Number': 'phone_number'}
         if have_consent_ui(self.db):
             col_map['Photo Consent'] = 'photo_consent'
         return col_map

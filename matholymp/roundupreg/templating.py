@@ -542,7 +542,7 @@ def show_bulk_csv_person(db, form):
     sdata = static_site_event_group(db)
     columns = ['Given Name', 'Family Name', 'Country', 'Primary Role',
                'Other Roles', 'Guide For', 'Previous Participation',
-               'Allergies and Dietary Requirements']
+               'Allergies and Dietary Requirements', 'Phone Number']
     if have_consent_ui(db):
         columns.extend(['Event Photos Consent', 'Photo Consent',
                         'Allergies and Dietary Requirements Consent'])
@@ -575,6 +575,8 @@ def show_bulk_csv_person(db, form):
         out_row.append(person_link)
         out_row.append(html.escape(csv_row.get(
             'Allergies and Dietary Requirements', '')))
+        out_row.append(html.escape(csv_row.get(
+            'Phone Number', '')))
         if have_consent_ui(db):
             out_row.append(html.escape(csv_row.get('Event Photos Consent',
                                                    '')))
