@@ -50,10 +50,13 @@ previously participated.  If &lsquo;Photo&rsquo; is specified, it must
 be the filename of a photo in a ZIP file uploaded at the same time (in
 exactly the same form as the filename appears in the ZIP file,
 including any directory components; for example,
-&lsquo;dir/photo.jpg&rsquo;).  &lsquo;Photo Consent&rsquo;, if specified,
-must be one of &lsquo;not_applicable&rsquo;, &lsquo;no&rsquo;,
+&lsquo;dir/photo.jpg&rsquo;).
+<tal:block tal:condition="python:utils.have_consent_ui(db._db)">&lsquo;Photo
+Consent&rsquo;, if specified, must be one of
+&lsquo;not_applicable&rsquo;, &lsquo;no&rsquo;,
 &lsquo;badge_only&rsquo;, &lsquo;yes&rsquo;.  Other consent columns,
-if specified, must be one of &lsquo;Yes&rsquo; and &lsquo;No&rsquo;.
+if specified, must be one of &lsquo;Yes&rsquo; and
+&lsquo;No&rsquo;.</tal:block>
 Unknown columns are ignored.  Only
 participants for staff countries may be registered through bulk
 registration.  If a contact email address is specified, a
