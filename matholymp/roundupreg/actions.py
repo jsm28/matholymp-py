@@ -53,7 +53,8 @@ import roundup.password
 
 from matholymp.data import EventGroup
 from matholymp.docgen import read_docgen_config, DocumentGenerator
-from matholymp.fileutil import read_text_from_file, boolean_states
+from matholymp.fileutil import read_text_from_file, boolean_states, \
+    file_extension, mime_type_map
 from matholymp.images import open_image_no_alpha, scale_image_to_size_jpeg
 from matholymp.roundupreg.auditors import audit_country_fields, \
     audit_person_fields
@@ -65,7 +66,7 @@ from matholymp.roundupreg.rounduputil import distinguish_official, \
     person_is_contestant, contestant_code, scores_final, \
     valid_country_problem, valid_int_str, create_rss, bulk_csv_data, \
     bulk_csv_contact_emails, bulk_csv_country_number_url, \
-    bulk_csv_person_number_url, country_from_code
+    bulk_csv_person_number_url, bulk_zip_data, country_from_code
 from matholymp.roundupreg.userauditor import valid_address
 
 
@@ -568,6 +569,10 @@ class BulkRegisterAction(Action):
             self.client.add_error_message(csv_data)
             return
         file_data, check_only = csv_data
+        zip_data = bulk_zip_data(self.db, self.form)
+        if isinstance(zip_data, str):
+            self.client.add_error_message(zip_data)
+            return
         # Verify the rows individually, generating corresponding data
         # for subsequent item creation.
         required_columns = self.get_required_columns()
@@ -576,6 +581,7 @@ class BulkRegisterAction(Action):
         default_values = self.get_default_values()
         str_column_map = self.get_str_column_map()
         bool_column_map = self.get_bool_column_map()
+        file_column_map = self.get_file_column_map()
         item_class = self.db.getclass(self.classname)
         item_data = []
         for row_num, row in enumerate(file_data, start=1):
@@ -604,6 +610,24 @@ class BulkRegisterAction(Action):
                             "'%s' bad value in row %d" % (key, row_num))
                         return
                     newvalues[bool_column_map[key]] = bool_val
+            for key in file_column_map:
+                if key in row:
+                    if zip_data is None:
+                        self.client.add_error_message(
+                            "'%s' in row %d with no ZIP file" % (key, row_num))
+                        return
+                    try:
+                        file_bytes = zip_data.read(row[key])
+                    except (zipfile.BadZipFile, zipfile.LargeZipFile,
+                            RuntimeError, ValueError, NotImplementedError,
+                            KeyError, EOFError) as exc:
+                        self.client.add_error_message('row %d: %s'
+                                                      % (row_num, str(exc)))
+                        return
+                    # The auditor needs to handle having a tuple here,
+                    # and adjust_for_create needs to convert them to a
+                    # linked item for the actual creation.
+                    newvalues[file_column_map[key]] = (row[key], file_bytes)
             try:
                 self.map_csv_data(row, newvalues)
                 # Run the auditor for each item at this point to
@@ -622,6 +646,7 @@ class BulkRegisterAction(Action):
         else:
             self.client.template = 'index'
             for csv_row, item in zip(file_data, item_data):
+                self.adjust_for_create(item)
                 item_id = item_class.create(**item)
                 self.db.commit()
                 self.client.add_ok_message('%s%s created'
@@ -648,6 +673,10 @@ class BulkRegisterAction(Action):
         """Return the mapping of boolean column names to property names."""
         return {}
 
+    def get_file_column_map(self):
+        """Return the mapping of file upload column names to property names."""
+        return {}
+
     def get_comma_sep_columns(self):
         """Return the list of columns with comma-separated values."""
         return ()
@@ -657,6 +686,9 @@ class BulkRegisterAction(Action):
 
     def adjust_after_audit(self, row, newvalues):
         """Adjust item properties after call to auditor."""
+
+    def adjust_for_create(self, newvalues):
+        """Adjust item properties just before creating item."""
 
     def act_after_create(self, item_id, item, csv_row):
         """Act after the creation of a new item."""
@@ -756,6 +788,9 @@ class PersonBulkRegisterAction(BulkRegisterAction):
         else:
             return {}
 
+    def get_file_column_map(self):
+        return {'Photo': 'photo'}
+
     def get_comma_sep_columns(self):
         return ('Other Roles', 'Guide For Codes')
 
@@ -798,6 +833,21 @@ class PersonBulkRegisterAction(BulkRegisterAction):
         # avoid creating photo items when only doing initial
         # validation, then to True afterwards.
         newvalues['reuse_photo'] = True
+
+    def adjust_for_create(self, newvalues):
+        # Convert (filename, contents) pair for photos to the id of a
+        # photo item in the database.
+        if 'photo' in newvalues:
+            filename = newvalues['photo'][0]
+            filename = filename.split('/')[-1]
+            file_ext = file_extension(filename)
+            # The verification done by the auditor means the
+            # extension is definitely a known one in mime_type_map.
+            file_type = mime_type_map[file_ext]
+            content = newvalues['photo'][1]
+            newvalues['photo'] = self.db.photo.create(name=filename,
+                                                      type=file_type,
+                                                      content=content)
 
     def act_after_create(self, item_id, item, csv_row):
         contact_list = bulk_csv_contact_emails(csv_row)

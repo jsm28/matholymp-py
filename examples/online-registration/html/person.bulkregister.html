@@ -37,7 +37,8 @@ the following columns, in any order: Person Number (optional), Given
 Name (required), Family Name (required), Country Code (required),
 Primary Role (required), Other Roles (optional), Guide For Codes
 (optional), Allergies and Dietary Requirements (optional), Phone
-Number (optional)<tal:block tal:condition="python:utils.have_consent_ui(db._db)">,
+Number (optional), Photo
+(optional)<tal:block tal:condition="python:utils.have_consent_ui(db._db)">,
 Event Photos Consent (optional), Photo Consent (optional), Allergies
 and Dietary Requirements Consent (optional)</tal:block>.  In addition,
 they may contain any number of columns with names &lsquo;Contact Email
@@ -45,7 +46,11 @@ they may contain any number of columns with names &lsquo;Contact Email
 addresses for each person.  Person numbers are the numbers in the
 <tal:block tal:replace="python:db._db.config.ext['MATHOLYMP_GENERIC_URL_DESC']"
 /> for previous participation, or empty for a person who has not
-previously participated.  &lsquo;Photo Consent&rsquo;, if specified,
+previously participated.  If &lsquo;Photo&rsquo; is specified, it must
+be the filename of a photo in a ZIP file uploaded at the same time (in
+exactly the same form as the filename appears in the ZIP file,
+including any directory components; for example,
+&lsquo;dir/photo.jpg&rsquo;).  &lsquo;Photo Consent&rsquo;, if specified,
 must be one of &lsquo;not_applicable&rsquo;, &lsquo;no&rsquo;,
 &lsquo;badge_only&rsquo;, &lsquo;yes&rsquo;.  Other consent columns,
 if specified, must be one of &lsquo;Yes&rsquo; and &lsquo;No&rsquo;.
@@ -65,6 +70,11 @@ them to complete other registration details.
 <tr>
 <th i18n:translate="">Field separator in CSV file</th>
 <td colspan=3><input type="radio" checked="checked" name="csv_delimiter" value=",">Comma<input type="radio" name="csv_delimiter" value=";">Semicolon</td>
+</tr>
+
+<tr>
+<th i18n:translate="">Upload ZIP file</th>
+<td colspan=3><input type="file" name="zip_file" size="20"></td>
 </tr>
 
 <tr>

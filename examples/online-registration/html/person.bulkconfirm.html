@@ -33,6 +33,8 @@ bulk registration; if not OK, try uploading a fixed CSV file.</p>
        tal:attributes="value python:utils.bulk_csv_delimiter(request.form)">
 <input type="hidden" name="csv_contents"
        tal:attributes="value python:utils.bulk_csv_contents(request.form)">
+<input type="hidden" name="zip_ref"
+       tal:attributes="value python:utils.bulk_zip_ref(request.form)">
 <input name="@csrf" type="hidden"
        tal:attributes="value python:utils.anti_csrf_nonce()">
 <input type="submit" value="Complete bulk registration of these participants">

@@ -39,7 +39,8 @@ import re
 
 from matholymp.datetimeutil import date_from_ymd_str, date_from_ymd_iso, \
     time_from_hhmm_str
-from matholymp.fileutil import read_text_from_file
+from matholymp.fileutil import read_text_from_file, file_format_contents, \
+    file_extension
 from matholymp.roundupreg.auditorutil import get_new_value, require_value
 from matholymp.roundupreg.roundupemail import send_email
 from matholymp.roundupreg.rounduputil import have_consent_forms, \
@@ -95,8 +96,16 @@ def audit_event_fields(db, cl, nodeid, newvalues):
 
 def audit_file_format(db, cls, file_id, desc1, desc2, fmts, fmtdesc):
     """Check for format of an uploaded file."""
-    format_contents = db_file_format_contents(db, cls, file_id)
-    format_ext = db_file_extension(db, cls, file_id)
+    if isinstance(file_id, tuple):
+        # This is the case of bulk registration, where the filename
+        # and contents are specified directly at verification time and
+        # the database object is only created when the bulk
+        # registration is acted on.
+        format_contents = file_format_contents(None, file_id[1])
+        format_ext = file_extension(file_id[0])
+    else:
+        format_contents = db_file_format_contents(db, cls, file_id)
+        format_ext = db_file_extension(db, cls, file_id)
     if format_contents not in fmts:
         raise ValueError('%s must be in %s format' % (desc1, fmtdesc))
     if format_ext != format_contents:
@@ -532,16 +541,17 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         if file_id is not None:
             audit_file_format(db, 'photo', file_id, 'Photos', 'photo',
                               ('jpg', 'png'), 'JPEG or PNG')
-            file_person = db.photo.get(file_id, 'person')
-            if file_person is not None and file_person != nodeid:
-                raise ValueError('Photo from another person')
-            if file_person is None:
-                # Ensure a race cannot occur linking to a photo
-                # uploaded by another user before the person reactor
-                # runs to set the person for that photo.
-                file_creator = db.photo.get(file_id, 'creator')
-                if file_creator != userid:
-                    raise ValueError('Photo from another user')
+            if not isinstance(file_id, tuple):
+                file_person = db.photo.get(file_id, 'person')
+                if file_person is not None and file_person != nodeid:
+                    raise ValueError('Photo from another person')
+                if file_person is None:
+                    # Ensure a race cannot occur linking to a photo
+                    # uploaded by another user before the person
+                    # reactor runs to set the person for that photo.
+                    file_creator = db.photo.get(file_id, 'creator')
+                    if file_creator != userid:
+                        raise ValueError('Photo from another user')
 
     if have_consent_forms(db) and 'consent_form' in newvalues:
         file_id = newvalues['consent_form']

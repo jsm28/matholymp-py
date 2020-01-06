@@ -34,7 +34,7 @@ registration system.
 
 import os.path
 
-from matholymp.fileutil import file_extension
+from matholymp.fileutil import file_extension, mime_type_map
 from matholymp.sitegen import read_sitegen_config, sitegen_event_group
 
 __all__ = ['static_site_event_group', 'static_site_file_data']
@@ -70,7 +70,6 @@ def static_site_file_data(db, url):
         return None
     static_site_path = os.path.join(db.config.TRACKER_HOME, static_site_path)
     file_path = os.path.join(static_site_path, *url_dirs)
-    mime_type_map = {'png': 'image/png', 'jpg': 'image/jpeg'}
     file_ext = file_extension(file_path)
     if file_ext not in mime_type_map:
         return None

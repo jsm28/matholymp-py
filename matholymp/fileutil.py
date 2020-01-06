@@ -45,7 +45,7 @@ __all__ = ['read_utf8_csv', 'read_utf8_csv_bytes', 'write_utf8_csv_bytes',
            'write_bytes_to_file', 'write_text_to_file', 'read_text_from_file',
            'replace_text_in_file', 'read_config_raw', 'read_config',
            'write_config_raw', 'boolean_states', 'remove_if_exists',
-           'file_format_contents', 'file_extension']
+           'file_format_contents', 'file_extension', 'mime_type_map']
 
 
 def read_utf8_csv(csv_file_name):
@@ -236,18 +236,21 @@ _file_format_ext_map = {'jpeg': 'jpg',
                         'png': 'png'}
 
 
-def file_format_contents(filename):
+def file_format_contents(filename, contents=None):
     """
     Return the format of a file (in the form of a canonical filename
     extension) based on its contents, or None if not a known format
     that might be valid for some matholymp uses.
     """
-    fmt = imghdr.what(filename)
+    fmt = imghdr.what(filename, contents)
     if fmt in _file_format_ext_map:
         return _file_format_ext_map[fmt]
     else:
-        with open(filename, 'rb') as f:
-            h = f.read(5)
+        if contents is not None:
+            h = contents[:5]
+        else:
+            with open(filename, 'rb') as f:
+                h = f.read(5)
         if h == b'%PDF-':
             return 'pdf'
         return None
@@ -277,3 +280,7 @@ def file_extension(name):
         return _file_ext_map[name]
     else:
         return None
+
+
+mime_type_map = {'png': 'image/png', 'jpg': 'image/jpeg'}
+"""Mapping of file extensions to corresponding MIME types."""

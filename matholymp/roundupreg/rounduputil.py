@@ -36,9 +36,13 @@ import base64
 import binascii
 import csv
 import datetime
+import hashlib
 import html
+import os
+import os.path
 import re
 import time
+import zipfile
 
 from matholymp.datetimeutil import date_from_ymd_str, date_from_ymd_iso, \
     age_on_date
@@ -59,7 +63,8 @@ __all__ = ['distinguish_official', 'get_consent_forms_date_str',
            'db_file_format_contents', 'db_file_extension', 'db_file_url',
            'bulk_csv_delimiter', 'bulk_csv_data', 'bulk_csv_contact_emails',
            'bulk_csv_country_number_url', 'bulk_csv_person_number_url',
-           'country_from_code', 'invitation_letter_register']
+           'upload_path_from_hash', 'bulk_zip_data', 'country_from_code',
+           'invitation_letter_register']
 
 
 def distinguish_official(db):
@@ -473,6 +478,58 @@ def bulk_csv_person_number_url(db, row):
                 '%speople/person%s/' % (gubase, person_number))
     else:
         return None, None
+
+
+def upload_path_from_hash(db, hashstr):
+    """
+    Return the path to use for an uploaded file, creating any required
+    directories.  This is used to stash uploaded ZIP files between the
+    first and second stages of bulk registration.  At present, such
+    uploaded files are never deleted once created.
+    """
+    db_path = db.config.DATABASE
+    upload_path = os.path.join(db_path, 'upload')
+    os.makedirs(upload_path, exist_ok=True)
+    return os.path.join(upload_path, hashstr)
+
+
+def bulk_zip_data(db, form):
+    """
+    Return a ZipFile object for an uploaded ZIP file, or None if no
+    such file was uploaded, or a string on error.
+    """
+    # A zip_file form input means a ZIP file has been uploaded now.  A
+    # zip_ref form input refers to such a file previously uploaded.
+    if 'zip_file' in form:
+        file_bytes = form['zip_file'].value
+        if not isinstance(file_bytes, bytes):
+            return 'zip_file not an uploaded file'
+        hashstr = hashlib.sha256(file_bytes).hexdigest()
+        file_path = upload_path_from_hash(db, hashstr)
+        if not os.access(file_path, os.F_OK):
+            with open(file_path, 'wb') as file:
+                file.write(file_bytes)
+        try:
+            return zipfile.ZipFile(file_path)
+        except (zipfile.BadZipFile, zipfile.LargeZipFile, RuntimeError,
+                ValueError, NotImplementedError, EOFError) as exc:
+            return str(exc)
+    elif 'zip_ref' in form:
+        hashstr = form['zip_ref'].value
+        if not isinstance(hashstr, str):
+            return 'zip_ref an uploaded file'
+        if not re.fullmatch('[0-9a-f]{64}', hashstr):
+            return 'zip_ref not a valid hash'
+        file_path = upload_path_from_hash(db, hashstr)
+        if not os.access(file_path, os.F_OK):
+            return 'zip_ref not a known hash'
+        try:
+            return zipfile.ZipFile(file_path)
+        except (zipfile.BadZipFile, zipfile.LargeZipFile, RuntimeError,
+                ValueError, NotImplementedError, EOFError) as exc:
+            return str(exc)
+    else:
+        return None
 
 
 def country_from_code(db, code):

@@ -45,10 +45,11 @@ __all__ = ['people_from_country_internal', 'people_from_country',
            'register_templating_utils', 'show_prereg_sidebar',
            'show_prereg_reminder', 'bulk_csv_contents',
            'show_bulk_csv_country', 'show_bulk_csv_country_link_from_code',
-           'show_bulk_csv_person', 'required_user_fields']
+           'show_bulk_csv_person', 'bulk_zip_ref', 'required_user_fields']
 
 import base64
 import datetime
+import hashlib
 import html
 import json
 
@@ -542,7 +543,7 @@ def show_bulk_csv_person(db, form):
     sdata = static_site_event_group(db)
     columns = ['Given Name', 'Family Name', 'Country', 'Primary Role',
                'Other Roles', 'Guide For', 'Previous Participation',
-               'Allergies and Dietary Requirements', 'Phone Number']
+               'Allergies and Dietary Requirements', 'Phone Number', 'Photo']
     if have_consent_ui(db):
         columns.extend(['Event Photos Consent', 'Photo Consent',
                         'Allergies and Dietary Requirements Consent'])
@@ -577,6 +578,7 @@ def show_bulk_csv_person(db, form):
             'Allergies and Dietary Requirements', '')))
         out_row.append(html.escape(csv_row.get(
             'Phone Number', '')))
+        out_row.append(html.escape(csv_row.get('Photo', '')))
         if have_consent_ui(db):
             out_row.append(html.escape(csv_row.get('Event Photos Consent',
                                                    '')))
@@ -587,6 +589,17 @@ def show_bulk_csv_person(db, form):
         out_row.append(html.escape(', '.join(contact_emails)))
         body_row_list.append(sitegen.html_tr_td_list(out_row))
     return sitegen.html_table_thead_tbody_list(head_row_list, body_row_list)
+
+
+def bulk_zip_ref(form):
+    """Return hash of a previously uploaded ZIP file."""
+    # In valid uses, zip_file is present as an uploaded file.  To
+    # avoid errors to the registration system admin when the template
+    # using this function is accessed directly without such an upload,
+    # silently return an empty string in such a case.
+    if 'zip_file' not in form or not isinstance(form['zip_file'].value, bytes):
+        return ''
+    return hashlib.sha256(form['zip_file'].value).hexdigest()
 
 
 def required_user_fields(db):
@@ -649,4 +662,5 @@ def register_templating_utils(instance):
     instance.registerUtil('bulk_csv_delimiter', bulk_csv_delimiter)
     instance.registerUtil('show_bulk_csv_country', show_bulk_csv_country)
     instance.registerUtil('show_bulk_csv_person', show_bulk_csv_person)
+    instance.registerUtil('bulk_zip_ref', bulk_zip_ref)
     instance.registerUtil('required_user_fields', required_user_fields)
