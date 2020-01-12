@@ -393,11 +393,12 @@ def bulk_csv_data(form, comma_sep_fields=()):
     for whether just to check the results or act on them, or a string
     error message.
     """
-    # A csv_file form input means data has been uploaded for initial
-    # checking.  A csv_contents form input means the previously
-    # checked data has been submitted for actual bulk registration
-    # (but should still be rechecked rather than trusting the client).
-    if 'csv_file' in form:
+    # A csv_file form input with nonempty filename means data has been
+    # uploaded for initial checking.  A csv_contents form input means
+    # the previously checked data has been submitted for actual bulk
+    # registration (but should still be rechecked rather than trusting
+    # the client).
+    if 'csv_file' in form and form['csv_file'].filename != '':
         check_only = True
         file_bytes = form['csv_file'].value
         if not isinstance(file_bytes, bytes):
@@ -498,9 +499,10 @@ def bulk_zip_data(db, form):
     Return a ZipFile object for an uploaded ZIP file, or None if no
     such file was uploaded, or a string on error.
     """
-    # A zip_file form input means a ZIP file has been uploaded now.  A
-    # zip_ref form input refers to such a file previously uploaded.
-    if 'zip_file' in form:
+    # A zip_file form input with nonempty filename means a ZIP file
+    # has been uploaded now.  A nonempty zip_ref form input refers to
+    # such a file previously uploaded.
+    if 'zip_file' in form and form['zip_file'].filename != '':
         file_bytes = form['zip_file'].value
         if not isinstance(file_bytes, bytes):
             return 'zip_file not an uploaded file'
@@ -514,7 +516,7 @@ def bulk_zip_data(db, form):
         except (zipfile.BadZipFile, zipfile.LargeZipFile, RuntimeError,
                 ValueError, NotImplementedError, EOFError) as exc:
             return str(exc)
-    elif 'zip_ref' in form:
+    elif 'zip_ref' in form and form['zip_ref'].value != '':
         hashstr = form['zip_ref'].value
         if not isinstance(hashstr, str):
             return 'zip_ref an uploaded file'

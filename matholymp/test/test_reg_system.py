@@ -3278,7 +3278,15 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.set({'@template': 'item'})
         admin_session.check_submit_selected(error='Node id specified for bulk '
                                             'registration')
-        # Errors missing uploaded CSV data.
+        # Errors missing uploaded CSV data.  The first case (csv_file
+        # present in the form but no file submitted there) is wrongly
+        # handled the same as the second (no csv_file in the form) by
+        # MechanicalSoup versions 0.11 and earlier
+        # <https://github.com/MechanicalSoup/MechanicalSoup/issues/250>.
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        form = admin_session.get_main_form()
+        admin_session.check_submit_selected(error='no CSV file uploaded')
         admin_session.check_open_relative('country?@template=bulkregister')
         admin_session.select_main_form()
         form = admin_session.get_main_form()
@@ -12021,7 +12029,15 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.set({'@template': 'item'})
         admin_session.check_submit_selected(error='Node id specified for bulk '
                                             'registration')
-        # Errors missing uploaded CSV data.
+        # Errors missing uploaded CSV data.  The first case (csv_file
+        # present in the form but no file submitted there) is wrongly
+        # handled the same as the second (no csv_file in the form) by
+        # MechanicalSoup versions 0.11 and earlier
+        # <https://github.com/MechanicalSoup/MechanicalSoup/issues/250>.
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        form = admin_session.get_main_form()
+        admin_session.check_submit_selected(error='no CSV file uploaded')
         admin_session.check_open_relative('person?@template=bulkregister')
         admin_session.select_main_form()
         form = admin_session.get_main_form()

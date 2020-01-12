@@ -472,7 +472,9 @@ def bulk_csv_contents(form):
     # avoid errors to the registration system admin when the template
     # using this function is accessed directly without such an upload,
     # silently return an empty string in such a case.
-    if 'csv_file' not in form or not isinstance(form['csv_file'].value, bytes):
+    if ('csv_file' not in form
+        or form['csv_file'].filename == ''
+        or not isinstance(form['csv_file'].value, bytes)):
         return ''
     return base64.b64encode(form['csv_file'].value).decode('ascii')
 
@@ -593,11 +595,14 @@ def show_bulk_csv_person(db, form):
 
 def bulk_zip_ref(form):
     """Return hash of a previously uploaded ZIP file."""
-    # In valid uses, zip_file is present as an uploaded file.  To
-    # avoid errors to the registration system admin when the template
-    # using this function is accessed directly without such an upload,
-    # silently return an empty string in such a case.
-    if 'zip_file' not in form or not isinstance(form['zip_file'].value, bytes):
+    # In valid uses, zip_file is present as a possibly uploaded file
+    # (empty filename if no file was uploaded).  To avoid errors to
+    # the registration system admin when the template using this
+    # function is accessed directly without such an upload, silently
+    # return an empty string in such a case.
+    if ('zip_file' not in form
+        or form['zip_file'].filename == ''
+        or not isinstance(form['zip_file'].value, bytes)):
         return ''
     return hashlib.sha256(form['zip_file'].value).hexdigest()
 
