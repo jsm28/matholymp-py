@@ -775,7 +775,11 @@ class PersonBulkRegisterAction(BulkRegisterAction):
     def get_str_column_map(self):
         col_map = {'Given Name': 'given_name', 'Family Name': 'family_name',
                    'Allergies and Dietary Requirements': 'diet',
-                   'Phone Number': 'phone_number'}
+                   'Phone Number': 'phone_number',
+                   'Arrival Date': 'arrival_date',
+                   'Arrival Flight': 'arrival_flight',
+                   'Departure Date': 'departure_date',
+                   'Departure Flight': 'departure_flight'}
         if have_consent_ui(self.db):
             col_map['Photo Consent'] = 'photo_consent'
         return col_map
@@ -823,6 +827,38 @@ class PersonBulkRegisterAction(BulkRegisterAction):
             newvalues['guide_for'] = []
             for code in row['Guide For Codes']:
                 newvalues['guide_for'].append(country_from_code(self.db, code))
+        if 'Arrival Place' in row:
+            arrival_place = row['Arrival Place']
+            try:
+                newvalues['arrival_place'] = self.db.arrival.lookup(
+                    arrival_place)
+            except KeyError:
+                raise ValueError('unknown arrival place %s' % arrival_place)
+        if 'Arrival Time' in row:
+            arrival_time_str = row['Arrival Time']
+            arrival_time = arrival_time_str.split(':')
+            if len(arrival_time) == 2:
+                newvalues['arrival_time_hour'] = arrival_time[0]
+                newvalues['arrival_time_minute'] = arrival_time[1]
+            else:
+                raise ValueError('invalid arrival time %s' % arrival_time_str)
+        if 'Departure Place' in row:
+            departure_place = row['Departure Place']
+            try:
+                newvalues['departure_place'] = self.db.arrival.lookup(
+                    departure_place)
+            except KeyError:
+                raise ValueError('unknown departure place %s'
+                                 % departure_place)
+        if 'Departure Time' in row:
+            departure_time_str = row['Departure Time']
+            departure_time = departure_time_str.split(':')
+            if len(departure_time) == 2:
+                newvalues['departure_time_hour'] = departure_time[0]
+                newvalues['departure_time_minute'] = departure_time[1]
+            else:
+                raise ValueError('invalid departure time %s'
+                                 % departure_time_str)
         contact_list = bulk_csv_contact_emails(row)
         for email in contact_list:
             if not valid_address(email):

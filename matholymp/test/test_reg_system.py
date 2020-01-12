@@ -11221,6 +11221,8 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session = self.get_session('admin')
         admin_session.create_country_generic()
         admin_session.create_country('DEF', 'Test Second Country')
+        admin_session.create('arrival', {'name': 'Example Airport'})
+        admin_session.create('arrival', {'name': 'Example Station'})
         reg_session = self.get_session('ABC_reg')
         reg2_session = self.get_session('DEF_reg')
         anon_csv = session.get_people_csv()
@@ -11234,7 +11236,10 @@ class RegSystemTestCase(unittest.TestCase):
         csv_cols = ['Person Number', 'Given Name', 'Family Name', 'Ignore',
                     'Country Code', 'Primary Role', 'Other Roles',
                     'Guide For Codes', 'Allergies and Dietary Requirements',
-                    'Phone Number', 'Contact Email 1', 'Contact Email 2']
+                    'Arrival Place', 'Arrival Date', 'Arrival Time',
+                    'Arrival Flight', 'Departure Place', 'Departure Date',
+                    'Departure Time', 'Departure Flight', 'Phone Number',
+                    'Contact Email 1', 'Contact Email 2']
         csv_in = [{'Person Number': '123',
                    'Given Name': 'Given One  ',
                    'Family Name': '  Family One',
@@ -11242,6 +11247,14 @@ class RegSystemTestCase(unittest.TestCase):
                    'Country Code': 'ZZA',
                    'Primary Role': 'Coordinator',
                    'Other Roles': 'Jury Chair,Problem Selection',
+                   'Arrival Place': 'Example Airport',
+                   'Arrival Date': '2015-04-02',
+                   'Arrival Time': '12:35',
+                   'Arrival Flight': 'ABC987',
+                   'Departure Place': 'Example Station',
+                   'Departure Date': '2015-04-03',
+                   'Departure Time': '23:59',
+                   'Departure Flight': 'XYZ123',
                    'Phone Number': '0123456789'},
                   {'Given Name': ' Test\u00fd',
                    'Family Name': 'Test',
@@ -11303,11 +11316,11 @@ class RegSystemTestCase(unittest.TestCase):
         expected_p1_admin.update(
             {'Gender': '', 'Date of Birth': '', 'Languages': '',
              'Allergies and Dietary Requirements': '',
-             'T-Shirt Size': '', 'Arrival Place': '',
-             'Arrival Date': '', 'Arrival Time': '',
-             'Arrival Flight': '', 'Departure Place': '',
-             'Departure Date': '', 'Departure Time': '',
-             'Departure Flight': '', 'Room Type': '',
+             'T-Shirt Size': '', 'Arrival Place': 'Example Airport',
+             'Arrival Date': '2015-04-02', 'Arrival Time': '12:35',
+             'Arrival Flight': 'ABC987', 'Departure Place': 'Example Station',
+             'Departure Date': '2015-04-03', 'Departure Time': '23:59',
+             'Departure Flight': 'XYZ123', 'Room Type': '',
              'Share Room With': '', 'Room Number': '',
              'Phone Number': '0123456789', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': 'f78b11',
@@ -12095,7 +12108,9 @@ class RegSystemTestCase(unittest.TestCase):
         # file.
         csv_cols = ['Person Number', 'Given Name', 'Family Name', 'Ignore',
                     'Country Code', 'Primary Role', 'Other Roles',
-                    'Guide For Codes', 'Contact Email 1', 'Contact Email 2']
+                    'Guide For Codes', 'Arrival Place', 'Arrival Date',
+                    'Arrival Time', 'Departure Place', 'Departure Date',
+                    'Departure Time', 'Contact Email 1', 'Contact Email 2']
         csv_in = [{'Person Number': '123',
                    'Given Name': 'Test',
                    'Family Name': 'Test',
@@ -12220,6 +12235,158 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.set({'csv_file': csv_filename})
         admin_session.check_submit_selected(error='row 1: May only guide '
                                             'normal countries')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Arrival Date': '1-2-3'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: arrival date: bad '
+                                            'date')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Arrival Date': '2015-22-33'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        # Error from standard library, so not checking exact text.
+        admin_session.check_submit_selected(error='row 1: arrival date: ')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Arrival Date': '2015-04-01',
+                   'Arrival Time': '000:00'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: arrival time: '
+                                            'invalid hour')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Arrival Date': '2015-04-01',
+                   'Arrival Time': '00:000'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: arrival time: '
+                                            'invalid minute')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Arrival Date': '2015-04-01',
+                   'Arrival Time': '25:61'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        # Error from standard library, so not checking exact text.
+        admin_session.check_submit_selected(error='row 1: arrival time: ')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Arrival Date': '2000-01-01'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: arrival date too '
+                                            'early')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Arrival Date': '2030-01-01'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: arrival date too '
+                                            'late')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Departure Date': '1-2-3'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: departure date: bad '
+                                            'date')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Departure Date': '2015-22-33'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        # Error from standard library, so not checking exact text.
+        admin_session.check_submit_selected(error='row 1: departure date: ')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Departure Date': '2015-04-02',
+                   'Departure Time': '000:00'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: departure time: '
+                                            'invalid hour')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Departure Date': '2015-04-02',
+                   'Departure Time': '00:000'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: departure time: '
+                                            'invalid minute')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Departure Date': '2015-04-02',
+                   'Departure Time': '25:61'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        # Error from standard library, so not checking exact text.
+        admin_session.check_submit_selected(error='row 1: departure time: ')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Departure Date': '2000-01-01'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: departure date too '
+                                            'early')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Departure Date': '2030-01-01'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: departure date too '
+                                            'late')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Arrival Date': '2015-04-02',
+                   'Departure Date': '2015-04-01'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: Departure date '
+                                            'before arrival date')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Arrival Date': '2015-04-02', 'Arrival Time': '14:00',
+                   'Departure Date': '2015-04-02', 'Departure Time': '13:59'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: Departure time '
+                                            'before arrival time')
         # Error for unknown country.
         csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
                    'Country Code': 'ZZB', 'Primary Role': 'Coordinator'}]
@@ -12265,6 +12432,62 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.set({'csv_file': csv_filename})
         admin_session.check_submit_selected(error='row 1: country DEF not '
                                             'registered')
+        # Error for unknown arrival or departure place.
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Arrival Place': 'Unknown'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: unknown arrival '
+                                            'place Unknown')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Departure Place': 'Unknown'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: unknown departure '
+                                            'place Unknown')
+        # Error for arrival or departure time not in hh:mm format.
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Arrival Time': '00'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: invalid arrival '
+                                            'time 00')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Arrival Time': '00:00:00'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: invalid arrival '
+                                            'time 00:00:00')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Departure Time': '00'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: invalid departure '
+                                            'time 00')
+        csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
+                   'Country Code': 'ZZA', 'Primary Role': 'IT',
+                   'Departure Time': '00:00:00'}]
+        csv_filename = self.gen_test_csv(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected(error='row 1: invalid departure '
+                                            'time 00:00:00')
         # Error for bad email address.
         csv_in = [{'Given Name': 'Test', 'Family Name': 'Test',
                    'Country Code': 'ZZA', 'Primary Role': 'Coordinator',

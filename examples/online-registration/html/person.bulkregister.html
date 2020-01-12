@@ -36,8 +36,11 @@ CSV files must be encoded in UTF-8 (BOM optional). They may contain
 the following columns, in any order: Person Number (optional), Given
 Name (required), Family Name (required), Country Code (required),
 Primary Role (required), Other Roles (optional), Guide For Codes
-(optional), Allergies and Dietary Requirements (optional), Phone
-Number (optional), Photo
+(optional), Allergies and Dietary Requirements (optional), Arrival
+Place (optional), Arrival Date (optional), Arrival Time (optional),
+Arrival Flight (optional), Departure Place (optional), Departure Date
+(optional), Departure Time (optional), Departure Flight (optional),
+Phone Number (optional), Photo
 (optional)<tal:block tal:condition="python:utils.have_consent_ui(db._db)">,
 Event Photos Consent (optional), Photo Consent (optional), Allergies
 and Dietary Requirements Consent (optional)</tal:block>.  In addition,
@@ -50,7 +53,8 @@ previously participated.  If &lsquo;Photo&rsquo; is specified, it must
 be the filename of a photo in a ZIP file uploaded at the same time (in
 exactly the same form as the filename appears in the ZIP file,
 including any directory components; for example,
-&lsquo;dir/photo.jpg&rsquo;).
+&lsquo;dir/photo.jpg&rsquo;).  Dates must be in YYYY-MM-DD format;
+times must be in hh:mm format.
 <tal:block tal:condition="python:utils.have_consent_ui(db._db)">&lsquo;Photo
 Consent&rsquo;, if specified, must be one of
 &lsquo;not_applicable&rsquo;, &lsquo;no&rsquo;,
