@@ -416,6 +416,12 @@ class CSVDataSource(DataSource):
             k = CSVDataSource._country_event_attr_map_bool[name]
             s = self._countries[event_id][country_id][k]
             return boolean_states[s.lower()]
+        if name == 'flag_thumb_url':
+            url = self._countries[event_id][country_id]['Flag URL']
+            if url == '' or '.' not in url:
+                return None
+            url_split = url.rsplit('.', 1)
+            return '%s-t%%(width)d.png' % url_split[0]
         if name == 'flag_filename':
             url = self._countries[event_id][country_id]['Flag URL']
             if url == '':
@@ -428,6 +434,13 @@ class CSVDataSource(DataSource):
                 url_path = url[len(self._cfg['url_base']):]
                 url_dirs = url_path.split('/')
                 return os.path.join(self._local_dir, *url_dirs)
+        if name == 'flag_thumb_filename':
+            filename = self.country_event_get_attr(country_id, event_id,
+                                                   'flag_filename')
+            if filename == '' or '.' not in filename:
+                return None
+            filename_split = filename.rsplit('.', 1)
+            return '%s-t%%(width)d.png' % filename_split[0]
         if name == 'is_official':
             k = self._cfg['official_desc']
             s = self._countries[event_id][country_id][k]

@@ -384,6 +384,11 @@ the registration system is not active.
   printed in an order other than the default (all Contestants 1, then
   all Contestants 2, and so on).
 
+* The static site pages for countries now inline a flag image at the
+  same width at which it is displayed, rather than inlining a
+  full-width image that the browser has to scale down.  To support
+  this, Pillow is now required for static site generation.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

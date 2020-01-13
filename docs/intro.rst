@@ -72,8 +72,7 @@ matholymp:
   not needed if those parts of matholymp are not used).
 
 * `Pillow <https://python-pillow.org/>`_, built with support for JPEG
-  and PNG files (used in the registration system; not needed if that
-  part of matholymp is not used).
+  and PNG files.
 
 * `LaTeX <https://www.latex-project.org/>`_; specifically, the
   :command:`pdflatex` command (used in generating PDF documents from

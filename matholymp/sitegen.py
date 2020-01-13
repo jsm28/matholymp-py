@@ -43,7 +43,9 @@ from matholymp.data import EventGroup
 from matholymp.datetimeutil import date_range_html, date_to_ymd_iso, \
     time_to_hhmm
 from matholymp.fileutil import read_utf8_csv, write_utf8_csv, \
-    comma_join, write_text_to_file, read_text_from_file, read_config
+    comma_join, write_bytes_to_file, write_text_to_file, read_text_from_file, \
+    read_config
+from matholymp.images import open_image_no_alpha, scale_image_to_width_png
 
 __all__ = ['read_sitegen_config', 'sitegen_events_csv', 'sitegen_papers_csv',
            'sitegen_countries_csv', 'sitegen_people_csv',
@@ -196,6 +198,15 @@ class SiteGenerator:
     def html_img(self, **attrs):
         """Generate an HTML img element."""
         return self.html_element_empty('img', **attrs)
+
+    def html_linked_img(self, src, thumb_src, width):
+        """
+        Generate an HTML img element surrounded by a link to a
+        full-resolution version.
+        """
+        thumb_src = thumb_src % {'width': width}
+        return self.html_a(self.html_img(width=str(width), alt='',
+                                         src=thumb_src), src)
 
     def html_th(self, contents, **attrs):
         """Generate an HTML th element."""
@@ -1540,13 +1551,18 @@ class SiteGenerator:
             text += '\n'
         return text
 
+    def country_flag_thumb_width(self):
+        """Return the width of a flag thumbnail on a country page."""
+        return 300
+
     def generate_one_event_country_page(self, c):
         """Generate a page for one country at one event."""
         text = ''
         if c.flag_url:
             text += ('<p class="%s">%s</p>\n'
                      % (self._cfg['photo_css'],
-                        self.html_img(width='300', alt='', src=c.flag_url)))
+                        self.html_linked_img(c.flag_url, c.flag_thumb_url,
+                                             self.country_flag_thumb_width())))
         text += self.country_event_text(c, 'h2', True)
 
         if c.num_contestants:
@@ -1567,13 +1583,28 @@ class SiteGenerator:
         self.write_html_to_file(text, title, header,
                                 self.path_for_country_at_event(c))
 
+    def generate_one_event_country_flag_thumb(self, c):
+        """Generate a flag thumbnail for one country at one event."""
+        flag_filename = c.flag_filename
+        if flag_filename and os.access(flag_filename, os.F_OK):
+            flag_thumb_filename = (c.flag_thumb_filename
+                                   % {'width':
+                                      self.country_flag_thumb_width()})
+            # Image scaling is slow, so do not do it if the thumbnail
+            # already exists.
+            if not os.access(flag_thumb_filename, os.F_OK):
+                thumb_bytes = scale_image_to_width_png(open_image_no_alpha(
+                    flag_filename), self.country_flag_thumb_width())
+                write_bytes_to_file(thumb_bytes, flag_thumb_filename)
+
     def generate_one_country_page(self, cd):
         """Generate main page for one country."""
         text = ''
         if cd.flag_url:
             text += ('<p class="%s">%s</p>\n'
                      % (self._cfg['photo_css'],
-                        self.html_img(width='300', alt='', src=cd.flag_url)))
+                        self.html_linked_img(cd.flag_url, cd.flag_thumb_url,
+                                             self.country_flag_thumb_width())))
         host = self.host_year_text(cd)
         if host:
             text += ('<p><strong>%s host</strong>: %s.</p>\n'
@@ -2206,6 +2237,7 @@ class SiteGenerator:
                 self.generate_one_event_redirects(e)
                 for c in e.country_list:
                     self.generate_one_event_country_page(c)
+                    self.generate_one_event_country_flag_thumb(c)
 
         for c in self._data.country_list:
             self.generate_one_country_page(c)

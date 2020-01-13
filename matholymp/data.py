@@ -1752,6 +1752,13 @@ class Country:
         'flag_url', _get_flag_url,
         """The flag URL of this country.""")
 
+    def _get_flag_thumb_url(self):
+        return self.participation_list[-1].flag_thumb_url
+
+    flag_thumb_url = _PropertyCached(
+        'flag_thumb_url', _get_flag_thumb_url,
+        """The flag thumbnail URL of this country, containing '%(width)d'.""")
+
     def _get_is_official(self):
         most_recent = self.participation_list[-1]
         if most_recent.event.distinguish_official:
@@ -1833,9 +1840,23 @@ class CountryEvent:
         'flag_url',
         """The flag URL of this country at this event.""")
 
+    flag_thumb_url = _CountryEventPropertyDS(
+        'flag_thumb_url',
+        """
+        The flag thumbnail URL of this country at this event,
+        containing '%(width)d'.
+        """)
+
     flag_filename = _CountryEventPropertyDS(
         'flag_filename',
         """The local filename for the flag of this country at this event.""")
+
+    flag_thumb_filename = _CountryEventPropertyDS(
+        'flag_thumb_filename',
+        """
+        The local filename for the flag thumbnail of this country at
+        this event, containing '%(width)d'.
+        """)
 
     def _get_is_official(self):
         if self.event.distinguish_official:

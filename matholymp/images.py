@@ -30,9 +30,11 @@
 """This module provides image processing support for matholymp use."""
 
 __all__ = ['open_image_no_alpha', 'scale_image_to_size',
-           'scale_image_to_size_jpeg']
+           'scale_image_to_size_jpeg', 'scale_image_to_size_png',
+           'image_size_for_width', 'scale_image_to_width_png']
 
 import io
+import fractions
 
 from PIL import Image
 
@@ -66,3 +68,25 @@ def scale_image_to_size_jpeg(image, size_xy):
     image_bytes = image_out.getvalue()
     image_out.close()
     return image_bytes
+
+
+def scale_image_to_size_png(image, size_xy):
+    """Return an image scaled to the given size, as PNG file contents."""
+    image = scale_image_to_size(image, size_xy)
+    image_out = io.BytesIO()
+    image.save(image_out, format='PNG')
+    image_bytes = image_out.getvalue()
+    image_out.close()
+    return image_bytes
+
+
+def image_size_for_width(image, width):
+    """Return the size of an image, scaled to the given width."""
+    orig_size = image.size
+    scaled_y = orig_size[1] * fractions.Fraction(width, orig_size[0])
+    return (width, round(scaled_y))
+
+
+def scale_image_to_width_png(image, width):
+    """Return an image scaled to the given width, as PNG file contents."""
+    return scale_image_to_size_png(image, image_size_for_width(image, width))
