@@ -32,7 +32,8 @@
 __all__ = ['ScoreAction', 'RetireCountryAction', 'ScalePhotoAction',
            'CountryCSVAction', 'ScoresCSVAction', 'PeopleCSVAction',
            'MedalBoundariesCSVAction', 'FlagsZIPAction', 'PhotosZIPAction',
-           'ScoresRSSAction', 'DocumentGenerateAction', 'NameBadgeAction',
+           'ConsentFormsZIPAction', 'ScoresRSSAction',
+           'DocumentGenerateAction', 'NameBadgeAction',
            'InvitationLetterAction', 'BulkRegisterAction',
            'CountryBulkRegisterAction', 'PersonBulkRegisterAction',
            'register_actions']
