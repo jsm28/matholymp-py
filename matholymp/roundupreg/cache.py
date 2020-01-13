@@ -32,16 +32,18 @@ This module provides cache support for the Roundup registration
 system.
 """
 
-__all__ = ['cached_text', 'invalidate_cache']
+__all__ = ['cached_text', 'invalidate_cache', 'cached_bin']
 
 import os
 import os.path
+import tempfile
 
 # This caching implementation depends on a Unix-like operating system.
 # It may remove the file marking the cache invalid while another
 # process has it open, which may not work on some operating systems.
 
-from matholymp.fileutil import write_text_to_file, read_text_from_file
+from matholymp.fileutil import write_bytes_to_file, write_text_to_file, \
+    read_text_from_file
 from matholymp.roundupreg.lockfile import can_lock, with_lock_file
 
 
@@ -87,3 +89,27 @@ def invalidate_cache(db, name):
     """Mark cached text invalid so it needs regenerating."""
     invalid_path = _invalid_path(db, name)
     write_text_to_file('', invalid_path)
+
+
+def cached_bin(db, subdir, name, gen_func):
+    """
+    Return a binary that can be cached, generating it if necessary.
+    The cached binary remains valid forever, so locking is not needed
+    but makes things more efficient.
+    """
+    db_path = db.config.DATABASE
+    subdir_path = os.path.join(db_path, subdir)
+    os.makedirs(subdir_path, exist_ok=True)
+    file_path = os.path.join(subdir_path, name)
+    lock_path = '%s.lock' % file_path
+    with with_lock_file(lock_path):
+        if os.access(file_path, os.F_OK):
+            with open(file_path, 'rb') as file:
+                return file.read()
+        content = gen_func()
+        temp_file = tempfile.NamedTemporaryFile(dir=subdir_path, delete=False)
+        temp_path = temp_file.name
+        temp_file.close()
+        write_bytes_to_file(content, temp_path)
+        os.rename(temp_path, file_path)
+        return content

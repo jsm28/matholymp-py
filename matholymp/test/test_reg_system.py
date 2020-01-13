@@ -63,7 +63,8 @@ except ImportError:
 
 from matholymp.fileutil import read_utf8_csv, write_utf8_csv_bytes, \
     write_utf8_csv, write_bytes_to_file, write_text_to_file, \
-    replace_text_in_file, read_config_raw, write_config_raw
+    replace_text_in_file, read_config_raw, write_config_raw, \
+    file_format_contents
 
 __all__ = ['gen_image', 'gen_image_file', 'gen_pdf_file',
            'RoundupTestInstance', 'RoundupTestSession', 'RegSystemTestCase']
@@ -560,9 +561,19 @@ class RoundupTestSession:
         """Get the (first) img tag from the current page."""
         return self.get_main().find('img')
 
-    def get_img_contents(self):
-        """Get the contents of the (first) img tag from the current page."""
-        img_src = self.get_img()['src']
+    def get_img_contents(self, use_parent_link=True):
+        """
+        Get the contents of the (first) img tag from the current page.
+        If it is inside a link, get the target of that link instead (a
+        full-size image, where the img tag is for a thumbnail), unless
+        use_parent_link is False.
+        """
+        img = self.get_img()
+        parent = img.parent
+        if use_parent_link and parent.name == 'a':
+            img_src = parent['href']
+        else:
+            img_src = img['src']
         img_src = self.b.absolute_url(img_src)
         return self.check_get(img_src, html=False).content
 
@@ -1306,6 +1317,14 @@ class RegSystemTestCase(unittest.TestCase):
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, flag_bytes)
         reg_session = self.get_session('ABC_reg')
+        admin_thumb = admin_session.get_img_contents(False)
+        session.check_open_relative('country3')
+        anon_thumb = session.get_img_contents(False)
+        reg_session.check_open_relative('country3')
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'png')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
@@ -1344,6 +1363,14 @@ class RegSystemTestCase(unittest.TestCase):
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, flag_bytes)
         reg_session = self.get_session('ABC_reg')
+        admin_thumb = admin_session.get_img_contents(False)
+        session.check_open_relative('country3')
+        anon_thumb = session.get_img_contents(False)
+        reg_session.check_open_relative('country3')
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'png')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
@@ -1385,6 +1412,14 @@ class RegSystemTestCase(unittest.TestCase):
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, flag_bytes)
         reg_session = self.get_session('ABC_reg')
+        admin_thumb = admin_session.get_img_contents(False)
+        session.check_open_relative('country3')
+        anon_thumb = session.get_img_contents(False)
+        reg_session.check_open_relative('country3')
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'png')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
@@ -1454,6 +1489,14 @@ class RegSystemTestCase(unittest.TestCase):
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, flag_bytes)
         reg_session = self.get_session('ABC_reg')
+        admin_thumb = admin_session.get_img_contents(False)
+        session.check_open_relative('country3')
+        anon_thumb = session.get_img_contents(False)
+        reg_session.check_open_relative('country3')
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'png')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
@@ -1503,6 +1546,14 @@ class RegSystemTestCase(unittest.TestCase):
         # Check the image inline on the country page.
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, flag_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        session.check_open_relative('country3')
+        anon_thumb = session.get_img_contents(False)
+        reg_session.check_open_relative('country3')
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'png')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
@@ -1552,6 +1603,14 @@ class RegSystemTestCase(unittest.TestCase):
         # Check the image inline on the country page.
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, flag_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        session.check_open_relative('country3')
+        anon_thumb = session.get_img_contents(False)
+        reg_session.check_open_relative('country3')
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'png')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
@@ -1639,6 +1698,14 @@ class RegSystemTestCase(unittest.TestCase):
         # Check the image inline on the country page.
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, flag_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        session.check_open_relative('country3')
+        anon_thumb = session.get_img_contents(False)
+        reg_session.check_open_relative('country3')
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'png')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
@@ -1676,6 +1743,14 @@ class RegSystemTestCase(unittest.TestCase):
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, flag_bytes)
         reg_session = self.get_session('ABC_reg')
+        admin_thumb = admin_session.get_img_contents(False)
+        session.check_open_relative('country3')
+        anon_thumb = session.get_img_contents(False)
+        reg_session.check_open_relative('country3')
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'png')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
@@ -1718,6 +1793,14 @@ class RegSystemTestCase(unittest.TestCase):
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, flag_bytes)
         reg_session = self.get_session('ABC_reg')
+        admin_thumb = admin_session.get_img_contents(False)
+        session.check_open_relative('country3')
+        anon_thumb = session.get_img_contents(False)
+        reg_session.check_open_relative('country3')
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'png')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv_public_only()
         reg_csv = reg_session.get_countries_csv()
@@ -1784,6 +1867,19 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session.check_open(img_url_csv,
                                error='You are not allowed to view this file',
                                status=403)
+        # Similarly, only admin should be able to access the old flag
+        # thumbnail.
+        img_url_thumb = (self.instance.url
+                         + 'flag1?@action=flag_thumb&width=200')
+        admin_session.get_bytes(img_url_thumb)
+        session.check_open(img_url_thumb,
+                           error='You do not have permission to view this '
+                           'flag',
+                           status=403)
+        reg_session.check_open(img_url_thumb,
+                               error='You do not have permission to view '
+                               'this flag',
+                               status=403)
 
     def test_country_flag_zip(self):
         """
@@ -1833,6 +1929,43 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.check_open_relative('country1?@action=flags_zip',
                                           error='Node id specified for ZIP '
                                           'generation')
+
+    def test_country_flag_thumb_errors(self):
+        """
+        Test errors from flag_thumb action.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        flag_filename, dummy = self.gen_test_image(2, 2, 2, '.png', 'PNG')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'flag-1@content': flag_filename})
+        session.check_open_relative('country?@action=flag_thumb',
+                                    error='This action only applies '
+                                    'to flags')
+        session.check_open_relative('flag?@action=flag_thumb',
+                                    error='No id specified to generate '
+                                    'thumbnail')
+        session.check_open_relative('flag1?@action=flag_thumb',
+                                    error='No width specified to generate '
+                                    'thumbnail')
+        session.check_open_relative('flag1?@action=flag_thumb&width=300',
+                                    error='Invalid width specified to '
+                                    'generate thumbnail')
+        # Permission errors are tested in
+        # test_country_flag_replace_access and
+        # test_country_retire_flag_access.
+        admin_session.check_open_relative('country?@action=flag_thumb',
+                                          error='This action only applies '
+                                          'to flags')
+        admin_session.check_open_relative('flag?@action=flag_thumb',
+                                          error='No id specified to '
+                                          'generate thumbnail')
+        admin_session.check_open_relative('flag1?@action=flag_thumb',
+                                          error='No width specified to '
+                                          'generate thumbnail')
+        admin_session.check_open_relative('flag1?@action=flag_thumb&width=300',
+                                          error='Invalid width specified to '
+                                          'generate thumbnail')
 
     def test_country_retire(self):
         """
@@ -1961,6 +2094,19 @@ class RegSystemTestCase(unittest.TestCase):
         session.check_open(img_url_csv,
                            error='You are not allowed to view this file',
                            status=403)
+        # Similarly, only admin should be able to access the old flag
+        # thumbnail.
+        img_url_thumb = (self.instance.url
+                         + 'flag1?@action=flag_thumb&width=200')
+        admin_session.get_bytes(img_url_thumb)
+        session.check_open(img_url_thumb,
+                           error='You do not have permission to view this '
+                           'flag',
+                           status=403)
+        reg_session.check_open(img_url_thumb,
+                               error='You do not have permission to view '
+                               'this flag',
+                               status=403)
 
     def test_country_retire_errors(self):
         """

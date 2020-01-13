@@ -258,7 +258,7 @@ define="edit_ok context/is_edit_ok"
 <tal:block tal:condition="context/flag">
 <table>
 <tr>
-  <td><img width="200" alt="" tal:attributes="src context/flag/download_url"></td>
+  <td><a tal:attributes="href context/flag/download_url"><img width="200" alt="" tal:attributes="src string:flag${context/flag/id}?@action=flag_thumb&width=200"></a></td>
 </tr>
 </table>
 </tal:block>
