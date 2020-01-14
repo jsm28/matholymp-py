@@ -332,8 +332,9 @@ Removing a photo
 ^^^^^^^^^^^^^^^^
 
 If someone wants their photo removed from the static site, remove the
-file from the relevant directory (note that there may be multiple
-copies of it, for someone at multiple events) and remove the entry or
+files from the relevant directory (note that there may be multiple
+copies of it, for someone at multiple events, and thumbnail versions
+that need to be removed as well) and remove the entry or
 entries from the Photo URL column for that person in
 :file:`people.csv`, before regenerating the site.
 
