@@ -1142,6 +1142,16 @@ class Person:
         'photo_url', _get_photo_url,
         """The photo URL of this person at their last participation.""")
 
+    def _get_photo_thumb_url(self):
+        return self.participation_list[-1].photo_thumb_url
+
+    photo_thumb_url = _PropertyCached(
+        'photo_thumb_url', _get_photo_thumb_url,
+        """
+        The photo thumbnail URL of this person at their last
+        participation, containing '%(width)d'.
+        """)
+
     def _get_sort_key_alpha(self):
         return (coll_get_sort_key(self.family_name),
                 coll_get_sort_key(self.given_name),
@@ -1430,11 +1440,26 @@ class PersonEvent:
         website) at this event.
         """)
 
+    photo_thumb_url = _PersonEventPropertyDS(
+        'photo_thumb_url',
+        """
+        The URL of the registration photo thumbnail of this person
+        (for the website) at this event, containing '%(width)d'.
+        """)
+
     photo_filename = _PersonEventPropertyDS(
         'photo_filename',
         """
         The local filename of the registration photo of this person
         (for the website) at this event.
+        """)
+
+    photo_thumb_filename = _PersonEventPropertyDS(
+        'photo_thumb_filename',
+        """
+        The local filename of the registration photo thumbnail of this
+        person (for the website) at this event, containing
+        '%(width)d'.
         """)
 
     badge_photo_url = _PersonEventPropertyDS(

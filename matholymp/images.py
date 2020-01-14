@@ -31,7 +31,8 @@
 
 __all__ = ['open_image_no_alpha', 'scale_image_to_size',
            'scale_image_to_size_jpeg', 'scale_image_to_size_png',
-           'image_size_for_width', 'scale_image_to_width_png']
+           'image_size_for_width', 'scale_image_to_width_jpeg',
+           'scale_image_to_width_png']
 
 import io
 import fractions
@@ -85,6 +86,11 @@ def image_size_for_width(image, width):
     orig_size = image.size
     scaled_y = orig_size[1] * fractions.Fraction(width, orig_size[0])
     return (width, round(scaled_y))
+
+
+def scale_image_to_width_jpeg(image, width):
+    """Return an image scaled to the given width, as JPEG file contents."""
+    return scale_image_to_size_jpeg(image, image_size_for_width(image, width))
 
 
 def scale_image_to_width_png(image, width):

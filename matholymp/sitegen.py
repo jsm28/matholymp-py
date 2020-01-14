@@ -45,7 +45,8 @@ from matholymp.datetimeutil import date_range_html, date_to_ymd_iso, \
 from matholymp.fileutil import read_utf8_csv, write_utf8_csv, \
     comma_join, write_bytes_to_file, write_text_to_file, read_text_from_file, \
     read_config
-from matholymp.images import open_image_no_alpha, scale_image_to_width_png
+from matholymp.images import open_image_no_alpha, scale_image_to_width_jpeg, \
+    scale_image_to_width_png
 
 __all__ = ['read_sitegen_config', 'sitegen_events_csv', 'sitegen_papers_csv',
            'sitegen_countries_csv', 'sitegen_people_csv',
@@ -1527,7 +1528,8 @@ class SiteGenerator:
         body_row_list = []
         for p in c_people:
             if p.photo_url:
-                photo = self.html_img(width='150', alt='', src=p.photo_url)
+                photo = self.html_linked_img(p.photo_url, p.photo_thumb_url,
+                                             self.country_photo_thumb_width())
             else:
                 photo = ''
             row = [self.link_for_person(p.person, html.escape(p.given_name)),
@@ -1554,6 +1556,14 @@ class SiteGenerator:
     def country_flag_thumb_width(self):
         """Return the width of a flag thumbnail on a country page."""
         return 300
+
+    def country_photo_thumb_width(self):
+        """Return the width of a photo thumbnail on a country page."""
+        return 150
+
+    def person_photo_thumb_width(self):
+        """Return the width of a photo thumbnail on a country page."""
+        return 200
 
     def generate_one_event_country_page(self, c):
         """Generate a page for one country at one event."""
@@ -1690,8 +1700,9 @@ class SiteGenerator:
             year_text += self.html_table_list_th_td(year_rows) + '\n'
             year_text += '</td><td>\n'
             if p.photo_url:
-                year_text += self.html_img(width='200', alt='',
-                                           src=p.photo_url)
+                year_text += self.html_linked_img(
+                    p.photo_url, p.photo_thumb_url,
+                    self.person_photo_thumb_width())
             year_text += '</td></tr>\n</table>\n'
             if p.is_contestant:
                 year_text += '<h3>Scores</h3>\n'
@@ -1717,6 +1728,21 @@ class SiteGenerator:
         title = html.escape(pd.name)
         header = title
         self.write_html_to_file(text, title, header, self.path_for_person(pd))
+
+    def generate_one_person_event_photo_thumb(self, p):
+        """Generate photo thumbnails for one person at one event."""
+        photo_filename = p.photo_filename
+        if photo_filename and os.access(photo_filename, os.F_OK):
+            widths = (self.country_photo_thumb_width(),
+                      self.person_photo_thumb_width())
+            for width in widths:
+                filename = p.photo_thumb_filename % {'width': width}
+                # Image scaling is slow, so do not do it if the
+                # thumbnail already exists.
+                if not os.access(filename, os.F_OK):
+                    thumb_bytes = scale_image_to_width_jpeg(
+                        open_image_no_alpha(photo_filename), width)
+                    write_bytes_to_file(thumb_bytes, filename)
 
     def generate_events_csv(self):
         """Generate the CSV file for all events."""
@@ -2244,6 +2270,8 @@ class SiteGenerator:
 
         for p in self._data.person_list:
             self.generate_one_person_page(p)
+            for pe in p.participation_list:
+                self.generate_one_person_event_photo_thumb(pe)
 
         self.generate_events_csv()
         self.generate_countries_csv()

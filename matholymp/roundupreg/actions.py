@@ -32,8 +32,8 @@
 __all__ = ['ScoreAction', 'RetireCountryAction', 'ScalePhotoAction',
            'CountryCSVAction', 'ScoresCSVAction', 'PeopleCSVAction',
            'MedalBoundariesCSVAction', 'FlagsZIPAction', 'PhotosZIPAction',
-           'ConsentFormsZIPAction', 'FlagThumbAction', 'ScoresRSSAction',
-           'DocumentGenerateAction', 'NameBadgeAction',
+           'ConsentFormsZIPAction', 'FlagThumbAction', 'PhotoThumbAction',
+           'ScoresRSSAction', 'DocumentGenerateAction', 'NameBadgeAction',
            'InvitationLetterAction', 'BulkRegisterAction',
            'CountryBulkRegisterAction', 'PersonBulkRegisterAction',
            'register_actions']
@@ -57,7 +57,7 @@ from matholymp.docgen import read_docgen_config, DocumentGenerator
 from matholymp.fileutil import read_text_from_file, boolean_states, \
     file_extension, mime_type_map
 from matholymp.images import open_image_no_alpha, scale_image_to_size_jpeg, \
-    scale_image_to_width_png
+    scale_image_to_width_jpeg, scale_image_to_width_png
 from matholymp.roundupreg.auditors import audit_country_fields, \
     audit_person_fields
 from matholymp.roundupreg.cache import cached_bin
@@ -356,6 +356,37 @@ class FlagThumbAction(Action):
                                                 self.form['width'].value),
                              self.thumb_contents)
         self.client.setHeader('Content-Type', 'image/png')
+        return content
+
+
+class PhotoThumbAction(Action):
+
+    """Action to return a thumbnail for a photo."""
+
+    def thumb_contents(self):
+        """Return the photo thumbnail bytes."""
+        filename = self.db.filename('photo', self.nodeid)
+        image = open_image_no_alpha(filename)
+        return scale_image_to_width_jpeg(image, int(self.form['width'].value))
+
+    def handle(self):
+        """Output a thumbnail for a photo."""
+        if self.classname != 'photo':
+            raise ValueError('This action only applies to photos')
+        if self.nodeid is None:
+            raise ValueError('No id specified to generate thumbnail')
+        if 'width' not in self.form:
+            raise ValueError('No width specified to generate thumbnail')
+        if self.form['width'].value not in ('150', '200'):
+            raise ValueError('Invalid width specified to generate thumbnail')
+        if not self.hasPermission('View', classname='photo',
+                                  itemid=self.nodeid):
+            raise Unauthorised('You do not have permission to view this photo')
+        content = cached_bin(self.db, 'thumbnails',
+                             'photo%s-%s.jpeg' % (self.nodeid,
+                                                  self.form['width'].value),
+                             self.thumb_contents)
+        self.client.setHeader('Content-Type', 'image/jpeg')
         return content
 
 
@@ -964,6 +995,7 @@ def register_actions(instance):
     instance.registerAction('photos_zip', PhotosZIPAction)
     instance.registerAction('consent_forms_zip', ConsentFormsZIPAction)
     instance.registerAction('flag_thumb', FlagThumbAction)
+    instance.registerAction('photo_thumb', PhotoThumbAction)
     instance.registerAction('scores_rss', ScoresRSSAction)
     instance.registerAction('name_badge', NameBadgeAction)
     instance.registerAction('invitation_letter', InvitationLetterAction)

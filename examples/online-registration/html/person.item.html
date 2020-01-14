@@ -616,7 +616,7 @@ select the appropriate options.  You must select &ldquo;Yes&rdquo; or
 <p tal:condition="python:utils.have_consent_ui(db._db) and context.photo_consent.plain() == 'badge_only'">The following photo is for use on name badges and is not public on the website.</p>
 <table>
 <tr>
-  <td><img width="200" alt="" tal:attributes="src context/photo/download_url"></td>
+  <td><a tal:attributes="href context/photo/download_url"><img width="200" alt="" tal:attributes="src string:photo${context/photo/id}?@action=photo_thumb&width=200"></a></td>
 </tr>
 </table>
 </tal:block>

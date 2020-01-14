@@ -175,12 +175,16 @@ class RoundupDataSource(DataSource):
             if extra_awards_str is None:
                 return []
             return comma_split(extra_awards_str)
-        elif name in ('photo_url', 'badge_photo_url'):
-            if name == 'photo_url' and have_consent_ui(self._db):
+        elif name in ('photo_url', 'photo_thumb_url', 'badge_photo_url'):
+            if name != 'badge_photo_url' and have_consent_ui(self._db):
                 if self._db.person.get(person_id, 'photo_consent') != 'yes':
                     return None
             photo_id = self._db.person.get(person_id, 'photo')
-            return db_file_url(self._db, 'photo', 'photo', photo_id)
+            if name == 'photo_thumb_url':
+                return ('%sphoto%s?@action=photo_thumb&width=%%(width)d'
+                        % (self._db.config.TRACKER_WEB, photo_id))
+            else:
+                return db_file_url(self._db, 'photo', 'photo', photo_id)
         elif name in ('photo_filename', 'badge_photo_filename'):
             if name == 'photo_filename' and have_consent_ui(self._db):
                 if self._db.person.get(person_id, 'photo_consent') != 'yes':

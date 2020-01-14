@@ -4565,6 +4565,14 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.check_open_relative('person1')
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, photo_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        session.check_open_relative('person1')
+        anon_thumb = session.get_img_contents(False)
+        reg_session.check_open_relative('person1')
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'jpg')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -4621,6 +4629,12 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session.check_open_relative('person1')
         got_bytes = reg_session.get_img_contents()
         self.assertEqual(got_bytes, photo_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        anon_thumb = session.get_img_contents(False)
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'jpg')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -4676,6 +4690,8 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session.check_open_relative('person1')
         got_bytes = reg_session.get_img_contents()
         self.assertEqual(got_bytes, photo_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'jpg')
         # Check no image inline on the person page for other users.
         session.check_open_relative('person1')
         self.assertIsNone(session.get_img())
@@ -4713,6 +4729,18 @@ class RegSystemTestCase(unittest.TestCase):
                            status=403)
         reg2_session.check_open(img_url_csv,
                                 error='You are not allowed to view this file',
+                                status=403)
+        # Similarly, other users should not be able to access the
+        # photo thumbnail.
+        img_url_thumb = (self.instance.url
+                         + 'photo1?@action=photo_thumb&width=200')
+        session.check_open(img_url_thumb,
+                           error='You do not have permission to view this '
+                           'photo',
+                           status=403)
+        reg2_session.check_open(img_url_thumb,
+                                error='You do not have permission to view '
+                                'this photo',
                                 status=403)
 
     @_with_config(consent_ui='Yes')
@@ -4768,6 +4796,18 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session.check_open(img_url_none,
                                error='You are not allowed to view this file',
                                status=403)
+        # Similarly, other users should not be able to access the
+        # photo thumbnail.
+        img_url_thumb = (self.instance.url
+                         + 'photo1?@action=photo_thumb&width=200')
+        session.check_open(img_url_thumb,
+                           error='You do not have permission to view this '
+                           'photo',
+                           status=403)
+        reg_session.check_open(img_url_thumb,
+                               error='You do not have permission to view this '
+                               'photo',
+                               status=403)
 
     def test_person_photo_create_upper(self):
         """
@@ -4785,6 +4825,14 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.check_open_relative('person1')
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, photo_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        session.check_open_relative('person1')
+        anon_thumb = session.get_img_contents(False)
+        reg_session.check_open_relative('person1')
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'jpg')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -4829,6 +4877,14 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.check_open_relative('person1')
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, photo_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        session.check_open_relative('person1')
+        anon_thumb = session.get_img_contents(False)
+        reg_session.check_open_relative('person1')
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'jpg')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -4873,6 +4929,14 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.check_open_relative('person1')
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, photo_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        session.check_open_relative('person1')
+        anon_thumb = session.get_img_contents(False)
+        reg_session.check_open_relative('person1')
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'jpg')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -4919,6 +4983,14 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.check_open_relative('person1')
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, photo_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        session.check_open_relative('person1')
+        anon_thumb = session.get_img_contents(False)
+        reg_session.check_open_relative('person1')
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'jpg')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5000,6 +5072,14 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.check_open_relative('person1')
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, photo_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        session.check_open_relative('person1')
+        anon_thumb = session.get_img_contents(False)
+        reg_session.check_open_relative('person1')
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'jpg')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5057,6 +5137,12 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session.check_open_relative('person1')
         got_bytes = reg_session.get_img_contents()
         self.assertEqual(got_bytes, photo_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        anon_thumb = session.get_img_contents(False)
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'jpg')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5113,6 +5199,10 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session.check_open_relative('person1')
         got_bytes = reg_session.get_img_contents()
         self.assertEqual(got_bytes, photo_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'jpg')
+        self.assertEqual(reg_thumb, admin_thumb)
         # Check no image inline on the person page for other users.
         session.check_open_relative('person1')
         self.assertIsNone(session.get_img())
@@ -5150,6 +5240,18 @@ class RegSystemTestCase(unittest.TestCase):
                            status=403)
         reg2_session.check_open(img_url_csv,
                                 error='You are not allowed to view this file',
+                                status=403)
+        # Similarly, other users should not be able to access the
+        # photo thumbnail.
+        img_url_thumb = (self.instance.url
+                         + 'photo1?@action=photo_thumb&width=200')
+        session.check_open(img_url_thumb,
+                           error='You do not have permission to view this '
+                           'photo',
+                           status=403)
+        reg2_session.check_open(img_url_thumb,
+                                error='You do not have permission to view '
+                                'this photo',
                                 status=403)
 
     @_with_config(static_site_directory='static-site', consent_ui='Yes')
@@ -5275,6 +5377,14 @@ class RegSystemTestCase(unittest.TestCase):
         # Check the image inline on the person page.
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, photo_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        session.check_open_relative('person1')
+        anon_thumb = session.get_img_contents(False)
+        reg_session.check_open_relative('person1')
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'jpg')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5352,6 +5462,12 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session.check_open_relative('person1')
         got_bytes = reg_session.get_img_contents()
         self.assertEqual(got_bytes, photo_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        anon_thumb = session.get_img_contents(False)
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'jpg')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5409,6 +5525,17 @@ class RegSystemTestCase(unittest.TestCase):
         reg2_session.check_open(img_url_csv,
                                 error='You are not allowed to view this file',
                                 status=403)
+        # Likewise, for the thumbnail.
+        img_url_thumb = (self.instance.url
+                         + 'photo1?@action=photo_thumb&width=200')
+        session.check_open(img_url_thumb,
+                           error='You do not have permission to view this '
+                           'photo',
+                           status=403)
+        reg2_session.check_open(img_url_thumb,
+                                error='You do not have permission to view '
+                                'this photo',
+                                status=403)
         # Restore consent for website.
         admin_session.edit(
             'person', '1',
@@ -5437,6 +5564,15 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_bytes, photo_bytes)
         self.assertEqual(reg_bytes, photo_bytes)
         self.assertEqual(reg2_bytes, photo_bytes)
+        # Likewise, for the thumbnail.
+        anon_thumb2 = session.get_bytes(img_url_thumb)
+        admin_thumb2 = admin_session.get_bytes(img_url_thumb)
+        reg_thumb2 = reg_session.get_bytes(img_url_thumb)
+        reg2_thumb2 = reg2_session.get_bytes(img_url_thumb)
+        self.assertEqual(anon_thumb2, admin_thumb)
+        self.assertEqual(admin_thumb2, admin_thumb)
+        self.assertEqual(reg_thumb2, admin_thumb)
+        self.assertEqual(reg2_thumb2, admin_thumb)
         # Remove consent, thereby removing the photo.
         admin_session.edit('person', '1',
                            {'photo_consent': 'No'})
@@ -5467,6 +5603,15 @@ class RegSystemTestCase(unittest.TestCase):
         reg2_session.check_open(img_url_csv,
                                 error='You are not allowed to view this file',
                                 status=403)
+        # Likewise, for the thumbnail.
+        session.check_open(img_url_thumb,
+                           error='You do not have permission to view this '
+                           'photo',
+                           status=403)
+        reg2_session.check_open(img_url_thumb,
+                                error='You do not have permission to view '
+                                'this photo',
+                                status=403)
         # Now restoring the consent does not bring the photo back.
         admin_session.edit(
             'person', '1',
@@ -5493,6 +5638,15 @@ class RegSystemTestCase(unittest.TestCase):
                            status=403)
         reg2_session.check_open(img_url_csv,
                                 error='You are not allowed to view this file',
+                                status=403)
+        # Likewise, for the thumbnail.
+        session.check_open(img_url_thumb,
+                           error='You do not have permission to view this '
+                           'photo',
+                           status=403)
+        reg2_session.check_open(img_url_thumb,
+                                error='You do not have permission to view '
+                                'this photo',
                                 status=403)
 
     @_with_config(static_site_directory='static-site')
@@ -5533,6 +5687,14 @@ class RegSystemTestCase(unittest.TestCase):
         # Check the image inline on the person page.
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, photo_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        session.check_open_relative('person1')
+        anon_thumb = session.get_img_contents(False)
+        reg_session.check_open_relative('person1')
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'jpg')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5655,6 +5817,14 @@ class RegSystemTestCase(unittest.TestCase):
         # Check the image inline on the person page.
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, photo_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        session.check_open_relative('person1')
+        anon_thumb = session.get_img_contents(False)
+        reg_session.check_open_relative('person1')
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'jpg')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5733,6 +5903,12 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session.check_open_relative('person1')
         got_bytes = reg_session.get_img_contents()
         self.assertEqual(got_bytes, photo_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        anon_thumb = session.get_img_contents(False)
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'jpg')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5810,6 +5986,10 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session.check_open_relative('person1')
         got_bytes = reg_session.get_img_contents()
         self.assertEqual(got_bytes, photo_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'jpg')
+        self.assertEqual(reg_thumb, admin_thumb)
         # Check no image inline on the person page for other users.
         session.check_open_relative('person1')
         self.assertIsNone(session.get_img())
@@ -5847,6 +6027,17 @@ class RegSystemTestCase(unittest.TestCase):
                            status=403)
         reg2_session.check_open(img_url_csv,
                                 error='You are not allowed to view this file',
+                                status=403)
+        # Likewise, for the thumbnail.
+        img_url_thumb = (self.instance.url
+                         + 'photo1?@action=photo_thumb&width=200')
+        session.check_open(img_url_thumb,
+                           error='You do not have permission to view this '
+                           'photo',
+                           status=403)
+        reg2_session.check_open(img_url_thumb,
+                                error='You do not have permission to view '
+                                'this photo',
                                 status=403)
 
     @_with_config(static_site_directory='static-site', consent_ui='Yes')
@@ -5998,6 +6189,14 @@ class RegSystemTestCase(unittest.TestCase):
         # Check the image inline on the person page.
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, photo_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        session.check_open_relative('person1')
+        anon_thumb = session.get_img_contents(False)
+        reg_session.check_open_relative('person1')
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'jpg')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -6046,6 +6245,14 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.check_open_relative('person1')
         got_bytes = admin_session.get_img_contents()
         self.assertEqual(got_bytes, photo_bytes)
+        admin_thumb = admin_session.get_img_contents(False)
+        session.check_open_relative('person1')
+        anon_thumb = session.get_img_contents(False)
+        reg_session.check_open_relative('person1')
+        reg_thumb = reg_session.get_img_contents(False)
+        self.assertEqual(file_format_contents(None, admin_thumb), 'jpg')
+        self.assertEqual(anon_thumb, admin_thumb)
+        self.assertEqual(reg_thumb, admin_thumb)
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -6128,6 +6335,18 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session.check_open(img_url_csv,
                                error='You are not allowed to view this file',
                                status=403)
+        # Likewise, for the thumbnail.
+        img_url_thumb = (self.instance.url
+                         + 'photo1?@action=photo_thumb&width=200')
+        admin_session.check_get(img_url_thumb, html=False)
+        session.check_open(img_url_thumb,
+                           error='You do not have permission to view this '
+                           'photo',
+                           status=403)
+        reg_session.check_open(img_url_thumb,
+                               error='You do not have permission to view '
+                               'this photo',
+                               status=403)
 
     def test_person_photo_replace_access_reg(self):
         """
@@ -6187,6 +6406,19 @@ class RegSystemTestCase(unittest.TestCase):
                            status=403)
         reg2_session.check_open(img_url_csv,
                                 error='You are not allowed to view this file',
+                                status=403)
+        # Likewise, for the thumbnail.
+        img_url_thumb = (self.instance.url
+                         + 'photo1?@action=photo_thumb&width=200')
+        admin_session.check_get(img_url_thumb, html=False)
+        reg_session.check_get(img_url_thumb, html=False)
+        session.check_open(img_url_thumb,
+                           error='You do not have permission to view this '
+                           'photo',
+                           status=403)
+        reg2_session.check_open(img_url_thumb,
+                                error='You do not have permission to view '
+                                'this photo',
                                 status=403)
 
     def test_person_photo_zip(self):
@@ -6324,6 +6556,43 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.check_open_relative('person1?@action=photos_zip',
                                           error='Node id specified for ZIP '
                                           'generation')
+
+    def test_person_photo_thumb_errors(self):
+        """
+        Test errors from photo_thumb action.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        photo_filename, dummy = self.gen_test_image(2, 2, 2, '.jpg', 'JPEG')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                    {'photo-1@content': photo_filename})
+        session.check_open_relative('person?@action=photo_thumb',
+                                    error='This action only applies '
+                                    'to photos')
+        session.check_open_relative('photo?@action=photo_thumb',
+                                    error='No id specified to generate '
+                                    'thumbnail')
+        session.check_open_relative('photo1?@action=photo_thumb',
+                                    error='No width specified to generate '
+                                    'thumbnail')
+        session.check_open_relative('photo1?@action=photo_thumb&width=300',
+                                    error='Invalid width specified to '
+                                    'generate thumbnail')
+        # Permission errors are tested in the same functions that test
+        # them for non-thumbnail access to photos.
+        admin_session.check_open_relative('country?@action=photo_thumb',
+                                          error='This action only applies '
+                                          'to photos')
+        admin_session.check_open_relative('photo?@action=photo_thumb',
+                                          error='No id specified to '
+                                          'generate thumbnail')
+        admin_session.check_open_relative('photo1?@action=photo_thumb',
+                                          error='No width specified to '
+                                          'generate thumbnail')
+        admin_session.check_open_relative('photo1?@action=photo_thumb'
+                                          '&width=300',
+                                          error='Invalid width specified to '
+                                          'generate thumbnail')
 
     def test_person_consent_form_create(self):
         """
@@ -6587,6 +6856,19 @@ class RegSystemTestCase(unittest.TestCase):
                            status=403)
         reg2_session.check_open(img_url_csv,
                                 error='You are not allowed to view this file',
+                                status=403)
+        # Likewise, for the thumbnail.
+        img_url_thumb = (self.instance.url
+                         + 'photo1?@action=photo_thumb&width=200')
+        admin_session.check_get(img_url_thumb, html=False)
+        reg_session.check_get(img_url_thumb, html=False)
+        session.check_open(img_url_thumb,
+                           error='You do not have permission to view this '
+                           'photo',
+                           status=403)
+        reg2_session.check_open(img_url_thumb,
+                                error='You do not have permission to view '
+                                'this photo',
                                 status=403)
 
     def test_person_retire_errors(self):

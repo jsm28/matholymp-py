@@ -384,11 +384,11 @@ the registration system is not active.
   printed in an order other than the default (all Contestants 1, then
   all Contestants 2, and so on).
 
-* Pages for countries, from both the static site and the registration
-  system, now inline a flag image at the same width at which it is
-  displayed, rather than inlining a full-width image that the browser
-  has to scale down.  To support this, Pillow is now required for
-  static site generation.
+* Pages for countries and people, from both the static site and the
+  registration system, now inline flag images and photos at the same
+  width at which they are displayed, rather than inlining a full-width
+  image that the browser has to scale down.  To support this, Pillow
+  is now required for static site generation.
 
 Version 2018.02.0 (11 February 2018)
 ------------------------------------

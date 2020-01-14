@@ -303,6 +303,12 @@ class CSVDataSource(DataSource):
                 return None
             else:
                 return boolean_states[s.lower()]
+        if name == 'photo_thumb_url':
+            url = self._people[event_id][person_id][country_id]['Photo URL']
+            if url == '' or '.' not in url:
+                return None
+            url_split = url.rsplit('.', 1)
+            return '%s-t%%(width)d.jpg' % url_split[0]
         if name == 'photo_filename':
             url = self._people[event_id][person_id][country_id]['Photo URL']
             if url == '':
@@ -315,6 +321,13 @@ class CSVDataSource(DataSource):
                 url_path = url[len(self._cfg['url_base']):]
                 url_dirs = url_path.split('/')
                 return os.path.join(self._local_dir, *url_dirs)
+        if name == 'photo_thumb_filename':
+            filename = self.person_event_get_attr(person_id, country_id,
+                                                  event_id, 'photo_filename')
+            if filename is None or '.' not in filename:
+                return None
+            filename_split = filename.rsplit('.', 1)
+            return '%s-t%%(width)d.jpg' % filename_split[0]
         if name == 'badge_photo_filename':
             url = self._people[event_id][person_id][country_id][
                 'Badge Photo URL']
