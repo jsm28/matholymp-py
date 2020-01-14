@@ -437,7 +437,7 @@ class CSVDataSource(DataSource):
         if name == 'flag_thumb_filename':
             filename = self.country_event_get_attr(country_id, event_id,
                                                    'flag_filename')
-            if filename == '' or '.' not in filename:
+            if filename is None or '.' not in filename:
                 return None
             filename_split = filename.rsplit('.', 1)
             return '%s-t%%(width)d.png' % filename_split[0]
