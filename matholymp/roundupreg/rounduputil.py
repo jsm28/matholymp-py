@@ -549,5 +549,5 @@ def invitation_letter_register(db):
     Return whether registering users can generate invitation letters
     for participants from their country.
     """
-    dist_off = db.config.ext['MATHOLYMP_INVITATION_LETTER_REGISTER']
-    return boolean_states[dist_off.lower()]
+    inv_letter = db.config.ext['MATHOLYMP_INVITATION_LETTER_REGISTER']
+    return boolean_states[inv_letter.lower()]
