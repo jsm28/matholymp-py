@@ -389,6 +389,8 @@ the registration system is not active.
   width at which they are displayed, rather than inlining a full-width
   image that the browser has to scale down.  To support this, Pillow
   is now required for static site generation.
+  :file:`country.item.html` and :file:`person.item.html` are updated
+  accordingly.
 
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
