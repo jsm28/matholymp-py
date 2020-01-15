@@ -33,24 +33,27 @@ registration system.
 """
 
 import datetime
+import os.path
 
 from matholymp.datetimeutil import date_from_ymd_iso
 from matholymp.fileutil import boolean_states
 
 __all__ = ['get_config_var', 'get_config_var_bool', 'get_config_var_int',
-           'get_config_var_date', 'get_config_var_comma_sep',
-           'distinguish_official', 'get_consent_forms_date_str',
-           'get_consent_forms_date', 'have_consent_forms', 'have_consent_ui',
-           'have_passport_numbers', 'have_nationality', 'require_diet',
-           'require_dob', 'get_num_problems', 'get_marks_per_problem',
-           'get_num_languages', 'get_language_numbers',
-           'get_earliest_date_of_birth', 'get_sanity_date_of_birth',
-           'get_earliest_date_of_birth_contestant', 'get_arrdep_bounds',
-           'get_staff_country_name', 'invitation_letter_register',
-           'get_initial_languages', 'get_extra_admin_roles_secondaryok',
-           'get_initial_room_types', 'get_initial_room_types_non_contestant',
+           'get_config_var_date', 'get_config_var_path',
+           'get_config_var_comma_sep', 'distinguish_official',
+           'get_consent_forms_date_str', 'get_consent_forms_date',
+           'have_consent_forms', 'have_consent_ui', 'have_passport_numbers',
+           'have_nationality', 'require_diet', 'require_dob',
+           'get_num_problems', 'get_marks_per_problem', 'get_num_languages',
+           'get_language_numbers', 'get_earliest_date_of_birth',
+           'get_sanity_date_of_birth', 'get_earliest_date_of_birth_contestant',
+           'get_arrdep_bounds', 'get_staff_country_name',
+           'invitation_letter_register', 'get_initial_languages',
+           'get_extra_admin_roles_secondaryok', 'get_initial_room_types',
+           'get_initial_room_types_non_contestant',
            'get_initial_room_types_contestant', 'get_contestant_genders',
-           'get_invitation_letter_email']
+           'get_invitation_letter_email', 'get_static_site_path',
+           'get_docgen_path']
 
 
 def get_config_var(db, name):
@@ -71,6 +74,15 @@ def get_config_var_int(db, name):
 def get_config_var_date(db, desc, name):
     """Return the date value of a configuration variable."""
     return date_from_ymd_iso(desc, get_config_var(db, name))
+
+
+def get_config_var_path(db, name):
+    """Return the path value of a configuration variable."""
+    path = get_config_var(db, name)
+    if path:
+        return os.path.join(db.config.TRACKER_HOME, path)
+    else:
+        return None
 
 
 def get_config_var_comma_sep(db, name):
@@ -259,3 +271,13 @@ def get_invitation_letter_email(db):
     personal details after an invitation letter has been generated.
     """
     return get_config_var_comma_sep(db, 'MATHOLYMP_INVITATION_LETTER_EMAIL')
+
+
+def get_static_site_path(db):
+    """Return the path to the static site directory, or None."""
+    return get_config_var_path(db, 'MATHOLYMP_STATIC_SITE_DIRECTORY')
+
+
+def get_docgen_path(db):
+    """Return the path to the document generation directory, or None."""
+    return get_config_var_path(db, 'MATHOLYMP_DOCGEN_DIRECTORY')

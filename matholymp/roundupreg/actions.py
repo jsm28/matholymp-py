@@ -62,7 +62,7 @@ from matholymp.roundupreg.auditors import audit_country_fields, \
     audit_person_fields
 from matholymp.roundupreg.cache import cached_bin
 from matholymp.roundupreg.config import distinguish_official, \
-    have_consent_ui, get_marks_per_problem
+    have_consent_ui, get_marks_per_problem, get_docgen_path
 from matholymp.roundupreg.roundupemail import send_email
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.roundupsource import RoundupDataSource
@@ -491,10 +491,9 @@ class DocumentGenerateAction(Action):
                                       itemid=self.nodeid):
                 raise Unauthorised('You do not have permission to %s the '
                                    '%s class' % (self.name, self.classname))
-        docgen_path = self.db.config.ext['MATHOLYMP_DOCGEN_DIRECTORY']
+        docgen_path = get_docgen_path(self.db)
         if not docgen_path:
             raise ValueError('Online document generation not enabled')
-        docgen_path = os.path.join(self.db.config.TRACKER_HOME, docgen_path)
         event_group = EventGroup(RoundupDataSource(self.db))
         event = event_group.event_list[0]
         config_data = read_docgen_config(docgen_path)
