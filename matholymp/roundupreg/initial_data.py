@@ -54,7 +54,7 @@
 
 """This module provides the Roundup initial data setup."""
 
-from matholymp.roundupreg.rounduputil import distinguish_official, \
+from matholymp.roundupreg.config import distinguish_official, \
     get_staff_country_name
 from matholymp.roundupreg.staticsite import static_site_event_group
 

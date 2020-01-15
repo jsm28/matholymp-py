@@ -54,7 +54,7 @@
 
 """This module provides the Roundup registration schema."""
 
-from matholymp.roundupreg.rounduputil import distinguish_official, \
+from matholymp.roundupreg.config import distinguish_official, \
     have_consent_forms, have_consent_ui, have_passport_numbers, \
     have_nationality, get_language_numbers, invitation_letter_register
 

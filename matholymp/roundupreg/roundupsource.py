@@ -36,11 +36,12 @@ countries involved in them from which other data is derived.
 from matholymp.datasource import DataSource
 from matholymp.datetimeutil import date_from_ymd_iso, time_from_hhmm_str
 from matholymp.fileutil import comma_split, boolean_states
-from matholymp.roundupreg.rounduputil import distinguish_official, \
+from matholymp.roundupreg.config import distinguish_official, \
     have_consent_forms, have_consent_ui, have_passport_numbers, \
     have_nationality, get_num_problems, get_marks_per_problem, \
-    scores_from_str, get_language_numbers, person_date_of_birth, \
-    contestant_age, db_file_url
+    get_language_numbers
+from matholymp.roundupreg.rounduputil import scores_from_str, \
+    person_date_of_birth, contestant_age, db_file_url
 
 __all__ = ['RoundupDataSource']
 

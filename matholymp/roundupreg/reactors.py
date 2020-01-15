@@ -38,8 +38,8 @@ import roundup.password
 
 from matholymp.fileutil import read_text_from_file
 from matholymp.roundupreg.cache import invalidate_cache
+from matholymp.roundupreg.config import have_consent_forms
 from matholymp.roundupreg.roundupemail import send_email
-from matholymp.roundupreg.rounduputil import have_consent_forms
 
 
 def country_react(db, cl, nodeid, oldvalues):

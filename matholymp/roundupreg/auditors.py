@@ -42,14 +42,14 @@ from matholymp.datetimeutil import date_from_ymd_str, date_from_ymd_iso, \
 from matholymp.fileutil import read_text_from_file, file_format_contents, \
     file_extension
 from matholymp.roundupreg.auditorutil import get_new_value, require_value
-from matholymp.roundupreg.roundupemail import send_email
-from matholymp.roundupreg.rounduputil import have_consent_forms, \
+from matholymp.roundupreg.config import have_consent_forms, \
     have_consent_ui, have_passport_numbers, have_nationality, require_diet, \
     require_dob, get_num_problems, get_marks_per_problem, \
     get_earliest_date_of_birth, get_sanity_date_of_birth, \
-    get_earliest_date_of_birth_contestant, get_arrdep_bounds, \
-    any_scores_missing, valid_int_str, create_rss, db_file_format_contents, \
-    db_file_extension
+    get_earliest_date_of_birth_contestant, get_arrdep_bounds
+from matholymp.roundupreg.roundupemail import send_email
+from matholymp.roundupreg.rounduputil import any_scores_missing, \
+    valid_int_str, create_rss, db_file_format_contents, db_file_extension
 from matholymp.roundupreg.staticsite import static_site_event_group, \
     static_site_file_data
 from matholymp.roundupreg.userauditor import valid_address, audit_user_fields

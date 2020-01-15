@@ -59,13 +59,14 @@ from matholymp.caseconv import all_uppercase
 from matholymp.collate import coll_get_sort_key
 from matholymp.datetimeutil import month_name, date_to_ymd_iso, date_to_name
 from matholymp.roundupreg.cache import cached_text
-from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
-from matholymp.roundupreg.rounduputil import distinguish_official, \
+from matholymp.roundupreg.config import distinguish_official, \
     get_consent_forms_date, have_consent_forms, have_consent_ui, \
     have_passport_numbers, have_nationality, require_diet, require_dob, \
     get_language_numbers, get_earliest_date_of_birth, \
-    get_sanity_date_of_birth, person_date_of_birth, contestant_age, \
-    get_arrdep_bounds, person_is_contestant, contestant_code, pn_score, \
+    get_sanity_date_of_birth, get_arrdep_bounds
+from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
+from matholymp.roundupreg.rounduputil import person_date_of_birth, \
+    contestant_age, person_is_contestant, contestant_code, pn_score, \
     scores_final, any_scores_missing, country_has_contestants, \
     valid_country_problem, bulk_csv_delimiter, bulk_csv_data, \
     bulk_csv_contact_emails, bulk_csv_country_number_url, \
