@@ -55,7 +55,9 @@
 """This module provides the Roundup initial data setup."""
 
 from matholymp.roundupreg.config import distinguish_official, \
-    get_staff_country_name
+    get_staff_country_name, get_initial_languages, \
+    get_extra_admin_roles_secondaryok, get_initial_room_types, \
+    get_initial_room_types_non_contestant, get_initial_room_types_contestant
 from matholymp.roundupreg.staticsite import static_site_event_group
 
 __all__ = ['init_data']
@@ -76,12 +78,7 @@ def init_data(env):
     staff_country_name = get_staff_country_name(db)
 
     # Extra roles from the configuration file.
-    extra_admin_roles_secondaryok = \
-        db.config.ext['MATHOLYMP_EXTRA_ADMIN_ROLES_SECONDARYOK'].split(',')
-    extra_admin_roles_secondaryok = [r.strip()
-                                     for r in extra_admin_roles_secondaryok]
-    extra_admin_roles_secondaryok = [r for r in extra_admin_roles_secondaryok
-                                     if r != '']
+    extra_admin_roles_secondaryok = get_extra_admin_roles_secondaryok(db)
 
     # Create a record for this event.
     event = db.getclass('event')
@@ -109,24 +106,17 @@ def init_data(env):
 
     # Create room types.
     room_type_cl = db.getclass('room_type')
-    initial_room_types = db.config.ext['MATHOLYMP_INITIAL_'
-                                       'ROOM_TYPES'].split(',')
+    initial_room_types = get_initial_room_types(db)
     for room_type in initial_room_types:
-        room_type = room_type.strip()
-        if room_type != '':
-            room_type_cl.create(name=room_type)
-    room_types_nc = db.config.ext['MATHOLYMP_INITIAL_'
-                                  'ROOM_TYPES_NON_CONTESTANT'].split(',')
-    room_types_nc = [t.strip() for t in room_types_nc]
-    room_types_nc = [db.room_type.lookup(t) for t in room_types_nc if t != '']
+        room_type_cl.create(name=room_type)
+    room_types_nc = get_initial_room_types_non_contestant(db)
+    room_types_nc = [db.room_type.lookup(t) for t in room_types_nc]
     room_type_nc_def = db.room_type.lookup(
         db.config.ext['MATHOLYMP_INITIAL_DEFAULT_ROOM_TYPE_NON_CONTESTANT'])
     rt_props_nc = {'room_types': room_types_nc,
                    'default_room_type': room_type_nc_def}
-    room_types_c = db.config.ext['MATHOLYMP_INITIAL_'
-                                 'ROOM_TYPES_CONTESTANT'].split(',')
-    room_types_c = [t.strip() for t in room_types_c]
-    room_types_c = [db.room_type.lookup(t) for t in room_types_c if t != '']
+    room_types_c = get_initial_room_types_contestant(db)
+    room_types_c = [db.room_type.lookup(t) for t in room_types_c]
     room_type_c_def = db.room_type.lookup(
         db.config.ext['MATHOLYMP_INITIAL_DEFAULT_ROOM_TYPE_CONTESTANT'])
     rt_props_c = {'room_types': room_types_c,
@@ -288,13 +278,10 @@ def init_data(env):
     tshirt.create(name='XXXL', order=6)
 
     # Create languages previously used.
-    initial_languages = db.config.ext['MATHOLYMP_INITIAL_LANGUAGES'].split(',')
+    initial_languages = get_initial_languages(db)
     lang_set = set()
     for lang in initial_languages:
-        lang = lang.strip()
-        if lang == '':
-            pass
-        elif lang.startswith('-'):
+        if lang.startswith('-'):
             lang_set.remove(lang[1:])
         elif lang == 'PREVIOUS':
             sdata = static_site_event_group(db)

@@ -38,15 +38,19 @@ from matholymp.datetimeutil import date_from_ymd_iso
 from matholymp.fileutil import boolean_states
 
 __all__ = ['get_config_var', 'get_config_var_bool', 'get_config_var_int',
-           'get_config_var_date', 'distinguish_official',
-           'get_consent_forms_date_str', 'get_consent_forms_date',
-           'have_consent_forms', 'have_consent_ui', 'have_passport_numbers',
-           'have_nationality', 'require_diet', 'require_dob',
-           'get_num_problems', 'get_marks_per_problem', 'get_num_languages',
-           'get_language_numbers', 'get_earliest_date_of_birth',
-           'get_sanity_date_of_birth', 'get_earliest_date_of_birth_contestant',
-           'get_arrdep_bounds', 'get_staff_country_name',
-           'invitation_letter_register']
+           'get_config_var_date', 'get_config_var_comma_sep',
+           'distinguish_official', 'get_consent_forms_date_str',
+           'get_consent_forms_date', 'have_consent_forms', 'have_consent_ui',
+           'have_passport_numbers', 'have_nationality', 'require_diet',
+           'require_dob', 'get_num_problems', 'get_marks_per_problem',
+           'get_num_languages', 'get_language_numbers',
+           'get_earliest_date_of_birth', 'get_sanity_date_of_birth',
+           'get_earliest_date_of_birth_contestant', 'get_arrdep_bounds',
+           'get_staff_country_name', 'invitation_letter_register',
+           'get_initial_languages', 'get_extra_admin_roles_secondaryok',
+           'get_initial_room_types', 'get_initial_room_types_non_contestant',
+           'get_initial_room_types_contestant', 'get_contestant_genders',
+           'get_invitation_letter_email']
 
 
 def get_config_var(db, name):
@@ -67,6 +71,17 @@ def get_config_var_int(db, name):
 def get_config_var_date(db, desc, name):
     """Return the date value of a configuration variable."""
     return date_from_ymd_iso(desc, get_config_var(db, name))
+
+
+def get_config_var_comma_sep(db, name):
+    """
+    Return the value of a comma-separated configuration variable.  We
+    allow spaces around list entries, and discard empty entries in the
+    list, to allow flexibility in how such lists are formatted in
+    config.ini.
+    """
+    value = [v.strip() for v in get_config_var(db, name).split(',')]
+    return [v for v in value if v != '']
 
 
 def distinguish_official(db):
@@ -203,3 +218,44 @@ def invitation_letter_register(db):
     for participants from their country.
     """
     return get_config_var_bool(db, 'MATHOLYMP_INVITATION_LETTER_REGISTER')
+
+
+def get_initial_languages(db):
+    """Return the list of initial languages."""
+    return get_config_var_comma_sep(db, 'MATHOLYMP_INITIAL_LANGUAGES')
+
+
+def get_extra_admin_roles_secondaryok(db):
+    """Return the list of initial extra roles OK as secondary for non-staff."""
+    return get_config_var_comma_sep(db,
+                                    'MATHOLYMP_EXTRA_ADMIN_ROLES_SECONDARYOK')
+
+
+def get_initial_room_types(db):
+    """Return the list of initial room types."""
+    return get_config_var_comma_sep(db, 'MATHOLYMP_INITIAL_ROOM_TYPES')
+
+
+def get_initial_room_types_non_contestant(db):
+    """Return the list of initial room types for non-contestants."""
+    return get_config_var_comma_sep(
+        db, 'MATHOLYMP_INITIAL_ROOM_TYPES_NON_CONTESTANT')
+
+
+def get_initial_room_types_contestant(db):
+    """Return the list of initial room types for contestants."""
+    return get_config_var_comma_sep(db,
+                                    'MATHOLYMP_INITIAL_ROOM_TYPES_CONTESTANT')
+
+
+def get_contestant_genders(db):
+    """Return the list of genders permitted for contestants."""
+    return get_config_var_comma_sep(db, 'MATHOLYMP_CONTESTANT_GENDERS')
+
+
+def get_invitation_letter_email(db):
+    """
+    Return the list of email addresses to notify of changes of
+    personal details after an invitation letter has been generated.
+    """
+    return get_config_var_comma_sep(db, 'MATHOLYMP_INVITATION_LETTER_EMAIL')

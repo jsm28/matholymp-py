@@ -46,7 +46,8 @@ from matholymp.roundupreg.config import have_consent_forms, \
     have_consent_ui, have_passport_numbers, have_nationality, require_diet, \
     require_dob, get_num_problems, get_marks_per_problem, \
     get_earliest_date_of_birth, get_sanity_date_of_birth, \
-    get_earliest_date_of_birth_contestant, get_arrdep_bounds
+    get_earliest_date_of_birth_contestant, get_arrdep_bounds, \
+    get_contestant_genders, get_invitation_letter_email
 from matholymp.roundupreg.roundupemail import send_email
 from matholymp.roundupreg.rounduputil import any_scores_missing, \
     valid_int_str, create_rss, db_file_format_contents, db_file_extension
@@ -376,9 +377,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
 
     # Contestants must have one of the permitted genders.
     if is_contestant and gender is not None:
-        req_genders = db.config.ext['MATHOLYMP_CONTESTANT_GENDERS'].split(',')
-        req_genders = [g.strip() for g in req_genders]
-        req_genders = [g for g in req_genders if g != '']
+        req_genders = get_contestant_genders(db)
         if req_genders:
             gender_name = db.gender.get(gender, 'name')
             if gender_name not in req_genders:
@@ -690,10 +689,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
             year = db.config.ext['MATHOLYMP_YEAR']
             subject = ('%s %s personal details change (%s, %s)'
                        % (short_name, year, name, country_name))
-            email_addrs = db.config.ext['MATHOLYMP_INVITATION_LETTER_EMAIL']
-            email_addrs = email_addrs.split(',')
-            email_addrs = [addr.strip() for addr in email_addrs]
-            email_addrs = [addr for addr in email_addrs if addr != '']
+            email_addrs = get_invitation_letter_email(db)
             send_email(db, email_addrs, subject, email_text, 'invchange')
 
 
