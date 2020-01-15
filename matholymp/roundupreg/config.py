@@ -37,20 +37,41 @@ import datetime
 from matholymp.datetimeutil import date_from_ymd_iso
 from matholymp.fileutil import boolean_states
 
-__all__ = ['distinguish_official', 'get_consent_forms_date_str',
-           'get_consent_forms_date', 'have_consent_forms', 'have_consent_ui',
-           'have_passport_numbers', 'have_nationality', 'require_diet',
-           'require_dob', 'get_num_problems', 'get_marks_per_problem',
-           'get_num_languages', 'get_language_numbers',
-           'get_earliest_date_of_birth', 'get_sanity_date_of_birth',
-           'get_earliest_date_of_birth_contestant', 'get_arrdep_bounds',
-           'get_staff_country_name', 'invitation_letter_register']
+__all__ = ['get_config_var', 'get_config_var_bool', 'get_config_var_int',
+           'get_config_var_date', 'distinguish_official',
+           'get_consent_forms_date_str', 'get_consent_forms_date',
+           'have_consent_forms', 'have_consent_ui', 'have_passport_numbers',
+           'have_nationality', 'require_diet', 'require_dob',
+           'get_num_problems', 'get_marks_per_problem', 'get_num_languages',
+           'get_language_numbers', 'get_earliest_date_of_birth',
+           'get_sanity_date_of_birth', 'get_earliest_date_of_birth_contestant',
+           'get_arrdep_bounds', 'get_staff_country_name',
+           'invitation_letter_register']
+
+
+def get_config_var(db, name):
+    """Return the string value of a configuration variable."""
+    return db.config.ext[name]
+
+
+def get_config_var_bool(db, name):
+    """Return the boolean value of a configuration variable."""
+    return boolean_states[get_config_var(db, name).lower()]
+
+
+def get_config_var_int(db, name):
+    """Return the integer value of a configuration variable."""
+    return int(get_config_var(db, name))
+
+
+def get_config_var_date(db, desc, name):
+    """Return the date value of a configuration variable."""
+    return date_from_ymd_iso(desc, get_config_var(db, name))
 
 
 def distinguish_official(db):
     """Return whether this event distinguishes official countries."""
-    dist_off = db.config.ext['MATHOLYMP_DISTINGUISH_OFFICIAL']
-    return boolean_states[dist_off.lower()]
+    return get_config_var_bool(db, 'MATHOLYMP_DISTINGUISH_OFFICIAL')
 
 
 def get_consent_forms_date_str(db):
@@ -58,7 +79,7 @@ def get_consent_forms_date_str(db):
     Return the earliest date of birth for which participants require
     consent forms, as a string, or the empty string if not required.
     """
-    return db.config.ext['MATHOLYMP_CONSENT_FORMS_DATE']
+    return get_config_var(db, 'MATHOLYMP_CONSENT_FORMS_DATE')
 
 
 def get_consent_forms_date(db):
@@ -80,8 +101,7 @@ def have_consent_forms(db):
 
 def have_consent_ui(db):
     """Return whether this event collects additional consent information."""
-    consent_ui = db.config.ext['MATHOLYMP_CONSENT_UI']
-    return boolean_states[consent_ui.lower()]
+    return get_config_var_bool(db, 'MATHOLYMP_CONSENT_UI')
 
 
 def have_passport_numbers(db):
@@ -89,14 +109,12 @@ def have_passport_numbers(db):
     Return whether passport or identity card numbers are collected for
     this event.
     """
-    req_passport = db.config.ext['MATHOLYMP_REQUIRE_PASSPORT_NUMBER']
-    return boolean_states[req_passport.lower()]
+    return get_config_var_bool(db, 'MATHOLYMP_REQUIRE_PASSPORT_NUMBER')
 
 
 def have_nationality(db):
     """Return whether nationalities are collected for this event."""
-    req_nationality = db.config.ext['MATHOLYMP_REQUIRE_NATIONALITY']
-    return boolean_states[req_nationality.lower()]
+    return get_config_var_bool(db, 'MATHOLYMP_REQUIRE_NATIONALITY')
 
 
 def require_diet(db):
@@ -104,31 +122,29 @@ def require_diet(db):
     Return whether dietary requirements information is required for
     all participants.
     """
-    req_diet = db.config.ext['MATHOLYMP_REQUIRE_DIET']
-    return boolean_states[req_diet.lower()]
+    return get_config_var_bool(db, 'MATHOLYMP_REQUIRE_DIET')
 
 
 def require_dob(db):
     """Return whether date of birth is required for all participants."""
-    req_dob = db.config.ext['MATHOLYMP_REQUIRE_DATE_OF_BIRTH']
-    return boolean_states[req_dob.lower()]
+    return get_config_var_bool(db, 'MATHOLYMP_REQUIRE_DATE_OF_BIRTH')
 
 
 def get_num_problems(db):
     """Return the number of problems at this event."""
-    return int(db.config.ext['MATHOLYMP_NUM_PROBLEMS'])
+    return get_config_var_int(db, 'MATHOLYMP_NUM_PROBLEMS')
 
 
 def get_marks_per_problem(db):
     """Return the number of marks for each problem at this event."""
-    marks_per_problem = db.config.ext['MATHOLYMP_MARKS_PER_PROBLEM']
+    marks_per_problem = get_config_var(db, 'MATHOLYMP_MARKS_PER_PROBLEM')
     marks_per_problem = marks_per_problem.split()
     return [int(m) for m in marks_per_problem]
 
 
 def get_num_languages(db):
     """Return the maximum number of languages for a person at this event."""
-    return int(db.config.ext['MATHOLYMP_NUM_LANGUAGES'])
+    return get_config_var_int(db, 'MATHOLYMP_NUM_LANGUAGES')
 
 
 def get_language_numbers(db):
@@ -147,14 +163,14 @@ def get_sanity_date_of_birth(db):
     Return a date of birth such that participants may not be born on
     or after that date.
     """
-    return date_from_ymd_iso('sanity date of birth',
-                             db.config.ext['MATHOLYMP_SANITY_DATE_OF_BIRTH'])
+    return get_config_var_date(db, 'sanity date of birth',
+                               'MATHOLYMP_SANITY_DATE_OF_BIRTH')
 
 
 def get_earliest_date_of_birth_contestant(db):
     """Return the earliest date of birth allowed for contestants."""
-    return date_from_ymd_iso('earliest date of birth for contestants',
-                             db.config.ext['MATHOLYMP_EARLIEST_DATE_OF_BIRTH'])
+    return get_config_var_date(db, 'earliest date of birth for contestants',
+                               'MATHOLYMP_EARLIEST_DATE_OF_BIRTH')
 
 
 _early_vars = {'arrival': 'MATHOLYMP_EARLIEST_ARRIVAL_DATE',
@@ -167,17 +183,17 @@ def get_arrdep_bounds(db, kind):
     """Return the bounds on arrival or departure dates."""
     early_var = _early_vars[kind]
     late_var = _late_vars[kind]
-    early_date = date_from_ymd_iso('earliest %s date' % kind,
-                                   db.config.ext[early_var])
-    late_date = date_from_ymd_iso('latest %s date' % kind,
-                                  db.config.ext[late_var])
+    early_date = get_config_var_date(db, 'earliest %s date' % kind,
+                                     early_var)
+    late_date = get_config_var_date(db, 'latest %s date' % kind,
+                                    late_var)
     return (early_date, late_date)
 
 
 def get_staff_country_name(db):
     """Return the name of the special staff country."""
-    short_name = db.config.ext['MATHOLYMP_SHORT_NAME']
-    year = db.config.ext['MATHOLYMP_YEAR']
+    short_name = get_config_var(db, 'MATHOLYMP_SHORT_NAME')
+    year = get_config_var(db, 'MATHOLYMP_YEAR')
     return short_name + ' ' + year + ' Staff'
 
 
@@ -186,5 +202,4 @@ def invitation_letter_register(db):
     Return whether registering users can generate invitation letters
     for participants from their country.
     """
-    inv_letter = db.config.ext['MATHOLYMP_INVITATION_LETTER_REGISTER']
-    return boolean_states[inv_letter.lower()]
+    return get_config_var_bool(db, 'MATHOLYMP_INVITATION_LETTER_REGISTER')
