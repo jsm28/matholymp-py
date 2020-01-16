@@ -35,11 +35,11 @@ countries involved in them from which other data is derived.
 
 from matholymp.datasource import DataSource
 from matholymp.datetimeutil import date_from_ymd_iso, time_from_hhmm_str
-from matholymp.fileutil import comma_split, boolean_states
+from matholymp.fileutil import comma_split
 from matholymp.roundupreg.config import distinguish_official, \
     have_consent_forms, have_consent_ui, have_passport_numbers, \
     have_nationality, get_num_problems, get_marks_per_problem, \
-    get_language_numbers, get_short_name
+    get_language_numbers, get_short_name, honourable_mentions_available
 from matholymp.roundupreg.rounduputil import scores_from_str, \
     person_date_of_birth, contestant_age, db_file_url
 
@@ -70,9 +70,7 @@ class RoundupDataSource(DataSource):
             else:
                 return None
         elif name == 'honourable_mentions_available':
-            hm_avail = self._db.config.ext['MATHOLYMP_HONOURABLE_'
-                                           'MENTIONS_AVAILABLE']
-            return boolean_states[hm_avail.lower()]
+            return honourable_mentions_available(self._db)
         elif name == '_event_ids':
             return [int(self._db.config.ext['MATHOLYMP_EVENT_NUMBER'])]
         elif name == '_person_ids':

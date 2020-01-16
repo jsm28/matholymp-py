@@ -63,7 +63,7 @@ from matholymp.roundupreg.auditors import audit_country_fields, \
 from matholymp.roundupreg.cache import cached_bin
 from matholymp.roundupreg.config import distinguish_official, \
     have_consent_ui, get_marks_per_problem, get_short_name_year, \
-    get_docgen_path
+    badge_use_background, get_docgen_path
 from matholymp.roundupreg.roundupemail import send_email
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.roundupsource import RoundupDataSource
@@ -554,11 +554,9 @@ class NameBadgeAction(DocumentGenerateAction):
     zip_permission_type = 'GenerateNameBadges'
 
     def generate_documents(self, docgen):
-        use_background = self.db.config.ext['MATHOLYMP_BADGE_USE_BACKGROUND']
-        use_background = boolean_states[use_background.lower()]
         docgen.generate_badges(
             self.nodeid if self.nodeid is not None else 'all',
-            use_background)
+            badge_use_background(self.db))
 
     def document_filename(self):
         return 'badge-person%s.pdf' % self.nodeid
