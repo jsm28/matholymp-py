@@ -39,7 +39,7 @@ from matholymp.fileutil import comma_split, boolean_states
 from matholymp.roundupreg.config import distinguish_official, \
     have_consent_forms, have_consent_ui, have_passport_numbers, \
     have_nationality, get_num_problems, get_marks_per_problem, \
-    get_language_numbers
+    get_language_numbers, get_short_name
 from matholymp.roundupreg.rounduputil import scores_from_str, \
     person_date_of_birth, contestant_age, db_file_url
 
@@ -60,7 +60,7 @@ class RoundupDataSource(DataSource):
 
     def event_group_get_attr(self, name):
         if name == 'short_name':
-            return self._db.config.ext['MATHOLYMP_SHORT_NAME']
+            return get_short_name(self._db)
         elif name == 'distinguish_official':
             return distinguish_official(self._db)
         elif name == 'rank_top_n':

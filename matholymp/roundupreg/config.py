@@ -47,7 +47,8 @@ __all__ = ['get_config_var', 'get_config_var_bool', 'get_config_var_int',
            'get_num_problems', 'get_marks_per_problem', 'get_num_languages',
            'get_language_numbers', 'get_earliest_date_of_birth',
            'get_sanity_date_of_birth', 'get_earliest_date_of_birth_contestant',
-           'get_arrdep_bounds', 'get_staff_country_name',
+           'get_arrdep_bounds', 'get_short_name', 'get_year',
+           'get_short_name_year', 'get_staff_country_name',
            'invitation_letter_register', 'get_initial_languages',
            'get_extra_admin_roles_secondaryok', 'get_initial_room_types',
            'get_initial_room_types_non_contestant',
@@ -217,11 +218,24 @@ def get_arrdep_bounds(db, kind):
     return (early_date, late_date)
 
 
+def get_short_name(db):
+    """Return the short name of the event."""
+    return get_config_var(db, 'MATHOLYMP_SHORT_NAME')
+
+
+def get_year(db):
+    """Return the year of the event."""
+    return get_config_var(db, 'MATHOLYMP_YEAR')
+
+
+def get_short_name_year(db):
+    """Return the short name and year of the event, as a single string."""
+    return '%s %s' % (get_short_name(db), get_year(db))
+
+
 def get_staff_country_name(db):
     """Return the name of the special staff country."""
-    short_name = get_config_var(db, 'MATHOLYMP_SHORT_NAME')
-    year = get_config_var(db, 'MATHOLYMP_YEAR')
-    return short_name + ' ' + year + ' Staff'
+    return '%s Staff' % get_short_name_year(db)
 
 
 def invitation_letter_register(db):

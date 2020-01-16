@@ -35,12 +35,13 @@ import email
 
 import roundup.mailer
 
+from matholymp.roundupreg.config import get_short_name_year
+
 
 def send_email(db, email_to, subject, body, msgid_frag):
     """Send an email, ignoring errors."""
-    short_name = db.config.ext['MATHOLYMP_SHORT_NAME']
-    year = db.config.ext['MATHOLYMP_YEAR']
-    author_name = '%s %s registration' % (short_name, year)
+    short_name_year = get_short_name_year(db)
+    author_name = '%s registration' % (short_name_year)
     mailer = roundup.mailer.Mailer(db.config)
     # Roundup's standard_message function does not set a Message-ID,
     # so go through the steps it takes but with one added.

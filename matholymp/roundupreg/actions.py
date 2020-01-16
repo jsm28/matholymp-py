@@ -62,7 +62,8 @@ from matholymp.roundupreg.auditors import audit_country_fields, \
     audit_person_fields
 from matholymp.roundupreg.cache import cached_bin
 from matholymp.roundupreg.config import distinguish_official, \
-    have_consent_ui, get_marks_per_problem, get_docgen_path
+    have_consent_ui, get_marks_per_problem, get_short_name_year, \
+    get_docgen_path
 from matholymp.roundupreg.roundupemail import send_email
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.roundupsource import RoundupDataSource
@@ -411,19 +412,16 @@ class ScoresRSSAction(Action):
             link_url = self.base + 'country' + self.nodeid
             url_id = self.nodeid
 
-        short_name = self.db.config.ext['MATHOLYMP_SHORT_NAME']
-        year = self.db.config.ext['MATHOLYMP_YEAR']
+        short_name_year = get_short_name_year(self.db)
         text = '<?xml version="1.0"?>\n'
         text += ('<rss version="2.0"'
                  ' xmlns:atom="http://www.w3.org/2005/Atom">\n')
         text += '  <channel>\n'
-        text += ('    <title>%s %s%s Scores</title>\n'
-                 % (html.escape(short_name), html.escape(year),
-                    html.escape(title_extra)))
+        text += ('    <title>%s%s Scores</title>\n'
+                 % (html.escape(short_name_year), html.escape(title_extra)))
         text += '    <link>%s</link>\n' % link_url
-        text += ('    <description>%s %s%s Scores Live Feed</description>\n'
-                 % (html.escape(short_name), html.escape(year),
-                    html.escape(title_extra)))
+        text += ('    <description>%s%s Scores Live Feed</description>\n'
+                 % (html.escape(short_name_year), html.escape(title_extra)))
         text += '    <language>en-gb</language>\n'
         text += '    <docs>http://www.rssboard.org/rss-specification</docs>\n'
         text += ('    <atom:link href="%s" rel="self"'
@@ -973,11 +971,10 @@ class PersonBulkRegisterAction(BulkRegisterAction):
                                           'id': item_id,
                                           'username': username,
                                           'password': pw}
-            short_name = self.db.config.ext['MATHOLYMP_SHORT_NAME']
-            year = self.db.config.ext['MATHOLYMP_YEAR']
-            subject = '%s %s registration (%s, %s)' % (short_name, year,
-                                                       realname,
-                                                       csv_row['Primary Role'])
+            short_name_year = get_short_name_year(self.db)
+            subject = '%s registration (%s, %s)' % (short_name_year,
+                                                    realname,
+                                                    csv_row['Primary Role'])
             send_email(self.db, contact_list, subject, email_text,
                        'selfreg%s' % item_id)
 

@@ -37,6 +37,7 @@ __all__ = ['RoundupSiteGenerator']
 import html
 
 from matholymp.data import EventGroup
+from matholymp.roundupreg.config import get_short_name
 from matholymp.roundupreg.roundupsource import RoundupDataSource
 from matholymp.regsitegen import RegSiteGenerator
 
@@ -56,7 +57,7 @@ class RoundupSiteGenerator(RegSiteGenerator):
         html_ver_map = {'html4': False,
                         'xhtml': True}
         use_xhtml = html_ver_map[db.config.HTML_VERSION]
-        cfg = {'num_key': db.config.ext['MATHOLYMP_SHORT_NAME'] + ' Number',
+        cfg = {'num_key': get_short_name(db) + ' Number',
                'scores_css': db.config.ext['MATHOLYMP_SCORES_CLASS'],
                'list_css': db.config.ext['MATHOLYMP_LIST_CLASS'],
                'use_xhtml': use_xhtml,

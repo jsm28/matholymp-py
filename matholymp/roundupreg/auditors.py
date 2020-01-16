@@ -47,7 +47,7 @@ from matholymp.roundupreg.config import have_consent_forms, \
     require_dob, get_num_problems, get_marks_per_problem, \
     get_earliest_date_of_birth, get_sanity_date_of_birth, \
     get_earliest_date_of_birth_contestant, get_arrdep_bounds, \
-    get_contestant_genders, get_invitation_letter_email
+    get_short_name_year, get_contestant_genders, get_invitation_letter_email
 from matholymp.roundupreg.roundupemail import send_email
 from matholymp.roundupreg.rounduputil import any_scores_missing, \
     valid_int_str, create_rss, db_file_format_contents, db_file_extension
@@ -685,10 +685,9 @@ def audit_person_fields(db, cl, nodeid, newvalues):
                                           'role': primary_role_name,
                                           'properties': ', '.join(
                                               sorted(invitation_letter_keys))}
-            short_name = db.config.ext['MATHOLYMP_SHORT_NAME']
-            year = db.config.ext['MATHOLYMP_YEAR']
-            subject = ('%s %s personal details change (%s, %s)'
-                       % (short_name, year, name, country_name))
+            short_name_year = get_short_name_year(db)
+            subject = ('%s personal details change (%s, %s)'
+                       % (short_name_year, name, country_name))
             email_addrs = get_invitation_letter_email(db)
             send_email(db, email_addrs, subject, email_text, 'invchange')
 

@@ -38,7 +38,7 @@ import roundup.password
 
 from matholymp.fileutil import read_text_from_file
 from matholymp.roundupreg.cache import invalidate_cache
-from matholymp.roundupreg.config import have_consent_forms
+from matholymp.roundupreg.config import have_consent_forms, get_short_name_year
 from matholymp.roundupreg.roundupemail import send_email
 
 
@@ -84,9 +84,8 @@ def country_react(db, cl, nodeid, oldvalues):
     email_text = template_text % {'country': country_name,
                                   'username': username,
                                   'password': pw}
-    short_name = db.config.ext['MATHOLYMP_SHORT_NAME']
-    year = db.config.ext['MATHOLYMP_YEAR']
-    subject = '%s %s registration (%s)' % (short_name, year, country_name)
+    short_name_year = get_short_name_year(db)
+    subject = '%s registration (%s)' % (short_name_year, country_name)
     send_email(db, [email_addr] + email_extra, subject, email_text,
                country_code)
 
