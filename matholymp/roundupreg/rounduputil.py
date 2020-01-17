@@ -43,11 +43,10 @@ import re
 import time
 import zipfile
 
-from matholymp.datetimeutil import date_from_ymd_str, date_from_ymd_iso, \
-    age_on_date
+from matholymp.datetimeutil import date_from_ymd_str, age_on_date
 from matholymp.fileutil import read_utf8_csv_bytes, comma_split, \
     file_format_contents, file_extension
-from matholymp.roundupreg.config import get_num_problems
+from matholymp.roundupreg.config import get_num_problems, get_age_day_date
 
 __all__ = ['scores_from_str', 'person_date_of_birth', 'contestant_age',
            'person_is_contestant', 'contestant_code', 'pn_score',
@@ -93,8 +92,7 @@ def contestant_age(db, person):
     date1 = person_date_of_birth(db, person)
     if date1 is None:
         return None
-    date2 = date_from_ymd_iso('age day date',
-                              db.config.ext['MATHOLYMP_AGE_DAY_DATE'])
+    date2 = get_age_day_date(db)
     return age_on_date(date1, date2)
 
 

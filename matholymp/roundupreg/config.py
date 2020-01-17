@@ -47,8 +47,8 @@ __all__ = ['get_config_var', 'get_config_var_bool', 'get_config_var_int',
            'get_num_problems', 'get_marks_per_problem', 'get_num_languages',
            'get_language_numbers', 'get_earliest_date_of_birth',
            'get_sanity_date_of_birth', 'get_earliest_date_of_birth_contestant',
-           'get_arrdep_bounds', 'get_short_name', 'get_year',
-           'get_short_name_year', 'get_staff_country_name',
+           'get_age_day_date', 'get_arrdep_bounds', 'get_short_name',
+           'get_year', 'get_short_name_year', 'get_staff_country_name',
            'invitation_letter_register', 'badge_use_background',
            'honourable_mentions_available', 'get_initial_languages',
            'get_extra_admin_roles_secondaryok', 'get_initial_room_types',
@@ -200,6 +200,12 @@ def get_earliest_date_of_birth_contestant(db):
     """Return the earliest date of birth allowed for contestants."""
     return get_config_var_date(db, 'earliest date of birth for contestants',
                                'MATHOLYMP_EARLIEST_DATE_OF_BIRTH')
+
+
+def get_age_day_date(db):
+    """Return the date as of which contestant ages are determined."""
+    return get_config_var_date(db, 'age day date',
+                               'MATHOLYMP_AGE_DAY_DATE')
 
 
 _early_vars = {'arrival': 'MATHOLYMP_EARLIEST_ARRIVAL_DATE',
