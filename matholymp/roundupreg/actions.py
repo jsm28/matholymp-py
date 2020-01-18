@@ -60,6 +60,9 @@ from matholymp.images import open_image_no_alpha, scale_image_to_size_jpeg, \
     scale_image_to_width_jpeg, scale_image_to_width_png
 from matholymp.roundupreg.auditors import audit_country_fields, \
     audit_person_fields
+from matholymp.roundupreg.bulkreg import bulk_csv_data, \
+    bulk_csv_contact_emails, bulk_csv_country_number_url, \
+    bulk_csv_person_number_url, bulk_zip_data
 from matholymp.roundupreg.cache import cached_bin
 from matholymp.roundupreg.config import distinguish_official, \
     have_consent_ui, get_marks_per_problem, get_short_name_year, \
@@ -69,9 +72,7 @@ from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.roundupsource import RoundupDataSource
 from matholymp.roundupreg.rounduputil import scores_from_str, \
     person_is_contestant, contestant_code, scores_final, \
-    valid_country_problem, valid_int_str, create_rss, bulk_csv_data, \
-    bulk_csv_contact_emails, bulk_csv_country_number_url, \
-    bulk_csv_person_number_url, bulk_zip_data, country_from_code
+    valid_country_problem, valid_int_str, create_rss, country_from_code
 from matholymp.roundupreg.userauditor import valid_address
 
 

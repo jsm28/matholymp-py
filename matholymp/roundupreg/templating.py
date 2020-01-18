@@ -58,6 +58,9 @@ from roundup.cgi.templating import HTMLItem
 from matholymp.caseconv import all_uppercase
 from matholymp.collate import coll_get_sort_key
 from matholymp.datetimeutil import month_name, date_to_ymd_iso, date_to_name
+from matholymp.roundupreg.bulkreg import bulk_csv_delimiter, bulk_csv_data, \
+    bulk_csv_contact_emails, bulk_csv_country_number_url, \
+    bulk_csv_person_number_url
 from matholymp.roundupreg.cache import cached_text
 from matholymp.roundupreg.config import distinguish_official, \
     get_consent_forms_date, have_consent_forms, have_consent_ui, \
@@ -68,9 +71,7 @@ from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import person_date_of_birth, \
     contestant_age, person_is_contestant, contestant_code, pn_score, \
     scores_final, any_scores_missing, country_has_contestants, \
-    valid_country_problem, bulk_csv_delimiter, bulk_csv_data, \
-    bulk_csv_contact_emails, bulk_csv_country_number_url, \
-    bulk_csv_person_number_url
+    valid_country_problem
 from matholymp.roundupreg.staticsite import static_site_event_group
 
 
