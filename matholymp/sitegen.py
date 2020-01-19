@@ -57,9 +57,9 @@ def read_sitegen_config(top_directory):
     """Read the configuration file for site generation."""
     cfg_file_name = os.path.join(top_directory, 'staticsite.cfg')
     cfg_str_keys = ['long_name', 'short_name', 'short_name_plural',
-                    'num_key', 'scores_css', 'list_css', 'photo_css',
-                    'page_suffix', 'page_include_extra', 'url_base',
-                    'short_name_url', 'short_name_url_plural',
+                    'num_key', 'scores_css', 'list_css', 'photo_list_css',
+                    'photo_css', 'page_suffix', 'page_include_extra',
+                    'url_base', 'short_name_url', 'short_name_url_plural',
                     'official_desc', 'official_desc_lc', 'official_adj',
                     'age_day_desc']
     cfg_int_keys = []
@@ -196,6 +196,10 @@ class SiteGenerator:
         """Generate an HTML link to an external page."""
         return self.html_a(contents, href, target='_blank', **attrs)
 
+    def html_br(self, **attrs):
+        """Generate an HTML br element."""
+        return self.html_element_empty('br', **attrs)
+
     def html_img(self, **attrs):
         """Generate an HTML img element."""
         return self.html_element_empty('img', **attrs)
@@ -224,6 +228,11 @@ class SiteGenerator:
     def html_td_scores(self, contents, **attrs):
         """Generate an HTML td element, using the CSS for tables of scores."""
         return self.html_td(contents, class_=self._cfg['scores_css'], **attrs)
+
+    def html_td_photo_list(self, contents, **attrs):
+        """Generate an HTML td element, using the CSS for tables of photos."""
+        return self.html_td(contents, class_=self._cfg['photo_list_css'],
+                            **attrs)
 
     def html_tr(self, contents, **attrs):
         """Generate an HTML tr element."""
@@ -261,6 +270,14 @@ class SiteGenerator:
         elements, each using the CSS for tables of scores.
         """
         return self.html_tr_list([self.html_td_scores(s) for s in td_list],
+                                 **attrs)
+
+    def html_tr_td_photo_list(self, td_list, **attrs):
+        """
+        Generate an HTML tr element, with contents a sequence of td
+        elements, each using the CSS for tables of photos.
+        """
+        return self.html_tr_list([self.html_td_photo_list(s) for s in td_list],
                                  **attrs)
 
     def html_tr_th_td(self, th, td, **attrs):
@@ -396,6 +413,20 @@ class SiteGenerator:
     def link_for_event_people(self, event, link_body):
         """Generate a link to the list of people for a given event."""
         return self.link_for_page(self.path_for_event_people(event),
+                                  link_body)
+
+    def path_for_event_people_table(self, event):
+        """
+        Return the path (a list) of the directory of people (single
+        table) for a given event.
+        """
+        p = self.path_for_event_people(event)
+        p.append('summary')
+        return p
+
+    def link_for_event_people_table(self, event, link_body):
+        """Generate a link to the single table of people for a given event."""
+        return self.link_for_page(self.path_for_event_people_table(event),
                                   link_body)
 
     def path_for_event_people_csv(self, event):
@@ -846,12 +877,14 @@ class SiteGenerator:
                            % (e.num_countries, part_c_off,
                               self.link_for_event_countries(e, 'list')))],
                          ['Contestants',
-                          '%d%s (%s, %s)'
+                          '%d%s (%s, %s, %s)'
                           % (e.num_contestants, cont_off,
                              self.link_for_event_scoreboard(e, 'scoreboard'),
                              self.link_for_event_people(e,
                                                         'list of'
-                                                        ' participants'))],
+                                                        ' participants'),
+                             self.link_for_event_people_table(
+                                 e, 'table of participants with photos'))],
                          ['Number of exams', str(e.num_exams)],
                          ['Number of problems', prob_marks],
                          ['Gold medals',
@@ -979,6 +1012,54 @@ class SiteGenerator:
         header = 'People at ' + self.link_for_event_and_host(e)
         self.write_html_to_file(text, title, header,
                                 self.path_for_event_people(e))
+
+    def event_people_summary_table(self, e):
+        """Generate the summary table of people at one event, with photos."""
+        person_entries = []
+        row_len = 6
+        countries = sorted(e.country_list, key=lambda x: x.sort_key)
+        for c in countries:
+            text = ''
+            people = sorted(c.person_list, key=lambda x: x.sort_key)
+            cl = self.link_for_country_at_event(c,
+                                                html.escape(c.name_with_code))
+            text += '<h2>%s</h2>\n' % cl
+            for p in people:
+                if p.photo_url:
+                    thumb_img = '%s%s' % (self.html_linked_img(
+                        p.photo_url,
+                        p.photo_thumb_url,
+                        self.summary_photo_thumb_width()),
+                                          self.html_br())
+                else:
+                    thumb_img = ''
+                p_entry = ('%s%s%s(%s, %s)'
+                           % (thumb_img,
+                              self.link_for_person(p.person,
+                                                   html.escape(p.name)),
+                              self.html_br(),
+                              html.escape(p.primary_role),
+                              cl))
+                person_entries.append(p_entry)
+            last_row = len(person_entries) % row_len
+            if last_row:
+                person_entries.extend([''] * (row_len - last_row))
+        rows = []
+        for row_num in range(len(person_entries) // row_len):
+            start = row_num * row_len
+            end = (row_num + 1) * row_len
+            rows.append(self.html_tr_td_photo_list(person_entries[start:end]))
+        return self.html_table('\n'.join(rows))
+
+    def generate_one_event_people_summary_table(self, e):
+        """Generate a summary table of the people at one event, with photos."""
+        text = ''
+        text += self.event_people_summary_table(e)
+        text += '\n'
+        title = 'People at ' + html.escape(e.short_name_with_year_and_country)
+        header = 'People at ' + self.link_for_event_and_host(e)
+        self.write_html_to_file(text, title, header,
+                                self.path_for_event_people_table(e))
 
     def person_scoreboard_header(self, event, show_rank=True, show_code=True,
                                  show_name=True, show_award=True):
@@ -1557,6 +1638,10 @@ class SiteGenerator:
         """Return the width of a flag thumbnail on a country page."""
         return 300
 
+    def summary_photo_thumb_width(self):
+        """Return the width of a photo thumbnail on a summary table page."""
+        return 75
+
     def country_photo_thumb_width(self):
         """Return the width of a photo thumbnail on a country page."""
         return 150
@@ -1733,7 +1818,8 @@ class SiteGenerator:
         """Generate photo thumbnails for one person at one event."""
         photo_filename = p.photo_filename
         if photo_filename and os.access(photo_filename, os.F_OK):
-            widths = (self.country_photo_thumb_width(),
+            widths = (self.summary_photo_thumb_width(),
+                      self.country_photo_thumb_width(),
                       self.person_photo_thumb_width())
             for width in widths:
                 filename = p.photo_thumb_filename % {'width': width}
@@ -2259,6 +2345,7 @@ class SiteGenerator:
             if e.num_contestants:
                 self.generate_one_event_countries_summary(e)
                 self.generate_one_event_people_summary(e)
+                self.generate_one_event_people_summary_table(e)
                 self.generate_one_event_scoreboard(e)
                 self.generate_one_event_redirects(e)
                 for c in e.country_list:

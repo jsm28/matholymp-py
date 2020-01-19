@@ -392,6 +392,11 @@ the registration system is not active.
   :file:`country.item.html` and :file:`person.item.html` are updated
   accordingly.
 
+* The static site now includes an additional summary table of
+  participants for each event, with all photos shown on a single
+  page.  A new variable ``photo_list_css`` must be specified in
+  :file:`staticsite.cfg` for static site generation.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 
