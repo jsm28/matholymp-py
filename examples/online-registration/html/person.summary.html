@@ -1,0 +1,24 @@
+<tal:block metal:use-macro="templates/page/macros/icing">
+<title metal:fill-slot="head_title" i18n:translate="">Person summary - <span
+ i18n:name="tracker" tal:replace="config/TRACKER_NAME" /></title>
+<span metal:fill-slot="body_title" tal:omit-tag="python:1"
+ i18n:translate="">Person listing</span>
+<td class="content" metal:fill-slot="content">
+
+<span tal:condition="python:not (context.is_view_ok()
+ or request.user.hasRole('Anonymous'))"
+ i18n:translate="">You are not allowed to view this page.</span>
+
+<span tal:condition="python:not context.is_view_ok()
+ and request.user.hasRole('Anonymous')"
+ i18n:translate="">Please login with your username and password.</span>
+
+<tal:block tal:condition="context/is_view_ok">
+
+<tal:block tal:replace="structure python:utils.all_people_summary(db._db)" />
+
+</tal:block>
+
+</td>
+
+</tal:block>

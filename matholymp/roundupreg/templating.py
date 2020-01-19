@@ -34,16 +34,16 @@ system.
 
 __all__ = ['people_from_country_internal', 'people_from_country',
            'show_country_people', 'country_people_table', 'all_people_table',
-           'person_scores_table', 'country_scores_table', 'scoreboard_gen',
-           'scoreboard', 'display_scoreboard', 'has_nonempty_travel',
-           'show_travel_copy_options', 'country_travel_copy_options',
-           'person_case_warning', 'registration_status',
-           'registration_status_country', 'edit_rooms', 'show_consent_form_ui',
-           'has_consent_for_photo', 'string_select', 'date_of_birth_select',
-           'arrdep_date_select', 'arrdep_time_select', 'photo_consent_select',
-           'score_country_select', 'show_incomplete', 'required_person_fields',
-           'register_templating_utils', 'show_prereg_sidebar',
-           'show_prereg_reminder', 'bulk_csv_contents',
+           'all_people_summary', 'person_scores_table', 'country_scores_table',
+           'scoreboard_gen', 'scoreboard', 'display_scoreboard',
+           'has_nonempty_travel', 'show_travel_copy_options',
+           'country_travel_copy_options', 'person_case_warning',
+           'registration_status', 'registration_status_country', 'edit_rooms',
+           'show_consent_form_ui', 'has_consent_for_photo', 'string_select',
+           'date_of_birth_select', 'arrdep_date_select', 'arrdep_time_select',
+           'photo_consent_select', 'score_country_select', 'show_incomplete',
+           'required_person_fields', 'register_templating_utils',
+           'show_prereg_sidebar', 'show_prereg_reminder', 'bulk_csv_contents',
            'show_bulk_csv_country', 'show_bulk_csv_country_link_from_code',
            'show_bulk_csv_person', 'bulk_zip_ref', 'required_user_fields']
 
@@ -121,6 +121,13 @@ def all_people_table(db):
     sitegen = RoundupSiteGenerator(db)
     event = sitegen.event
     return sitegen.event_people_table(event)
+
+
+def all_people_summary(db):
+    """Show the summary table of all people, with photos."""
+    sitegen = RoundupSiteGenerator(db)
+    event = sitegen.event
+    return sitegen.event_people_summary_table(event)
 
 
 def person_scores_table(db, person):
@@ -646,6 +653,7 @@ def register_templating_utils(instance):
     instance.registerUtil('show_country_people', show_country_people)
     instance.registerUtil('country_people_table', country_people_table)
     instance.registerUtil('all_people_table', all_people_table)
+    instance.registerUtil('all_people_summary', all_people_summary)
     instance.registerUtil('contestant_code', contestant_code)
     instance.registerUtil('contestant_age', contestant_age)
     instance.registerUtil('pn_score', pn_score)

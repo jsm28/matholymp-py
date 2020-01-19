@@ -1556,6 +1556,11 @@ class SiteGenerator:
                 dest_path = self.path_for_person(p.person)
                 text += self.generate_redirect_page(src_url, '', dest_path)
         src_url = base_url + 'person'
+        dest_path = self.path_for_event_people_table(e)
+        text += self.generate_redirect_page(src_url, '@template=summary',
+                                            dest_path)
+        text += self.generate_redirect_page(src_url, '%40template=summary',
+                                            dest_path)
         dest_path = self.path_for_event_scoreboard(e)
         text += self.generate_redirect_page(src_url, '@template=scoreboard',
                                             dest_path)

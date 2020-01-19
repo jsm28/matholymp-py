@@ -380,7 +380,7 @@ class PhotoThumbAction(Action):
             raise ValueError('No id specified to generate thumbnail')
         if 'width' not in self.form:
             raise ValueError('No width specified to generate thumbnail')
-        if self.form['width'].value not in ('150', '200'):
+        if self.form['width'].value not in ('75', '150', '200'):
             raise ValueError('Invalid width specified to generate thumbnail')
         if not self.hasPermission('View', classname='photo',
                                   itemid=self.nodeid):

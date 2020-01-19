@@ -60,6 +60,7 @@ class RoundupSiteGenerator(RegSiteGenerator):
         cfg = {'num_key': get_short_name(db) + ' Number',
                'scores_css': db.config.ext['MATHOLYMP_SCORES_CLASS'],
                'list_css': db.config.ext['MATHOLYMP_LIST_CLASS'],
+               'photo_list_css': db.config.ext['MATHOLYMP_PHOTO_LIST_CLASS'],
                'use_xhtml': use_xhtml,
                'official_desc': db.config.ext['MATHOLYMP_OFFICIAL_DESC'],
                'official_desc_lc':

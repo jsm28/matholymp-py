@@ -19,6 +19,12 @@ RewriteRule ^.* https://www.example.org/people/person4/? [R=301,L]
 RewriteCond %{REQUEST_URI} ^/registration/2017/person5$
 RewriteRule ^.* https://www.example.org/people/person5/? [R=301,L]
 RewriteCond %{REQUEST_URI} ^/registration/2017/person$
+RewriteCond %{QUERY_STRING} ^@template=summary$
+RewriteRule ^.* https://www.example.org/xmos/xmo4/people/summary/? [R=301,L]
+RewriteCond %{REQUEST_URI} ^/registration/2017/person$
+RewriteCond %{QUERY_STRING} ^%40template=summary$
+RewriteRule ^.* https://www.example.org/xmos/xmo4/people/summary/? [R=301,L]
+RewriteCond %{REQUEST_URI} ^/registration/2017/person$
 RewriteCond %{QUERY_STRING} ^@template=scoreboard$
 RewriteRule ^.* https://www.example.org/xmos/xmo4/scoreboard/? [R=301,L]
 RewriteCond %{REQUEST_URI} ^/registration/2017/person$

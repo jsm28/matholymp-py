@@ -41,6 +41,10 @@ columns string:id;
    </li>
    <li tal:condition="python:request.user.hasPermission('View', 'person')
                       or request.user.hasPermission('Edit', 'person')">
+    <a href="person?@template=summary" i18n:translate="">Summary table of participants with photos</a>
+   </li>
+   <li tal:condition="python:request.user.hasPermission('View', 'person')
+                      or request.user.hasPermission('Edit', 'person')">
     <a href="person?@template=scoreboard"  i18n:translate="">Scoreboard</a>
    </li>
    </ul>

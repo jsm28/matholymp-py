@@ -35,6 +35,12 @@ RewriteRule ^.* https://www.example.org/people/person4/? [R=301,L]
 RewriteCond %{REQUEST_URI} ^/registration/2014/person9$
 RewriteRule ^.* https://www.example.org/people/person7/? [R=301,L]
 RewriteCond %{REQUEST_URI} ^/registration/2014/person$
+RewriteCond %{QUERY_STRING} ^@template=summary$
+RewriteRule ^.* https://www.example.org/xmos/xmo1/people/summary/? [R=301,L]
+RewriteCond %{REQUEST_URI} ^/registration/2014/person$
+RewriteCond %{QUERY_STRING} ^%40template=summary$
+RewriteRule ^.* https://www.example.org/xmos/xmo1/people/summary/? [R=301,L]
+RewriteCond %{REQUEST_URI} ^/registration/2014/person$
 RewriteCond %{QUERY_STRING} ^@template=scoreboard$
 RewriteRule ^.* https://www.example.org/xmos/xmo1/scoreboard/? [R=301,L]
 RewriteCond %{REQUEST_URI} ^/registration/2014/person$

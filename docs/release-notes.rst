@@ -392,10 +392,14 @@ the registration system is not active.
   :file:`country.item.html` and :file:`person.item.html` are updated
   accordingly.
 
-* The static site now includes an additional summary table of
-  participants for each event, with all photos shown on a single
-  page.  A new variable ``photo_list_css`` must be specified in
-  :file:`staticsite.cfg` for static site generation.
+* The static site and registration system now include an additional
+  summary table of participants for each event, with all photos shown
+  on a single page.  A new variable ``photo_list_css`` must be
+  specified in :file:`staticsite.cfg` for static site generation; a
+  new variable ``matholymp_photo_list_class`` must be specified in
+  :file:`extensions/config.ini` for the registration system; there is
+  a new page template :file:`person.summary.html` and
+  :file:`page.html` is updated accordingly.
 
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
