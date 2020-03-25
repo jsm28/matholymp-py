@@ -401,6 +401,15 @@ the registration system is not active.
   a new page template :file:`person.summary.html` and
   :file:`page.html` is updated accordingly.
 
+* There is some support for a virtual event, held remotely with
+  leaders assigning marks for their contestants' scripts and with
+  medals, certificates and other materials shipped afterwards.  A new
+  variable ``matholymp_virtual_event`` must be specified in
+  :file:`extensions/config.ini` for the registration system.  If
+  ``Yes``, leader email addresses and physical addresses for each
+  country can be specified through :file:`country.prereg.html`.
+  :file:`country.item.html` is updated accordingly.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

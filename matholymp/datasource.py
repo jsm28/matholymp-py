@@ -143,7 +143,8 @@ class DataSource:
         expected_deputies, expected_contestants, expected_observers_a,
         expected_observers_b, expected_observers_c,
         expected_single_rooms, expected_numbers_confirmed,
-        _person_ids, _guide_ids, generic_id.
+        leader_email, physical_address, _person_ids, _guide_ids,
+        generic_id.
         """
         raise NotImplementedError
 

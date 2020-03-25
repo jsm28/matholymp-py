@@ -39,7 +39,8 @@ from matholymp.fileutil import comma_split
 from matholymp.roundupreg.config import distinguish_official, \
     have_consent_forms, have_consent_ui, have_passport_numbers, \
     have_nationality, get_num_problems, get_marks_per_problem, \
-    get_language_numbers, get_short_name, honourable_mentions_available
+    get_language_numbers, get_short_name, honourable_mentions_available, \
+    is_virtual_event
 from matholymp.roundupreg.rounduputil import scores_from_str, \
     person_date_of_birth, contestant_age, db_file_url
 
@@ -396,6 +397,10 @@ class RoundupDataSource(DataSource):
         elif name == 'expected_numbers_confirmed':
             return self._db.country.get(country_id,
                                         'expected_numbers_confirmed')
+        elif name in ('leader_email', 'physical_address'):
+            if not is_virtual_event(self._db):
+                return None
+            return self._db.country.get(country_id, name)
         elif name == '_person_ids':
             person_list = self._db.person.filter(None, {'country': country_id})
             return [int(p) for p in person_list]

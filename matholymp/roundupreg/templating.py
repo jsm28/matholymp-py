@@ -66,7 +66,7 @@ from matholymp.roundupreg.config import distinguish_official, \
     get_consent_forms_date, have_consent_forms, have_consent_ui, \
     have_passport_numbers, have_nationality, require_diet, require_dob, \
     get_language_numbers, get_earliest_date_of_birth, \
-    get_sanity_date_of_birth, get_arrdep_bounds
+    get_sanity_date_of_birth, get_arrdep_bounds, is_virtual_event
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import person_date_of_birth, \
     contestant_age, person_is_contestant, contestant_code, pn_score, \
@@ -648,6 +648,7 @@ def register_templating_utils(instance):
     instance.registerUtil('require_diet', require_diet)
     instance.registerUtil('require_dob', require_dob)
     instance.registerUtil('get_language_numbers', get_language_numbers)
+    instance.registerUtil('is_virtual_event', is_virtual_event)
     instance.registerUtil('person_is_contestant', person_is_contestant)
     instance.registerUtil('people_from_country', people_from_country)
     instance.registerUtil('show_country_people', show_country_people)

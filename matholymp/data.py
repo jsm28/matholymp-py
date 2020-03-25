@@ -1978,6 +1978,14 @@ class CountryEvent:
         role for this country at this event.
         """)
 
+    leader_email = _CountryEventPropertyDS(
+        'leader_email',
+        """The email address for the leader of this country at this event.""")
+
+    physical_address = _CountryEventPropertyDS(
+        'physical_address',
+        """The physical address for this country at this event.""")
+
     def _get_person_list(self):
         ds = self.country.event_group._ds
         if ds.country_event_have_attr(self.country.id, self.event.id,

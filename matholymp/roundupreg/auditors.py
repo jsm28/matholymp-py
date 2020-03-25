@@ -169,6 +169,10 @@ def audit_country_fields(db, cl, nodeid, newvalues):
         for email in emails:
             if not valid_address(email):
                 raise ValueError('Email address syntax is invalid')
+    # Likewise for a leader email address.
+    if 'leader_email' in newvalues and newvalues['leader_email'] is not None:
+        if not valid_address(newvalues['leader_email']):
+            raise ValueError('Email address syntax is invalid')
 
     userid = db.getuid()
     if (nodeid is not None

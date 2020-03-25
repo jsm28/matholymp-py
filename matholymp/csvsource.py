@@ -395,7 +395,9 @@ class CSVDataSource(DataSource):
     _country_event_attr_map_str = {'annual_url': 'Annual URL',
                                    'code': 'Code',
                                    'name': 'Name',
-                                   'flag_url': 'Flag URL'}
+                                   'flag_url': 'Flag URL',
+                                   'leader_email': 'Leader Email',
+                                   'physical_address': 'Physical Address'}
 
     _country_event_attr_map_int = {
         'generic_id': 'Generic Number',

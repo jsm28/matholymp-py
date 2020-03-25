@@ -1988,7 +1988,8 @@ class SiteGenerator:
                          'Expected Observers with Deputy',
                          'Expected Observers with Contestants',
                          'Expected Single Rooms',
-                         'Expected Numbers Confirmed'])
+                         'Expected Numbers Confirmed', 'Leader Email',
+                         'Physical Address'])
         if not reg_system:
             cols.extend(['Contestants', 'Gold Medals', 'Silver Medals',
                          'Bronze Medals'])
@@ -2046,6 +2047,8 @@ class SiteGenerator:
                 'Yes'
                 if c.expected_numbers_confirmed
                 else 'No')
+            csv_out['Leader Email'] = c.leader_email or ''
+            csv_out['Physical Address'] = c.physical_address or ''
         if not reg_system:
             if c.num_contestants:
                 csv_out['Contestants'] = str(c.num_contestants)

@@ -56,7 +56,8 @@
 
 from matholymp.roundupreg.config import distinguish_official, \
     have_consent_forms, have_consent_ui, have_passport_numbers, \
-    have_nationality, get_language_numbers, invitation_letter_register
+    have_nationality, get_language_numbers, invitation_letter_register, \
+    is_virtual_event
 
 __all__ = ['init_schema']
 
@@ -88,10 +89,12 @@ def init_schema(env):
           silver=String(),
           bronze=String())
 
+    country_extra = {}
     if distinguish_official(db):
-        country_extra = {'official': Boolean()}
-    else:
-        country_extra = {}
+        country_extra['official'] = Boolean()
+    if is_virtual_event(db):
+        country_extra['leader_email'] = String()
+        country_extra['physical_address'] = String()
     country = Class(db, 'country',
                     code=String(),
                     name=String(),
@@ -492,10 +495,13 @@ def init_schema(env):
 
     # Registering users can view and edit the preregistration data for
     # their own country.
-    prereg_props = ('expected_leaders', 'expected_deputies',
+    prereg_props = ['expected_leaders', 'expected_deputies',
                     'expected_contestants', 'expected_observers_a',
                     'expected_observers_b', 'expected_observers_c',
-                    'expected_single_rooms', 'expected_numbers_confirmed')
+                    'expected_single_rooms', 'expected_numbers_confirmed']
+    if is_virtual_event(db):
+        prereg_props.append('leader_email')
+        prereg_props.append('physical_address')
     p = db.security.addPermission(name='View', klass='country',
                                   check=own_country, properties=prereg_props)
     db.security.addPermissionToRole('Register', p)

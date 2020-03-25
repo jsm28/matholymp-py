@@ -509,6 +509,8 @@ class RoundupTestSession:
             del entry['Expected Observers with Contestants']
             del entry['Expected Single Rooms']
             del entry['Expected Numbers Confirmed']
+            del entry['Leader Email']
+            del entry['Physical Address']
         return countries_csv
 
     def get_people_csv(self):
@@ -1141,7 +1143,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Deputy': '0',
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
-             'Expected Numbers Confirmed': 'Yes'})
+             'Expected Numbers Confirmed': 'Yes',
+             'Leader Email': '',
+             'Physical Address': ''})
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff_admin])
         admin_session.create_country_generic()
@@ -1163,7 +1167,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Deputy': '0',
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
-             'Expected Numbers Confirmed': 'No'})
+             'Expected Numbers Confirmed': 'No',
+             'Leader Email': '',
+             'Physical Address': ''})
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
@@ -1279,6 +1285,72 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv, [expected_abc, expected_def,
                                      expected_staff])
         self.assertEqual(reg_csv, [expected_abc, expected_def, expected_staff])
+
+    @_with_config(virtual_event='Yes')
+    def test_country_csv_virtual(self):
+        """
+        Test CSV file of countries, virtual event.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        expected_staff_admin = expected_staff.copy()
+        expected_staff_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '0',
+             'Expected Deputies': '0',
+             'Expected Contestants': '0',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'Yes',
+             'Leader Email': '',
+             'Physical Address': ''})
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff_admin])
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        expected_abc_admin = expected_abc.copy()
+        expected_abc_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '1',
+             'Expected Deputies': '1',
+             'Expected Contestants': '6',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'No',
+             'Leader Email': '',
+             'Physical Address': ''})
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # Test virtual event data in CSV file.
+        admin_session.edit('country', '3',
+                           {'leader_email': 'ABCleader@example.invalid',
+                            'physical_address': 'Maths HQ\nThis Country'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc_admin['Leader Email'] = 'ABCleader@example.invalid'
+        expected_abc_admin['Physical Address'] = 'Maths HQ\nThis Country'
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
 
     def test_country_csv_errors(self):
         """
@@ -2468,6 +2540,25 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff])
 
+    @_with_config(virtual_event='Yes')
+    def test_country_create_audit_errors_virtual(self):
+        """
+        Test errors from country creation auditor, virtual event.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'leader_email': 'bad_email'},
+                                     error='Email address syntax is invalid')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
+
     def test_country_create_audit_errors_missing(self):
         """
         Test errors from country creation auditor, missing required data.
@@ -2719,7 +2810,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Deputy': '0',
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
-             'Expected Numbers Confirmed': 'No'})
+             'Expected Numbers Confirmed': 'No',
+             'Leader Email': '',
+             'Physical Address': ''})
         expected_def_admin = expected_def.copy()
         expected_def_admin.update(
             {'Contact Emails': '',
@@ -2730,7 +2823,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Deputy': '0',
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
-             'Expected Numbers Confirmed': 'No'})
+             'Expected Numbers Confirmed': 'No',
+             'Leader Email': '',
+             'Physical Address': ''})
         expected_staff_admin = expected_staff.copy()
         expected_staff_admin.update(
             {'Contact Emails': '',
@@ -2741,7 +2836,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Deputy': '0',
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
-             'Expected Numbers Confirmed': 'Yes'})
+             'Expected Numbers Confirmed': 'Yes',
+             'Leader Email': '',
+             'Physical Address': ''})
         self.assertEqual(admin_csv,
                          [expected_abc_admin, expected_def_admin,
                           expected_staff_admin])
@@ -2771,6 +2868,26 @@ class RegSystemTestCase(unittest.TestCase):
         admin_csv = admin_session.get_countries_csv_public_only()
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc, expected_staff])
+
+    @_with_config(virtual_event='Yes')
+    def test_country_edit_audit_errors_virtual(self):
+        """
+        Test errors from country edit auditor, virtual event.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        admin_session.edit(
+            'country', '1',
+            {'leader_email': 'bad_email'},
+            error='Email address syntax is invalid')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
 
     def test_country_edit_audit_errors_missing(self):
         """
@@ -2914,7 +3031,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Deputy': '0',
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
-             'Expected Numbers Confirmed': 'No'})
+             'Expected Numbers Confirmed': 'No',
+             'Leader Email': '',
+             'Physical Address': ''})
         expected_staff_admin = expected_staff.copy()
         expected_staff_admin.update(
             {'Contact Emails': '',
@@ -2925,7 +3044,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Deputy': '0',
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
-             'Expected Numbers Confirmed': 'Yes'})
+             'Expected Numbers Confirmed': 'Yes',
+             'Leader Email': '',
+             'Physical Address': ''})
         self.assertEqual(admin_csv,
                          [expected_abc_admin, expected_staff_admin])
 
@@ -3011,7 +3132,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Deputy': '0',
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '2',
-             'Expected Numbers Confirmed': 'Yes'})
+             'Expected Numbers Confirmed': 'Yes',
+             'Leader Email': '',
+             'Physical Address': ''})
         expected_staff_admin = expected_staff.copy()
         expected_staff_admin.update(
             {'Contact Emails': '',
@@ -3022,7 +3145,63 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Deputy': '0',
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
-             'Expected Numbers Confirmed': 'Yes'})
+             'Expected Numbers Confirmed': 'Yes',
+             'Leader Email': '',
+             'Physical Address': ''})
+        self.assertEqual(admin_csv,
+                         [expected_abc_admin, expected_staff_admin])
+
+    @_with_config(virtual_event='Yes')
+    def test_country_edit_audit_errors_prereg_virtual(self):
+        """
+        Test errors from country edit auditor, preregistration virtual
+        event case.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        reg_session.edit_prereg('3',
+                                {'leader_email': 'bad'},
+                                error='Email address syntax is invalid')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        self.assertEqual(anon_csv,
+                         [expected_abc, expected_staff])
+        expected_abc_admin = expected_abc.copy()
+        expected_abc_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '1',
+             'Expected Deputies': '1',
+             'Expected Contestants': '6',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'No',
+             'Leader Email': '',
+             'Physical Address': ''})
+        expected_staff_admin = expected_staff.copy()
+        expected_staff_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '0',
+             'Expected Deputies': '0',
+             'Expected Contestants': '0',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'Yes',
+             'Leader Email': '',
+             'Physical Address': ''})
         self.assertEqual(admin_csv,
                          [expected_abc_admin, expected_staff_admin])
 
@@ -3065,7 +3244,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Deputy': '0',
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
-             'Expected Numbers Confirmed': 'Yes'})
+             'Expected Numbers Confirmed': 'Yes',
+             'Leader Email': '',
+             'Physical Address': ''})
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff_admin])
         admin_session.create_country_generic()
@@ -3087,7 +3268,9 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Deputy': '0',
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
-             'Expected Numbers Confirmed': 'No'})
+             'Expected Numbers Confirmed': 'No',
+             'Leader Email': '',
+             'Physical Address': ''})
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
@@ -3121,6 +3304,90 @@ class RegSystemTestCase(unittest.TestCase):
         reg_csv = reg_session.get_countries_csv()
         expected_abc_admin['Expected Leaders'] = '0'
         expected_abc_admin['Expected Deputies'] = '1'
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+
+    @_with_config(virtual_event='Yes')
+    def test_country_prereg_virtual(self):
+        """
+        Test preregistration of virtual event data.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        expected_staff_admin = expected_staff.copy()
+        expected_staff_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '0',
+             'Expected Deputies': '0',
+             'Expected Contestants': '0',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'Yes',
+             'Leader Email': '',
+             'Physical Address': ''})
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff_admin])
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        expected_abc_admin = expected_abc.copy()
+        expected_abc_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '1',
+             'Expected Deputies': '1',
+             'Expected Contestants': '6',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'No',
+             'Leader Email': '',
+             'Physical Address': ''})
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # Test editing virtual event data.
+        reg_session.edit_prereg('3',
+                                {'leader_email': 'gets-papers@example.invalid',
+                                 'physical_address': 'Some Address\nCountry'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc_admin.update(
+            {'Expected Numbers Confirmed': 'Yes',
+             'Leader Email': 'gets-papers@example.invalid',
+             'Physical Address': 'Some Address\nCountry'})
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # This data can be edited even when preregistration is disabled.
+        admin_session.edit('event', '1', {'preregistration_enabled': 'no'})
+        reg_session.edit_prereg('3',
+                                {'leader_email':
+                                 'gets-papers2@example.invalid',
+                                 'physical_address':
+                                 'Some Address 2\nCountry'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc_admin.update(
+            {'Leader Email': 'gets-papers2@example.invalid',
+             'Physical Address': 'Some Address 2\nCountry'})
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])

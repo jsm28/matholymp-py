@@ -50,9 +50,9 @@ __all__ = ['get_config_var', 'get_config_var_bool', 'get_config_var_int',
            'get_age_day_date', 'get_arrdep_bounds', 'get_short_name',
            'get_year', 'get_short_name_year', 'get_staff_country_name',
            'invitation_letter_register', 'badge_use_background',
-           'honourable_mentions_available', 'get_initial_languages',
-           'get_extra_admin_roles_secondaryok', 'get_initial_room_types',
-           'get_initial_room_types_non_contestant',
+           'honourable_mentions_available', 'is_virtual_event',
+           'get_initial_languages', 'get_extra_admin_roles_secondaryok',
+           'get_initial_room_types', 'get_initial_room_types_non_contestant',
            'get_initial_room_types_contestant', 'get_contestant_genders',
            'get_invitation_letter_email', 'get_static_site_path',
            'get_docgen_path']
@@ -261,6 +261,11 @@ def badge_use_background(db):
 def honourable_mentions_available(db):
     """Return whether Honourable Mentions are available at this event."""
     return get_config_var_bool(db, 'MATHOLYMP_HONOURABLE_MENTIONS_AVAILABLE')
+
+
+def is_virtual_event(db):
+    """Return whether this is a virtual event."""
+    return get_config_var_bool(db, 'MATHOLYMP_VIRTUAL_EVENT')
 
 
 def get_initial_languages(db):
