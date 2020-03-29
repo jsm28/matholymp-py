@@ -70,6 +70,7 @@ def main():
     e_max_num_problems = 0
     e_honourable_mentions_available_varies = False
     e_distinguish_official_varies = False
+    e_age_day_desc_varies = False
     e_staff_names = {}
     events_data = read_utf8_csv(events_csv)
     for e in events_data:
@@ -83,6 +84,8 @@ def main():
             e_honourable_mentions_available_varies = True
         if 'Distinguish Official Countries' in e:
             e_distinguish_official_varies = True
+        if 'Age Day Description' in e:
+            e_age_day_desc_varies = True
         if 'Country Name In' not in e:
             # Updating from 2017.01.0 or earlier.
             e['Country Name In'] = e['Country']
@@ -99,6 +102,8 @@ def main():
         events_header.extend(['Honourable Mentions Available'])
     if e_distinguish_official_varies:
         events_header.extend(['Distinguish Official Countries'])
+    if e_age_day_desc_varies:
+        events_header.extend(['Age Day Description'])
     write_utf8_csv(events_csv, events_data, events_header)
 
     countries_data = read_utf8_csv(countries_csv)

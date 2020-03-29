@@ -1,0 +1,12 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>%(title)s</title>
+<link rel="stylesheet" href="https://www.example.org/xmo.css" type="text/css">
+</head>
+<body>
+<h1>%(header)s</h1>
+
+%(body)s
+</body>
+</html>

@@ -410,6 +410,10 @@ the registration system is not active.
   country can be specified through :file:`country.prereg.html`.
   :file:`country.item.html` is updated accordingly.
 
+* A bug has been fixed in :command:`mo-static-upgrade` where it would
+  fail when the CSV file of events has a column ``Age Day
+  Description``.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 
