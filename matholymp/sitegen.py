@@ -653,7 +653,7 @@ class SiteGenerator:
             year = self.link_for_event(e, html.escape(e.year))
             country = self.link_for_country(e.host_country,
                                             html.escape(e.host_country_name))
-            city = html.escape(e.host_city or '')
+            city = html.escape(e.host_city_virtual)
             if e.start_date is None or e.end_date is None:
                 dates = ''
             else:
@@ -834,7 +834,7 @@ class SiteGenerator:
                     ['Country',
                      self.link_for_country(e.host_country,
                                            html.escape(e.host_country_name))],
-                    ['City', html.escape(e.host_city or '')],
+                    ['City', html.escape(e.host_city_virtual)],
                     ['Start date', html.escape(date_to_ymd_iso(e.start_date))],
                     ['End date', html.escape(date_to_ymd_iso(e.end_date))],
                     ['Contact name', html.escape(e.contact_name or '')],
@@ -1846,6 +1846,7 @@ class SiteGenerator:
             csv_out['Country'] = e.host_country_name
             csv_out['Country Name In'] = e.host_country_name_in
             csv_out['City'] = e.host_city or ''
+            csv_out['Virtual Event'] = 'Yes' if e.host_virtual else 'No'
             csv_out['Start Date'] = date_to_ymd_iso(e.start_date)
             csv_out['End Date'] = date_to_ymd_iso(e.end_date)
             csv_out['Home Page URL'] = e.home_page_url or ''
@@ -1925,9 +1926,9 @@ class SiteGenerator:
                         + ' Teams'] = ''
             events_data_output.append(csv_out)
         events_columns = ['Number', 'Year', 'Country Number', 'Country',
-                          'Country Name In', 'City', 'Start Date', 'End Date',
-                          'Home Page URL', 'Contact Name',
-                          'Contact Email', 'Number of Exams',
+                          'Country Name In', 'City', 'Virtual Event',
+                          'Start Date', 'End Date', 'Home Page URL',
+                          'Contact Name', 'Contact Email', 'Number of Exams',
                           'Number of Problems']
         events_columns.extend(['P%d Max' % (i + 1)
                                for i in range(self._data.max_num_problems)])

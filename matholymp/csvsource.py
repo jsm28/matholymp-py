@@ -165,7 +165,8 @@ class CSVDataSource(DataSource):
                            'silver_boundary': 'Silver Boundary',
                            'bronze_boundary': 'Bronze Boundary'}
 
-    _event_attr_map_bool_maybe = {'distinguish_official':
+    _event_attr_map_bool_maybe = {'host_virtual': 'Virtual Event',
+                                  'distinguish_official':
                                   'Distinguish Official Countries',
                                   'honourable_mentions_available':
                                   'Honourable Mentions Available'}

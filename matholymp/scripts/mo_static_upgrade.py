@@ -89,9 +89,12 @@ def main():
         if 'Country Name In' not in e:
             # Updating from 2017.01.0 or earlier.
             e['Country Name In'] = e['Country']
+        if 'Virtual Event' not in e:
+            # Updating from 2018.02.0 or earlier.
+            e['Virtual Event'] = 'No'
     events_header = ['Number', 'Year', 'Country Number', 'Country',
-                     'Country Name In', 'City', 'Start Date', 'End Date',
-                     'Home Page URL', 'Contact Name',
+                     'Country Name In', 'City', 'Virtual Event', 'Start Date',
+                     'End Date', 'Home Page URL', 'Contact Name',
                      'Contact Email', 'Number of Exams',
                      'Number of Problems']
     events_header.extend(['P%d Max' % (i + 1)

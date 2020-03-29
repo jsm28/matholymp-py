@@ -430,11 +430,32 @@ class Event:
         'host_city',
         """The name of the host city of this event.""")
 
+    host_virtual = _EventPropertyDS(
+        'host_virtual',
+        """Whether this is a virtual event.""")
+
+    def _get_host_city_virtual(self):
+        loc = self.host_city
+        if loc is None:
+            loc = ''
+        if self.host_virtual:
+            loc = '%s (virtual)' % loc
+            loc = loc.strip()
+        return loc
+
+    host_city_virtual = _PropertyCached(
+        'host_city_virtual', _get_host_city_virtual,
+        """The host city of this event, marked if virtual.""")
+
     def _get_host_location(self):
         if self.host_city is None:
-            return self.host_country_name
+            loc = self.host_country_name
         else:
-            return self.host_city + ', ' + self.host_country_name
+            loc = self.host_city + ', ' + self.host_country_name
+        if self.host_virtual:
+            return '%s (virtual)' % loc
+        else:
+            return loc
 
     host_location = _PropertyCached(
         'host_location', _get_host_location,
