@@ -62,8 +62,6 @@ class RoundupDataSource(DataSource):
     def event_group_get_attr(self, name):
         if name == 'short_name':
             return get_short_name(self._db)
-        elif name == 'host_virtual':
-            return is_virtual_event(self._db)
         elif name == 'distinguish_official':
             return distinguish_official(self._db)
         elif name == 'rank_top_n':
@@ -130,6 +128,8 @@ class RoundupDataSource(DataSource):
                     if self._db.country.get(c, 'participants_ok')]
         elif name == 'age_day_desc':
             return self._db.config.ext['MATHOLYMP_AGE_DAY_DESC']
+        elif name == 'host_virtual':
+            return is_virtual_event(self._db)
         raise KeyError(name)
 
     def person_event_get_attr(self, person_id, country_id, event_id, name):

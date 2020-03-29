@@ -321,6 +321,23 @@ class RegSiteGenerator(SiteGenerator):
                              % html.escape(c.name_with_code))
         return ret_text
 
+    def missing_country_details_text(self, c):
+        """
+        Return a description of missing details for a country.
+        """
+        if not self.event.host_virtual:
+            return ''
+        missing = []
+        if not c.leader_email:
+            missing.append('leader email')
+        if not c.physical_address:
+            missing.append('physical address')
+        if missing:
+            return ('<p>Not specified for <strong>%s</strong>: %s.</p>\n'
+                    % (html.escape(c.name_with_code),
+                       html.escape(', '.join(missing))))
+        return ''
+
     def missing_person_details_text(self, people, consent_forms_date,
                                     have_consent_ui, show_country):
         """Return a table of missing details for people."""
@@ -383,6 +400,7 @@ class RegSiteGenerator(SiteGenerator):
 
         for c in normal_countries:
             text += self.missing_extra_roles_text(c)
+            text += self.missing_country_details_text(c)
 
         text += self.missing_person_details_text(normal_people,
                                                  consent_forms_date,
@@ -463,6 +481,7 @@ class RegSiteGenerator(SiteGenerator):
         people = sorted(country.person_list, key=lambda x: x.sort_key)
         text = ''
         text += self.missing_extra_roles_text(country)
+        text += self.missing_country_details_text(country)
 
         text += self.missing_person_details_text(people, consent_forms_date,
                                                  have_consent_ui, False)
