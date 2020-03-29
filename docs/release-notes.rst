@@ -407,7 +407,8 @@ the registration system is not active.
   variable ``matholymp_virtual_event`` must be specified in
   :file:`extensions/config.ini` for the registration system.  If
   ``Yes``, leader email addresses and physical addresses for each
-  country can be specified through :file:`country.prereg.html`.
+  country can be specified through :file:`country.prereg.html`, and
+  the registration status page notes when those are missing.
   :file:`country.item.html` is updated accordingly.  A new column
   ``Virtual Event`` is used in the CSV file of events for the static
   site.
