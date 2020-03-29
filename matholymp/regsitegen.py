@@ -250,7 +250,7 @@ class RegSiteGenerator(SiteGenerator):
             if p.departure_is_airport:
                 if p.departure_flight is None:
                     have_travel_details = False
-        if not have_travel_details:
+        if not have_travel_details and not self.event.host_virtual:
             missing_list.append('travel details')
 
         if p.guide_for and p.phone_number is None:
@@ -408,11 +408,12 @@ class RegSiteGenerator(SiteGenerator):
 
         text += '<h2>Action needed by the organisers</h2>\n'
 
-        for c in normal_countries:
-            if not c.guide_list:
-                text += ('<p>No guide registered for'
-                         ' <strong>%s</strong>.</p>\n'
-                         % html.escape(c.name_with_code))
+        if not self.event.host_virtual:
+            for c in normal_countries:
+                if not c.guide_list:
+                    text += ('<p>No guide registered for'
+                             ' <strong>%s</strong>.</p>\n'
+                             % html.escape(c.name_with_code))
         text += ('<p>The system cannot tell automatically if not all'
                  ' staff have been registered.</p>\n')
 
@@ -421,12 +422,13 @@ class RegSiteGenerator(SiteGenerator):
 
         head_row_list = [self.html_tr_th_list(['Country', 'Person', 'Role'])]
         body_row_list = []
-        for p in people:
-            if p.room_number is None:
-                row = [html.escape(p.country.name_with_code),
-                       self.link_for_person(p.person, html.escape(p.name)),
-                       html.escape(p.primary_role)]
-                body_row_list.append(self.html_tr_td_list(row))
+        if not self.event.host_virtual:
+            for p in people:
+                if p.room_number is None:
+                    row = [html.escape(p.country.name_with_code),
+                           self.link_for_person(p.person, html.escape(p.name)),
+                           html.escape(p.primary_role)]
+                    body_row_list.append(self.html_tr_td_list(row))
         if body_row_list:
             text += '<h2>Room allocations needed</h2>\n'
             text += ('<p>Room numbers need only be entered if they will'

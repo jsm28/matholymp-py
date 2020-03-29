@@ -408,10 +408,11 @@ the registration system is not active.
   :file:`extensions/config.ini` for the registration system.  If
   ``Yes``, leader email addresses and physical addresses for each
   country can be specified through :file:`country.prereg.html`, and
-  the registration status page notes when those are missing.
-  :file:`country.item.html` is updated accordingly.  A new column
-  ``Virtual Event`` is used in the CSV file of events for the static
-  site.
+  the registration status page notes when those are missing, while not
+  noting certain missing information that is irrelevant for a virtual
+  event.  :file:`country.item.html` is updated accordingly.  A new
+  column ``Virtual Event`` is used in the CSV file of events for the
+  static site.
 
 * A bug has been fixed in :command:`mo-static-upgrade` where it would
   fail when the CSV file of events has a column ``Age Day
