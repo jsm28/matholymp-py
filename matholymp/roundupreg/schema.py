@@ -82,12 +82,16 @@ def init_schema(env):
     # Create classes:
 
     # The 'event' class has only one instance, to store global information.
+    event_extra = {}
+    if is_virtual_event(db):
+        event_extra['self_scoring_enabled'] = Boolean()
     Class(db, 'event',
           registration_enabled=Boolean(),
           preregistration_enabled=Boolean(),
           gold=String(),
           silver=String(),
-          bronze=String())
+          bronze=String(),
+          **event_extra)
 
     country_extra = {}
     if distinguish_official(db):
@@ -509,11 +513,33 @@ def init_schema(env):
                                   check=own_country, properties=prereg_props)
     db.security.addPermissionToRole('Register', p)
 
-    # Entering scores has its own Permission and Role.
+    # Entering scores has its own Permission and Role.  For the menu
+    # of countries for entering scores, there is a separate Permission
+    # for whether all countries are shown in that list rather than
+    # just the user's own country.  A third Permission is used to
+    # check if scores can be entered for a given country.
     p = db.security.addPermission(name='Score')
+    p2 = db.security.addPermission(name='ScoreAllCountries')
+    p3 = db.security.addPermission(name='ScoreForCountry')
     db.security.addPermissionToRole('Admin', p)
+    db.security.addPermissionToRole('Admin', p2)
+    db.security.addPermissionToRole('Admin', p3)
     db.security.addRole(name='Score', description='Entering scores')
     db.security.addPermissionToRole('Score', p)
+    db.security.addPermissionToRole('Score', p2)
+    db.security.addPermissionToRole('Score', p3)
+
+    def reg_can_enter_scores(db, userid, itemid):
+        """Determine whether the registering user can enter scores."""
+        return (db.event.get('1', 'self_scoring_enabled')
+                and own_country(db, userid, itemid))
+
+    if is_virtual_event(db):
+        p = db.security.addPermission(name='Score')
+        p2 = db.security.addPermission(name='ScoreForCountry', klass='country',
+                                       check=reg_can_enter_scores)
+        db.security.addPermissionToRole('Register', p)
+        db.security.addPermissionToRole('Register', p2)
 
     # Permission for registering people from all countries, as opposed
     # to only from one's own country.

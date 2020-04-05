@@ -11129,6 +11129,169 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(score_csv, admin_csv)
         self.assertEqual(score_csv_p, admin_csv)
 
+    @_with_config(virtual_event='Yes')
+    def test_person_score_virtual(self):
+        """
+        Test entering scores and CSV file of scores, virtual event.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_scoring_user()
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1')
+        admin_session.create_person('Test First Country', 'Contestant 2')
+        admin_session.create_person('Test First Country', 'Contestant 4')
+        admin_session.create_country('DEF', 'Test Second Country')
+        reg2_session = self.get_session('DEF_reg')
+        admin_session.create_person('Test Second Country', 'Contestant 2')
+        admin_session.create_person('Test Second Country', 'Contestant 3')
+        admin_session.create_person('Test Second Country', 'Contestant 4')
+        admin_session.create_person('Test Second Country', 'Leader')
+        admin_session.edit('event', '1', {'registration_enabled': 'no',
+                                          'self_scoring_enabled': 'yes'})
+        admin_csv = admin_session.get_scores_csv()
+        admin_csv_p = admin_session.get_people_csv_scores()
+        anon_csv = session.get_scores_csv()
+        anon_csv_p = session.get_people_csv_scores()
+        reg_csv = reg_session.get_scores_csv()
+        reg_csv_p = reg_session.get_people_csv_scores()
+        self.assertEqual(len(admin_csv), 6)
+        self.assertEqual(admin_csv_p, admin_csv)
+        self.assertEqual(anon_csv, admin_csv)
+        self.assertEqual(anon_csv_p, admin_csv)
+        self.assertEqual(reg_csv, admin_csv)
+        self.assertEqual(reg_csv_p, admin_csv)
+        # Enter some scores and check the results.
+        reg_session.enter_scores('Test First Country', 'ABC', '2',
+                                 ['3', '4', None, '0'])
+        reg_session.enter_scores('Test First Country', 'ABC', '4',
+                                 ['7', '', None, '5'])
+        reg2_session.enter_scores('Test Second Country', 'DEF', '1',
+                                  [None, '5', '1', '2'])
+        admin_csv = admin_session.get_scores_csv()
+        admin_csv_p = admin_session.get_people_csv_scores()
+        anon_csv = session.get_scores_csv()
+        anon_csv_p = session.get_people_csv_scores()
+        reg_csv = reg_session.get_scores_csv()
+        reg_csv_p = reg_session.get_people_csv_scores()
+        self.assertEqual(admin_csv,
+                         [{'Country Name': 'Test First Country',
+                           'Country Code': 'ABC', 'Contestant Code': 'ABC1',
+                           'Given Name': 'Given 1', 'Family Name': 'Family 1',
+                           'P1': '', 'P2': '3', 'P3': '',
+                           'P4': '7', 'P5': '', 'P6': '',
+                           'Total': '10', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test First Country',
+                           'Country Code': 'ABC', 'Contestant Code': 'ABC2',
+                           'Given Name': 'Given 2', 'Family Name': 'Family 2',
+                           'P1': '', 'P2': '4', 'P3': '',
+                           'P4': '', 'P5': '', 'P6': '',
+                           'Total': '4', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test First Country',
+                           'Country Code': 'ABC', 'Contestant Code': 'ABC4',
+                           'Given Name': 'Given 3', 'Family Name': 'Family 3',
+                           'P1': '', 'P2': '0', 'P3': '',
+                           'P4': '5', 'P5': '', 'P6': '',
+                           'Total': '5', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test Second Country',
+                           'Country Code': 'DEF', 'Contestant Code': 'DEF2',
+                           'Given Name': 'Given 4', 'Family Name': 'Family 4',
+                           'P1': '5', 'P2': '', 'P3': '',
+                           'P4': '', 'P5': '', 'P6': '',
+                           'Total': '5', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test Second Country',
+                           'Country Code': 'DEF', 'Contestant Code': 'DEF3',
+                           'Given Name': 'Given 5', 'Family Name': 'Family 5',
+                           'P1': '1', 'P2': '', 'P3': '',
+                           'P4': '', 'P5': '', 'P6': '',
+                           'Total': '1', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test Second Country',
+                           'Country Code': 'DEF', 'Contestant Code': 'DEF4',
+                           'Given Name': 'Given 6', 'Family Name': 'Family 6',
+                           'P1': '2', 'P2': '', 'P3': '',
+                           'P4': '', 'P5': '', 'P6': '',
+                           'Total': '2', 'Award': '', 'Extra Awards': ''}])
+        self.assertEqual(admin_csv_p, admin_csv)
+        self.assertEqual(anon_csv, admin_csv)
+        self.assertEqual(anon_csv_p, admin_csv)
+        self.assertEqual(reg_csv, admin_csv)
+        self.assertEqual(reg_csv_p, admin_csv)
+        # Test a null edit of scores.
+        reg2_session.enter_scores('Test Second Country', 'DEF', '1',
+                                  [])
+        reg_session.enter_scores('Test First Country', 'ABC', '2',
+                                 [])
+        reg_session.enter_scores('Test First Country', 'ABC', '4',
+                                 [])
+        reg_session.enter_scores('Test First Country', 'ABC', '6',
+                                 [])
+        admin_csv_2 = admin_session.get_scores_csv()
+        admin_csv_p_2 = admin_session.get_people_csv_scores()
+        anon_csv_2 = session.get_scores_csv()
+        anon_csv_p_2 = session.get_people_csv_scores()
+        reg_csv_2 = reg_session.get_scores_csv()
+        reg_csv_p_2 = reg_session.get_people_csv_scores()
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(admin_csv_p_2, admin_csv)
+        self.assertEqual(anon_csv_2, admin_csv)
+        self.assertEqual(anon_csv_p_2, admin_csv)
+        self.assertEqual(reg_csv_2, admin_csv)
+        self.assertEqual(reg_csv_p_2, admin_csv)
+        # Test an edit that changes some scores.
+        reg_session.enter_scores('Test First Country', 'ABC', '2',
+                                 ['', '5', None, '0'])
+        reg_session.enter_scores('Test First Country', 'ABC', '4',
+                                 ['', '6', None, '5'])
+        admin_csv = admin_session.get_scores_csv()
+        admin_csv_p = admin_session.get_people_csv_scores()
+        anon_csv = session.get_scores_csv()
+        anon_csv_p = session.get_people_csv_scores()
+        reg_csv = reg_session.get_scores_csv()
+        reg_csv_p = reg_session.get_people_csv_scores()
+        self.assertEqual(admin_csv,
+                         [{'Country Name': 'Test First Country',
+                           'Country Code': 'ABC', 'Contestant Code': 'ABC1',
+                           'Given Name': 'Given 1', 'Family Name': 'Family 1',
+                           'P1': '', 'P2': '', 'P3': '',
+                           'P4': '', 'P5': '', 'P6': '',
+                           'Total': '0', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test First Country',
+                           'Country Code': 'ABC', 'Contestant Code': 'ABC2',
+                           'Given Name': 'Given 2', 'Family Name': 'Family 2',
+                           'P1': '', 'P2': '5', 'P3': '',
+                           'P4': '6', 'P5': '', 'P6': '',
+                           'Total': '11', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test First Country',
+                           'Country Code': 'ABC', 'Contestant Code': 'ABC4',
+                           'Given Name': 'Given 3', 'Family Name': 'Family 3',
+                           'P1': '', 'P2': '0', 'P3': '',
+                           'P4': '5', 'P5': '', 'P6': '',
+                           'Total': '5', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test Second Country',
+                           'Country Code': 'DEF', 'Contestant Code': 'DEF2',
+                           'Given Name': 'Given 4', 'Family Name': 'Family 4',
+                           'P1': '5', 'P2': '', 'P3': '',
+                           'P4': '', 'P5': '', 'P6': '',
+                           'Total': '5', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test Second Country',
+                           'Country Code': 'DEF', 'Contestant Code': 'DEF3',
+                           'Given Name': 'Given 5', 'Family Name': 'Family 5',
+                           'P1': '1', 'P2': '', 'P3': '',
+                           'P4': '', 'P5': '', 'P6': '',
+                           'Total': '1', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test Second Country',
+                           'Country Code': 'DEF', 'Contestant Code': 'DEF4',
+                           'Given Name': 'Given 6', 'Family Name': 'Family 6',
+                           'P1': '2', 'P2': '', 'P3': '',
+                           'P4': '', 'P5': '', 'P6': '',
+                           'Total': '2', 'Award': '', 'Extra Awards': ''}])
+        self.assertEqual(admin_csv_p, admin_csv)
+        self.assertEqual(anon_csv, admin_csv)
+        self.assertEqual(anon_csv_p, admin_csv)
+        self.assertEqual(reg_csv, admin_csv)
+        self.assertEqual(reg_csv_p, admin_csv)
+
     def test_person_score_errors(self):
         """
         Test errors entering scores.
@@ -11379,6 +11542,74 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv_p, admin_csv)
         self.assertEqual(score_csv, admin_csv)
         self.assertEqual(score_csv_p, admin_csv)
+
+    @_with_config(virtual_event='Yes')
+    def test_person_score_errors_virtual(self):
+        """
+        Test errors entering scores, virtual event.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_scoring_user()
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1')
+        admin_session.create_country('DEF', 'Test Second Country')
+        reg2_session = self.get_session('DEF_reg')
+        admin_session.create_person('Test Second Country', 'Contestant 1')
+        admin_session.edit('event', '1', {'registration_enabled': 'no'})
+        # Error entering scores when self-scoring not enabled.
+        reg_session.check_open_relative('person?@template=scoreselect')
+        reg_session.select_main_form()
+        reg_session.set({'country': 'Test First Country', 'problem': '1'})
+        reg_session.check_submit_selected()
+        reg_session.select_main_form()
+        reg_session.set({'ABC1': '0'})
+        reg_session.check_submit_selected(error='Entering scores is currently '
+                                          'disabled',
+                                          status=403)
+        # Error entering scores for another country.
+        admin_session.edit('event', '1', {'self_scoring_enabled': 'yes'})
+        reg_session.check_open_relative('person?@template=scoreenter'
+                                        '&country=4&problem=1')
+        reg_session.select_main_form()
+        reg_session.set({'DEF1': '0'})
+        reg_session.check_submit_selected(error='You do not have permission '
+                                          'to enter scores for this country',
+                                          status=403)
+        reg2_session.check_open_relative('person?@template=scoreenter'
+                                         '&country=3&problem=1')
+        reg2_session.select_main_form()
+        reg2_session.set({'ABC1': '0'})
+        reg2_session.check_submit_selected(error='You do not have permission '
+                                           'to enter scores for this country',
+                                           status=403)
+        # All these failed edits should not have changed the empty
+        # scores.
+        admin_csv = admin_session.get_scores_csv()
+        admin_csv_p = admin_session.get_people_csv_scores()
+        anon_csv = session.get_scores_csv()
+        anon_csv_p = session.get_people_csv_scores()
+        reg_csv = reg_session.get_scores_csv()
+        reg_csv_p = reg_session.get_people_csv_scores()
+        self.assertEqual(admin_csv,
+                         [{'Country Name': 'Test First Country',
+                           'Country Code': 'ABC', 'Contestant Code': 'ABC1',
+                           'Given Name': 'Given 1', 'Family Name': 'Family 1',
+                           'P1': '', 'P2': '', 'P3': '',
+                           'P4': '', 'P5': '', 'P6': '',
+                           'Total': '0', 'Award': '', 'Extra Awards': ''},
+                          {'Country Name': 'Test Second Country',
+                           'Country Code': 'DEF', 'Contestant Code': 'DEF1',
+                           'Given Name': 'Given 2', 'Family Name': 'Family 2',
+                           'P1': '', 'P2': '', 'P3': '',
+                           'P4': '', 'P5': '', 'P6': '',
+                           'Total': '0', 'Award': '', 'Extra Awards': ''}])
+        self.assertEqual(admin_csv_p, admin_csv)
+        self.assertEqual(anon_csv, admin_csv)
+        self.assertEqual(anon_csv_p, admin_csv)
+        self.assertEqual(reg_csv, admin_csv)
+        self.assertEqual(reg_csv_p, admin_csv)
 
     def test_event_medal_boundaries_csv_errors(self):
         """

@@ -71,6 +71,20 @@ define="edit_ok context/is_edit_ok"
   </tal:if>
  </tr>
 
+ <tal:block tal:condition="python:utils.is_virtual_event(db._db)">
+
+ <tr tal:define="name string:self_scoring_enabled; label string:Countries can enter own scores?; value context/self_scoring_enabled; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Countries can enter own scores?</th>
+  <tal:if condition="context/id">
+   <td tal:content="structure context/self_scoring_enabled/field">staff</td>
+  </tal:if>
+  <tal:if condition="not:context/id">
+   <td><input type="radio" checked="checked" name="self_scoring_enabled" value="yes">Yes<input type="radio" name="self_scoring_enabled" value="no">No</td>
+  </tal:if>
+ </tr>
+
+ </tal:block>
+
  <tal:if condition="python:utils.any_scores_missing(db._db)">
   <tr>
    <td colspan="2"><strong>Medal boundaries cannot be set as not all

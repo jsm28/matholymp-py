@@ -100,6 +100,13 @@ class ScoreAction(Action):
         if not valid_country_problem(self.db, self.form):
             raise ValueError('Country or problem invalid or not specified')
         country = self.form['country'].value
+        if not self.hasPermission('ScoreForCountry', classname='country',
+                                  itemid=country):
+            if self.db.event.get('1', 'self_scoring_enabled'):
+                raise Unauthorised('You do not have permission to enter '
+                                   'scores for this country')
+            else:
+                raise Unauthorised('Entering scores is currently disabled')
         problem = self.form['problem'].value
         country_node = self.db.country.getnode(country)
         problem_number = int(problem)

@@ -383,7 +383,11 @@ def photo_consent_select(selected):
 
 def score_country_select(db):
     """Return form content for selecting a country for entering scores."""
-    countries = db.country.filter(None, {'is_normal': True}, [('+', 'code')])
+    if db.security.hasPermission('ScoreAllCountries', db.getuid()):
+        countries = db.country.filter(None, {'is_normal': True},
+                                      [('+', 'code')])
+    else:
+        countries = [db.user.get(db.getuid(), 'country')]
     country_list = [(c, db.country.get(c, 'name')) for c in countries]
     return string_select('country', None, country_list, None)
 

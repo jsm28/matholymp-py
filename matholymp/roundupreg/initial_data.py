@@ -55,7 +55,7 @@
 """This module provides the Roundup initial data setup."""
 
 from matholymp.roundupreg.config import distinguish_official, \
-    get_staff_country_name, get_initial_languages, \
+    get_staff_country_name, is_virtual_event, get_initial_languages, \
     get_extra_admin_roles_secondaryok, get_initial_room_types, \
     get_initial_room_types_non_contestant, get_initial_room_types_contestant
 from matholymp.roundupreg.staticsite import static_site_event_group
@@ -82,8 +82,12 @@ def init_data(env):
 
     # Create a record for this event.
     event = db.getclass('event')
+    event_extra = {}
+    if is_virtual_event(db):
+        event_extra['self_scoring_enabled'] = False
     event.create(registration_enabled=True,
-                 preregistration_enabled=True)
+                 preregistration_enabled=True,
+                 **event_extra)
 
     # Create country records for administration and special-case users.
     country = db.getclass('country')
