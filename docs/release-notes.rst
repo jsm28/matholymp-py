@@ -415,7 +415,7 @@ the registration system is not active.
   static site.  For a virtual event, registering users may enter
   scores for their own country if this is enabled under :guilabel:`Set
   medal boundaries or disable registration`; :file:`event.item.html`
-  is updated accordingly.
+  and :file:`page.html` are updated accordingly.
 
 * A bug has been fixed in :command:`mo-static-upgrade` where it would
   fail when the CSV file of events has a column ``Age Day

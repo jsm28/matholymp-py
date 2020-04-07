@@ -73,7 +73,9 @@ columns string:id;
    <li tal:condition="python:request.user.hasPermission('EditRooms')">
     <a href="person?@template=rooms" i18n:translate="">View and edit room allocations</a>
    </li>
-   <li tal:condition="python:request.user.hasPermission('Score')">
+   <li tal:condition="python:request.user.hasPermission('ScoreAllCountries')
+		      or request.user.hasPermission('ScoreForCountry',
+		      'country', None, request.user.country.id)">
     <a href="person?@template=scoreselect"  i18n:translate="">Enter scores</a>
    </li>
    <li tal:condition="python:utils.show_prereg_sidebar(db._db, request.user.id)">
