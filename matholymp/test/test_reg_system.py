@@ -890,6 +890,19 @@ class RegSystemTestCase(unittest.TestCase):
         write_bytes_to_file(file_contents, filename)
         return filename
 
+    def gen_test_csv_no_trailing_empty(self, rows, keys):
+        """Generate a CSV file with specified contents and no trailing empty
+        fields."""
+        temp_file = tempfile.NamedTemporaryFile(suffix='.csv',
+                                                dir=self.temp_dir,
+                                                delete=False)
+        filename = temp_file.name
+        temp_file.close()
+        file_contents = write_utf8_csv_bytes(rows, keys)
+        file_contents = re.sub(b',*\r', b'\r', file_contents)
+        write_bytes_to_file(file_contents, filename)
+        return filename
+
     def gen_test_zip(self, data):
         """Generate a ZIP file with specified contents."""
         temp_file = tempfile.NamedTemporaryFile(suffix='.zip',
@@ -3471,6 +3484,27 @@ class RegSystemTestCase(unittest.TestCase):
                                     expected_staff])
         self.assertEqual(admin_csv, [expected_abc, expected_def, expected_ghi,
                                      expected_staff])
+        # Test without trailing empty columns.
+        csv_in = [{'Name': 'Test Fourth Country',
+                   'Code': 'JKL'}]
+        csv_filename = self.gen_test_csv_no_trailing_empty(csv_in, csv_cols)
+        admin_session.check_open_relative('country?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.check_submit_selected()
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        expected_jkl = {'XMO Number': '2', 'Country Number': '6',
+                        'Annual URL': self.instance.url + 'country6',
+                        'Code': 'JKL', 'Name': 'Test Fourth Country',
+                        'Flag URL': '', 'Generic Number': '',
+                        'Normal': 'Yes'}
+        self.assertEqual(anon_csv, [expected_abc, expected_def, expected_ghi,
+                                    expected_jkl, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc, expected_def, expected_ghi,
+                                     expected_jkl, expected_staff])
 
     @_with_config(distinguish_official='Yes')
     def test_country_bulk_register_official(self):
@@ -12330,6 +12364,62 @@ class RegSystemTestCase(unittest.TestCase):
                           expected_p2_admin])
         self.assertEqual(reg_csv, [expected_p1, expected_p3, expected_p2])
         self.assertEqual(reg2_csv, [expected_p1, expected_p3, expected_p2])
+        # Test without trailing empty columns.
+        csv_in = [{'Given Name': 'Test',
+                   'Family Name': 'Doe',
+                   'Country Code': 'ZZA',
+                   'Primary Role': 'VIP'}]
+        csv_filename = self.gen_test_csv_no_trailing_empty(csv_in, csv_cols)
+        admin_session.check_open_relative('person?@template=bulkregister')
+        admin_session.select_main_form()
+        admin_session.set({'csv_file': csv_filename})
+        admin_session.check_submit_selected()
+        admin_session.select_main_form()
+        admin_session.check_submit_selected()
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        reg2_csv = reg2_session.get_people_csv()
+        expected_p4 = {'XMO Number': '2', 'Country Number': '1',
+                       'Person Number': '4',
+                       'Annual URL': self.instance.url + 'person4',
+                       'Country Name': 'XMO 2015 Staff',
+                       'Country Code': 'ZZA', 'Primary Role': 'VIP',
+                       'Other Roles': '',
+                       'Guide For': '',
+                       'Contestant Code': '', 'Contestant Age': '',
+                       'Given Name': 'Test', 'Family Name': 'Doe',
+                       'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                       'P6': '', 'Total': '', 'Award': '',
+                       'Extra Awards': '', 'Photo URL': '',
+                       'Generic Number': ''}
+        expected_p4_admin = expected_p4.copy()
+        expected_p4_admin.update(
+            {'Gender': '', 'Date of Birth': '', 'Languages': '',
+             'Allergies and Dietary Requirements': '',
+             'T-Shirt Size': '', 'Arrival Place': '',
+             'Arrival Date': '', 'Arrival Time': '',
+             'Arrival Flight': '', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': '',
+             'Share Room With': '', 'Room Number': '',
+             'Phone Number': '', 'Badge Photo URL': '',
+             'Badge Background': 'generic', 'Badge Outer Colour': 'a9a9a9',
+             'Badge Inner Colour': 'dcdcdc', 'Badge Text Colour': '000000',
+             'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Passport Given Name': 'Test',
+             'Passport Family Name': 'Doe',
+             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+        self.assertEqual(anon_csv, [expected_p1, expected_p3, expected_p2,
+                                    expected_p4])
+        self.assertEqual(admin_csv,
+                         [expected_p1_admin, expected_p3_admin,
+                          expected_p2_admin, expected_p4_admin])
+        self.assertEqual(reg_csv, [expected_p1, expected_p3, expected_p2,
+                                   expected_p4])
+        self.assertEqual(reg2_csv, [expected_p1, expected_p3, expected_p2,
+                                    expected_p4])
 
     @_with_config(consent_ui='Yes')
     def test_person_bulk_register_consent_ui(self):

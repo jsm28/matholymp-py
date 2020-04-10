@@ -55,7 +55,7 @@ def read_utf8_csv(csv_file_name):
     """
     with open(csv_file_name, 'r', encoding='utf-8-sig',
               newline='') as csv_file:
-        csv_reader = csv.DictReader(csv_file)
+        csv_reader = csv.DictReader(csv_file, restval='')
         rows = [row for row in csv_reader]
         return rows
 
@@ -69,7 +69,8 @@ def read_utf8_csv_bytes(csv_file_bytes, delimiter=','):
     csv_bytes_file = io.TextIOWrapper(csv_bytes_file_b,
                                       encoding='utf-8-sig',
                                       newline='')
-    csv_reader = csv.DictReader(csv_bytes_file, delimiter=delimiter)
+    csv_reader = csv.DictReader(csv_bytes_file, restval='',
+                                delimiter=delimiter)
     rows = [row for row in csv_reader]
     return rows
 
