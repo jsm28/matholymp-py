@@ -657,7 +657,7 @@ class DocumentGenerator:
             lang_filenames[lang_to_filename(lang)] = lang
 
         new_drafts_only = False
-        if person_id == 'all':
+        if person_id in ('all', 'all-split'):
             contestants = self._event.contestant_list
             if exam_order is None:
                 contestants = sorted(contestants,
@@ -668,6 +668,13 @@ class DocumentGenerator:
                     key=lambda x: exam_order[x.contestant_code])
             languages = []
             output_file_base = 'papers' + day_text
+            if person_id == 'all-split':
+                for c in contestants:
+                    # Recursing here is the most convenient way to
+                    # generate a separate file for each contestant.
+                    self.generate_papers(c.contestant_code, day_opt,
+                                         use_background, exam_order)
+                return
         elif person_id == 'all-languages':
             contestants = []
             languages = all_languages

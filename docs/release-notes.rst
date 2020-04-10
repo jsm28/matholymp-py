@@ -426,6 +426,11 @@ the registration system is not active.
   have had papers provided and which are still waiting for those
   papers.
 
+* :command:`mo-document-generate` now supports generating papers for
+  all contestants in separate per-contestant files with a single
+  command, by specifying :samp:`all-split` in place of :samp:`all` for
+  the papers to generate.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 
