@@ -1,0 +1,9 @@
+Languages present:
+
+English
+
+Languages missing:
+
+French
+German
+Russian

@@ -142,8 +142,9 @@ order is required.
 Checklist of languages
 ^^^^^^^^^^^^^^^^^^^^^^
 
-To generate a checklist :file:`language-list` of which contestants
-have requested papers in which languages::
+To generate a checklist :file:`language-list.txt` of which contestants
+have requested papers in which languages, and a checklist
+:file:`language-status.txt` of which languages have papers available::
 
    mo-document-generate language-list all
 

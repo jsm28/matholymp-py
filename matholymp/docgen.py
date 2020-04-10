@@ -805,15 +805,42 @@ class DocumentGenerator:
             if len(p.languages) <= 1:
                 one_language_contestants.append(ccode)
         lang_text_list = []
+        langs_ok = []
+        langs_missing = []
+        if self._event.num_exams == 1:
+            days = ['']
+        else:
+            days = ['-day%d' % (i + 1) for i in range(self._event.num_exams)]
         for lang in sorted(all_languages, key=coll_get_sort_key):
             code_list = ' '.join(all_languages[lang])
             lang_text_list.append(lang + ' ' + code_list)
+            lang_filename = lang_to_filename(lang)
+            lang_present = True
+            for day in days:
+                lang_filename_day = lang_filename + day
+                pdf_file_name = lang_filename_day + '.pdf'
+                tex_file_name = lang_filename_day + '.tex'
+                papers_dir_pdf_name = os.path.join(self._problems_dir,
+                                                   pdf_file_name)
+                papers_dir_tex_name = os.path.join(self._problems_dir,
+                                                   tex_file_name)
+                if (not os.access(papers_dir_pdf_name, os.F_OK)
+                    and not os.access(papers_dir_tex_name, os.F_OK)):
+                    lang_present = False
+            if lang_present:
+                langs_ok.append(lang)
+            else:
+                langs_missing.append(lang)
         out_text = '\n'.join(lang_text_list) + '\n'
         out_text += ('\nOnly one language: '
                      + ' '.join(one_language_contestants))
         out_text += '\n'
         write_text_to_file(out_text, os.path.join(self._out_dir,
                                                   'language-list.txt'))
+        status_text = ('Languages present:\n\n%s\n\nLanguages missing:\n\n%s\n'
+                       % ('\n'.join(langs_ok), '\n'.join(langs_missing)))
+        write_text_to_file(status_text, os.path.join(self._out_dir,
+                                                     'language-status.txt'))
 
     def generate_coord_forms(self, use_background):
         """Generate all coordination forms requested by the command line."""

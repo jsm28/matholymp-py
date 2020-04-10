@@ -421,6 +421,11 @@ the registration system is not active.
   fail when the CSV file of events has a column ``Age Day
   Description``.
 
+* :command:`mo-document-generate language-list all` now generates an
+  additional file :file:`language-status.txt`, showing which languages
+  have had papers provided and which are still waiting for those
+  papers.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 
