@@ -99,6 +99,9 @@ text is replaced by the name of the directory for that event.  For
 this to be useful, you need some templating system (possibly as
 minimal as server-side includes, as shown in the example file) that
 can include such extra content when encountering such text.
+Similarly, ``scoreboard_include_extra`` is text that goes on
+scoreboard pages; ``%(dir)s`` in that text is replaced by the name of
+the directory for the event (not for the scoreboard itself).
 
 Your page template should reference a stylesheet which provides styles
 whose names are specified in :file:`staticsite.cfg` for various

@@ -431,6 +431,11 @@ the registration system is not active.
   command, by specifying :samp:`all-split` in place of :samp:`all` for
   the papers to generate.
 
+* The static site now supports adding custom text to the top of the
+  scoreboard page; this is intended for when per-event notes are
+  needed on that page.  A new variable ``scoreboard_include_extra``
+  must be specified in :file:`staticsite.cfg`.
+
 Version 2018.02.0 (11 February 2018)
 ------------------------------------
 

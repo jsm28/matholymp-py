@@ -59,9 +59,9 @@ def read_sitegen_config(top_directory):
     cfg_str_keys = ['long_name', 'short_name', 'short_name_plural',
                     'num_key', 'scores_css', 'list_css', 'photo_list_css',
                     'photo_css', 'page_suffix', 'page_include_extra',
-                    'url_base', 'short_name_url', 'short_name_url_plural',
-                    'official_desc', 'official_desc_lc', 'official_adj',
-                    'age_day_desc']
+                    'scoreboard_include_extra', 'url_base', 'short_name_url',
+                    'short_name_url_plural', 'official_desc',
+                    'official_desc_lc', 'official_adj', 'age_day_desc']
     cfg_int_keys = []
     cfg_int_none_keys = ['rank_top_n', 'event_active_number']
     cfg_bool_keys = ['use_xhtml', 'distinguish_official',
@@ -1470,6 +1470,8 @@ class SiteGenerator:
     def generate_one_event_scoreboard(self, e):
         """Generate a scoreboard for one event."""
         text = ''
+        extra_dir = '/'.join(self.path_for_event(e))
+        text += self._cfg['scoreboard_include_extra'] % {'dir': extra_dir}
         rss_file = os.path.join(self._out_dir,
                                 *self.path_for_event_scores_rss(e))
         if os.access(rss_file, os.F_OK):
@@ -1479,7 +1481,7 @@ class SiteGenerator:
                                                          ' published'))
         else:
             rss_note = ''
-        text += ('<p>The table of scores may also be %s in CSV format.'
+        text += ('\n<p>The table of scores may also be %s in CSV format.'
                  '%s</p>\n'
                  % (self.link_for_event_scores_csv(e, 'downloaded'),
                     rss_note))
