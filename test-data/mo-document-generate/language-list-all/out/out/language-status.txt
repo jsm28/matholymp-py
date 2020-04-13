@@ -1,8 +1,8 @@
-Languages present:
+Languages present (1):
 
 English
 
-Languages missing:
+Languages missing (3):
 
 French
 German

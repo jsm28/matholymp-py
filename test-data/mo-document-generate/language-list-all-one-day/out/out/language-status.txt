@@ -1,9 +1,9 @@
-Languages present:
+Languages present (2):
 
 English
 German
 
-Languages missing:
+Languages missing (2):
 
 French
 Russian

@@ -844,8 +844,10 @@ class DocumentGenerator:
         out_text += '\n'
         write_text_to_file(out_text, os.path.join(self._out_dir,
                                                   'language-list.txt'))
-        status_text = ('Languages present:\n\n%s\n\nLanguages missing:\n\n%s\n'
-                       % ('\n'.join(langs_ok), '\n'.join(langs_missing)))
+        status_text = (
+            'Languages present (%d):\n\n%s\n\nLanguages missing (%d):\n\n%s\n'
+            % (len(langs_ok), '\n'.join(langs_ok), len(langs_missing),
+               '\n'.join(langs_missing)))
         write_text_to_file(status_text, os.path.join(self._out_dir,
                                                      'language-status.txt'))
 
