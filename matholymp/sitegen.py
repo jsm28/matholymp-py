@@ -2352,6 +2352,11 @@ class SiteGenerator:
             e_extra = os.path.join(e_extra, 'extra' + self._cfg['page_suffix'])
             if not os.access(e_extra, os.F_OK):
                 write_text_to_file('', e_extra)
+            s_extra = os.path.join(self._out_dir, *self.path_for_event(e))
+            s_extra = os.path.join(
+                s_extra, 'scoreboard-extra' + self._cfg['page_suffix'])
+            if not os.access(s_extra, os.F_OK):
+                write_text_to_file('', s_extra)
             self.generate_one_event_summary(e)
             if e.num_contestants:
                 self.generate_one_event_countries_summary(e)
