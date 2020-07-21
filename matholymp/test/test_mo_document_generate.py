@@ -50,10 +50,8 @@ class MoDocumentGenerateTestCase(MoScriptTestCase):
     def __init__(self, method_name='runTest', script_dir=None, script=None,
                  top_dir=None, this_dir=None, coverage=False):
         """Initialise a MoDocumentGenerateTestCase."""
-        super(MoDocumentGenerateTestCase, self).__init__(method_name,
-                                                         script_dir, script,
-                                                         top_dir, this_dir,
-                                                         coverage)
+        super().__init__(method_name, script_dir, script, top_dir, this_dir,
+                         coverage)
         if this_dir is not None and not self.check_dir:
             doc_list_file = os.path.join(self.full_dir, 'doc-list')
             doc_list_text = read_text_from_file(doc_list_file)

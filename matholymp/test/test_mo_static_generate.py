@@ -46,10 +46,8 @@ class MoStaticGenerateTestCase(MoScriptTestCase):
     def __init__(self, method_name='runTest', script_dir=None, script=None,
                  top_dir=None, this_dir=None, coverage=False):
         """Initialise a MoStaticGenerateTestCase."""
-        super(MoStaticGenerateTestCase, self).__init__(method_name,
-                                                       script_dir, script,
-                                                       top_dir, this_dir,
-                                                       coverage)
+        super().__init__(method_name, script_dir, script, top_dir, this_dir,
+                         coverage)
         if this_dir is not None:
             assert self.check_dir
 

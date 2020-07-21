@@ -809,7 +809,7 @@ class RegSystemTestCase(unittest.TestCase):
         method = getattr(self, method_name)
         self.config = getattr(method, 'config', {})
         self.coverage = False
-        super(RegSystemTestCase, self).__init__(method_name)
+        super().__init__(method_name)
 
     def __str__(self):
         # Generate test names similar to those for script tests.

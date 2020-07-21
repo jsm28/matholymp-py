@@ -73,7 +73,7 @@ class RoundupSiteGenerator(RegSiteGenerator):
                'display_scoreboard_columns':
                    int(db.config.ext['MATHOLYMP_DISPLAY_SCOREBOARD_COLUMNS'])}
         event_group = EventGroup(RoundupDataSource(db))
-        super(RoundupSiteGenerator, self).__init__(cfg, event_group)
+        super().__init__(cfg, event_group)
 
     def link_for_country_at_event(self, country, link_body):
         return self.html_a(link_body, 'country' + str(country.country.id))

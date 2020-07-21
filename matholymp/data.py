@@ -100,7 +100,7 @@ class _PropertyCached(property):
                 return obj._cache[name]
             obj._cache[name] = getter(obj)
             return obj._cache[name]
-        super(_PropertyCached, self).__init__(get_cached, None, None, doc)
+        super().__init__(get_cached, None, None, doc)
         self.__doc__ = doc
 
 
@@ -111,7 +111,7 @@ class _EventGroupPropertyDS(_PropertyCached):
     def __init__(self, name, doc):
         def ds_get(obj):
             return obj._ds.event_group_get_attr(name)
-        super(_EventGroupPropertyDS, self).__init__(name, ds_get, doc)
+        super().__init__(name, ds_get, doc)
 
 
 class EventGroup:
@@ -333,7 +333,7 @@ class _EventPropertyDS(_PropertyCached):
     def __init__(self, name, doc):
         def ds_get(obj):
             return obj.event_group._ds.event_get_attr(obj.id, name)
-        super(_EventPropertyDS, self).__init__(name, ds_get, doc)
+        super().__init__(name, ds_get, doc)
 
 
 class Event:
@@ -1211,7 +1211,7 @@ class _PersonEventPropertyDS(_PropertyCached):
                                             obj.country.country.id,
                                             obj.event.id,
                                             name)
-        super(_PersonEventPropertyDS, self).__init__(name, ds_get, doc)
+        super().__init__(name, ds_get, doc)
 
 
 class PersonEvent:
@@ -1839,7 +1839,7 @@ class _CountryEventPropertyDS(_PropertyCached):
             ds = obj.country.event_group._ds
             return ds.country_event_get_attr(obj.country.id, obj.event.id,
                                              name)
-        super(_CountryEventPropertyDS, self).__init__(name, ds_get, doc)
+        super().__init__(name, ds_get, doc)
 
 
 class CountryEvent:

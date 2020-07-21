@@ -75,7 +75,7 @@ class MoScriptTestCase(unittest.TestCase):
             else:
                 arg_text = ''
             self.args = arg_text.split()
-        super(MoScriptTestCase, self).__init__(method_name)
+        super().__init__(method_name)
 
     def setUp(self):
         self.temp_dir_td = tempfile.TemporaryDirectory()
@@ -155,7 +155,7 @@ class MoTestLoader(unittest.TestLoader):
 
     def __init__(self, coverage):
         """Initialise a MoTestLoader."""
-        super(MoTestLoader, self).__init__()
+        super().__init__()
         self.coverage = coverage
 
 
