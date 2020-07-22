@@ -114,8 +114,7 @@ the registration system is not active.
 * The automated tests run by :command:`mo-run-tests` now include some
   tests of the registration system, if Roundup and `MechanicalSoup
   <https://mechanicalsoup.readthedocs.io/>`_ are available.  These
-  tests are very preliminary and much of the registration system
-  functionality is not covered by them.
+  tests do not yet cover all of the registration system functionality.
 
 * Various HTML templates for the registration system have been
   removed, as templates that originally came from Roundup but are not
