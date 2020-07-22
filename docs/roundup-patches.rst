@@ -39,10 +39,9 @@ installing Roundup.  All these patches can be applied with
 :command:`patch -p1 -N -E` from within the Roundup source directory.
 
 These are located in the :file:`roundup-patches/` directory of the
-source distribution, and are relative to the current development
-version of Roundup as of September 2019 (so may require changes to
-apply cleanly to later versions).  Details of the individual patches
-are:
+source distribution, and are relative to Roundup version 2.0.0 (so may
+require changes to apply cleanly to later versions).  Details of the
+individual patches are:
 
 * :download:`issue2550750-no-timeout-mail.patch
   <../roundup-patches/issue2550750-no-timeout-mail.patch>` is a patch

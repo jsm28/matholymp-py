@@ -1,8 +1,7 @@
-diff --git a/roundup/cgi/client.py b/roundup/cgi/client.py
-index fcb1a0e5..525bfd4f 100644
---- a/roundup/cgi/client.py
-+++ b/roundup/cgi/client.py
-@@ -1996,6 +1996,8 @@ class Client:
+diff -rupN roundup-2.0.0.orig/roundup/cgi/client.py roundup-2.0.0/roundup/cgi/client.py
+--- roundup-2.0.0.orig/roundup/cgi/client.py	2020-06-29 14:35:12.000000000 +0000
++++ roundup-2.0.0/roundup/cgi/client.py	2020-07-22 12:07:01.396684267 +0000
+@@ -2002,6 +2002,8 @@ class Client:
          """
          try:
              call(*args, **kwargs)

@@ -53,8 +53,7 @@ the registration system is not active.
 
 * Python 3 is now fully supported in the registration system.  Python
   3.5 or later is now required; Python 2 is no longer supported.  To
-  support Python 3, Roundup 2.0.0 or later (the current development
-  version of Roundup, until Roundup 2.0.0 is released) by the
+  support Python 3, Roundup 2.0.0 or later is required by the
   registration system.
 
 * A bug has been fixed in :command:`mo-static-import` where it would
