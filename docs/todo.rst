@@ -145,7 +145,7 @@ Static site
   events.
 
 * Make :command:`mo-static-generate` support running a command to
-  postprocess its ouput, or commands to postprocess and push to
+  postprocess its output, or commands to postprocess and push to
   production.
 
 * Make :command:`mo-static-import` ignore excess data (e.g., from
