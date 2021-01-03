@@ -4,7 +4,7 @@
 # sphinx-quickstart on Sat Sep  6 21:48:20 2014.
 
 # The following applies to matholymp-specific parts of this file:
-# Copyright 2014-2020 Joseph Samuel Myers.
+# Copyright 2014-2021 Joseph Samuel Myers.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'matholymp'
-copyright = u'2014-2020, Joseph Samuel Myers'
+copyright = u'2014-2021, Joseph Samuel Myers'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
