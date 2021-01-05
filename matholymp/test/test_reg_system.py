@@ -11003,6 +11003,46 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(selfreg_2_csv,
                          [expected_cont, expected_staff])
 
+    @_with_config(require_diet='Yes', consent_ui='Yes', virtual_event='Yes')
+    def test_person_virtual(self):
+        """
+        Test person creation and editing for a virtual event.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Leader',
+                                    {'event_photos_consent': 'yes'})
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'event_photos_consent': 'yes'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 2)
+        self.assertEqual(len(admin_csv), 2)
+        self.assertEqual(len(reg_csv), 2)
+        self.assertEqual(
+            admin_csv[0]['Allergies and Dietary Requirements'], '')
+        self.assertEqual(
+            admin_csv[1]['Allergies and Dietary Requirements'], '')
+        self.assertEqual(admin_csv[0]['Room Type'], '')
+        self.assertEqual(admin_csv[1]['Room Type'], '')
+        admin_session.edit('person', '1', {'event_photos_consent': 'no'})
+        reg_session.edit('person', '2', {'primary_role': 'Contestant 2'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 2)
+        self.assertEqual(len(admin_csv), 2)
+        self.assertEqual(len(reg_csv), 2)
+        self.assertEqual(
+            admin_csv[0]['Allergies and Dietary Requirements'], '')
+        self.assertEqual(
+            admin_csv[1]['Allergies and Dietary Requirements'], '')
+        self.assertEqual(admin_csv[0]['Room Type'], '')
+        self.assertEqual(admin_csv[1]['Room Type'], '')
+
     def test_person_score(self):
         """
         Test entering scores and CSV file of scores.

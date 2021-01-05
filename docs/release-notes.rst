@@ -44,6 +44,14 @@ static site, to update the CSV data files with details of past events
 for any format changes in the new version of matholymp.  After doing
 so, run :command:`mo-static-generate`.
 
+Next version (unreleased)
+-------------------------
+
+* For a virtual event, the registration system does not request
+  information about allergies and dietary requirements, travel, room
+  type or person with whom to share a room.  :file:`person.item.html`
+  is changed accordingly.
+
 Version 2020.07.0 (22 July 2020)
 --------------------------------
 

@@ -448,7 +448,7 @@ def required_person_fields(db, person):
             req.append('passport_number')
         if have_nationality(db):
             req.append('nationality')
-        if require_diet(db):
+        if require_diet(db) and not is_virtual_event(db):
             req.append('diet')
     return req
 

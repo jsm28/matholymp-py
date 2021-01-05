@@ -224,12 +224,12 @@ please inform the people you register of this information.
   if papers are desired in a language not included in the list.</td>
  </tr>
 
- <tr tal:define="name string:diet; label string:Allergies and dietary requirements; value context/diet; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:diet; label string:Allergies and dietary requirements; value context/diet; edit_ok edit_ok" tal:condition="python:(context.is_edit_ok() and not utils.is_virtual_event(db._db))">
   <th class="required" metal:use-macro="th_label">Allergies and dietary requirements</th>
   <td><textarea rows="5" cols="40" tal:replace="structure context/diet/multiline"></textarea></td>
  </tr>
 
- <tr tal:condition="context/is_edit_ok">
+ <tr tal:condition="python:(context.is_edit_ok() and not utils.is_virtual_event(db._db))">
   <td colspan="2">Allergies and dietary requirements should be
   entered so that appropriate food can be arranged.
  <tal:block tal:condition="python:utils.require_diet(db._db)">
@@ -252,7 +252,8 @@ please inform the people you register of this information.
  </tr>
 
  <tr tal:condition="python:context.is_edit_ok() and
-  utils.show_travel_copy_options(db._db, request.user.id, context.id)">
+  utils.show_travel_copy_options(db._db, request.user.id, context.id) and
+  not utils.is_virtual_event(db._db)">
   <th></th>
   <td tal:condition="context/id" tal:content="structure
   python:utils.country_travel_copy_options(db._db,
@@ -262,47 +263,47 @@ please inform the people you register of this information.
   db._db.user.get(request.user.id, 'country'), context.id)"></td>
  </tr>
 
- <tr tal:define="name string:arrival_place; label string:Arrival place; value context/arrival_place; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:arrival_place; label string:Arrival place; value context/arrival_place; edit_ok edit_ok" tal:condition="python:(context.is_edit_ok() and not utils.is_virtual_event(db._db))">
   <th metal:use-macro="th_label">Arrival place</th>
   <td tal:content="structure context/arrival_place/menu">arrival_place</td>
  </tr>
 
- <tr tal:define="name string:arrival_date; label string:Arrival date; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:arrival_date; label string:Arrival date; edit_ok edit_ok" tal:condition="python:(context.is_edit_ok() and not utils.is_virtual_event(db._db))">
   <th metal:use-macro="th_label">Arrival date</th>
   <td tal:content="structure python:utils.arrdep_date_select(db._db, 'arrival', context.arrival_date.plain())"></td>
  </tr>
 
- <tr tal:define="name string:arrival_time_hour; label string:Arrival time; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:arrival_time_hour; label string:Arrival time; edit_ok edit_ok" tal:condition="python:(context.is_edit_ok() and not utils.is_virtual_event(db._db))">
   <th metal:use-macro="th_label">Arrival time</th>
   <td tal:content="structure python:utils.arrdep_time_select(db._db, 'arrival', context.arrival_time_hour.plain(), context.arrival_time_minute.plain())"></td>
  </tr>
 
- <tr tal:define="name string:arrival_flight; label string:Arrival flight number; value context/arrival_flight; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:arrival_flight; label string:Arrival flight number; value context/arrival_flight; edit_ok edit_ok" tal:condition="python:(context.is_edit_ok() and not utils.is_virtual_event(db._db))">
   <th metal:use-macro="th_label">Arrival flight number</th>
   <td><input name="arrival_flight" metal:use-macro="normal_input"></td>
  </tr>
 
- <tr tal:define="name string:departure_place; label string:Departure place; value context/departure_place; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:departure_place; label string:Departure place; value context/departure_place; edit_ok edit_ok" tal:condition="python:(context.is_edit_ok() and not utils.is_virtual_event(db._db))">
   <th metal:use-macro="th_label">Departure place</th>
   <td tal:content="structure context/departure_place/menu">departure_place</td>
  </tr>
 
- <tr tal:define="name string:departure_date; label string:Departure date; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:departure_date; label string:Departure date; edit_ok edit_ok" tal:condition="python:(context.is_edit_ok() and not utils.is_virtual_event(db._db))">
   <th metal:use-macro="th_label">Departure date</th>
   <td tal:content="structure python:utils.arrdep_date_select(db._db, 'departure', context.departure_date.plain())"></td>
  </tr>
 
- <tr tal:define="name string:departure_time_hour; label string:Departure time; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:departure_time_hour; label string:Departure time; edit_ok edit_ok" tal:condition="python:(context.is_edit_ok() and not utils.is_virtual_event(db._db))">
   <th metal:use-macro="th_label">Departure time</th>
   <td tal:content="structure python:utils.arrdep_time_select(db._db, 'departure', context.departure_time_hour.plain(), context.departure_time_minute.plain())"></td>
  </tr>
 
- <tr tal:define="name string:departure_flight; label string:Departure flight number; value context/departure_flight; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:departure_flight; label string:Departure flight number; value context/departure_flight; edit_ok edit_ok" tal:condition="python:(context.is_edit_ok() and not utils.is_virtual_event(db._db))">
   <th metal:use-macro="th_label">Departure flight number</th>
   <td><input name="departure_flight" metal:use-macro="normal_input"></td>
  </tr>
 
-<tal:block tal:condition="context/is_edit_ok">
+<tal:block tal:condition="python:(context.is_edit_ok() and not utils.is_virtual_event(db._db))">
  <tr>
   <td colspan="2">If you wish to arrive before or depart after the standard
   dates, please consult the organisers about availability of transport and
@@ -310,18 +311,18 @@ please inform the people you register of this information.
  </tr>
 </tal:block>
 
- <tr tal:define="name string:room_type; label string:Preferred room type; value context/room_type; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:room_type; label string:Preferred room type; value context/room_type; edit_ok edit_ok" tal:condition="python:(context.is_edit_ok() and not utils.is_virtual_event(db._db))">
   <th metal:use-macro="th_label">Preferred room type</th>
   <td tal:content="structure python:context.room_type.menu(html_kwargs =
   { 'id' : 'room_type' })">room_type">room_type</td>
  </tr>
 
- <tr tal:define="name string:room_share_with; label string:Share room with (name and country); value context/room_share_with; edit_ok edit_ok" tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:room_share_with; label string:Share room with (name and country); value context/room_share_with; edit_ok edit_ok" tal:condition="python:(context.is_edit_ok() and not utils.is_virtual_event(db._db))">
   <th metal:use-macro="th_label">Share room with (name and country)</th>
   <td><input name="room_share_with" metal:use-macro="normal_input"></td>
  </tr>
 
-<tal:block tal:condition="context/is_edit_ok">
+<tal:block tal:condition="python:(context.is_edit_ok() and not utils.is_virtual_event(db._db))">
  <tr>
   <td colspan="2">Please see the regulations or consult the organisers
   regarding availability of single rooms and associated fees and
@@ -329,7 +330,7 @@ please inform the people you register of this information.
  </tr>
 </tal:block>
 
- <tr tal:define="name string:room_number; label string:Room number; value context/room_number; edit_ok context/room_number/is_edit_ok" tal:condition="context/is_edit_ok">
+ <tr tal:define="name string:room_number; label string:Room number; value context/room_number; edit_ok context/room_number/is_edit_ok" tal:condition="python:(context.is_edit_ok() and not utils.is_virtual_event(db._db))">
   <th metal:use-macro="th_label">Room number</th>
   <td><input name="room_number" metal:use-macro="normal_input"></td>
  </tr>
@@ -507,7 +508,7 @@ select the appropriate options.  You must select &ldquo;Yes&rdquo; or
    <td tal:content="structure python:utils.photo_consent_select('not_applicable')"></td>
   </tal:if>
  </tr>
- <tr>
+ <tr tal:condition="python:not utils.is_virtual_event(db._db)">
   <td colspan="2">3. <strong>This participant has given permission for
   processing information provided on their allergies and dietary
   requirements as needed for the purposes of running the
@@ -516,7 +517,7 @@ select the appropriate options.  You must select &ldquo;Yes&rdquo; or
   such information provided will be replaced by
   &ldquo;Unknown&rdquo;.</td>
  </tr>
- <tr tal:define="name string:diet_consent; label string:Permission for this information?; value context/diet_consent; edit_ok edit_ok">
+ <tr tal:define="name string:diet_consent; label string:Permission for this information?; value context/diet_consent; edit_ok edit_ok" tal:condition="python:not utils.is_virtual_event(db._db)">
   <th class="required" metal:use-macro="th_label">Permission for this information?</th>
   <tal:if condition="python:context.id and db._db.person.get(context.id, 'diet_consent') is not None">
    <td tal:content="structure context/diet_consent/field">diet_consent</td>
@@ -554,7 +555,7 @@ select the appropriate options.  You must select &ldquo;Yes&rdquo; or
 </table>
 </form>
 
-<table class="form" tal:condition="context/is_edit_ok">
+<table class="form" tal:condition="python:(context.is_edit_ok() and not utils.is_virtual_event(db._db))">
 <tr>
  <td>Room numbers will be assigned by event organisers.</td>
 </tr>

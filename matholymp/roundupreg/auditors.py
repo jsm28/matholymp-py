@@ -47,7 +47,8 @@ from matholymp.roundupreg.config import have_consent_forms, \
     require_dob, get_num_problems, get_marks_per_problem, \
     get_earliest_date_of_birth, get_sanity_date_of_birth, \
     get_earliest_date_of_birth_contestant, get_arrdep_bounds, \
-    get_short_name_year, get_contestant_genders, get_invitation_letter_email
+    get_short_name_year, is_virtual_event, get_contestant_genders, \
+    get_invitation_letter_email
 from matholymp.roundupreg.roundupemail import send_email
 from matholymp.roundupreg.rounduputil import any_scores_missing, \
     valid_int_str, create_rss, db_file_format_contents, db_file_extension
@@ -332,6 +333,12 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         allow_incomplete = False
         newvalues['incomplete'] = False
 
+    # For a virtual event, some information can be missing for all
+    # registrations even if normally required.
+    virtual_event = is_virtual_event(db)
+    allow_incomplete_diet = allow_incomplete or virtual_event
+    allow_incomplete_room = allow_incomplete or virtual_event
+
     # Initially, an invitation letter has not been generated.
     if nodeid is None:
         newvalues['invitation_letter_generated'] = False
@@ -468,13 +475,13 @@ def audit_person_fields(db, cl, nodeid, newvalues):
                 del newvalues['photo']
         diet_consent = get_new_value(db, cl, nodeid, newvalues,
                                      'diet_consent')
-        if diet_consent is None and not allow_incomplete:
+        if diet_consent is None and not allow_incomplete_diet:
             raise ValueError('No choice of consent for allergies and dietary '
                              'requirements information specified')
         if not diet_consent:
             # Leave a blank diet value if diet consent is blank and
             # incomplete data allowed.
-            if not (allow_incomplete
+            if not (allow_incomplete_diet
                     and diet_consent is None
                     and get_new_value(db, cl, nodeid,
                                       newvalues, 'diet') is None):
@@ -497,7 +504,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     if require_diet(db):
         require_value(db, cl, nodeid, newvalues, 'diet',
                       'Allergies and dietary requirements not specified',
-                      allow_incomplete)
+                      allow_incomplete_diet)
 
     # Start with blank scores for contestants - and for other people
     # in case someone is first registered with another role then
@@ -523,7 +530,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     # If no room type is specified, use the default for the role, but
     # leave it unspecified when incomplete data is allowed.
     room_type = get_new_value(db, cl, nodeid, newvalues, 'room_type')
-    if room_type is None and not allow_incomplete:
+    if room_type is None and not allow_incomplete_room:
         room_type = db.matholymprole.get(primary_role, 'default_room_type')
         newvalues['room_type'] = room_type
 
@@ -532,7 +539,8 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     # for the role, or unless such a room type was previously set and
     # neither role nor room type are being changed.
     if (('room_type' in newvalues or 'primary_role' in newvalues)
-        and not db.security.hasPermission('RegisterAnyRoomType', userid)):
+        and not db.security.hasPermission('RegisterAnyRoomType', userid)
+        and not (room_type is None and allow_incomplete_room)):
         valid_room_types = db.matholymprole.get(primary_role, 'room_types')
         if valid_room_types and room_type not in valid_room_types:
             raise ValueError('Room type for this role must be %s'
