@@ -40,7 +40,7 @@ from matholymp.roundupreg.config import distinguish_official, \
     have_consent_forms, have_consent_ui, have_passport_numbers, \
     have_nationality, get_num_problems, get_marks_per_problem, \
     get_language_numbers, get_short_name, honourable_mentions_available, \
-    is_virtual_event
+    event_type, is_virtual_event
 from matholymp.roundupreg.rounduputil import scores_from_str, \
     person_date_of_birth, contestant_age, db_file_url
 
@@ -129,7 +129,7 @@ class RoundupDataSource(DataSource):
         elif name == 'age_day_desc':
             return self._db.config.ext['MATHOLYMP_AGE_DAY_DESC']
         elif name == 'host_type':
-            return 'virtual' if is_virtual_event(self._db) else 'in-person'
+            return event_type(self._db)
         raise KeyError(name)
 
     def person_event_get_attr(self, person_id, country_id, event_id, name):

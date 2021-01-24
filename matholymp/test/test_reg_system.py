@@ -1302,7 +1302,7 @@ class RegSystemTestCase(unittest.TestCase):
                                      expected_staff])
         self.assertEqual(reg_csv, [expected_abc, expected_def, expected_staff])
 
-    @_with_config(virtual_event='Yes')
+    @_with_config(event_type='virtual')
     def test_country_csv_virtual(self):
         """
         Test CSV file of countries, virtual event.
@@ -2558,7 +2558,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff])
 
-    @_with_config(virtual_event='Yes')
+    @_with_config(event_type='virtual')
     def test_country_create_audit_errors_virtual(self):
         """
         Test errors from country creation auditor, virtual event.
@@ -2890,7 +2890,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc, expected_staff])
 
-    @_with_config(virtual_event='Yes')
+    @_with_config(event_type='virtual')
     def test_country_edit_audit_errors_virtual(self):
         """
         Test errors from country edit auditor, virtual event.
@@ -3176,7 +3176,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv,
                          [expected_abc_admin, expected_staff_admin])
 
-    @_with_config(virtual_event='Yes')
+    @_with_config(event_type='virtual')
     def test_country_edit_audit_errors_prereg_virtual(self):
         """
         Test errors from country edit auditor, preregistration virtual
@@ -3337,7 +3337,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
 
-    @_with_config(virtual_event='Yes')
+    @_with_config(event_type='virtual')
     def test_country_prereg_virtual(self):
         """
         Test preregistration of virtual event data.
@@ -4829,7 +4829,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv, [expected_staff_admin])
         self.assertEqual(reg_csv, [expected_staff])
 
-    @_with_config(virtual_event='Yes')
+    @_with_config(event_type='virtual')
     def test_person_csv_virtual(self):
         """
         Test CSV file of people for a virtual event.
@@ -11160,7 +11160,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(selfreg_2_csv,
                          [expected_cont, expected_staff])
 
-    @_with_config(require_diet='Yes', consent_ui='Yes', virtual_event='Yes',
+    @_with_config(require_diet='Yes', consent_ui='Yes', event_type='virtual',
                   require_passport_number='Yes', require_nationality='Yes')
     def test_person_virtual(self):
         """
@@ -11369,7 +11369,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(score_csv, admin_csv)
         self.assertEqual(score_csv_p, admin_csv)
 
-    @_with_config(virtual_event='Yes')
+    @_with_config(event_type='virtual')
     def test_person_score_virtual(self):
         """
         Test entering scores and CSV file of scores, virtual event.
@@ -11783,7 +11783,7 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(score_csv, admin_csv)
         self.assertEqual(score_csv_p, admin_csv)
 
-    @_with_config(virtual_event='Yes')
+    @_with_config(event_type='virtual')
     def test_person_score_errors_virtual(self):
         """
         Test errors entering scores, virtual event.

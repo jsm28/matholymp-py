@@ -53,6 +53,12 @@ Next version (unreleased)
   whom to share a room.  :file:`person.item.html` is changed
   accordingly.
 
+* The variable ``matholymp_virtual_event`` in
+  :file:`extensions/config.ini` for the registration system has been
+  replaced by a variable ``matholymp_event_type``.  The value
+  ``in-person`` is equivalent to ``No`` for the old variable while
+  ``virtual`` is equivalent to ``Yes`` for the old variable.
+
 Version 2020.07.0 (22 July 2020)
 --------------------------------
 
