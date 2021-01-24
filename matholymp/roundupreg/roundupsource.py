@@ -215,6 +215,8 @@ class RoundupDataSource(DataSource):
             if not have_consent_ui(self._db):
                 return None
             return self._db.person.get(person_id, 'event_photos_consent')
+        elif name == 'remote_participant':
+            return is_virtual_event(self._db)
         elif name == 'basic_data_missing':
             return self._db.person.get(person_id, 'incomplete')
         elif name == 'badge_background':

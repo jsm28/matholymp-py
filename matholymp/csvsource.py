@@ -262,6 +262,8 @@ class CSVDataSource(DataSource):
 
     _person_event_attr_map_bool_none = {'event_photos_consent':
                                         'Event Photos Consent',
+                                        'remote_participant':
+                                        'Remote Participant',
                                         'basic_data_missing':
                                         'Basic Data Missing'}
 

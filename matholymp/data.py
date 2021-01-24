@@ -1680,6 +1680,10 @@ class PersonEvent:
         not collected.
         """)
 
+    remote_participant = _PersonEventPropertyDS(
+        'remote_participant',
+        """Whether this person is taking part remotely at this event.""")
+
     basic_data_missing = _PersonEventPropertyDS(
         'basic_data_missing',
         """

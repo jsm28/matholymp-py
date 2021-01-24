@@ -2150,7 +2150,8 @@ class SiteGenerator:
                          'Consent Form URL',
                          'Passport or Identity Card Number', 'Nationality',
                          'Passport Given Name', 'Passport Family Name',
-                         'Event Photos Consent', 'Basic Data Missing'])
+                         'Event Photos Consent', 'Remote Participant',
+                         'Basic Data Missing'])
         return cols
 
     def person_csv_data(self, p, num_problems=None, distinguish_official=None,
@@ -2260,6 +2261,12 @@ class SiteGenerator:
                 csv_out['Event Photos Consent'] = ('Yes'
                                                    if p.event_photos_consent
                                                    else 'No')
+            if p.remote_participant is None:
+                csv_out['Remote Participant'] = ''
+            else:
+                csv_out['Remote Participant'] = ('Yes'
+                                                 if p.remote_participant
+                                                 else 'No')
             if p.basic_data_missing is None:
                 csv_out['Basic Data Missing'] = ''
             else:

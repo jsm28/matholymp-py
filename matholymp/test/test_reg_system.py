@@ -4157,7 +4157,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
-             'Basic Data Missing': 'No'})
+             'Remote Participant': 'No', 'Basic Data Missing': 'No'})
         expected_leader_admin.update(
             {'Gender': 'Male', 'Date of Birth': '',
              'Languages': 'English,French',
@@ -4173,7 +4173,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 2',
              'Passport Family Name': 'Family 2', 'Event Photos Consent': '',
-             'Basic Data Missing': 'No'})
+             'Remote Participant': 'No', 'Basic Data Missing': 'No'})
         expected_staff_admin.update(
             {'Gender': 'Female', 'Date of Birth': '2000-01-01',
              'Languages': 'English',
@@ -4190,7 +4190,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 3',
              'Passport Family Name': 'Family 3', 'Event Photos Consent': '',
-             'Basic Data Missing': 'No'})
+             'Remote Participant': 'No', 'Basic Data Missing': 'No'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -4254,7 +4254,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
-             'Basic Data Missing': 'No'})
+             'Remote Participant': 'No', 'Basic Data Missing': 'No'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -4315,7 +4315,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '123456789',
              'Nationality': '', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
-             'Basic Data Missing': 'No'})
+             'Remote Participant': 'No', 'Basic Data Missing': 'No'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -4376,7 +4376,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '',
              'Nationality': 'Matholympian', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
-             'Basic Data Missing': 'No'})
+             'Remote Participant': 'No', 'Basic Data Missing': 'No'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -4439,7 +4439,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '123456789',
              'Nationality': 'Matholympian', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
-             'Basic Data Missing': 'No'})
+             'Remote Participant': 'No', 'Basic Data Missing': 'No'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -4502,7 +4502,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '123456790',
              'Nationality': 'Other-olympian', 'Passport Given Name': 'Random',
              'Passport Family Name': 'Randomer', 'Event Photos Consent': '',
-             'Basic Data Missing': 'No'})
+             'Remote Participant': 'No', 'Basic Data Missing': 'No'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -4566,7 +4566,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1',
-             'Event Photos Consent': 'Yes', 'Basic Data Missing': 'No'})
+             'Event Photos Consent': 'Yes', 'Remote Participant': 'No',
+             'Basic Data Missing': 'No'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -4631,7 +4632,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 2',
              'Passport Family Name': 'Family 2', 'Event Photos Consent': 'No',
-             'Basic Data Missing': 'No'})
+             'Remote Participant': 'No', 'Basic Data Missing': 'No'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -4703,7 +4704,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
-             'Basic Data Missing': 'No'})
+             'Remote Participant': 'No', 'Basic Data Missing': 'No'})
         expected_cont2 = expected_cont1.copy()
         expected_cont2_admin = expected_cont1_admin.copy()
         expected_cont2.update(
@@ -4802,13 +4803,145 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
-             'Basic Data Missing': 'No'})
+             'Remote Participant': 'No', 'Basic Data Missing': 'No'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff_admin])
         self.assertEqual(reg_csv, [expected_staff])
+
+    @_with_config(virtual_event='Yes')
+    def test_person_csv_virtual(self):
+        """
+        Test CSV file of people for a virtual event.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create('arrival', {'name': 'Example Airport'})
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1')
+        admin_session.create_person(
+            'Test First Country', 'Leader',
+            {'gender': 'Male',
+             'date_of_birth_year': None,
+             'date_of_birth_month': None,
+             'date_of_birth_day': None,
+             'language_2': 'French',
+             'tshirt': 'M'})
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Guide',
+            {'guide_for': ['Test First Country'],
+             'other_roles': ['Logistics', 'Jury Chair'],
+             'phone_number': '9876543210'})
+        expected_cont = {'XMO Number': '2', 'Country Number': '3',
+                         'Person Number': '1',
+                         'Annual URL': self.instance.url + 'person1',
+                         'Country Name': 'Test First Country',
+                         'Country Code': 'ABC', 'Primary Role': 'Contestant 1',
+                         'Other Roles': '', 'Guide For': '',
+                         'Contestant Code': 'ABC1', 'Contestant Age': '15',
+                         'Given Name': 'Given 1', 'Family Name': 'Family 1',
+                         'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                         'P6': '', 'Total': '0', 'Award': '',
+                         'Extra Awards': '', 'Photo URL': '',
+                         'Generic Number': ''}
+        expected_leader = {'XMO Number': '2', 'Country Number': '3',
+                           'Person Number': '2',
+                           'Annual URL': self.instance.url + 'person2',
+                           'Country Name': 'Test First Country',
+                           'Country Code': 'ABC', 'Primary Role': 'Leader',
+                           'Other Roles': '', 'Guide For': '',
+                           'Contestant Code': '', 'Contestant Age': '',
+                           'Given Name': 'Given 2', 'Family Name': 'Family 2',
+                           'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                           'P6': '', 'Total': '', 'Award': '',
+                           'Extra Awards': '', 'Photo URL': '',
+                           'Generic Number': ''}
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Person Number': '3',
+                          'Annual URL': self.instance.url + 'person3',
+                          'Country Name': 'XMO 2015 Staff',
+                          'Country Code': 'ZZA', 'Primary Role': 'Guide',
+                          'Other Roles': 'Jury Chair,Logistics',
+                          'Guide For': 'Test First Country',
+                          'Contestant Code': '', 'Contestant Age': '',
+                          'Given Name': 'Given 3', 'Family Name': 'Family 3',
+                          'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                          'P6': '', 'Total': '', 'Award': '',
+                          'Extra Awards': '', 'Photo URL': '',
+                          'Generic Number': ''}
+        expected_cont_admin = expected_cont.copy()
+        expected_leader_admin = expected_leader.copy()
+        expected_staff_admin = expected_staff.copy()
+        expected_cont_admin.update(
+            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
+             'Languages': 'English',
+             'Allergies and Dietary Requirements': '', 'T-Shirt Size': 'S',
+             'Arrival Place': '', 'Arrival Date': '',
+             'Arrival Time': '', 'Arrival Flight': '',
+             'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': '',
+             'Share Room With': '', 'Room Number': '',
+             'Phone Number': '', 'Badge Photo URL': '',
+             'Badge Background': 'generic', 'Badge Outer Colour': '7ab558',
+             'Badge Inner Colour': 'c9deb0', 'Badge Text Colour': '000000',
+             'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Passport Given Name': 'Given 1',
+             'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
+             'Remote Participant': 'Yes', 'Basic Data Missing': 'No'})
+        expected_leader_admin.update(
+            {'Gender': 'Male', 'Date of Birth': '',
+             'Languages': 'English,French',
+             'Allergies and Dietary Requirements': '', 'T-Shirt Size': 'M',
+             'Arrival Place': '', 'Arrival Date': '', 'Arrival Time': '',
+             'Arrival Flight': '', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': '',
+             'Share Room With': '', 'Room Number': '', 'Phone Number': '',
+             'Badge Photo URL': '', 'Badge Background': 'generic',
+             'Badge Outer Colour': 'd22027', 'Badge Inner Colour': 'eb9984',
+             'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '',
+             'Nationality': '', 'Passport Given Name': 'Given 2',
+             'Passport Family Name': 'Family 2', 'Event Photos Consent': '',
+             'Remote Participant': 'Yes', 'Basic Data Missing': 'No'})
+        expected_staff_admin.update(
+            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
+             'Languages': 'English',
+             'Allergies and Dietary Requirements': '',
+             'T-Shirt Size': 'S', 'Arrival Place': '', 'Arrival Date': '',
+             'Arrival Time': '', 'Arrival Flight': '', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': '',
+             'Share Room With': '', 'Room Number': '',
+             'Phone Number': '9876543210', 'Badge Photo URL': '',
+             'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
+             'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
+             'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Passport Given Name': 'Given 3',
+             'Passport Family Name': 'Family 3', 'Event Photos Consent': '',
+             'Remote Participant': 'Yes', 'Basic Data Missing': 'No'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv,
+                         [expected_cont, expected_leader, expected_staff])
+        self.assertEqual(admin_csv,
+                         [expected_cont_admin, expected_leader_admin,
+                          expected_staff_admin])
+        self.assertEqual(reg_csv,
+                         [expected_cont, expected_leader, expected_staff])
 
     def test_person_csv_errors(self):
         """
@@ -10619,7 +10752,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Nationality': 'Matholympian',
              'Passport Given Name': 'Passport given',
              'Passport Family Name': 'Passport family',
-             'Event Photos Consent': 'Yes', 'Basic Data Missing': 'No'})
+             'Event Photos Consent': 'Yes', 'Remote Participant': 'No',
+             'Basic Data Missing': 'No'})
         expected_staff_admin.update(
             {'Gender': 'Non-binary', 'Date of Birth': '1998-12-31',
              'Languages': 'French,English',
@@ -10638,7 +10772,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Nationality': 'Matholympian also',
              'Passport Given Name': 'Passport given 2',
              'Passport Family Name': 'Passport family 2',
-             'Event Photos Consent': 'Yes', 'Basic Data Missing': 'No'})
+             'Event Photos Consent': 'Yes', 'Remote Participant': 'No',
+             'Basic Data Missing': 'No'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -10810,7 +10945,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1',
-             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+             'Event Photos Consent': '', 'Remote Participant': 'No',
+             'Basic Data Missing': 'Yes'})
         expected_staff_admin.update(
             {'Gender': '', 'Date of Birth': '', 'Languages': '',
              'Allergies and Dietary Requirements': '',
@@ -10827,7 +10963,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 2',
              'Passport Family Name': 'Family 2',
-             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+             'Event Photos Consent': '', 'Remote Participant': 'No',
+             'Basic Data Missing': 'Yes'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -10918,7 +11055,8 @@ class RegSystemTestCase(unittest.TestCase):
              'T-Shirt Size': 'S', 'Room Type': 'Shared room',
              'Passport or Identity Card Number': '987',
              'Nationality': 'Matholympian',
-             'Event Photos Consent': 'No', 'Basic Data Missing': 'No'})
+             'Event Photos Consent': 'No', 'Remote Participant': 'No',
+             'Basic Data Missing': 'No'})
         selfreg_2_session.edit('person', '2',
                                {'gender': 'Male',
                                 'date_of_birth_year': '2000',
@@ -10940,7 +11078,8 @@ class RegSystemTestCase(unittest.TestCase):
              'T-Shirt Size': 'M', 'Room Type': 'Shared room',
              'Passport or Identity Card Number': '9876',
              'Nationality': 'Matholympianish',
-             'Event Photos Consent': 'Yes', 'Basic Data Missing': 'No'})
+             'Event Photos Consent': 'Yes', 'Remote Participant': 'No',
+             'Basic Data Missing': 'No'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -12338,7 +12477,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given One',
              'Passport Family Name': 'Family One',
-             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+             'Event Photos Consent': '', 'Remote Participant': 'No',
+             'Basic Data Missing': 'Yes'})
         expected_p2_admin.update(
             {'Gender': '', 'Date of Birth': '', 'Languages': '',
              'Allergies and Dietary Requirements': 'Vegetarian',
@@ -12355,7 +12495,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Test\u00fd',
              'Passport Family Name': 'Test',
-             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+             'Event Photos Consent': '', 'Remote Participant': 'No',
+             'Basic Data Missing': 'Yes'})
         self.assertEqual(anon_csv, [expected_p1, expected_p2])
         self.assertEqual(admin_csv, [expected_p1_admin, expected_p2_admin])
         self.assertEqual(reg_csv, [expected_p1, expected_p2])
@@ -12406,7 +12547,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Test\u00fd',
              'Passport Family Name': 'Doe',
-             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+             'Event Photos Consent': '', 'Remote Participant': 'No',
+             'Basic Data Missing': 'Yes'})
         self.assertEqual(anon_csv, [expected_p1, expected_p3, expected_p2])
         self.assertEqual(admin_csv,
                          [expected_p1_admin, expected_p3_admin,
@@ -12459,7 +12601,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Test',
              'Passport Family Name': 'Doe',
-             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+             'Event Photos Consent': '', 'Remote Participant': 'No',
+             'Basic Data Missing': 'Yes'})
         self.assertEqual(anon_csv, [expected_p1, expected_p3, expected_p2,
                                     expected_p4])
         self.assertEqual(admin_csv,
@@ -12562,7 +12705,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given One',
              'Passport Family Name': 'Family One',
-             'Event Photos Consent': 'Yes', 'Basic Data Missing': 'Yes'})
+             'Event Photos Consent': 'Yes', 'Remote Participant': 'No',
+             'Basic Data Missing': 'Yes'})
         expected_p2_admin.update(
             {'Gender': '', 'Date of Birth': '', 'Languages': '',
              'Allergies and Dietary Requirements': 'Pescetarian',
@@ -12579,7 +12723,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given Two',
              'Passport Family Name': 'Family Two',
-             'Event Photos Consent': 'Yes', 'Basic Data Missing': 'Yes'})
+             'Event Photos Consent': 'Yes', 'Remote Participant': 'No',
+             'Basic Data Missing': 'Yes'})
         self.assertEqual(anon_csv, [expected_p1, expected_p2])
         self.assertEqual(admin_csv, [expected_p1_admin, expected_p2_admin])
         self.assertEqual(reg_csv, [expected_p1, expected_p2])
@@ -12701,7 +12846,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given One',
              'Passport Family Name': 'Family One',
-             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+             'Event Photos Consent': '', 'Remote Participant': 'No',
+             'Basic Data Missing': 'Yes'})
         expected_p2_admin.update(
             {'Gender': '', 'Date of Birth': '', 'Languages': '',
              'Allergies and Dietary Requirements': '',
@@ -12718,7 +12864,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Test\u00fd',
              'Passport Family Name': 'Test',
-             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+             'Event Photos Consent': '', 'Remote Participant': 'No',
+             'Basic Data Missing': 'Yes'})
         expected_p3_admin.update(
             {'Gender': '', 'Date of Birth': '', 'Languages': '',
              'Allergies and Dietary Requirements': '',
@@ -12735,7 +12882,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Test\u00fd',
              'Passport Family Name': 'Doe',
-             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+             'Event Photos Consent': '', 'Remote Participant': 'No',
+             'Basic Data Missing': 'Yes'})
         self.assertEqual(anon_csv, [expected_p1, expected_p3, expected_p2])
         self.assertEqual(admin_csv,
                          [expected_p1_admin, expected_p3_admin,
@@ -12834,7 +12982,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given One',
              'Passport Family Name': 'Family One',
-             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+             'Event Photos Consent': '', 'Remote Participant': 'No',
+             'Basic Data Missing': 'Yes'})
         expected_p2_admin.update(
             {'Gender': '', 'Date of Birth': '', 'Languages': '',
              'Allergies and Dietary Requirements': '',
@@ -12851,7 +13000,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Test',
              'Passport Family Name': 'Test',
-             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+             'Event Photos Consent': '', 'Remote Participant': 'No',
+             'Basic Data Missing': 'Yes'})
         self.assertEqual(anon_csv, [expected_p1, expected_p2])
         self.assertEqual(admin_csv, [expected_p1_admin, expected_p2_admin])
         self.assertEqual(reg_csv, [expected_p1, expected_p2])
@@ -12936,7 +13086,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given One',
              'Passport Family Name': 'Family One',
-             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+             'Event Photos Consent': '', 'Remote Participant': 'No',
+             'Basic Data Missing': 'Yes'})
         self.assertEqual(anon_csv, [expected_p1])
         self.assertEqual(admin_csv, [expected_p1_admin])
         self.assertEqual(reg_csv, [expected_p1])
@@ -13052,7 +13203,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given One',
              'Passport Family Name': 'Family One',
-             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+             'Event Photos Consent': '', 'Remote Participant': 'No',
+             'Basic Data Missing': 'Yes'})
         expected_p2_admin.update(
             {'Gender': '', 'Date of Birth': '', 'Languages': '',
              'Allergies and Dietary Requirements': '',
@@ -13069,7 +13221,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Test\u00fd',
              'Passport Family Name': 'Test',
-             'Event Photos Consent': '', 'Basic Data Missing': 'Yes'})
+             'Event Photos Consent': '', 'Remote Participant': 'No',
+             'Basic Data Missing': 'Yes'})
         self.assertEqual(anon_csv, [expected_p1, expected_p2])
         self.assertEqual(admin_csv, [expected_p1_admin, expected_p2_admin])
         self.assertEqual(reg_csv, [expected_p1, expected_p2])

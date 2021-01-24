@@ -234,6 +234,9 @@ class RegSiteGenerator(SiteGenerator):
         if p.badge_photo_url is None:
             missing_list.append('photo')
 
+        if p.remote_participant is None:
+            missing_list.append('whether remote or in-person')
+
         have_travel_details = True
         if (p.arrival_place is None
             or p.arrival_date is None
@@ -250,7 +253,7 @@ class RegSiteGenerator(SiteGenerator):
             if p.departure_is_airport:
                 if p.departure_flight is None:
                     have_travel_details = False
-        if not have_travel_details and not self.event.host_virtual:
+        if not have_travel_details and not p.remote_participant:
             missing_list.append('travel details')
 
         if p.guide_for and p.phone_number is None:
@@ -422,13 +425,12 @@ class RegSiteGenerator(SiteGenerator):
 
         head_row_list = [self.html_tr_th_list(['Country', 'Person', 'Role'])]
         body_row_list = []
-        if not self.event.host_virtual:
-            for p in people:
-                if p.room_number is None:
-                    row = [html.escape(p.country.name_with_code),
-                           self.link_for_person(p.person, html.escape(p.name)),
-                           html.escape(p.primary_role)]
-                    body_row_list.append(self.html_tr_td_list(row))
+        for p in people:
+            if p.room_number is None and not p.remote_participant:
+                row = [html.escape(p.country.name_with_code),
+                       self.link_for_person(p.person, html.escape(p.name)),
+                       html.escape(p.primary_role)]
+                body_row_list.append(self.html_tr_td_list(row))
         if body_row_list:
             text += '<h2>Room allocations needed</h2>\n'
             text += ('<p>Room numbers need only be entered if they will'

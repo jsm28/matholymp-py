@@ -122,7 +122,8 @@ class DataSource:
         passport_given_name, passport_family_name, tshirt,
         arrival_place, arrival_date, arrival_time, arrival_flight,
         departure_place, departure_date, departure_time,
-        departure_flight, event_photos_consent, basic_data_missing.
+        departure_flight, event_photos_consent, remote_participant,
+        basic_data_missing.
         """
         raise NotImplementedError
 
