@@ -151,6 +151,7 @@ class CSVDataSource(DataSource):
                            'host_country_name': 'Country',
                            'host_country_name_in': 'Country Name In',
                            'host_city': 'City',
+                           'host_type': 'Event Type',
                            'home_page_url': 'Home Page URL',
                            'contact_name': 'Contact Name',
                            'contact_email': 'Contact Email'}
@@ -165,8 +166,7 @@ class CSVDataSource(DataSource):
                            'silver_boundary': 'Silver Boundary',
                            'bronze_boundary': 'Bronze Boundary'}
 
-    _event_attr_map_bool_maybe = {'host_virtual': 'Virtual Event',
-                                  'distinguish_official':
+    _event_attr_map_bool_maybe = {'distinguish_official':
                                   'Distinguish Official Countries',
                                   'honourable_mentions_available':
                                   'Honourable Mentions Available'}

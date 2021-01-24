@@ -1848,7 +1848,7 @@ class SiteGenerator:
             csv_out['Country'] = e.host_country_name
             csv_out['Country Name In'] = e.host_country_name_in
             csv_out['City'] = e.host_city or ''
-            csv_out['Virtual Event'] = 'Yes' if e.host_virtual else 'No'
+            csv_out['Event Type'] = e.host_type
             csv_out['Start Date'] = date_to_ymd_iso(e.start_date)
             csv_out['End Date'] = date_to_ymd_iso(e.end_date)
             csv_out['Home Page URL'] = e.home_page_url or ''
@@ -1928,7 +1928,7 @@ class SiteGenerator:
                         + ' Teams'] = ''
             events_data_output.append(csv_out)
         events_columns = ['Number', 'Year', 'Country Number', 'Country',
-                          'Country Name In', 'City', 'Virtual Event',
+                          'Country Name In', 'City', 'Event Type',
                           'Start Date', 'End Date', 'Home Page URL',
                           'Contact Name', 'Contact Email', 'Number of Exams',
                           'Number of Problems']

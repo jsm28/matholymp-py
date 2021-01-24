@@ -430,9 +430,25 @@ class Event:
         'host_city',
         """The name of the host city of this event.""")
 
-    host_virtual = _EventPropertyDS(
+    host_type = _EventPropertyDS(
+        'host_type',
+        """The type of event ('in-person', 'hybrid' or 'virtual').""")
+
+    def _get_host_virtual(self):
+        return self.host_type == 'virtual'
+
+    host_virtual = _PropertyCached(
         'host_virtual',
+        _get_host_virtual,
         """Whether this is a virtual event.""")
+
+    def _get_host_hybrid(self):
+        return self.host_type == 'hybrid'
+
+    host_hybrid = _PropertyCached(
+        'host_hybrid',
+        _get_host_hybrid,
+        """Whether this is a hybrid event.""")
 
     def _get_host_city_virtual(self):
         loc = self.host_city
@@ -441,11 +457,14 @@ class Event:
         if self.host_virtual:
             loc = '%s (virtual)' % loc
             loc = loc.strip()
+        elif self.host_hybrid:
+            loc = '%s (hybrid)' % loc
+            loc = loc.strip()
         return loc
 
     host_city_virtual = _PropertyCached(
         'host_city_virtual', _get_host_city_virtual,
-        """The host city of this event, marked if virtual.""")
+        """The host city of this event, marked if virtual or hybrid.""")
 
     def _get_host_location(self):
         if self.host_city is None:
@@ -454,6 +473,8 @@ class Event:
             loc = self.host_city + ', ' + self.host_country_name
         if self.host_virtual:
             return '%s (virtual)' % loc
+        elif self.host_hybrid:
+            return '%s (hybrid)' % loc
         else:
             return loc
 

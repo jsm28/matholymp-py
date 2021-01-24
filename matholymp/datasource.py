@@ -85,12 +85,12 @@ class DataSource:
         """
         Return the value of an attribute for an Event.  Possible names
         are: short_name, long_name, year, _host_country_id,
-        host_country_name, host_country_name_in, host_city,
-        host_virtual, start_date, end_date, home_page_url,
-        contact_name, contact_email, num_exams, num_problems,
-        marks_per_problem, registration_active, gold_boundary,
-        silver_boundary, bronze_boundary, paper_list, _person_ids,
-        _country_ids, distinguish_official, rank_top_n,
+        host_country_name, host_country_name_in, host_city, host_type,
+        start_date, end_date, home_page_url, contact_name,
+        contact_email, num_exams, num_problems, marks_per_problem,
+        registration_active, gold_boundary, silver_boundary,
+        bronze_boundary, paper_list, _person_ids, _country_ids,
+        distinguish_official, rank_top_n,
         honourable_mentions_available, age_day_desc.
         """
         raise NotImplementedError

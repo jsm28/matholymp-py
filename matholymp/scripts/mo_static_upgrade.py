@@ -89,11 +89,18 @@ def main():
         if 'Country Name In' not in e:
             # Updating from 2017.01.0 or earlier.
             e['Country Name In'] = e['Country']
-        if 'Virtual Event' not in e:
-            # Updating from 2018.02.0 or earlier.
-            e['Virtual Event'] = 'No'
+        if 'Event Type' not in e:
+            # Updating from 2020.07.0 or earlier.
+            if 'Virtual Event' in e:
+                e['Event Type'] = ('virtual'
+                                   if e['Virtual Event'] == 'Yes'
+                                   else 'in-person')
+                del e['Virtual Event']
+            else:
+                # Updating from 2018.02.0 or earlier.
+                e['Event Type'] = 'in-person'
     events_header = ['Number', 'Year', 'Country Number', 'Country',
-                     'Country Name In', 'City', 'Virtual Event', 'Start Date',
+                     'Country Name In', 'City', 'Event Type', 'Start Date',
                      'End Date', 'Home Page URL', 'Contact Name',
                      'Contact Email', 'Number of Exams',
                      'Number of Problems']

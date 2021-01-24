@@ -128,8 +128,8 @@ class RoundupDataSource(DataSource):
                     if self._db.country.get(c, 'participants_ok')]
         elif name == 'age_day_desc':
             return self._db.config.ext['MATHOLYMP_AGE_DAY_DESC']
-        elif name == 'host_virtual':
-            return is_virtual_event(self._db)
+        elif name == 'host_type':
+            return 'virtual' if is_virtual_event(self._db) else 'in-person'
         raise KeyError(name)
 
     def person_event_get_attr(self, person_id, country_id, event_id, name):
