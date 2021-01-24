@@ -400,7 +400,8 @@ class CSVDataSource(DataSource):
                                    'name': 'Name',
                                    'flag_url': 'Flag URL',
                                    'leader_email': 'Leader Email',
-                                   'physical_address': 'Physical Address'}
+                                   'physical_address': 'Physical Address',
+                                   'participation_type': 'Participation Type'}
 
     _country_event_attr_map_int = {
         'generic_id': 'Generic Number',

@@ -328,9 +328,11 @@ class RegSiteGenerator(SiteGenerator):
         """
         Return a description of missing details for a country.
         """
-        if not self.event.host_virtual:
+        if c.participation_type == 'in-person':
             return ''
         missing = []
+        if c.participation_type is None:
+            missing.append('whether remote or in-person')
         if not c.leader_email:
             missing.append('leader email')
         if not c.physical_address:
@@ -411,12 +413,11 @@ class RegSiteGenerator(SiteGenerator):
 
         text += '<h2>Action needed by the organisers</h2>\n'
 
-        if not self.event.host_virtual:
-            for c in normal_countries:
-                if not c.guide_list:
-                    text += ('<p>No guide registered for'
-                             ' <strong>%s</strong>.</p>\n'
-                             % html.escape(c.name_with_code))
+        for c in normal_countries:
+            if c.participation_type != 'virtual' and not c.guide_list:
+                text += ('<p>No guide registered for'
+                         ' <strong>%s</strong>.</p>\n'
+                         % html.escape(c.name_with_code))
         text += ('<p>The system cannot tell automatically if not all'
                  ' staff have been registered.</p>\n')
 

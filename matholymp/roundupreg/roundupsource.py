@@ -405,6 +405,8 @@ class RoundupDataSource(DataSource):
             if not is_virtual_event(self._db):
                 return None
             return self._db.country.get(country_id, name)
+        elif name == 'participation_type':
+            return 'virtual' if is_virtual_event(self._db) else 'in-person'
         elif name == '_person_ids':
             person_list = self._db.person.filter(None, {'country': country_id})
             return [int(p) for p in person_list]

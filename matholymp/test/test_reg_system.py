@@ -511,6 +511,7 @@ class RoundupTestSession:
             del entry['Expected Numbers Confirmed']
             del entry['Leader Email']
             del entry['Physical Address']
+            del entry['Participation Type']
         return countries_csv
 
     def get_people_csv(self):
@@ -1158,7 +1159,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'Yes',
              'Leader Email': '',
-             'Physical Address': ''})
+             'Physical Address': '',
+             'Participation Type': 'in-person'})
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff_admin])
         admin_session.create_country_generic()
@@ -1182,7 +1184,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
              'Leader Email': '',
-             'Physical Address': ''})
+             'Physical Address': '',
+             'Participation Type': 'in-person'})
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
@@ -1324,7 +1327,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'Yes',
              'Leader Email': '',
-             'Physical Address': ''})
+             'Physical Address': '',
+             'Participation Type': 'virtual'})
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff_admin])
         admin_session.create_country_generic()
@@ -1348,7 +1352,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
              'Leader Email': '',
-             'Physical Address': ''})
+             'Physical Address': '',
+             'Participation Type': 'virtual'})
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
@@ -2825,7 +2830,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
              'Leader Email': '',
-             'Physical Address': ''})
+             'Physical Address': '',
+             'Participation Type': 'in-person'})
         expected_def_admin = expected_def.copy()
         expected_def_admin.update(
             {'Contact Emails': '',
@@ -2838,7 +2844,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
              'Leader Email': '',
-             'Physical Address': ''})
+             'Physical Address': '',
+             'Participation Type': 'in-person'})
         expected_staff_admin = expected_staff.copy()
         expected_staff_admin.update(
             {'Contact Emails': '',
@@ -2851,7 +2858,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'Yes',
              'Leader Email': '',
-             'Physical Address': ''})
+             'Physical Address': '',
+             'Participation Type': 'in-person'})
         self.assertEqual(admin_csv,
                          [expected_abc_admin, expected_def_admin,
                           expected_staff_admin])
@@ -3046,7 +3054,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
              'Leader Email': '',
-             'Physical Address': ''})
+             'Physical Address': '',
+             'Participation Type': 'in-person'})
         expected_staff_admin = expected_staff.copy()
         expected_staff_admin.update(
             {'Contact Emails': '',
@@ -3059,7 +3068,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'Yes',
              'Leader Email': '',
-             'Physical Address': ''})
+             'Physical Address': '',
+             'Participation Type': 'in-person'})
         self.assertEqual(admin_csv,
                          [expected_abc_admin, expected_staff_admin])
 
@@ -3147,7 +3157,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Single Rooms': '2',
              'Expected Numbers Confirmed': 'Yes',
              'Leader Email': '',
-             'Physical Address': ''})
+             'Physical Address': '',
+             'Participation Type': 'in-person'})
         expected_staff_admin = expected_staff.copy()
         expected_staff_admin.update(
             {'Contact Emails': '',
@@ -3160,7 +3171,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'Yes',
              'Leader Email': '',
-             'Physical Address': ''})
+             'Physical Address': '',
+             'Participation Type': 'in-person'})
         self.assertEqual(admin_csv,
                          [expected_abc_admin, expected_staff_admin])
 
@@ -3201,7 +3213,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
              'Leader Email': '',
-             'Physical Address': ''})
+             'Physical Address': '',
+             'Participation Type': 'virtual'})
         expected_staff_admin = expected_staff.copy()
         expected_staff_admin.update(
             {'Contact Emails': '',
@@ -3214,7 +3227,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'Yes',
              'Leader Email': '',
-             'Physical Address': ''})
+             'Physical Address': '',
+             'Participation Type': 'virtual'})
         self.assertEqual(admin_csv,
                          [expected_abc_admin, expected_staff_admin])
 
@@ -3259,7 +3273,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'Yes',
              'Leader Email': '',
-             'Physical Address': ''})
+             'Physical Address': '',
+             'Participation Type': 'in-person'})
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff_admin])
         admin_session.create_country_generic()
@@ -3283,7 +3298,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
              'Leader Email': '',
-             'Physical Address': ''})
+             'Physical Address': '',
+             'Participation Type': 'in-person'})
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
@@ -3346,7 +3362,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'Yes',
              'Leader Email': '',
-             'Physical Address': ''})
+             'Physical Address': '',
+             'Participation Type': 'virtual'})
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff_admin])
         admin_session.create_country_generic()
@@ -3370,7 +3387,8 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
              'Leader Email': '',
-             'Physical Address': ''})
+             'Physical Address': '',
+             'Participation Type': 'virtual'})
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])

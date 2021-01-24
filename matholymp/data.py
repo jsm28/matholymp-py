@@ -2032,6 +2032,13 @@ class CountryEvent:
         'physical_address',
         """The physical address for this country at this event.""")
 
+    participation_type = _CountryEventPropertyDS(
+        'participation_type',
+        """
+        The type of participation for this country at this event
+        ('in-person', 'hybrid', 'virtual' or None if unknown).
+        """)
+
     def _get_person_list(self):
         ds = self.country.event_group._ds
         if ds.country_event_have_attr(self.country.id, self.event.id,
