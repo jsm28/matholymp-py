@@ -336,8 +336,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     # For a virtual event, some information can be missing for all
     # registrations even if normally required.
     virtual_event = is_virtual_event(db)
-    allow_incomplete_diet = allow_incomplete or virtual_event
-    allow_incomplete_room = allow_incomplete or virtual_event
+    allow_incomplete_remote = allow_incomplete or virtual_event
 
     # Initially, an invitation letter has not been generated.
     if nodeid is None:
@@ -475,13 +474,13 @@ def audit_person_fields(db, cl, nodeid, newvalues):
                 del newvalues['photo']
         diet_consent = get_new_value(db, cl, nodeid, newvalues,
                                      'diet_consent')
-        if diet_consent is None and not allow_incomplete_diet:
+        if diet_consent is None and not allow_incomplete_remote:
             raise ValueError('No choice of consent for allergies and dietary '
                              'requirements information specified')
         if not diet_consent:
             # Leave a blank diet value if diet consent is blank and
             # incomplete data allowed.
-            if not (allow_incomplete_diet
+            if not (allow_incomplete_remote
                     and diet_consent is None
                     and get_new_value(db, cl, nodeid,
                                       newvalues, 'diet') is None):
@@ -493,18 +492,18 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     if have_passport_numbers(db):
         require_value(db, cl, nodeid, newvalues, 'passport_number',
                       'No passport or identity card number specified',
-                      allow_incomplete)
+                      allow_incomplete_remote)
 
     # If nationalities are collected, they are required.
     if have_nationality(db):
         require_value(db, cl, nodeid, newvalues, 'nationality',
-                      'No nationality specified', allow_incomplete)
+                      'No nationality specified', allow_incomplete_remote)
 
     # Dietary requirements may be required.
     if require_diet(db):
         require_value(db, cl, nodeid, newvalues, 'diet',
                       'Allergies and dietary requirements not specified',
-                      allow_incomplete_diet)
+                      allow_incomplete_remote)
 
     # Start with blank scores for contestants - and for other people
     # in case someone is first registered with another role then
@@ -530,7 +529,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     # If no room type is specified, use the default for the role, but
     # leave it unspecified when incomplete data is allowed.
     room_type = get_new_value(db, cl, nodeid, newvalues, 'room_type')
-    if room_type is None and not allow_incomplete_room:
+    if room_type is None and not allow_incomplete_remote:
         room_type = db.matholymprole.get(primary_role, 'default_room_type')
         newvalues['room_type'] = room_type
 
@@ -540,7 +539,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     # neither role nor room type are being changed.
     if (('room_type' in newvalues or 'primary_role' in newvalues)
         and not db.security.hasPermission('RegisterAnyRoomType', userid)
-        and not (room_type is None and allow_incomplete_room)):
+        and not (room_type is None and allow_incomplete_remote)):
         valid_room_types = db.matholymprole.get(primary_role, 'room_types')
         if valid_room_types and room_type not in valid_room_types:
             raise ValueError('Room type for this role must be %s'

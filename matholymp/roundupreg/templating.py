@@ -444,12 +444,13 @@ def required_person_fields(db, person):
             # <input> with an appropriate id, which must have a
             # value).
             req.append('photo_consent')
-        if have_passport_numbers(db):
-            req.append('passport_number')
-        if have_nationality(db):
-            req.append('nationality')
-        if require_diet(db) and not is_virtual_event(db):
-            req.append('diet')
+        if not is_virtual_event(db):
+            if have_passport_numbers(db):
+                req.append('passport_number')
+            if have_nationality(db):
+                req.append('nationality')
+            if require_diet(db):
+                req.append('diet')
     return req
 
 

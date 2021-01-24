@@ -48,9 +48,10 @@ Next version (unreleased)
 -------------------------
 
 * For a virtual event, the registration system does not request
-  information about allergies and dietary requirements, travel, room
-  type or person with whom to share a room.  :file:`person.item.html`
-  is changed accordingly.
+  information about nationality, passport number, name as on passport,
+  allergies and dietary requirements, travel, room type or person with
+  whom to share a room.  :file:`person.item.html` is changed
+  accordingly.
 
 Version 2020.07.0 (22 July 2020)
 --------------------------------

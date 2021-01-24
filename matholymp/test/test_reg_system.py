@@ -11003,7 +11003,8 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(selfreg_2_csv,
                          [expected_cont, expected_staff])
 
-    @_with_config(require_diet='Yes', consent_ui='Yes', virtual_event='Yes')
+    @_with_config(require_diet='Yes', consent_ui='Yes', virtual_event='Yes',
+                  require_passport_number='Yes', require_nationality='Yes')
     def test_person_virtual(self):
         """
         Test person creation and editing for a virtual event.
@@ -11028,6 +11029,10 @@ class RegSystemTestCase(unittest.TestCase):
             admin_csv[1]['Allergies and Dietary Requirements'], '')
         self.assertEqual(admin_csv[0]['Room Type'], '')
         self.assertEqual(admin_csv[1]['Room Type'], '')
+        self.assertEqual(admin_csv[0]['Passport or Identity Card Number'], '')
+        self.assertEqual(admin_csv[1]['Passport or Identity Card Number'], '')
+        self.assertEqual(admin_csv[0]['Nationality'], '')
+        self.assertEqual(admin_csv[1]['Nationality'], '')
         admin_session.edit('person', '1', {'event_photos_consent': 'no'})
         reg_session.edit('person', '2', {'primary_role': 'Contestant 2'})
         anon_csv = session.get_people_csv()
@@ -11042,6 +11047,10 @@ class RegSystemTestCase(unittest.TestCase):
             admin_csv[1]['Allergies and Dietary Requirements'], '')
         self.assertEqual(admin_csv[0]['Room Type'], '')
         self.assertEqual(admin_csv[1]['Room Type'], '')
+        self.assertEqual(admin_csv[0]['Passport or Identity Card Number'], '')
+        self.assertEqual(admin_csv[1]['Passport or Identity Card Number'], '')
+        self.assertEqual(admin_csv[0]['Nationality'], '')
+        self.assertEqual(admin_csv[1]['Nationality'], '')
 
     def test_person_score(self):
         """
