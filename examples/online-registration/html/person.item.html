@@ -148,6 +148,7 @@ please inform the people you register of this information.
   python:utils.date_of_birth_select(db._db, context.date_of_birth_year.plain(), context.date_of_birth_month.plain(), context.date_of_birth_day.plain())"></td>
  </tr>
 
+ <tal:block tal:condition="context/is_edit_ok">
  <tal:block tal:condition="python:utils.is_hybrid_event(db._db)">
 
  <tr>
@@ -181,6 +182,7 @@ please inform the people you register of this information.
   requirements information must be specified below.</td>
  </tr>
 
+ </tal:block>
  </tal:block>
 
 <tal:block tal:condition="python:utils.have_passport_numbers(db._db) and not utils.is_virtual_event(db._db)">
