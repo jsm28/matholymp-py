@@ -51,6 +51,7 @@ __all__ = ['get_config_var', 'get_config_var_bool', 'get_config_var_int',
            'get_year', 'get_short_name_year', 'get_staff_country_name',
            'invitation_letter_register', 'badge_use_background',
            'honourable_mentions_available', 'event_type', 'is_virtual_event',
+           'is_hybrid_event', 'have_remote_participation',
            'get_initial_languages', 'get_extra_admin_roles_secondaryok',
            'get_initial_room_types', 'get_initial_room_types_non_contestant',
            'get_initial_room_types_contestant', 'get_contestant_genders',
@@ -271,6 +272,16 @@ def event_type(db):
 def is_virtual_event(db):
     """Return whether this is a virtual event."""
     return event_type(db) == 'virtual'
+
+
+def is_hybrid_event(db):
+    """Return whether this is a hybrid event."""
+    return event_type(db) == 'hybrid'
+
+
+def have_remote_participation(db):
+    """Return whether this event has at least some remote participation."""
+    return event_type(db) in ('virtual', 'hybrid')
 
 
 def get_initial_languages(db):

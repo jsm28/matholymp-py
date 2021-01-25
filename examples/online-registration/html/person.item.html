@@ -148,6 +148,41 @@ please inform the people you register of this information.
   python:utils.date_of_birth_select(db._db, context.date_of_birth_year.plain(), context.date_of_birth_month.plain(), context.date_of_birth_day.plain())"></td>
  </tr>
 
+ <tal:block tal:condition="python:utils.is_hybrid_event(db._db)">
+
+ <tr>
+  <td colspan="2">Please indicate whether you expect this participant
+  to travel to attend the event in person, or to take part remotely.
+  You may change this later if circumstances change.</td>
+ </tr>
+
+ <tr tal:define="name string:participation_type; label string:Participation type; value context/participation_type; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Participation type</th>
+  <tal:if condition="context/id">
+   <td tal:content="structure python:utils.person_participation_type_select(context.participation_type.plain())"></td>
+  </tal:if>
+  <tal:if condition="not:context/id">
+   <td tal:content="structure python:utils.person_participation_type_select('')"></td>
+  </tal:if>
+ </tr>
+
+ <tr tal:condition="python:utils.have_passport_numbers(db._db)">
+  <td colspan="2">If attending in person, a passport or identity card
+  number must be specified below.</td>
+ </tr>
+
+ <tr tal:condition="python:utils.have_nationality(db._db)">
+  <td colspan="2">If attending in person, nationality information must
+  be specified below.</td>
+ </tr>
+
+ <tr tal:condition="python:utils.require_diet(db._db)">
+  <td colspan="2">If attending in person, allergies and dietary
+  requirements information must be specified below.</td>
+ </tr>
+
+ </tal:block>
+
 <tal:block tal:condition="python:utils.have_passport_numbers(db._db) and not utils.is_virtual_event(db._db)">
  <tr tal:condition="context/is_edit_ok"
      tal:define="name string:passport_number; label string:Passport or identity card number; value context/passport_number; edit_ok edit_ok">

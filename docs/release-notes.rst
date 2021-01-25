@@ -59,6 +59,12 @@ Next version (unreleased)
   ``in-person`` is equivalent to ``No`` for the old variable while
   ``virtual`` is equivalent to ``Yes`` for the old variable.
 
+* There is some support for a hybrid event, where some participants
+  attend in person and others take part remotely.
+  ``matholymp_event_type`` is set to ``hybrid`` for such an event.
+  :file:`country.item.html`, :file:`country.prereg.html` and
+  :file:`person.item.html` are changed accordingly.
+
 Version 2020.07.0 (22 July 2020)
 --------------------------------
 

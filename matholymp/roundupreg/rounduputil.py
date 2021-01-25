@@ -38,14 +38,15 @@ import time
 
 from matholymp.datetimeutil import date_from_ymd_str, age_on_date
 from matholymp.fileutil import file_format_contents, file_extension
-from matholymp.roundupreg.config import get_num_problems, get_age_day_date
+from matholymp.roundupreg.config import get_num_problems, get_age_day_date, \
+    event_type
 
 __all__ = ['scores_from_str', 'person_date_of_birth', 'contestant_age',
            'person_is_contestant', 'contestant_code', 'pn_score',
            'scores_final', 'any_scores_missing', 'country_has_contestants',
            'valid_country_problem', 'valid_int_str', 'create_rss',
            'db_file_format_contents', 'db_file_extension', 'db_file_url',
-           'country_from_code']
+           'country_from_code', 'person_is_remote']
 
 
 def scores_from_str(db, score_str):
@@ -232,3 +233,26 @@ def country_from_code(db, code):
         return countries_with_code[0]
     else:
         raise ValueError('country %s not registered' % code)
+
+
+def person_is_remote(db, person, override=None):
+    """Determine whether a person is a remote participant."""
+    this_event_type = event_type(db)
+    if this_event_type == 'in-person':
+        return False
+    elif this_event_type == 'virtual':
+        return True
+    if override is None:
+        override = {}
+    if 'participation_type' in override:
+        val = override['participation_type']
+    elif person is None:
+        val = None
+    else:
+        val = db.person.get(person, 'participation_type')
+    if val == 'in-person':
+        return False
+    elif val == 'virtual':
+        return True
+    else:
+        return None

@@ -39,11 +39,13 @@ __all__ = ['people_from_country_internal', 'people_from_country',
            'has_nonempty_travel', 'show_travel_copy_options',
            'country_travel_copy_options', 'person_case_warning',
            'registration_status', 'registration_status_country', 'edit_rooms',
-           'show_consent_form_ui', 'has_consent_for_photo', 'string_select',
-           'date_of_birth_select', 'arrdep_date_select', 'arrdep_time_select',
-           'photo_consent_select', 'score_country_select', 'show_incomplete',
-           'required_person_fields', 'register_templating_utils',
-           'show_prereg_sidebar', 'show_prereg_reminder', 'bulk_csv_contents',
+           'show_consent_form_ui', 'country_participation_type_select',
+           'person_participation_type_select', 'has_consent_for_photo',
+           'string_select', 'date_of_birth_select', 'arrdep_date_select',
+           'arrdep_time_select', 'photo_consent_select',
+           'score_country_select', 'show_incomplete', 'required_person_fields',
+           'register_templating_utils', 'show_prereg_sidebar',
+           'show_prereg_reminder', 'bulk_csv_contents',
            'show_bulk_csv_country', 'show_bulk_csv_country_link_from_code',
            'show_bulk_csv_person', 'bulk_zip_ref', 'required_user_fields']
 
@@ -66,7 +68,8 @@ from matholymp.roundupreg.config import distinguish_official, \
     get_consent_forms_date, have_consent_forms, have_consent_ui, \
     have_passport_numbers, have_nationality, require_diet, require_dob, \
     get_language_numbers, get_earliest_date_of_birth, \
-    get_sanity_date_of_birth, get_arrdep_bounds, is_virtual_event
+    get_sanity_date_of_birth, get_arrdep_bounds, is_virtual_event, \
+    is_hybrid_event, have_remote_participation
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import person_date_of_birth, \
     contestant_age, person_is_contestant, contestant_code, pn_score, \
@@ -392,6 +395,25 @@ def score_country_select(db):
     return string_select('country', None, country_list, None)
 
 
+def country_participation_type_select(selected):
+    """Return form content for selecting participation type for a country."""
+    return string_select(
+        'participation_type', '(unknown)',
+        (('in-person', 'All participants present in person'),
+         ('virtual', 'All participants remote'),
+         ('hybrid', 'Some participants present in person, some remote')),
+        selected)
+
+
+def person_participation_type_select(selected):
+    """Return form content for selecting participation type for a person."""
+    return string_select(
+        'participation_type', '(unknown)',
+        (('in-person', 'Present in person'),
+         ('virtual', 'Participating remotely')),
+        selected)
+
+
 def has_consent_for_photo(db, person):
     """
     Return whether there is consent (if needed) to show this person's
@@ -444,7 +466,7 @@ def required_person_fields(db, person):
             # <input> with an appropriate id, which must have a
             # value).
             req.append('photo_consent')
-        if not is_virtual_event(db):
+        if not have_remote_participation(db):
             if have_passport_numbers(db):
                 req.append('passport_number')
             if have_nationality(db):
@@ -654,6 +676,9 @@ def register_templating_utils(instance):
     instance.registerUtil('require_dob', require_dob)
     instance.registerUtil('get_language_numbers', get_language_numbers)
     instance.registerUtil('is_virtual_event', is_virtual_event)
+    instance.registerUtil('is_hybrid_event', is_hybrid_event)
+    instance.registerUtil('have_remote_participation',
+                          have_remote_participation)
     instance.registerUtil('person_is_contestant', person_is_contestant)
     instance.registerUtil('people_from_country', people_from_country)
     instance.registerUtil('show_country_people', show_country_people)
@@ -686,6 +711,10 @@ def register_templating_utils(instance):
     instance.registerUtil('arrdep_time_select', arrdep_time_select)
     instance.registerUtil('photo_consent_select', photo_consent_select)
     instance.registerUtil('score_country_select', score_country_select)
+    instance.registerUtil('country_participation_type_select',
+                          country_participation_type_select)
+    instance.registerUtil('person_participation_type_select',
+                          person_participation_type_select)
     instance.registerUtil('show_incomplete', show_incomplete)
     instance.registerUtil('required_person_fields', required_person_fields)
     instance.registerUtil('show_prereg_sidebar', show_prereg_sidebar)

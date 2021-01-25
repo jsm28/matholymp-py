@@ -1370,6 +1370,166 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
 
+    @_with_config(event_type='hybrid')
+    def test_country_csv_hybrid(self):
+        """
+        Test CSV file of countries, hybrid event.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        expected_staff_admin = expected_staff.copy()
+        expected_staff_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '0',
+             'Expected Deputies': '0',
+             'Expected Contestants': '0',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'Yes',
+             'Leader Email': '',
+             'Physical Address': '',
+             'Participation Type': ''})
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff_admin])
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        expected_abc_admin = expected_abc.copy()
+        expected_abc_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '1',
+             'Expected Deputies': '1',
+             'Expected Contestants': '6',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'No',
+             'Leader Email': '',
+             'Physical Address': '',
+             'Participation Type': ''})
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # Test virtual event data in CSV file.
+        admin_session.edit('country', '3',
+                           {'leader_email': 'ABCleader@example.invalid',
+                            'physical_address': 'Maths HQ\nThis Country'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc_admin['Leader Email'] = 'ABCleader@example.invalid'
+        expected_abc_admin['Physical Address'] = 'Maths HQ\nThis Country'
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # Test countries with different participation types.
+        admin_session.create_country(
+            'DEF', 'Test Second Country',
+            {'participation_type': 'All participants present in person'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_def = {'XMO Number': '2', 'Country Number': '4',
+                        'Annual URL': self.instance.url + 'country4',
+                        'Code': 'DEF', 'Name': 'Test Second Country',
+                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        expected_def_admin = expected_def.copy()
+        expected_def_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '1',
+             'Expected Deputies': '1',
+             'Expected Contestants': '6',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'No',
+             'Leader Email': '',
+             'Physical Address': '',
+             'Participation Type': 'in-person'})
+        self.assertEqual(anon_csv, [expected_abc, expected_def,
+                                    expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_def_admin,
+                                     expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_def, expected_staff])
+        admin_session.create_country(
+            'GHI', 'Test Third Country',
+            {'participation_type': 'All participants remote'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_ghi = {'XMO Number': '2', 'Country Number': '5',
+                        'Annual URL': self.instance.url + 'country5',
+                        'Code': 'GHI', 'Name': 'Test Third Country',
+                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        expected_ghi_admin = expected_ghi.copy()
+        expected_ghi_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '1',
+             'Expected Deputies': '1',
+             'Expected Contestants': '6',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'No',
+             'Leader Email': '',
+             'Physical Address': '',
+             'Participation Type': 'virtual'})
+        self.assertEqual(anon_csv, [expected_abc, expected_def, expected_ghi,
+                                    expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_def_admin,
+                                     expected_ghi_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_def, expected_ghi,
+                                   expected_staff])
+        admin_session.create_country(
+            'JKL', 'Test Fourth Country',
+            {'participation_type':
+             'Some participants present in person, some remote'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_jkl = {'XMO Number': '2', 'Country Number': '6',
+                        'Annual URL': self.instance.url + 'country6',
+                        'Code': 'JKL', 'Name': 'Test Fourth Country',
+                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        expected_jkl_admin = expected_jkl.copy()
+        expected_jkl_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '1',
+             'Expected Deputies': '1',
+             'Expected Contestants': '6',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'No',
+             'Leader Email': '',
+             'Physical Address': '',
+             'Participation Type': 'hybrid'})
+        self.assertEqual(anon_csv, [expected_abc, expected_def, expected_ghi,
+                                    expected_jkl, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_def_admin,
+                                     expected_ghi_admin, expected_jkl_admin,
+                                     expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_def, expected_ghi,
+                                   expected_jkl, expected_staff])
+
     def test_country_csv_errors(self):
         """
         Test errors from country_csv action.
@@ -2577,6 +2737,41 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff])
 
+    @_with_config(event_type='hybrid')
+    def test_country_create_audit_errors_hybrid(self):
+        """
+        Test errors from country creation auditor, hybrid event.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'leader_email': 'bad_email'},
+                                     error='Email address syntax is invalid')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
+        admin_session.check_open_relative('country?@template=item')
+        admin_session.select_main_form()
+        form = admin_session.b.get_current_form().form
+        select = form.find('select', attrs={'name': 'participation_type'})
+        new_option = admin_session.b.get_current_page().new_tag(
+            'option', value='invalid')
+        new_option.string = 'invalid'
+        select.append(new_option)
+        admin_session.set({'code': 'ABC',
+                           'name': 'Test First Country',
+                           'participation_type': 'invalid'})
+        admin_session.check_submit_selected(error='invalid participation type')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
+
     def test_country_create_audit_errors_missing(self):
         """
         Test errors from country creation auditor, missing required data.
@@ -2910,6 +3105,40 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff])
 
+    @_with_config(event_type='hybrid')
+    def test_country_edit_audit_errors_hybrid(self):
+        """
+        Test errors from country edit auditor, hybrid event.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        admin_session.edit(
+            'country', '1',
+            {'leader_email': 'bad_email'},
+            error='Email address syntax is invalid')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
+        admin_session.check_open_relative('country1')
+        admin_session.select_main_form()
+        form = admin_session.b.get_current_form().form
+        select = form.find('select', attrs={'name': 'participation_type'})
+        new_option = admin_session.b.get_current_page().new_tag(
+            'option', value='invalid')
+        new_option.string = 'invalid'
+        select.append(new_option)
+        admin_session.set({'participation_type': 'invalid'})
+        admin_session.check_submit_selected(error='invalid participation type')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv_public_only()
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff])
+
     def test_country_edit_audit_errors_missing(self):
         """
         Test errors from country edit auditor, missing required data.
@@ -3232,6 +3461,78 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv,
                          [expected_abc_admin, expected_staff_admin])
 
+    @_with_config(event_type='hybrid')
+    def test_country_edit_audit_errors_prereg_hybrid(self):
+        """
+        Test errors from country edit auditor, preregistration hybrid
+        event case.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        reg_session.edit_prereg('3',
+                                {'leader_email': 'bad'},
+                                error='Email address syntax is invalid')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        self.assertEqual(anon_csv,
+                         [expected_abc, expected_staff])
+        expected_abc_admin = expected_abc.copy()
+        expected_abc_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '1',
+             'Expected Deputies': '1',
+             'Expected Contestants': '6',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'No',
+             'Leader Email': '',
+             'Physical Address': '',
+             'Participation Type': ''})
+        expected_staff_admin = expected_staff.copy()
+        expected_staff_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '0',
+             'Expected Deputies': '0',
+             'Expected Contestants': '0',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'Yes',
+             'Leader Email': '',
+             'Physical Address': '',
+             'Participation Type': ''})
+        self.assertEqual(admin_csv,
+                         [expected_abc_admin, expected_staff_admin])
+        reg_session.check_open_relative('country3?@template=prereg')
+        reg_session.select_main_form()
+        form = reg_session.b.get_current_form().form
+        select = form.find('select', attrs={'name': 'participation_type'})
+        new_option = reg_session.b.get_current_page().new_tag(
+            'option', value='invalid')
+        new_option.string = 'invalid'
+        select.append(new_option)
+        reg_session.set({'participation_type': 'invalid'})
+        reg_session.check_submit_selected(error='invalid participation type')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        self.assertEqual(anon_csv,
+                         [expected_abc, expected_staff])
+        self.assertEqual(admin_csv,
+                         [expected_abc_admin, expected_staff_admin])
+
     def test_country_no_participants_access(self):
         """
         Test access to no-participants countries.
@@ -3401,6 +3702,95 @@ class RegSystemTestCase(unittest.TestCase):
         reg_csv = reg_session.get_countries_csv()
         expected_abc_admin.update(
             {'Expected Numbers Confirmed': 'Yes',
+             'Leader Email': 'gets-papers@example.invalid',
+             'Physical Address': 'Some Address\nCountry'})
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # This data can be edited even when preregistration is disabled.
+        admin_session.edit('event', '1', {'preregistration_enabled': 'no'})
+        reg_session.edit_prereg('3',
+                                {'leader_email':
+                                 'gets-papers2@example.invalid',
+                                 'physical_address':
+                                 'Some Address 2\nCountry'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc_admin.update(
+            {'Leader Email': 'gets-papers2@example.invalid',
+             'Physical Address': 'Some Address 2\nCountry'})
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+
+    @_with_config(event_type='hybrid')
+    def test_country_prereg_hybrid(self):
+        """
+        Test preregistration of hybrid event data.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        expected_staff_admin = expected_staff.copy()
+        expected_staff_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '0',
+             'Expected Deputies': '0',
+             'Expected Contestants': '0',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'Yes',
+             'Leader Email': '',
+             'Physical Address': '',
+             'Participation Type': ''})
+        self.assertEqual(anon_csv, [expected_staff])
+        self.assertEqual(admin_csv, [expected_staff_admin])
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        expected_abc_admin = expected_abc.copy()
+        expected_abc_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '1',
+             'Expected Deputies': '1',
+             'Expected Contestants': '6',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'No',
+             'Leader Email': '',
+             'Physical Address': '',
+             'Participation Type': ''})
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # Test editing hybrid event data.
+        reg_session.edit_prereg('3',
+                                {'participation_type':
+                                 'All participants present in person',
+                                 'leader_email': 'gets-papers@example.invalid',
+                                 'physical_address': 'Some Address\nCountry'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc_admin.update(
+            {'Expected Numbers Confirmed': 'Yes',
+             'Participation Type': 'in-person',
              'Leader Email': 'gets-papers@example.invalid',
              'Physical Address': 'Some Address\nCountry'})
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
@@ -4950,6 +5340,140 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Given Name': 'Given 3',
              'Passport Family Name': 'Family 3', 'Event Photos Consent': '',
              'Remote Participant': 'Yes', 'Basic Data Missing': 'No'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv,
+                         [expected_cont, expected_leader, expected_staff])
+        self.assertEqual(admin_csv,
+                         [expected_cont_admin, expected_leader_admin,
+                          expected_staff_admin])
+        self.assertEqual(reg_csv,
+                         [expected_cont, expected_leader, expected_staff])
+
+    @_with_config(event_type='hybrid')
+    def test_person_csv_hybrid(self):
+        """
+        Test CSV file of people for a hybrid event.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create('arrival', {'name': 'Example Airport'})
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1')
+        admin_session.create_person(
+            'Test First Country', 'Leader',
+            {'gender': 'Male',
+             'date_of_birth_year': None,
+             'date_of_birth_month': None,
+             'date_of_birth_day': None,
+             'language_2': 'French',
+             'tshirt': 'M',
+             'participation_type': 'Participating remotely'})
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Guide',
+            {'guide_for': ['Test First Country'],
+             'other_roles': ['Logistics', 'Jury Chair'],
+             'phone_number': '9876543210',
+             'participation_type': 'Present in person'})
+        expected_cont = {'XMO Number': '2', 'Country Number': '3',
+                         'Person Number': '1',
+                         'Annual URL': self.instance.url + 'person1',
+                         'Country Name': 'Test First Country',
+                         'Country Code': 'ABC', 'Primary Role': 'Contestant 1',
+                         'Other Roles': '', 'Guide For': '',
+                         'Contestant Code': 'ABC1', 'Contestant Age': '15',
+                         'Given Name': 'Given 1', 'Family Name': 'Family 1',
+                         'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                         'P6': '', 'Total': '0', 'Award': '',
+                         'Extra Awards': '', 'Photo URL': '',
+                         'Generic Number': ''}
+        expected_leader = {'XMO Number': '2', 'Country Number': '3',
+                           'Person Number': '2',
+                           'Annual URL': self.instance.url + 'person2',
+                           'Country Name': 'Test First Country',
+                           'Country Code': 'ABC', 'Primary Role': 'Leader',
+                           'Other Roles': '', 'Guide For': '',
+                           'Contestant Code': '', 'Contestant Age': '',
+                           'Given Name': 'Given 2', 'Family Name': 'Family 2',
+                           'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                           'P6': '', 'Total': '', 'Award': '',
+                           'Extra Awards': '', 'Photo URL': '',
+                           'Generic Number': ''}
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Person Number': '3',
+                          'Annual URL': self.instance.url + 'person3',
+                          'Country Name': 'XMO 2015 Staff',
+                          'Country Code': 'ZZA', 'Primary Role': 'Guide',
+                          'Other Roles': 'Jury Chair,Logistics',
+                          'Guide For': 'Test First Country',
+                          'Contestant Code': '', 'Contestant Age': '',
+                          'Given Name': 'Given 3', 'Family Name': 'Family 3',
+                          'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                          'P6': '', 'Total': '', 'Award': '',
+                          'Extra Awards': '', 'Photo URL': '',
+                          'Generic Number': ''}
+        expected_cont_admin = expected_cont.copy()
+        expected_leader_admin = expected_leader.copy()
+        expected_staff_admin = expected_staff.copy()
+        expected_cont_admin.update(
+            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
+             'Languages': 'English',
+             'Allergies and Dietary Requirements': '', 'T-Shirt Size': 'S',
+             'Arrival Place': '', 'Arrival Date': '',
+             'Arrival Time': '', 'Arrival Flight': '',
+             'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': '',
+             'Share Room With': '', 'Room Number': '',
+             'Phone Number': '', 'Badge Photo URL': '',
+             'Badge Background': 'generic', 'Badge Outer Colour': '7ab558',
+             'Badge Inner Colour': 'c9deb0', 'Badge Text Colour': '000000',
+             'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Passport Given Name': 'Given 1',
+             'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
+             'Remote Participant': '', 'Basic Data Missing': 'No'})
+        expected_leader_admin.update(
+            {'Gender': 'Male', 'Date of Birth': '',
+             'Languages': 'English,French',
+             'Allergies and Dietary Requirements': '', 'T-Shirt Size': 'M',
+             'Arrival Place': '', 'Arrival Date': '', 'Arrival Time': '',
+             'Arrival Flight': '', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': '',
+             'Share Room With': '', 'Room Number': '', 'Phone Number': '',
+             'Badge Photo URL': '', 'Badge Background': 'generic',
+             'Badge Outer Colour': 'd22027', 'Badge Inner Colour': 'eb9984',
+             'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'Passport or Identity Card Number': '',
+             'Nationality': '', 'Passport Given Name': 'Given 2',
+             'Passport Family Name': 'Family 2', 'Event Photos Consent': '',
+             'Remote Participant': 'Yes', 'Basic Data Missing': 'No'})
+        expected_staff_admin.update(
+            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
+             'Languages': 'English',
+             'Allergies and Dietary Requirements': '',
+             'T-Shirt Size': 'S', 'Arrival Place': '', 'Arrival Date': '',
+             'Arrival Time': '', 'Arrival Flight': '', 'Departure Place': '',
+             'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': 'Shared room',
+             'Share Room With': '', 'Room Number': '',
+             'Phone Number': '9876543210', 'Badge Photo URL': '',
+             'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
+             'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
+             'Consent Form URL': '',
+             'Passport or Identity Card Number': '', 'Nationality': '',
+             'Passport Given Name': 'Given 3',
+             'Passport Family Name': 'Family 3', 'Event Photos Consent': '',
+             'Remote Participant': 'No', 'Basic Data Missing': 'No'})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -11208,6 +11732,89 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv[1]['Passport or Identity Card Number'], '')
         self.assertEqual(admin_csv[0]['Nationality'], '')
         self.assertEqual(admin_csv[1]['Nationality'], '')
+
+    @_with_config(require_diet='Yes', consent_ui='Yes', event_type='hybrid',
+                  require_passport_number='Yes', require_nationality='Yes')
+    def test_person_hybrid(self):
+        """
+        Test person creation and editing for a hybrid event.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        admin_session.create_person('Test First Country', 'Leader',
+                                    {'event_photos_consent': 'yes'})
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'event_photos_consent': 'yes',
+                                   'participation_type':
+                                   'Participating remotely'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 2)
+        self.assertEqual(len(admin_csv), 2)
+        self.assertEqual(len(reg_csv), 2)
+        self.assertEqual(
+            admin_csv[0]['Allergies and Dietary Requirements'], '')
+        self.assertEqual(
+            admin_csv[1]['Allergies and Dietary Requirements'], '')
+        self.assertEqual(admin_csv[0]['Room Type'], '')
+        self.assertEqual(admin_csv[1]['Room Type'], '')
+        self.assertEqual(admin_csv[0]['Passport or Identity Card Number'], '')
+        self.assertEqual(admin_csv[1]['Passport or Identity Card Number'], '')
+        self.assertEqual(admin_csv[0]['Nationality'], '')
+        self.assertEqual(admin_csv[1]['Nationality'], '')
+        admin_session.edit('person', '1', {'event_photos_consent': 'no'})
+        reg_session.edit('person', '2', {'primary_role': 'Contestant 2'})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(len(anon_csv), 2)
+        self.assertEqual(len(admin_csv), 2)
+        self.assertEqual(len(reg_csv), 2)
+        self.assertEqual(
+            admin_csv[0]['Allergies and Dietary Requirements'], '')
+        self.assertEqual(
+            admin_csv[1]['Allergies and Dietary Requirements'], '')
+        self.assertEqual(admin_csv[0]['Room Type'], '')
+        self.assertEqual(admin_csv[1]['Room Type'], '')
+        self.assertEqual(admin_csv[0]['Passport or Identity Card Number'], '')
+        self.assertEqual(admin_csv[1]['Passport or Identity Card Number'], '')
+        self.assertEqual(admin_csv[0]['Nationality'], '')
+        self.assertEqual(admin_csv[1]['Nationality'], '')
+        admin_session.create_person('Test First Country', 'Deputy Leader',
+                                    {'event_photos_consent': 'yes',
+                                     'participation_type': 'Present in person',
+                                     'diet': 'None',
+                                     'diet_consent': 'yes',
+                                     'passport_number': '123456789'},
+                                    error='No nationality specified')
+        reg_session.create_person('Test First Country', 'Deputy Leader',
+                                  {'event_photos_consent': 'yes',
+                                   'participation_type': 'Present in person',
+                                   'diet': 'None',
+                                   'diet_consent': 'yes',
+                                   'nationality': 'Matholympian'},
+                                  error='No passport or identity card number '
+                                  'specified')
+        reg_session.create_person('Test First Country', 'Deputy Leader',
+                                  {'event_photos_consent': 'yes',
+                                   'participation_type': 'Present in person',
+                                   'diet_consent': 'yes',
+                                   'nationality': 'Matholympian',
+                                   'passport_number': '123456789'},
+                                  error='Allergies and dietary requirements '
+                                  'not specified')
+        reg_session.create_person('Test First Country', 'Deputy Leader',
+                                  {'event_photos_consent': 'yes',
+                                   'participation_type': 'Present in person',
+                                   'diet': 'Vegan',
+                                   'nationality': 'Matholympian',
+                                   'passport_number': '123456789'},
+                                  error='No choice of consent for allergies '
+                                  'and dietary requirements information '
+                                  'specified')
 
     def test_person_score(self):
         """

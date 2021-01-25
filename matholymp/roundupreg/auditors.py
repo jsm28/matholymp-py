@@ -47,11 +47,11 @@ from matholymp.roundupreg.config import have_consent_forms, \
     require_dob, get_num_problems, get_marks_per_problem, \
     get_earliest_date_of_birth, get_sanity_date_of_birth, \
     get_earliest_date_of_birth_contestant, get_arrdep_bounds, \
-    get_short_name_year, is_virtual_event, get_contestant_genders, \
-    get_invitation_letter_email
+    get_short_name_year, get_contestant_genders, get_invitation_letter_email
 from matholymp.roundupreg.roundupemail import send_email
 from matholymp.roundupreg.rounduputil import any_scores_missing, \
-    valid_int_str, create_rss, db_file_format_contents, db_file_extension
+    valid_int_str, create_rss, db_file_format_contents, db_file_extension, \
+    person_is_remote
 from matholymp.roundupreg.staticsite import static_site_event_group, \
     static_site_file_data
 from matholymp.roundupreg.userauditor import valid_address, audit_user_fields
@@ -223,6 +223,15 @@ def audit_country_fields(db, cl, nodeid, newvalues):
     # single rooms (which might be reasonable in some unusual
     # circumstances).
 
+    # If a participation type is specified, it must be valid.  (If the
+    # event is in-person or virtual, the value specified ends up being
+    # ignored; it's only significant for hybrid events.)
+    if ('participation_type' in newvalues
+        and newvalues['participation_type'] is not None):
+        if newvalues['participation_type'] not in ('in-person', 'hybrid',
+                                                   'virtual'):
+            raise ValueError('invalid participation type')
+
     if 'flag' in newvalues:
         file_id = newvalues['flag']
         if file_id is not None:
@@ -334,9 +343,11 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         newvalues['incomplete'] = False
 
     # For a virtual event, some information can be missing for all
-    # registrations even if normally required.
-    virtual_event = is_virtual_event(db)
-    allow_incomplete_remote = allow_incomplete or virtual_event
+    # registrations even if normally required.  For hybrid events,
+    # this is allowed for remote participants and for those for which
+    # it is not yet known whether they are remote.
+    is_remote = person_is_remote(db, nodeid, newvalues)
+    allow_incomplete_remote = allow_incomplete or (is_remote is not False)
 
     # Initially, an invitation letter has not been generated.
     if nodeid is None:
@@ -504,6 +515,19 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         require_value(db, cl, nodeid, newvalues, 'diet',
                       'Allergies and dietary requirements not specified',
                       allow_incomplete_remote)
+
+    # If a participation type is specified, it must be valid.  (If the
+    # event is in-person or virtual, the value specified ends up being
+    # ignored; it's only significant for hybrid events.)
+    if ('participation_type' in newvalues
+        and newvalues['participation_type'] is not None):
+        if newvalues['participation_type'] not in ('in-person', 'virtual'):
+            raise ValueError('invalid participation type')
+        # We don't currently check if the participation type for a
+        # hybrid event is consistent with that specified for the
+        # country; we treat that specified for the country as a just a
+        # statement of intent rather than required to be consistent
+        # with that for individual participants.
 
     # Start with blank scores for contestants - and for other people
     # in case someone is first registered with another role then

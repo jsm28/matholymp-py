@@ -40,9 +40,9 @@ from matholymp.roundupreg.config import distinguish_official, \
     have_consent_forms, have_consent_ui, have_passport_numbers, \
     have_nationality, get_num_problems, get_marks_per_problem, \
     get_language_numbers, get_short_name, honourable_mentions_available, \
-    event_type, is_virtual_event
+    event_type, have_remote_participation
 from matholymp.roundupreg.rounduputil import scores_from_str, \
-    person_date_of_birth, contestant_age, db_file_url
+    person_date_of_birth, contestant_age, db_file_url, person_is_remote
 
 __all__ = ['RoundupDataSource']
 
@@ -216,7 +216,7 @@ class RoundupDataSource(DataSource):
                 return None
             return self._db.person.get(person_id, 'event_photos_consent')
         elif name == 'remote_participant':
-            return is_virtual_event(self._db)
+            return person_is_remote(self._db, person_id)
         elif name == 'basic_data_missing':
             return self._db.person.get(person_id, 'incomplete')
         elif name == 'badge_background':
@@ -402,11 +402,14 @@ class RoundupDataSource(DataSource):
             return self._db.country.get(country_id,
                                         'expected_numbers_confirmed')
         elif name in ('leader_email', 'physical_address'):
-            if not is_virtual_event(self._db):
+            if not have_remote_participation(self._db):
                 return None
             return self._db.country.get(country_id, name)
         elif name == 'participation_type':
-            return 'virtual' if is_virtual_event(self._db) else 'in-person'
+            this_event_type = event_type(self._db)
+            if this_event_type in ('in-person', 'virtual'):
+                return this_event_type
+            return self._db.country.get(country_id, 'participation_type')
         elif name == '_person_ids':
             person_list = self._db.person.filter(None, {'country': country_id})
             return [int(p) for p in person_list]

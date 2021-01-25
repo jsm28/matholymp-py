@@ -57,7 +57,7 @@
 from matholymp.roundupreg.config import distinguish_official, \
     have_consent_forms, have_consent_ui, have_passport_numbers, \
     have_nationality, get_language_numbers, invitation_letter_register, \
-    is_virtual_event
+    is_virtual_event, have_remote_participation
 
 __all__ = ['init_schema']
 
@@ -96,7 +96,11 @@ def init_schema(env):
     country_extra = {}
     if distinguish_official(db):
         country_extra['official'] = Boolean()
-    if is_virtual_event(db):
+    if have_remote_participation(db):
+        # participation_type is only relevant for hybrid events, but
+        # include in the schema for virtual events as well, given the
+        # possibility of a hybrid event turning into a virtual one.
+        country_extra['participation_type'] = String()
         country_extra['leader_email'] = String()
         country_extra['physical_address'] = String()
     country = Class(db, 'country',
@@ -177,6 +181,11 @@ def init_schema(env):
     if have_passport_numbers(db) and have_nationality(db):
         person_extra['passport_given_name'] = String()
         person_extra['passport_family_name'] = String()
+    if have_remote_participation(db):
+        # participation_type is only relevant for hybrid events, but
+        # include in the schema for virtual events as well, given the
+        # possibility of a hybrid event turning into a virtual one.
+        person_extra['participation_type'] = String()
     for i in get_language_numbers(db):
         person_extra['language_%d' % i] = Link('language')
     person = Class(db, 'person',
@@ -371,6 +380,8 @@ def init_schema(env):
     if have_passport_numbers(db) and have_nationality(db):
         person_common_reg_props.append('passport_given_name')
         person_common_reg_props.append('passport_family_name')
+    if have_remote_participation(db):
+        person_common_reg_props.append('participation_type')
     for i in get_language_numbers(db):
         person_common_reg_props.append('language_%d' % i)
     person_reg_props = person_common_reg_props.copy()
@@ -503,7 +514,8 @@ def init_schema(env):
                     'expected_contestants', 'expected_observers_a',
                     'expected_observers_b', 'expected_observers_c',
                     'expected_single_rooms', 'expected_numbers_confirmed']
-    if is_virtual_event(db):
+    if have_remote_participation(db):
+        prereg_props.append('participation_type')
         prereg_props.append('leader_email')
         prereg_props.append('physical_address')
     p = db.security.addPermission(name='View', klass='country',

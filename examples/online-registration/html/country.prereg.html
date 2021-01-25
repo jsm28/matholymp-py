@@ -81,7 +81,28 @@ define="edit_ok context/is_edit_ok"
   <td><input name="code" metal:use-macro="normal_input"></td>
  </tr>
 
- <tal:block tal:condition="python:utils.is_virtual_event(db._db)">
+ <tal:block tal:condition="python:utils.is_hybrid_event(db._db)">
+
+ <tr>
+  <td colspan="2">Please indicate whether you expect participants
+  from your country to travel to attend the event in person, or to
+  take part remotely.  You may change this later if circumstances
+  change.</td>
+ </tr>
+
+ <tr tal:define="name string:participation_type; label string:Participation type; value context/participation_type; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Participation type</th>
+  <tal:if condition="context/id">
+   <td tal:content="structure python:utils.country_participation_type_select(context.participation_type.plain())"></td>
+  </tal:if>
+  <tal:if condition="not:context/id">
+   <td tal:content="structure python:utils.country_participation_type_select('')"></td>
+  </tal:if>
+ </tr>
+
+ </tal:block>
+
+ <tal:block tal:condition="python:utils.have_remote_participation(db._db)">
 
  <tr>
   <td colspan="2">The email address for the leader will be used to
