@@ -767,12 +767,13 @@ class Event:
     def _get_people_by_room(self):
         r = {}
         for p in self.person_list:
-            room = p.room_number
-            if room is None:
-                room = ''
-            if room not in r:
-                r[room] = []
-            r[room].append(p)
+            if not p.remote_participant:
+                room = p.room_number
+                if room is None:
+                    room = ''
+                if room not in r:
+                    r[room] = []
+                r[room].append(p)
         return r
 
     people_by_room = _PropertyCached(

@@ -534,8 +534,12 @@ class RegSiteGenerator(SiteGenerator):
                                                    'Share With', 'Room'])]
             body_row_list = []
             for p in sorted(people_by_room[r], key=lambda x: x.sort_key):
+                hybrid_note = (' (if present in person)'
+                               if p.remote_participant is None
+                               else '')
                 row = [html.escape(p.country.name_with_code),
-                       self.link_for_person(p.person, html.escape(p.name)),
+                       (self.link_for_person(p.person, html.escape(p.name))
+                        + hybrid_note),
                        html.escape(p.primary_role),
                        html.escape(p.gender or ''),
                        html.escape(p.room_type or ''),
