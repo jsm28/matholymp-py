@@ -444,8 +444,12 @@ class RegSiteGenerator(SiteGenerator):
         body_row_list = []
         for p in people:
             if p.room_number is None and not p.remote_participant:
+                hybrid_note = (' (if present in person)'
+                               if p.remote_participant is None
+                               else '')
                 row = [html.escape(p.country.name_with_code),
-                       self.link_for_person(p.person, html.escape(p.name)),
+                       (self.link_for_person(p.person, html.escape(p.name))
+                        + hybrid_note),
                        html.escape(p.primary_role)]
                 body_row_list.append(self.html_tr_td_list(row))
         if body_row_list:
