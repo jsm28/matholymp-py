@@ -264,8 +264,8 @@ class RegSiteGenerator(SiteGenerator):
     def missing_extra_roles_text(self, c):
         """
         Return a description of people not registered, or unexpectedly
-        registered, or with unexpected single room requests, for a
-        country.
+        registered, or with unexpected single room requests, or with
+        unexpected remote/in-person status, for a country.
         """
         if c.expected_numbers_confirmed:
             ret_text = ''
@@ -284,12 +284,18 @@ class RegSiteGenerator(SiteGenerator):
         else:
             have_roles = collections.defaultdict(int)
             have_single_rooms = 0
+            have_in_person = False
+            have_remote = False
             for p in person_list:
                 have_roles[p.primary_role] += 1
                 if p.room_type == 'Single room':
                     have_single_rooms += 1
                 if p.primary_role not in expected_roles:
                     expected_roles[p.primary_role] = 0
+                if p.remote_participant is True:
+                    have_remote = True
+                if p.remote_participant is False:
+                    have_in_person = True
             missing_roles = []
             extra_roles = []
             for role in sorted(expected_roles.keys()):
@@ -321,6 +327,16 @@ class RegSiteGenerator(SiteGenerator):
             if have_single_rooms > expected_single_rooms:
                 ret_text += ('<p>More single room requests than expected '
                              'from <strong>%s</strong>.</p>\n'
+                             % html.escape(c.name_with_code))
+            if have_in_person and c.participation_type == 'virtual':
+                ret_text += ('<p><strong>%s</strong> registered for remote '
+                             'participation, but has in-person '
+                             'participant.</p>\n'
+                             % html.escape(c.name_with_code))
+            if have_remote and c.participation_type == 'in-person':
+                ret_text += ('<p><strong>%s</strong> registered for in-person '
+                             'participation, but has remote '
+                             'participant.</p>\n'
                              % html.escape(c.name_with_code))
         return ret_text
 
