@@ -571,10 +571,11 @@ class SiteGenerator:
         Generate header text referring to an event and its host
         country, with links.
         """
-        return ('%s in %s'
+        return ('%s%s%s'
                 % (self.link_for_event(event,
                                        html.escape(
                                            event.short_name_with_year)),
+                   html.escape(event.host_assoc),
                    self.link_for_country(event.host_country,
                                          html.escape(
                                              event.host_country_name_in))))
@@ -939,8 +940,9 @@ class SiteGenerator:
                                     html.escape(desc)))
                     text += '</ul>\n'
         title = html.escape(e.short_name_with_year_and_country)
-        header = ('%s in %s'
+        header = ('%s%s%s'
                   % (html.escape(e.short_name_with_year),
+                     html.escape(e.host_assoc),
                      self.link_for_country(
                          e.host_country,
                          html.escape(e.host_country_name_in))))
@@ -1721,8 +1723,9 @@ class SiteGenerator:
                         html.escape(e.short_name_with_year)))
             hl = self.link_for_country(e.host_country,
                                        html.escape(e.host_country_name_in))
-            year_text += ('<h2>%s in %s</h2>\n'
-                          % (self.link_for_country_at_event(c, cltxt), hl))
+            year_text += ('<h2>%s%s%s</h2>\n'
+                          % (self.link_for_country_at_event(c, cltxt),
+                             e.host_assoc, hl))
             year_text += self.country_event_text(c, 'h3', False)
             year_list.append(year_text)
             if c.num_contestants:

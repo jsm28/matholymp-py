@@ -419,7 +419,8 @@ class Event:
         """)
 
     def _get_short_name_with_year_and_country(self):
-        return self.short_name_with_year + ' in ' + self.host_country_name_in
+        return (self.short_name_with_year + self.host_assoc
+                + self.host_country_name_in)
 
     short_name_with_year_and_country = _PropertyCached(
         'short_name_with_year_and_country',
@@ -481,6 +482,14 @@ class Event:
     host_location = _PropertyCached(
         'host_location', _get_host_location,
         """The name (city and country) of the host location of this event.""")
+
+    def _get_host_assoc(self):
+        return ' organised by ' if self.host_virtual else ' in '
+
+    host_assoc = _PropertyCached(
+        'host_assoc',
+        _get_host_assoc,
+        """How the host country is associated with the event, e.g. ' in '.""")
 
     start_date = _EventPropertyDS(
         'start_date',

@@ -65,6 +65,9 @@ Next version (unreleased)
   :file:`country.item.html`, :file:`country.prereg.html` and
   :file:`person.item.html` are changed accordingly.
 
+* The static site now describes virtual events as "organised by" not
+  "in" their host countries.
+
 Version 2020.07.0 (22 July 2020)
 --------------------------------
 
