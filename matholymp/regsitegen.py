@@ -176,8 +176,7 @@ class RegSiteGenerator(SiteGenerator):
         cell_width = 'width:%d%%' % (100 // cols)
         per_screen = rows * cols
         num_screens = (len(countries) + per_screen - 1) // per_screen
-        if num_screens < 1:
-            num_screens = 1
+        num_screens = max(1, num_screens)
         display_start = display_start % num_screens
         start_idx = display_start * per_screen
         end_idx = (display_start + 1) * per_screen
