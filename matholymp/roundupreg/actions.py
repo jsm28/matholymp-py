@@ -667,10 +667,10 @@ class BulkRegisterAction(Action):
                         return
                     unique_vals[key].add(row[key])
             newvalues = default_values.copy()
-            for key in str_column_map:
+            for key, col_key in str_column_map.items():
                 if key in row:
-                    newvalues[str_column_map[key]] = row[key]
-            for key in bool_column_map:
+                    newvalues[col_key] = row[key]
+            for key, col_key in bool_column_map.items():
                 if key in row:
                     try:
                         bool_val = boolean_states[row[key].lower()]
@@ -678,8 +678,8 @@ class BulkRegisterAction(Action):
                         self.client.add_error_message(
                             "'%s' bad value in row %d" % (key, row_num))
                         return
-                    newvalues[bool_column_map[key]] = bool_val
-            for key in file_column_map:
+                    newvalues[col_key] = bool_val
+            for key, col_key in file_column_map.items():
                 if key in row:
                     if zip_data is None:
                         self.client.add_error_message(
@@ -696,7 +696,7 @@ class BulkRegisterAction(Action):
                     # The auditor needs to handle having a tuple here,
                     # and adjust_for_create needs to convert them to a
                     # linked item for the actual creation.
-                    newvalues[file_column_map[key]] = (row[key], file_bytes)
+                    newvalues[col_key] = (row[key], file_bytes)
             try:
                 self.map_csv_data(row, newvalues)
                 # Run the auditor for each item at this point to
