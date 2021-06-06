@@ -12597,16 +12597,15 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(zip_response.headers['content-disposition'],
                          'attachment; filename=badges.zip')
         zip_io = io.BytesIO(zip_response.content)
-        zip_zip = zipfile.ZipFile(zip_io, 'r')
-        zip_contents = [f.filename for f in zip_zip.infolist()]
-        expected_contents = ['badges/badge-person1.pdf',
-                             'badges/badge-person2.pdf']
-        self.assertEqual(zip_contents, expected_contents)
-        self.assertTrue(zip_zip.read('badges/badge-person1.pdf').startswith(
-            b'%PDF-'))
-        self.assertTrue(zip_zip.read('badges/badge-person2.pdf').startswith(
-            b'%PDF-'))
-        zip_zip.close()
+        with zipfile.ZipFile(zip_io, 'r') as zip_zip:
+            zip_contents = [f.filename for f in zip_zip.infolist()]
+            expected_contents = ['badges/badge-person1.pdf',
+                                 'badges/badge-person2.pdf']
+            self.assertEqual(zip_contents, expected_contents)
+            self.assertTrue(zip_zip.read(
+                'badges/badge-person1.pdf').startswith(b'%PDF-'))
+            self.assertTrue(zip_zip.read(
+                'badges/badge-person2.pdf').startswith(b'%PDF-'))
 
     @_with_config(docgen_directory='docgen')
     def test_person_name_badge_zip_background(self):
@@ -12875,19 +12874,18 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(zip_response.headers['content-disposition'],
                          'attachment; filename=invitation-letters.zip')
         zip_io = io.BytesIO(zip_response.content)
-        zip_zip = zipfile.ZipFile(zip_io, 'r')
-        zip_contents = [f.filename for f in zip_zip.infolist()]
-        expected_contents = [
-            'invitation-letters/invitation-letter-person1.pdf',
-            'invitation-letters/invitation-letter-person2.pdf']
-        self.assertEqual(zip_contents, expected_contents)
-        self.assertTrue(zip_zip.read(
-            'invitation-letters/invitation-letter-person1.pdf').startswith(
-                b'%PDF-'))
-        self.assertTrue(zip_zip.read(
-            'invitation-letters/invitation-letter-person2.pdf').startswith(
-                b'%PDF-'))
-        zip_zip.close()
+        with zipfile.ZipFile(zip_io, 'r') as zip_zip:
+            zip_contents = [f.filename for f in zip_zip.infolist()]
+            expected_contents = [
+                'invitation-letters/invitation-letter-person1.pdf',
+                'invitation-letters/invitation-letter-person2.pdf']
+            self.assertEqual(zip_contents, expected_contents)
+            self.assertTrue(zip_zip.read(
+                'invitation-letters/invitation-letter-person1.pdf').startswith(
+                    b'%PDF-'))
+            self.assertTrue(zip_zip.read(
+                'invitation-letters/invitation-letter-person2.pdf').startswith(
+                    b'%PDF-'))
         # Changing relevant details after an invitation letter was
         # generated results in an email being sent; changing
         # irrelevant details does not.

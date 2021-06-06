@@ -599,10 +599,9 @@ class DocumentGenerator:
         else:
             lang_filename_day = lang_filename
         if lang_filename_day not in self._langs_num_pages:
-            pdf_file = open(self.get_paper_pdf(lang_filename_day), 'rb')
-            r = PdfFileReader(pdf_file)
-            self._langs_num_pages[lang_filename_day] = r.getNumPages()
-            pdf_file.close()
+            with open(self.get_paper_pdf(lang_filename_day), 'rb') as pdf_file:
+                r = PdfFileReader(pdf_file)
+                self._langs_num_pages[lang_filename_day] = r.getNumPages()
         npages = self._langs_num_pages[lang_filename_day]
         if npages == 1:
             return ('\\onepaper{%s}{%s}{%s}{%s}{%s}{}{1}'

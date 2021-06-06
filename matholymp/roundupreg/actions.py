@@ -516,12 +516,13 @@ class DocumentGenerateAction(Action):
                                           'attachment; filename=%s'
                                           % zip_filename)
                     output = io.BytesIO()
-                    zip_file = zipfile.ZipFile(output, 'w', zipfile.ZIP_STORED)
-                    zip_dir = self.zip_dirname()
-                    for doc_filename in self.document_list(event):
-                        zip_file.write(os.path.join(temp_dir, doc_filename),
-                                       '%s/%s' % (zip_dir, doc_filename))
-                    zip_file.close()
+                    with zipfile.ZipFile(output, 'w',
+                                         zipfile.ZIP_STORED) as zip_file:
+                        zip_dir = self.zip_dirname()
+                        for doc_filename in self.document_list(event):
+                            zip_file.write(os.path.join(temp_dir,
+                                                        doc_filename),
+                                           '%s/%s' % (zip_dir, doc_filename))
                     zip_bytes = output.getvalue()
                     output.close()
                     return zip_bytes
