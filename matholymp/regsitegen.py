@@ -119,8 +119,9 @@ class RegSiteGenerator(SiteGenerator):
         output = io.BytesIO()
         with zipfile.ZipFile(output, 'w', zipfile.ZIP_STORED) as zip_file:
             zip_file.writestr('photos/README.txt',
-                              'The photos in this file are arranged by internal'
-                              ' database identifier\nfor the person.\n')
+                              'The photos in this file are arranged by'
+                              ' internal database identifier\n'
+                              'for the person.\n')
 
             e = self.event
             person_list = sorted(e.person_list, key=lambda x: x.sort_key)
