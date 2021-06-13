@@ -160,10 +160,6 @@ The current development sources of matholymp are available using `Git
 
    git clone https://git.ukmt.org.uk/matholymp-py.git
 
-or::
-
-   git clone git://git.ukmt.org.uk/git/matholymp-py.git
-
 There is also a `mirror on GitHub
 <https://github.com/jsm28/matholymp-py>`_.
 
