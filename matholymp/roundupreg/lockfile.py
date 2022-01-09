@@ -55,7 +55,7 @@ def with_lock_file(file):
     If locking is not supported, runs without a lock; if this is not
     OK, the caller must check for whether locking is supported."""
     if can_lock:
-        with open(file, 'w') as lock_file:
+        with open(file, 'wb') as lock_file:
             fcntl.lockf(lock_file, fcntl.LOCK_EX)
             yield
     else:

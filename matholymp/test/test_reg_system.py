@@ -139,7 +139,7 @@ class RoundupTestInstance:
         self.mail_file = os.path.join(self.temp_dir, 'mail')
         # Create mail file as empty to avoid needing to check for
         # existence later when checking size.
-        with open(self.mail_file, 'w') as f:
+        with open(self.mail_file, 'w', encoding='utf-8') as f:
             pass
         self.log_file = os.path.join(self.temp_dir, 'log')
         self.html_dir = os.path.join(self.instance_dir, 'html')
@@ -12773,7 +12773,8 @@ class RegSystemTestCase(unittest.TestCase):
         form = admin_session.get_main().find_all('form')[3]
         admin_session.b.select_form(form)
         with open(os.path.join(self.instance.docgen_dir, 'templates',
-                               'invitation-letter-template.tex'), 'w') as f:
+                               'invitation-letter-template.tex'), 'w',
+                  encoding='utf-8') as f:
             f.write(r'\notavalidlatexdocument')
         invitation_response = admin_session.check_submit_selected(html=False,
                                                                   mail=True)
@@ -12952,7 +12953,8 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.b.select_form(
             admin_session.get_main().find_all('form')[1])
         with open(os.path.join(self.instance.docgen_dir, 'templates',
-                               'invitation-letter-template.tex'), 'w') as f:
+                               'invitation-letter-template.tex'), 'w',
+                  encoding='utf-8') as f:
             f.write(r'\notavalidlatexdocument')
         zip_response = admin_session.check_submit_selected(html=False,
                                                            mail=True)
