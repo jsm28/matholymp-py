@@ -68,6 +68,9 @@ Next version (unreleased)
 * The static site now describes virtual events as "organised by" not
   "in" their host countries.
 
+* The Roundup patches have been updated for Roundup 2.1.0, as has the
+  example :file:`config.ini`.
+
 Version 2020.07.0 (22 July 2020)
 --------------------------------
 
