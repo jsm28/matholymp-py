@@ -8762,11 +8762,11 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session.create_person('Test First Country', 'Contestant 2',
                                   {'room_type': 'Palace'},
                                   error='Room type for this role must be '
-                                  'Tent or Shared room')
+                                  'Shared room or Tent')
         reg_session.create_person('Test First Country', 'Leader',
                                   {'room_type': 'Tent'},
                                   error='Room type for this role must be '
-                                  'Single room or Palace')
+                                  'Palace or Single room')
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -10208,28 +10208,28 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(len(reg_csv), 2)
         reg_session.edit('person', '1',
                          {'room_type': 'Palace'},
-                         error='Room type for this role must be Tent or '
-                         'Shared room')
+                         error='Room type for this role must be Shared room '
+                         'or Tent')
         reg_session.edit('person', '1',
                          {'room_type': 'Single room'},
-                         error='Room type for this role must be Tent or '
-                         'Shared room')
+                         error='Room type for this role must be Shared room '
+                         'or Tent')
         reg_session.edit('person', '1',
                          {'primary_role': 'Deputy Leader'},
                          error='Room type for this role must be '
-                         'Single room or Palace')
+                         'Palace or Single room')
         reg_session.edit('person', '2',
                          {'room_type': 'Tent'},
                          error='Room type for this role must be '
-                         'Single room or Palace')
+                         'Palace or Single room')
         reg_session.edit('person', '2',
                          {'room_type': 'Shared room'},
                          error='Room type for this role must be '
-                         'Single room or Palace')
+                         'Palace or Single room')
         reg_session.edit('person', '2',
                          {'primary_role': 'Contestant 3'},
-                         error='Room type for this role must be Tent or '
-                         'Shared room')
+                         error='Room type for this role must be Shared room '
+                         'or Tent')
         anon_csv_2 = session.get_people_csv()
         admin_csv_2 = admin_session.get_people_csv()
         reg_csv_2 = reg_session.get_people_csv()

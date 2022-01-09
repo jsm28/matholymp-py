@@ -567,8 +567,9 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         valid_room_types = db.matholymprole.get(primary_role, 'room_types')
         if valid_room_types and room_type not in valid_room_types:
             raise ValueError('Room type for this role must be %s'
-                             % (' or '.join(db.room_type.get(r, 'name')
-                                            for r in valid_room_types)))
+                             % (' or '.join(
+                                 sorted(db.room_type.get(r, 'name')
+                                        for r in valid_room_types))))
 
     if 'photo' in newvalues:
         file_id = newvalues['photo']
