@@ -218,7 +218,9 @@ class RegSiteGenerator(SiteGenerator):
                      % (e.gold_boundary, e.silver_boundary, e.bronze_boundary))
         return text
 
-    def missing_person_details(self, p, consent_forms_date):
+    def missing_person_details(self, p, consent_forms_date,
+                               have_sars_cov2_cert, have_sars_cov2_doses,
+                               have_sars_cov2_after):
         """Return a description of missing details for a person."""
 
         missing_list = []
@@ -233,6 +235,17 @@ class RegSiteGenerator(SiteGenerator):
 
         if p.badge_photo_url is None:
             missing_list.append('photo')
+
+        missing_vaccine_info = False
+        if not p.remote_participant:
+            if have_sars_cov2_cert and p.sars_cov2_cert is None:
+                missing_vaccine_info = True
+            elif have_sars_cov2_doses and p.sars_cov2_doses is None:
+                missing_vaccine_info = True
+            elif have_sars_cov2_after and p.sars_cov2_after is None:
+                missing_vaccine_info = True
+        if missing_vaccine_info:
+            missing_list.append('vaccination status')
 
         if p.remote_participant is None:
             missing_list.append('whether remote or in-person')
@@ -360,6 +373,8 @@ class RegSiteGenerator(SiteGenerator):
         return ''
 
     def missing_person_details_text(self, people, consent_forms_date,
+                                    have_sars_cov2_cert, have_sars_cov2_doses,
+                                    have_sars_cov2_after,
                                     have_consent_ui, show_country):
         """Return a table of missing details for people."""
         text = ''
@@ -373,7 +388,10 @@ class RegSiteGenerator(SiteGenerator):
         missing_photo = False
         missing_phone = False
         for p in people:
-            p_needed = self.missing_person_details(p, consent_forms_date)
+            p_needed = self.missing_person_details(p, consent_forms_date,
+                                                   have_sars_cov2_cert,
+                                                   have_sars_cov2_doses,
+                                                   have_sars_cov2_after)
             if p_needed:
                 if 'photo' in p_needed:
                     missing_photo = True
@@ -406,7 +424,9 @@ class RegSiteGenerator(SiteGenerator):
         """Return a form to scale down a person's photo."""
         raise NotImplementedError
 
-    def registration_status_text(self, consent_forms_date, have_consent_ui,
+    def registration_status_text(self, consent_forms_date, have_sars_cov2_cert,
+                                 have_sars_cov2_doses, have_sars_cov2_after,
+                                 have_consent_ui,
                                  max_photo_size, nonce):
         """Return the text of the registration status page."""
         e = self.event
@@ -425,6 +445,9 @@ class RegSiteGenerator(SiteGenerator):
 
         text += self.missing_person_details_text(normal_people,
                                                  consent_forms_date,
+                                                 have_sars_cov2_cert,
+                                                 have_sars_cov2_doses,
+                                                 have_sars_cov2_after,
                                                  have_consent_ui, True)
 
         text += '<h2>Action needed by the organisers</h2>\n'
@@ -438,6 +461,9 @@ class RegSiteGenerator(SiteGenerator):
                  ' staff have been registered.</p>\n')
 
         text += self.missing_person_details_text(staff, consent_forms_date,
+                                                 have_sars_cov2_cert,
+                                                 have_sars_cov2_doses,
+                                                 have_sars_cov2_after,
                                                  have_consent_ui, False)
 
         head_row_list = [self.html_tr_th_list(['Country', 'Person', 'Role'])]
@@ -501,6 +527,9 @@ class RegSiteGenerator(SiteGenerator):
         return text
 
     def registration_status_country_text(self, country, consent_forms_date,
+                                         have_sars_cov2_cert,
+                                         have_sars_cov2_doses,
+                                         have_sars_cov2_after,
                                          have_consent_ui):
         """Return the text of the registration status page for one country."""
         people = sorted(country.person_list, key=lambda x: x.sort_key)
@@ -509,6 +538,9 @@ class RegSiteGenerator(SiteGenerator):
         text += self.missing_country_details_text(country)
 
         text += self.missing_person_details_text(people, consent_forms_date,
+                                                 have_sars_cov2_cert,
+                                                 have_sars_cov2_doses,
+                                                 have_sars_cov2_after,
                                                  have_consent_ui, False)
 
         return text

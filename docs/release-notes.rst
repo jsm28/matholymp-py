@@ -71,6 +71,13 @@ Next version (unreleased)
 * The Roundup patches have been updated for Roundup 2.1.0, as has the
   example :file:`config.ini`.
 
+* The registration system now supports collecting information about
+  SARS-CoV-2 vaccination status for in-person participants.  There are
+  new variables ``matholymp_sars_cov2_cert``,
+  ``matholymp_sars_cov2_doses`` and ``matholymp_sars_cov2_after`` in
+  :file:`extensions/config.ini`, and :file:`person.item.html` is
+  changed accordingly.
+
 Version 2020.07.0 (22 July 2020)
 --------------------------------
 

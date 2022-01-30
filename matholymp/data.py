@@ -1578,6 +1578,27 @@ class PersonEvent:
         event.
         """)
 
+    sars_cov2_cert = _PersonEventPropertyDS(
+        'sars_cov2_cert',
+        """
+        Whether this person has a SARS-CoV-2 vaccine certificate of
+        the appropriate form for this event.
+        """)
+
+    sars_cov2_doses = _PersonEventPropertyDS(
+        'sars_cov2_doses',
+        """
+        The number of doses of SARS-CoV-2 vaccine this person has had
+        for this event.
+        """)
+
+    sars_cov2_after = _PersonEventPropertyDS(
+        'sars_cov2_after',
+        """
+        Whether this person has had a SARS-CoV-2 vaccine dose after
+        the threshold date for this event.
+        """)
+
     room_type = _PersonEventPropertyDS(
         'room_type',
         """The requested room type of this person at this event.""")

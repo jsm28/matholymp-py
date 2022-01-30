@@ -56,7 +56,10 @@ __all__ = ['get_config_var', 'get_config_var_bool', 'get_config_var_int',
            'get_initial_room_types', 'get_initial_room_types_non_contestant',
            'get_initial_room_types_contestant', 'get_contestant_genders',
            'get_invitation_letter_email', 'get_static_site_path',
-           'get_docgen_path']
+           'get_docgen_path', 'get_sars_cov2_cert_html',
+           'get_sars_cov2_cert_bool', 'get_sars_cov2_doses_html',
+           'get_sars_cov2_doses_bool', 'get_sars_cov2_after_html',
+           'get_sars_cov2_after_bool', 'have_vaccine_status']
 
 
 def get_config_var(db, name):
@@ -333,3 +336,49 @@ def get_static_site_path(db):
 def get_docgen_path(db):
     """Return the path to the document generation directory, or None."""
     return get_config_var_path(db, 'MATHOLYMP_DOCGEN_DIRECTORY')
+
+
+def get_sars_cov2_cert_html(db):
+    """
+    Return the HTML text of the question to ask about SARS-CoV-2
+    vaccine certificate status.
+    """
+    return get_config_var(db, 'MATHOLYMP_SARS_COV2_CERT')
+
+
+def get_sars_cov2_cert_bool(db):
+    """Return whether to ask about SARS-CoV-2 vaccine certificate status."""
+    return bool(get_sars_cov2_cert_html(db))
+
+
+def get_sars_cov2_doses_html(db):
+    """Return the HTML text of the question to ask about SARS-CoV-2 doses."""
+    return get_config_var(db, 'MATHOLYMP_SARS_COV2_DOSES')
+
+
+def get_sars_cov2_doses_bool(db):
+    """Return whether to ask about SARS-CoV-2 vaccine doses."""
+    return bool(get_sars_cov2_doses_html(db))
+
+
+def get_sars_cov2_after_html(db):
+    """
+    Return the HTML text of the question to ask about SARS-CoV-2
+    vaccine doses on or after a threshold date.
+    """
+    return get_config_var(db, 'MATHOLYMP_SARS_COV2_AFTER')
+
+
+def get_sars_cov2_after_bool(db):
+    """
+    Return whether to ask about SARS-CoV-2 vaccine doses on or after a
+    threshold date.
+    """
+    return bool(get_sars_cov2_after_html(db))
+
+
+def have_vaccine_status(db):
+    """Return whether collecting any vaccine status information."""
+    return (get_sars_cov2_cert_bool(db)
+            or get_sars_cov2_doses_bool(db)
+            or get_sars_cov2_after_bool(db))
