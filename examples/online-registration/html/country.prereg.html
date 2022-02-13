@@ -93,10 +93,10 @@ define="edit_ok context/is_edit_ok"
  <tr tal:define="name string:participation_type; label string:Participation type; value context/participation_type; edit_ok edit_ok">
   <th metal:use-macro="th_label">Participation type</th>
   <tal:if condition="context/id">
-   <td tal:content="structure python:utils.country_participation_type_select(context.participation_type.plain())"></td>
+   <td tal:content="structure python:utils.country_participation_type_select(db._db, context.participation_type.plain())"></td>
   </tal:if>
   <tal:if condition="not:context/id">
-   <td tal:content="structure python:utils.country_participation_type_select('')"></td>
+   <td tal:content="structure python:utils.country_participation_type_select(db._db, '')"></td>
   </tal:if>
  </tr>
 

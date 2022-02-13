@@ -63,7 +63,11 @@ Next version (unreleased)
   attend in person and others take part remotely.
   ``matholymp_event_type`` is set to ``hybrid`` for such an event.
   :file:`country.item.html`, :file:`country.prereg.html` and
-  :file:`person.item.html` are changed accordingly.
+  :file:`person.item.html` are changed accordingly.  An additional
+  variable ``matholymp_hybrid_countries`` must be specified to say
+  whether non-administrative registration accounts can register their
+  own country as having participants split between in-person and
+  remote participation.
 
 * The static site now describes virtual events as "organised by" not
   "in" their host countries.

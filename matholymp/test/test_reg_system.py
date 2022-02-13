@@ -3533,6 +3533,103 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv,
                          [expected_abc_admin, expected_staff_admin])
 
+    @_with_config(event_type='hybrid', hybrid_countries='No')
+    def test_country_edit_audit_errors_prereg_hybrid_disallow(self):
+        """
+        Test errors from country edit auditor, preregistration hybrid
+        event case, individual countries restricted from being hybrid.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        expected_staff = {'XMO Number': '2', 'Country Number': '1',
+                          'Annual URL': self.instance.url + 'country1',
+                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
+                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        expected_abc = {'XMO Number': '2', 'Country Number': '3',
+                        'Annual URL': self.instance.url + 'country3',
+                        'Code': 'ABC', 'Name': 'Test First Country',
+                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        self.assertEqual(anon_csv,
+                         [expected_abc, expected_staff])
+        expected_abc_admin = expected_abc.copy()
+        expected_abc_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '1',
+             'Expected Deputies': '1',
+             'Expected Contestants': '6',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'No',
+             'Leader Email': '',
+             'Physical Address': '',
+             'Participation Type': ''})
+        expected_staff_admin = expected_staff.copy()
+        expected_staff_admin.update(
+            {'Contact Emails': '',
+             'Expected Leaders': '0',
+             'Expected Deputies': '0',
+             'Expected Contestants': '0',
+             'Expected Observers with Leader': '0',
+             'Expected Observers with Deputy': '0',
+             'Expected Observers with Contestants': '0',
+             'Expected Single Rooms': '0',
+             'Expected Numbers Confirmed': 'Yes',
+             'Leader Email': '',
+             'Physical Address': '',
+             'Participation Type': ''})
+        self.assertEqual(admin_csv,
+                         [expected_abc_admin, expected_staff_admin])
+        reg_session.check_open_relative('country3?@template=prereg')
+        reg_session.select_main_form()
+        form = reg_session.b.get_current_form().form
+        select = form.find('select', attrs={'name': 'participation_type'})
+        new_option = reg_session.b.get_current_page().new_tag(
+            'option', value='hybrid')
+        new_option.string = 'hybrid'
+        select.append(new_option)
+        reg_session.set({'participation_type': 'hybrid'})
+        reg_session.check_submit_selected(error='invalid participation type')
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        self.assertEqual(anon_csv,
+                         [expected_abc, expected_staff])
+        self.assertEqual(admin_csv,
+                         [expected_abc_admin, expected_staff_admin])
+        # Administrative accounts can still set hybrid participation.
+        admin_session.edit_prereg('3',
+                                  {'participation_type':
+                                   'Some participants present in person, '
+                                   'some remote'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        expected_abc_admin.update(
+            {'Expected Numbers Confirmed': 'Yes',
+             'Participation Type': 'hybrid'})
+        self.assertEqual(anon_csv,
+                         [expected_abc, expected_staff])
+        self.assertEqual(admin_csv,
+                         [expected_abc_admin, expected_staff_admin])
+        # Registering accounts can still make other edits in this state.
+        reg_session.edit_prereg('3',
+                                {'expected_contestants': '3',
+                                 'participation_type':
+                                 'Some participants present in person, '
+                                 'some remote'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        expected_abc_admin.update(
+            {'Expected Contestants': '3'})
+        self.assertEqual(anon_csv,
+                         [expected_abc, expected_staff])
+        self.assertEqual(admin_csv,
+                         [expected_abc_admin, expected_staff_admin])
+
     def test_country_no_participants_access(self):
         """
         Test access to no-participants countries.
@@ -3793,6 +3890,19 @@ class RegSystemTestCase(unittest.TestCase):
              'Participation Type': 'in-person',
              'Leader Email': 'gets-papers@example.invalid',
              'Physical Address': 'Some Address\nCountry'})
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # By default, a country can be registered as hybrid.
+        reg_session.edit_prereg('3',
+                                {'participation_type':
+                                 'Some participants present in person, '
+                                 'some remote'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc_admin.update(
+            {'Participation Type': 'hybrid'})
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])

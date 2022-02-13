@@ -52,8 +52,9 @@ __all__ = ['get_config_var', 'get_config_var_bool', 'get_config_var_int',
            'invitation_letter_register', 'badge_use_background',
            'honourable_mentions_available', 'event_type', 'is_virtual_event',
            'is_hybrid_event', 'have_remote_participation',
-           'get_initial_languages', 'get_extra_admin_roles_secondaryok',
-           'get_initial_room_types', 'get_initial_room_types_non_contestant',
+           'allow_hybrid_countries', 'get_initial_languages',
+           'get_extra_admin_roles_secondaryok', 'get_initial_room_types',
+           'get_initial_room_types_non_contestant',
            'get_initial_room_types_contestant', 'get_contestant_genders',
            'get_invitation_letter_email', 'get_static_site_path',
            'get_docgen_path', 'get_sars_cov2_cert_html',
@@ -285,6 +286,15 @@ def is_hybrid_event(db):
 def have_remote_participation(db):
     """Return whether this event has at least some remote participation."""
     return event_type(db) in ('virtual', 'hybrid')
+
+
+def allow_hybrid_countries(db):
+    """
+    Return whether countries may register themselves as having some
+    participants in person and some remote.
+    """
+    return is_hybrid_event(db) and get_config_var_bool(
+        db, 'MATHOLYMP_HYBRID_COUNTRIES')
 
 
 def get_initial_languages(db):

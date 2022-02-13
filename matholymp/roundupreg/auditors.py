@@ -233,6 +233,10 @@ def audit_country_fields(db, cl, nodeid, newvalues):
         if newvalues['participation_type'] not in ('in-person', 'hybrid',
                                                    'virtual'):
             raise ValueError('invalid participation type')
+        if (newvalues['participation_type'] == 'hybrid'
+            and not db.security.hasPermission(
+                'RegisterHybridCountry', userid)):
+            raise ValueError('invalid participation type')
 
     if 'flag' in newvalues:
         file_id = newvalues['flag']

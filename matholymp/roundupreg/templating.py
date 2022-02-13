@@ -403,14 +403,16 @@ def score_country_select(db):
     return string_select('country', None, country_list, None)
 
 
-def country_participation_type_select(selected):
+def country_participation_type_select(db, selected):
     """Return form content for selecting participation type for a country."""
+    entry_list = [('in-person', 'All participants present in person'),
+                  ('virtual', 'All participants remote')]
+    if (selected == 'hybrid'
+        or db.security.hasPermission('RegisterHybridCountry', db.getuid())):
+        entry_list.append(('hybrid',
+                           'Some participants present in person, some remote'))
     return string_select(
-        'participation_type', '(unknown)',
-        (('in-person', 'All participants present in person'),
-         ('virtual', 'All participants remote'),
-         ('hybrid', 'Some participants present in person, some remote')),
-        selected)
+        'participation_type', '(unknown)', entry_list, selected)
 
 
 def person_participation_type_select(selected):

@@ -38,6 +38,8 @@ would be useful for the software.  I haven't kept good records of
 everyone who has helped in such ways; they include, but are not
 limited to:
 
+* Ágnes Backhausz
+
 * Alessandra Caraceni
 
 * James Cranch

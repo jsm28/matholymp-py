@@ -57,8 +57,9 @@
 from matholymp.roundupreg.config import distinguish_official, \
     have_consent_forms, have_consent_ui, have_passport_numbers, \
     have_nationality, get_language_numbers, invitation_letter_register, \
-    is_virtual_event, have_remote_participation, get_sars_cov2_cert_bool, \
-    get_sars_cov2_doses_bool, get_sars_cov2_after_bool, have_vaccine_status
+    is_virtual_event, have_remote_participation, allow_hybrid_countries, \
+    get_sars_cov2_cert_bool, get_sars_cov2_doses_bool, \
+    get_sars_cov2_after_bool, have_vaccine_status
 
 __all__ = ['init_schema']
 
@@ -661,6 +662,13 @@ def init_schema(env):
     # own permission.
     p = db.security.addPermission(name='EditRooms')
     db.security.addPermissionToRole('Admin', p)
+
+    # Permission to register an individual country for hybrid
+    # participation.
+    p = db.security.addPermission(name='RegisterHybridCountry')
+    db.security.addPermissionToRole('Admin', p)
+    if allow_hybrid_countries(db):
+        db.security.addPermissionToRole('Register', p)
 
     # Downloading full person data has its own Permission.
     p = db.security.addPermission(name='Omnivident')
