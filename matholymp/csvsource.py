@@ -308,7 +308,7 @@ class CSVDataSource(DataSource):
                 return int(s)
         if name in CSVDataSource._person_event_attr_map_bool_none:
             k = CSVDataSource._person_event_attr_map_bool_none[name]
-            s = self._people[event_id][person_id][k]
+            s = self._people[event_id][person_id][country_id][k]
             if s == '':
                 return None
             else:

@@ -72,7 +72,8 @@ from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.roundupsource import RoundupDataSource
 from matholymp.roundupreg.rounduputil import scores_from_str, \
     person_is_contestant, contestant_code, scores_final, \
-    valid_country_problem, valid_int_str, create_rss, country_from_code
+    valid_country_problem, valid_int_str, create_rss, country_from_code, \
+    person_is_remote
 from matholymp.roundupreg.userauditor import valid_address
 
 
@@ -572,7 +573,8 @@ class NameBadgeAction(DocumentGenerateAction):
 
     def document_list(self, event):
         return ['badge-person%d.pdf' % p.person.id
-                for p in sorted(event.person_list, key=lambda x: x.sort_key)]
+                for p in sorted(event.person_list, key=lambda x: x.sort_key)
+                if not p.remote_participant]
 
     def zip_filename(self):
         return 'badges.zip'
@@ -595,7 +597,9 @@ class InvitationLetterAction(DocumentGenerateAction):
             self.nodeid if self.nodeid is not None else 'all')
         if self.nodeid is None:
             for nodeid in self.db.person.list():
-                self.db.person.set(nodeid, invitation_letter_generated=True)
+                if not person_is_remote(self.db, nodeid):
+                    self.db.person.set(nodeid,
+                                       invitation_letter_generated=True)
         else:
             self.db.person.set(self.nodeid, invitation_letter_generated=True)
         self.db.commit()
@@ -605,7 +609,8 @@ class InvitationLetterAction(DocumentGenerateAction):
 
     def document_list(self, event):
         return ['invitation-letter-person%d.pdf' % p.person.id
-                for p in sorted(event.person_list, key=lambda x: x.sort_key)]
+                for p in sorted(event.person_list, key=lambda x: x.sort_key)
+                if not p.remote_participant]
 
     def zip_filename(self):
         return 'invitation-letters.zip'

@@ -67,7 +67,10 @@ Next version (unreleased)
   variable ``matholymp_hybrid_countries`` must be specified to say
   whether non-administrative registration accounts can register their
   own country as having participants split between in-person and
-  remote participation.
+  remote participation.  Generation of name badges, invitation letters
+  or labels for contestant desks, whether from the command line or
+  through the registration system, automatically excludes remote
+  participants.
 
 * The static site now describes virtual events as "organised by" not
   "in" their host countries.

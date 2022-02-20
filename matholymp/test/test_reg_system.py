@@ -13511,6 +13511,54 @@ class RegSystemTestCase(unittest.TestCase):
             b'%PDF-'))
         zip_zip.close()
 
+    @_with_config(docgen_directory='docgen', badge_use_background='No',
+                  event_type='hybrid')
+    def test_person_name_badge_zip_hybrid(self):
+        """
+        Test online name badge zip creation for hybrid event.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Coordinator',
+            {'participation_type': 'Present in person'})
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Problem Selection',
+            {'participation_type': 'Participating remotely'})
+        admin_session.check_open_relative('person')
+        admin_session.select_main_form()
+        zip_response = admin_session.check_submit_selected(html=False)
+        self.assertEqual(zip_response.headers['content-type'],
+                         'application/zip')
+        self.assertEqual(zip_response.headers['content-disposition'],
+                         'attachment; filename=badges.zip')
+        zip_io = io.BytesIO(zip_response.content)
+        with zipfile.ZipFile(zip_io, 'r') as zip_zip:
+            zip_contents = [f.filename for f in zip_zip.infolist()]
+            expected_contents = ['badges/badge-person1.pdf']
+            self.assertEqual(zip_contents, expected_contents)
+            self.assertTrue(zip_zip.read(
+                'badges/badge-person1.pdf').startswith(b'%PDF-'))
+        # Unknown participation type treated as in person.
+        admin_session.edit('person', '2',
+                           {'participation_type': '(unknown)'})
+        admin_session.check_open_relative('person')
+        admin_session.select_main_form()
+        zip_response = admin_session.check_submit_selected(html=False)
+        self.assertEqual(zip_response.headers['content-type'],
+                         'application/zip')
+        self.assertEqual(zip_response.headers['content-disposition'],
+                         'attachment; filename=badges.zip')
+        zip_io = io.BytesIO(zip_response.content)
+        with zipfile.ZipFile(zip_io, 'r') as zip_zip:
+            zip_contents = [f.filename for f in zip_zip.infolist()]
+            expected_contents = ['badges/badge-person1.pdf',
+                                 'badges/badge-person2.pdf']
+            self.assertEqual(zip_contents, expected_contents)
+            self.assertTrue(zip_zip.read(
+                'badges/badge-person1.pdf').startswith(b'%PDF-'))
+            self.assertTrue(zip_zip.read(
+                'badges/badge-person2.pdf').startswith(b'%PDF-'))
+
     @_with_config(docgen_directory='docgen')
     def test_person_name_badge_zip_errors(self):
         """
@@ -13798,6 +13846,63 @@ class RegSystemTestCase(unittest.TestCase):
                            mail=True)
         admin_session.edit('person', '1',
                            {'date_of_birth_day': '2'},
+                           mail=True)
+
+    @_with_config(docgen_directory='docgen', require_passport_number='Yes',
+                  require_nationality='Yes', event_type='hybrid')
+    def test_person_invitation_letter_zip_hybrid(self):
+        """
+        Test online invitation letter zip creation for hybrid event.
+        """
+        admin_session = self.get_session('admin')
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Coordinator',
+            {'passport_number': '123454321',
+             'nationality': 'Matholympian',
+             'participation_type': 'Present in person'})
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Problem Selection',
+            {'passport_number': '543212345',
+             'nationality': 'Matholympian',
+             'participation_type': 'Participating remotely'})
+        admin_session.create_person(
+            'XMO 2015 Staff', 'Staff',
+            {'passport_number': '76543',
+             'nationality': 'Matholympian'})
+        admin_session.check_open_relative('person')
+        admin_session.b.select_form(
+            admin_session.get_main().find_all('form')[1])
+        zip_response = admin_session.check_submit_selected(html=False)
+        self.assertEqual(zip_response.headers['content-type'],
+                         'application/zip')
+        self.assertEqual(zip_response.headers['content-disposition'],
+                         'attachment; filename=invitation-letters.zip')
+        zip_io = io.BytesIO(zip_response.content)
+        with zipfile.ZipFile(zip_io, 'r') as zip_zip:
+            zip_contents = [f.filename for f in zip_zip.infolist()]
+            expected_contents = [
+                'invitation-letters/invitation-letter-person1.pdf',
+                'invitation-letters/invitation-letter-person3.pdf']
+            self.assertEqual(zip_contents, expected_contents)
+            self.assertTrue(zip_zip.read(
+                'invitation-letters/invitation-letter-person1.pdf').startswith(
+                    b'%PDF-'))
+            self.assertTrue(zip_zip.read(
+                'invitation-letters/invitation-letter-person3.pdf').startswith(
+                    b'%PDF-'))
+        # Changing relevant details after an invitation letter was
+        # generated results in an email being sent; changing
+        # details for a remote participant does not.
+        admin_session.edit('person', '1',
+                           {'given_name': 'Changed Given'},
+                           mail=True)
+        self.assertIn(
+            b'TO: admin@example.invalid, webmaster@example.invalid\n',
+            admin_session.last_mail_bin)
+        admin_session.edit('person', '2',
+                           {'given_name': 'Changed Given'})
+        admin_session.edit('person', '3',
+                           {'given_name': 'Changed Given'},
                            mail=True)
 
     @_with_config(docgen_directory='docgen')

@@ -411,7 +411,8 @@ class DocumentGenerator:
         """Generate all badges requested by the command line."""
         if person_id == 'all':
             for p in self._event.person_list:
-                self.generate_badge(p, use_background)
+                if not p.remote_participant:
+                    self.generate_badge(p, use_background)
         else:
             p = self.get_person_by_id(person_id)
             self.generate_badge(p, use_background)
@@ -433,7 +434,8 @@ class DocumentGenerator:
         """Generate all invitation letters requested by the command line."""
         if person_id == 'all':
             for p in self._event.person_list:
-                self.generate_invitation_letter(p)
+                if not p.remote_participant:
+                    self.generate_invitation_letter(p)
         else:
             p = self.get_person_by_id(person_id)
             self.generate_invitation_letter(p)
@@ -450,6 +452,7 @@ class DocumentGenerator:
                     self._event.contestant_list,
                     key=lambda x: exam_order[x.contestant_code])
             output_file_base = 'desk-labels'
+            contestants = [c for c in contestants if not c.remote_participant]
         else:
             p = self.get_contestant_by_id(person_id)
             contestants = [p]

@@ -97,7 +97,8 @@ contestant code in place of ``all``.
 Name badges
 ^^^^^^^^^^^
 
-To generate all name badges::
+To generate all name badges (for participants who are, or might be,
+attending in person)::
 
    mo-document-generate --background badge all
 
@@ -121,7 +122,8 @@ To generate an invitation letter for a given person::
 
    mo-document-generate invitation-letter *number*
 
-To generate invitation letters for all participants:
+To generate invitation letters for all participants (who are, or might
+be, attending in person):
 
    mo-document-generate invitation-letter all
 
@@ -137,7 +139,8 @@ you can change the template to print them in some other way)::
 This prints labels in a default order (all Contestants 1, then all
 Contestants 2, and so on).  The :samp:`--exam-order {file}` option may
 be used to specify a text file listing contestant codes if a different
-order is required.
+order is required.  Labels are only generated for contestants who are,
+or might be, attending in person.
 
 Checklist of languages
 ^^^^^^^^^^^^^^^^^^^^^^
