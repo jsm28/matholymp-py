@@ -46,7 +46,7 @@ __all__ = ['scores_from_str', 'person_date_of_birth', 'contestant_age',
            'scores_final', 'any_scores_missing', 'country_has_contestants',
            'valid_country_problem', 'valid_int_str', 'create_rss',
            'db_file_format_contents', 'db_file_extension', 'db_file_url',
-           'country_from_code', 'person_is_remote']
+           'country_from_code', 'person_is_remote', 'registration_enabled']
 
 
 def scores_from_str(db, score_str):
@@ -256,3 +256,13 @@ def person_is_remote(db, person, override=None):
         return True
     else:
         return None
+
+
+def registration_enabled(db, userid):
+    """
+    Determine whether registration is enabled for a given user.  The
+    result is only of significance for a user with some kind of
+    registration permissions.
+    """
+    return (db.security.hasPermission('RegisterAnyTime', userid)
+            or db.event.get('1', 'registration_enabled'))

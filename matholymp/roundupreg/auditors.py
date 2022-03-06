@@ -53,7 +53,7 @@ from matholymp.roundupreg.config import have_consent_forms, \
 from matholymp.roundupreg.roundupemail import send_email
 from matholymp.roundupreg.rounduputil import any_scores_missing, \
     valid_int_str, create_rss, db_file_format_contents, db_file_extension, \
-    person_is_remote
+    person_is_remote, registration_enabled
 from matholymp.roundupreg.staticsite import static_site_event_group, \
     static_site_file_data
 from matholymp.roundupreg.userauditor import valid_address, audit_user_fields
@@ -368,8 +368,7 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         and not db.security.hasPermission('RegisterAllCountries', userid)):
         raise ValueError('Person must be from your country')
 
-    if (not db.security.hasPermission('RegisterAnyTime', userid)
-        and not db.event.get('1', 'registration_enabled')):
+    if not registration_enabled(db, userid):
         if db.event.get('1', 'preregistration_enabled'):
             raise ValueError('Registration has not yet opened')
         else:

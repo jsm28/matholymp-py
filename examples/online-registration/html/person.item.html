@@ -43,18 +43,14 @@ define="edit_ok context/is_edit_ok"
 <div tal:condition="context/is_view_ok">
 
 <p tal:condition="python:context.is_edit_ok() and
-		  not request.user.hasPermission('RegisterAnyTime')
-		  and not db._db.event.get('1',
-		  'registration_enabled')
+		  not utils.registration_enabled(db._db, request.user.id)
 		  and not db._db.event.get('1',
 		  'preregistration_enabled')">Registration is now
 		  disabled, please contact the event organisers to change
 		  details of registered participants.</p>
 
 <p tal:condition="python:context.is_edit_ok() and
-		  not request.user.hasPermission('RegisterAnyTime')
-		  and not db._db.event.get('1',
-		  'registration_enabled')
+		  not utils.registration_enabled(db._db, request.user.id)
 		  and db._db.event.get('1',
 		  'preregistration_enabled')">Registration has not yet
 		  opened.</p>

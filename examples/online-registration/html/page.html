@@ -91,8 +91,7 @@ columns string:id;
 		      request.user.hasPermission('RegisterAllCountries')
 		      and not (db._db.event.get('1',
 		      'preregistration_enabled') and not
-		      request.user.hasPermission('RegisterAnyTime')
-		      and not db._db.event.get('1', 'registration_enabled'))">
+		      utils.registration_enabled(db._db, request.user.id))">
     <a tal:attributes="href python:'person?@template=item&country=' +
 		       request.user.country.id">Register new participant</a>
    </li>

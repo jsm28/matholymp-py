@@ -87,6 +87,9 @@ Next version (unreleased)
   :file:`extensions/config.ini`, and :file:`person.item.html` is
   changed accordingly.
 
+* As part of changes to how enabling and disabling registration are
+  handled, :file:`page.html` and :file:`person.item.html` are changed.
+
 Version 2020.07.0 (22 July 2020)
 --------------------------------
 
