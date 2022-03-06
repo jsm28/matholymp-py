@@ -70,7 +70,9 @@ Next version (unreleased)
   remote participation.  Generation of name badges, invitation letters
   or labels for contestant desks, whether from the command line or
   through the registration system, automatically excludes remote
-  participants.
+  participants.  When generating papers, single files may be generated
+  for in-person participants only, and split files may be generated
+  for remote participants only.
 
 * The static site now describes virtual events as "organised by" not
   "in" their host countries.

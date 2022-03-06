@@ -659,8 +659,15 @@ class DocumentGenerator:
             lang_filenames[lang_to_filename(lang)] = lang
 
         new_drafts_only = False
-        if person_id in ('all', 'all-split'):
+        if person_id in ('all', 'all-in-person', 'all-split',
+                         'all-split-remote'):
             contestants = self._event.contestant_list
+            if person_id == 'all-split-remote':
+                contestants = [c for c in contestants
+                               if c.remote_participant is not False]
+            elif person_id == 'all-in-person':
+                contestants = [c for c in contestants
+                               if not c.remote_participant]
             if exam_order is None:
                 contestants = sorted(contestants,
                                      key=lambda x: x.sort_key_exams)
@@ -670,7 +677,7 @@ class DocumentGenerator:
                     key=lambda x: exam_order[x.contestant_code])
             languages = []
             output_file_base = 'papers' + day_text
-            if person_id == 'all-split':
+            if person_id in ('all-split', 'all-split-remote'):
                 for c in contestants:
                     # Recursing here is the most convenient way to
                     # generate a separate file for each contestant.
@@ -768,12 +775,15 @@ class DocumentGenerator:
             template_fields['papers'] = paper_list_text
             self.subst_and_pdflatex(template_file_base, output_file_base,
                                     template_fields, raw_fields)
-            if person_id == 'all':
+            if person_id in ('all', 'all-in-person'):
                 leader_roles = ('Leader', 'Observer with Leader')
                 for kind in ('leaders', 'deputies'):
                     output_file_base = 'papers-%s%s' % (kind, day_text)
                     country_leader_counts = {}
                     for p in self._event.person_list:
+                        if (person_id == 'all-in-person'
+                            and p.remote_participant):
+                            continue
                         if p.country.code not in country_leader_counts:
                             country_leader_counts[p.country.code] = 0
                         if not p.is_contestant:

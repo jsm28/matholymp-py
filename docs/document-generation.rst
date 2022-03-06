@@ -203,7 +203,11 @@ be used to specify a text file listing contestant codes if a different
 order is required.  To generate papers for individual contestants in
 separate files, a contestant code may be used in place of :samp:`all`;
 use :samp:`all-split` to generate papers for all contestants in
-separate files.
+separate files, or :samp:`all-split-remote` to do so only for
+contestants who are, or may be, remote participants at a hybrid
+event.  To generate a single file for a day's papers, but only for
+participants who are, or may be, participating in person at a hybrid
+event, use :samp:`all-in-person`.
 
 For final papers for the website (if papers are being printed with
 pre-printed backgrounds, use both commands, otherwise just the first
