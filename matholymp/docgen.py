@@ -814,13 +814,22 @@ class DocumentGenerator:
         """Generate a list of languages and the contestants using them."""
 
         all_languages = {}
+        all_languages_part_kind = {}
+        part_kinds = set()
         one_language_contestants = []
         for p in sorted(self._event.contestant_list, key=lambda x: x.sort_key):
             ccode = p.contestant_code
+            if p.remote_participant is None:
+                part_kind = 'unknown'
+            else:
+                part_kind = 'virtual' if p.remote_participant else 'in-person'
+            part_kinds.add(part_kind)
             for lang in p.languages:
                 if lang not in all_languages:
                     all_languages[lang] = []
+                    all_languages_part_kind[lang] = set()
                 all_languages[lang].append(ccode)
+                all_languages_part_kind[lang].add(part_kind)
             if len(p.languages) <= 1:
                 one_language_contestants.append(ccode)
         lang_text_list = []
@@ -830,6 +839,7 @@ class DocumentGenerator:
             days = ['']
         else:
             days = ['-day%d' % (i + 1) for i in range(self._event.num_exams)]
+        part_kind_varies = False
         for lang in sorted(all_languages, key=coll_get_sort_key):
             code_list = ' '.join(all_languages[lang])
             lang_text_list.append(lang + ' ' + code_list)
@@ -850,6 +860,13 @@ class DocumentGenerator:
                 langs_ok.append(lang)
             else:
                 langs_missing.append(lang)
+            if all_languages_part_kind[lang] != part_kinds:
+                part_kind_varies = True
+        if part_kind_varies:
+            langs_ok = ['%s (%s)' % (lang, ', '.join(sorted(
+                all_languages_part_kind[lang]))) for lang in langs_ok]
+            langs_missing = ['%s (%s)' % (lang, ', '.join(sorted(
+                all_languages_part_kind[lang]))) for lang in langs_missing]
         out_text = '\n'.join(lang_text_list) + '\n'
         out_text += ('\nOnly one language: '
                      + ' '.join(one_language_contestants))
