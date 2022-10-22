@@ -33,7 +33,7 @@ countries involved in them, with data provided by a subclass of
 DataSource.
 """
 
-import collections
+import collections.abc
 
 from matholymp.collate import coll_get_sort_key
 from matholymp.stats import mean_std_dev, corr_coeff
@@ -47,7 +47,7 @@ _award_types = ['Gold Medal', 'Silver Medal', 'Bronze Medal',
 _award_types_no_hm = ['Gold Medal', 'Silver Medal', 'Bronze Medal']
 
 
-class _LazyMap(collections.Mapping):
+class _LazyMap(collections.abc.Mapping):
 
     """A mapping where values are created dynamically."""
 
