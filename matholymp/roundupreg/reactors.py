@@ -38,7 +38,7 @@ import roundup.password
 
 from matholymp.fileutil import read_text_from_file
 from matholymp.roundupreg.cache import invalidate_cache
-from matholymp.roundupreg.config import have_consent_forms, get_short_name_year
+from matholymp.roundupreg.config import have_consent_forms, have_id_scans, get_short_name_year
 from matholymp.roundupreg.roundupemail import send_email
 
 
@@ -93,7 +93,7 @@ def country_react(db, cl, nodeid, oldvalues):
 def person_react(db, cl, nodeid, oldvalues):
     """
     Mark the cached scoreboard invalid, and set the person for a
-    person's photo and consent form if required.
+    person's photo, ID scan and consent form if required.
     """
     scoreboard_react(db, cl, nodeid, oldvalues)
     if db.person.is_retired(nodeid):
@@ -109,6 +109,12 @@ def person_react(db, cl, nodeid, oldvalues):
             cf_person = db.consent_form.get(cf_id, 'person')
             if nodeid != cf_person:
                 db.consent_form.set(cf_id, person=nodeid)
+    if have_id_scans(db):
+        sc_id = db.person.get(nodeid, 'id_scan')
+        if sc_id:
+            sc_person = db.id_scan.get(sc_id, 'person')
+            if nodeid != sc_person:
+                db.id_scan.set(sc_id, person=nodeid)
 
 
 def scoreboard_react(db, cl, nodeid, oldvalues):

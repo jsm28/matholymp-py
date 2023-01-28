@@ -2155,6 +2155,7 @@ class SiteGenerator:
                          'Badge Background', 'Badge Outer Colour',
                          'Badge Inner Colour', 'Badge Text Colour',
                          'Consent Form URL',
+                         'ID Scan URL',
                          'Passport or Identity Card Number', 'Nationality',
                          'Passport Given Name', 'Passport Family Name',
                          'Event Photos Consent', 'Remote Participant',
@@ -2272,6 +2273,7 @@ class SiteGenerator:
             csv_out['Badge Inner Colour'] = p.badge_colour_inner or ''
             csv_out['Badge Text Colour'] = p.badge_colour_text or ''
             csv_out['Consent Form URL'] = p.consent_form_url or ''
+            csv_out['ID Scan URL'] = p.id_scan_url or ''
             csv_out['Passport or Identity Card Number'] = (p.passport_number
                                                            or '')
             csv_out['Passport Given Name'] = p.passport_given_name

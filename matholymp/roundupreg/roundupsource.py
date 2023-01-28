@@ -37,7 +37,7 @@ from matholymp.datasource import DataSource
 from matholymp.datetimeutil import date_from_ymd_iso, time_from_hhmm_str
 from matholymp.fileutil import comma_split
 from matholymp.roundupreg.config import distinguish_official, \
-    have_consent_forms, have_consent_ui, have_passport_numbers, \
+    have_consent_forms, have_id_scans, have_consent_ui, have_passport_numbers, \
     have_nationality, get_num_problems, get_marks_per_problem, \
     get_language_numbers, get_short_name, honourable_mentions_available, \
     event_type, have_remote_participation, get_sars_cov2_cert_bool, \
@@ -212,6 +212,21 @@ class RoundupDataSource(DataSource):
                 consent_form_filename = self._db.filename('consent_form',
                                                           consent_form_id)
             return consent_form_filename
+        elif name == 'id_scan_url':
+            if not have_id_scans(self._db):
+                return None
+            id_scan_id = self._db.person.get(person_id, 'id_scan')
+            return db_file_url(self._db, 'id_scan', 'id-scan',
+                               id_scan_id)
+        elif name == 'id_scan_filename':
+            if not have_id_scans(self._db):
+                return None
+            id_scan_id = self._db.person.get(person_id, 'id_scan')
+            id_scan_filename = None
+            if id_scan_id is not None:
+                id_scan_filename = self._db.filename('id_scan',
+                                                          id_scan_id)
+            return id_scan_filename
         elif name == 'event_photos_consent':
             if not have_consent_ui(self._db):
                 return None

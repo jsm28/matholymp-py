@@ -80,6 +80,9 @@ please inform the people you register of this information.
  <tal:block tal:condition="python:utils.have_consent_forms(db._db)">
  a consent form (if needed),
  </tal:block>
+ <tal:block tal:condition="python:utils.have_id_scans(db._db)">
+  an ID scan (if needed),
+ </tal:block> 
  a photo and
  arrival/departure details after initial registration.</td>
 </tr>
@@ -524,6 +527,18 @@ please inform the people you register of this information.
  </tr>
 </tal:block>
 </tal:block>
+</tal:block>
+<tal:block tal:condition="python:utils.have_id_scansdb._db)">
+<tal:block tal:condition="not:context/id">
+ <tr>
+  <th i18n:translate="">Upload ID scan</th>
+  <td colspan=3><input type="file" name="id_scan-1@content" size="20">
+  <input type="hidden" name="@link@id_scan" value="id_scan-1"></td>
+ </tr>
+ <tr>
+  <td colspan="2">ID scans are required for all participants,
+  and should be uploaded as PDF files.
+ </tr>
 </tal:block>
 </tal:block>
 </tal:block>

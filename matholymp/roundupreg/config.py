@@ -42,6 +42,7 @@ __all__ = ['get_config_var', 'get_config_var_bool', 'get_config_var_int',
            'get_config_var_date', 'get_config_var_path',
            'get_config_var_comma_sep', 'distinguish_official',
            'get_consent_forms_date_str', 'get_consent_forms_date',
+           'have_id_scans',
            'have_consent_forms', 'have_consent_ui', 'have_passport_numbers',
            'have_nationality', 'require_diet', 'require_dob',
            'get_num_problems', 'get_marks_per_problem', 'get_num_languages',
@@ -131,6 +132,11 @@ def get_consent_forms_date(db):
 def have_consent_forms(db):
     """Return whether this event has consent forms."""
     return get_consent_forms_date_str(db) != ''
+
+
+def have_id_scans(db):
+    """Return whether this event has ID scans."""
+    return get_config_var_bool(db, 'MATHOLYMP_ID_SCANS')
 
 
 def have_consent_ui(db):

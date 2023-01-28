@@ -1,0 +1,36 @@
+<tal:block metal:use-macro="templates/page/macros/icing">
+<title metal:fill-slot="head_title" i18n:translate=""
+ >List of ID scans - <span tal:replace="config/TRACKER_NAME" i18n:name="tracker" /></title>
+<span metal:fill-slot="body_title" tal:omit-tag="python:1"
+  i18n:translate="">List of ID scans</span>
+<td class="content" metal:fill-slot="content">
+
+<span tal:condition="python:not (context.is_view_ok()
+ or request.user.hasRole('Anonymous'))"
+ i18n:translate="">You are not allowed to view this page.</span>
+
+<span tal:condition="python:not context.is_view_ok()
+ and request.user.hasRole('Anonymous')"
+ i18n:translate="">Please login with your username and password.</span>
+
+<table class="otherinfo" tal:define="batch request/batch" tal:condition="context/is_view_ok">
+ <tr><th style="padding-right: 10" i18n:translate="">Download</th>
+     <th style="padding-right: 10" i18n:translate="">Content Type</th>
+     <th style="padding-right: 10" i18n:translate="">Uploaded By</th>
+     <th style="padding-right: 10" i18n:translate="">Date</th>
+ </tr>
+ <tr tal:repeat="id_scan batch" tal:attributes="class python:['normal', 'alt'][repeat['id_scan'].index%6//3]">
+  <td>
+   <a tal:attributes="href string:id_scan${id_scan/id}/${id_scan/name}"
+      tal:content="id_scan/name">dld link</a>
+  </td>
+  <td tal:content="id_scan/type">content type</td>
+  <td tal:content="id_scan/creator">creator's name</td>
+  <td tal:content="id_scan/creation">creation date</td>
+ </tr>
+
+</table>
+
+</td>
+
+</tal:block>

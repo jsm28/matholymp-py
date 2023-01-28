@@ -32,7 +32,7 @@
 __all__ = ['ScoreAction', 'RetireCountryAction', 'ScalePhotoAction',
            'CountryCSVAction', 'ScoresCSVAction', 'PeopleCSVAction',
            'MedalBoundariesCSVAction', 'FlagsZIPAction', 'PhotosZIPAction',
-           'ConsentFormsZIPAction', 'FlagThumbAction', 'PhotoThumbAction',
+           'ConsentFormsZIPAction', 'IDScanZIPAction', 'FlagThumbAction', 'PhotoThumbAction',
            'ScoresRSSAction', 'DocumentGenerateAction', 'NameBadgeAction',
            'InvitationLetterAction', 'BulkRegisterAction',
            'CountryBulkRegisterAction', 'PersonBulkRegisterAction',
@@ -337,6 +337,24 @@ class ConsentFormsZIPAction(Action):
         self.client.setHeader('Content-Disposition',
                               'attachment; filename=consent-forms.zip')
         return RoundupSiteGenerator(self.db).consent_forms_zip_bytes()
+
+class IDScansZIPAction(Action):
+
+    """Action to return a ZIP file of ID scans."""
+
+    def handle(self):
+        """Output a ZIP file of ID scans of registered participants."""
+        if self.classname != 'person':
+            raise ValueError('This action only applies to people')
+        if self.nodeid is not None:
+            raise ValueError('Node id specified for ZIP generation')
+        if not self.hasPermission('Omnivident'):
+            raise Unauthorised('You do not have permission to access '
+                               'ID scans')
+        self.client.setHeader('Content-Type', 'application/zip')
+        self.client.setHeader('Content-Disposition',
+                              'attachment; filename=id-scans.zip')
+        return RoundupSiteGenerator(self.db).id_scans_zip_bytes()
 
 
 class FlagThumbAction(Action):
@@ -1003,6 +1021,7 @@ def register_actions(instance):
     instance.registerAction('flags_zip', FlagsZIPAction)
     instance.registerAction('photos_zip', PhotosZIPAction)
     instance.registerAction('consent_forms_zip', ConsentFormsZIPAction)
+    instance.registerAction('id_scans_zip', IDScansZIPAction)
     instance.registerAction('flag_thumb', FlagThumbAction)
     instance.registerAction('photo_thumb', PhotoThumbAction)
     instance.registerAction('scores_rss', ScoresRSSAction)

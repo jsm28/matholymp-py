@@ -1567,6 +1567,17 @@ class PersonEvent:
         event.
         """)
 
+    id_scan_url = _PersonEventPropertyDS(
+        'id_scan_url',
+        """The URL of the ID scan of this person at this event.""")
+
+    id_scan_filename = _PersonEventPropertyDS(
+        'id_scan_filename',
+        """
+        The local filename of the ID scan of this person at this
+        event.
+        """)
+
     languages = _PersonEventPropertyDS(
         'languages',
         """The languages of this person at this event.""")

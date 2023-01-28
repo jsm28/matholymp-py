@@ -66,7 +66,7 @@ from matholymp.roundupreg.bulkreg import bulk_csv_delimiter, bulk_csv_data, \
     bulk_csv_person_number_url
 from matholymp.roundupreg.cache import cached_text
 from matholymp.roundupreg.config import distinguish_official, \
-    get_consent_forms_date, have_consent_forms, have_consent_ui, \
+    get_consent_forms_date, have_consent_forms, have_id_scans, have_consent_ui, \
     have_passport_numbers, have_nationality, require_diet, require_dob, \
     get_language_numbers, get_earliest_date_of_birth, \
     get_sanity_date_of_birth, get_arrdep_bounds, is_virtual_event, \
@@ -271,6 +271,7 @@ def registration_status(db, nonce):
     consent_forms_date = get_consent_forms_date(db)
     max_photo_size = int(db.config.ext['MATHOLYMP_PHOTO_MAX_SIZE'])
     return sitegen.registration_status_text(consent_forms_date,
+                                            have_id_scans(db),
                                             get_sars_cov2_cert_bool(db),
                                             get_sars_cov2_doses_bool(db),
                                             get_sars_cov2_after_bool(db),
@@ -286,7 +287,7 @@ def registration_status_country(db, country):
     consent_forms_date = get_consent_forms_date(db)
     c = sitegen.event.country_map[int(country)]
     return sitegen.registration_status_country_text(
-        c, consent_forms_date, get_sars_cov2_cert_bool(db),
+        c, consent_forms_date, have_id_scans(db), get_sars_cov2_cert_bool(db),
         get_sars_cov2_doses_bool(db), get_sars_cov2_after_bool(db),
         have_consent_ui(db))
 
@@ -689,6 +690,7 @@ def register_templating_utils(instance):
     """Register functions for use from page templates with Roundup."""
     instance.registerUtil('distinguish_official', distinguish_official)
     instance.registerUtil('have_consent_forms', have_consent_forms)
+    instance.registerUtil('have_id_scans', have_id_scans)
     instance.registerUtil('have_consent_ui', have_consent_ui)
     instance.registerUtil('have_passport_numbers', have_passport_numbers)
     instance.registerUtil('have_nationality', have_nationality)

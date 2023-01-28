@@ -164,6 +164,30 @@ class RegSiteGenerator(SiteGenerator):
         output.close()
         return zip_bytes
 
+    def id_scans_zip_bytes(self):
+        """Return the byte contents of the ZIP of id_scans."""
+        output = io.BytesIO()
+        with zipfile.ZipFile(output, 'w', zipfile.ZIP_STORED) as zip_file:
+            zip_file.writestr('id-scans/README.txt',
+                              'The ID scans in this file are arranged by'
+                              ' internal database identifier\nfor the'
+                              ' person.\n')
+
+            e = self.event
+            person_list = sorted(e.person_list, key=lambda x: x.sort_key)
+            for p in person_list:
+                url = p.id_scan_url
+                if url is not None:
+                    ext = file_extension(url)
+                    filename = p.id_scan_filename
+                    zip_filename = ('id-scans/person%d/id-scan.%s'
+                                    % (p.person.id, ext))
+                    zip_file.write(filename, zip_filename)
+
+        zip_bytes = output.getvalue()
+        output.close()
+        return zip_bytes
+
     def display_scoreboard_text(self, e, display_start):
         """
         Return the text of one page of the display scoreboard for one
@@ -219,6 +243,7 @@ class RegSiteGenerator(SiteGenerator):
         return text
 
     def missing_person_details(self, p, consent_forms_date,
+                               have_id_scans,
                                have_sars_cov2_cert, have_sars_cov2_doses,
                                have_sars_cov2_after):
         """Return a description of missing details for a person."""
@@ -232,6 +257,9 @@ class RegSiteGenerator(SiteGenerator):
             if p.date_of_birth is not None:
                 if p.date_of_birth >= consent_forms_date:
                     missing_list.append('consent form')
+
+        if have_id_scans is not None and p.id_scan_url is None:
+            missing_list.append('id scan')
 
         if p.badge_photo_url is None:
             missing_list.append('photo')
@@ -372,7 +400,7 @@ class RegSiteGenerator(SiteGenerator):
                        html.escape(', '.join(missing))))
         return ''
 
-    def missing_person_details_text(self, people, consent_forms_date,
+    def missing_person_details_text(self, people, consent_forms_date, have_id_scans,
                                     have_sars_cov2_cert, have_sars_cov2_doses,
                                     have_sars_cov2_after,
                                     have_consent_ui, show_country):
@@ -389,6 +417,7 @@ class RegSiteGenerator(SiteGenerator):
         missing_phone = False
         for p in people:
             p_needed = self.missing_person_details(p, consent_forms_date,
+                                                   have_id_scans,
                                                    have_sars_cov2_cert,
                                                    have_sars_cov2_doses,
                                                    have_sars_cov2_after)
@@ -424,7 +453,7 @@ class RegSiteGenerator(SiteGenerator):
         """Return a form to scale down a person's photo."""
         raise NotImplementedError
 
-    def registration_status_text(self, consent_forms_date, have_sars_cov2_cert,
+    def registration_status_text(self, consent_forms_date, have_id_scans, have_sars_cov2_cert,
                                  have_sars_cov2_doses, have_sars_cov2_after,
                                  have_consent_ui,
                                  max_photo_size, nonce):
@@ -445,6 +474,7 @@ class RegSiteGenerator(SiteGenerator):
 
         text += self.missing_person_details_text(normal_people,
                                                  consent_forms_date,
+                                                 have_id_scans,
                                                  have_sars_cov2_cert,
                                                  have_sars_cov2_doses,
                                                  have_sars_cov2_after,
@@ -460,7 +490,8 @@ class RegSiteGenerator(SiteGenerator):
         text += ('<p>The system cannot tell automatically if not all'
                  ' staff have been registered.</p>\n')
 
-        text += self.missing_person_details_text(staff, consent_forms_date,
+        text += self.missing_person_details_text(staff, consent_forms_date, 
+                                                 have_id_scans,
                                                  have_sars_cov2_cert,
                                                  have_sars_cov2_doses,
                                                  have_sars_cov2_after,
@@ -527,6 +558,7 @@ class RegSiteGenerator(SiteGenerator):
         return text
 
     def registration_status_country_text(self, country, consent_forms_date,
+                                         have_id_scans,
                                          have_sars_cov2_cert,
                                          have_sars_cov2_doses,
                                          have_sars_cov2_after,
@@ -538,6 +570,7 @@ class RegSiteGenerator(SiteGenerator):
         text += self.missing_country_details_text(country)
 
         text += self.missing_person_details_text(people, consent_forms_date,
+                                                 have_id_scans,
                                                  have_sars_cov2_cert,
                                                  have_sars_cov2_doses,
                                                  have_sars_cov2_after,

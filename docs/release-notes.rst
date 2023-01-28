@@ -92,6 +92,8 @@ Next version (unreleased)
 * As part of changes to how enabling and disabling registration are
   handled, :file:`page.html` and :file:`person.item.html` are changed.
 
+* The registration also supports the collection of passport or ID scans.
+
 Version 2020.07.0 (22 July 2020)
 --------------------------------
 

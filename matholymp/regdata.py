@@ -40,7 +40,8 @@ __all__ = ['file_url_to_local', 'lang_to_filename']
 
 _type_to_entity_type = {'flag': 'country',
                         'photo': 'person',
-                        'consent-form': 'person'}
+                        'consent-form': 'person',
+                        'id-scan': 'person'}
 
 
 def file_url_to_local(url, local_dir, file_type, entity_id):

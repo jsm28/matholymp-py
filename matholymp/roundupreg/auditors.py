@@ -42,7 +42,7 @@ from matholymp.datetimeutil import date_from_ymd_str, date_from_ymd_iso, \
 from matholymp.fileutil import read_text_from_file, file_format_contents, \
     file_extension
 from matholymp.roundupreg.auditorutil import get_new_value, require_value
-from matholymp.roundupreg.config import have_consent_forms, \
+from matholymp.roundupreg.config import have_consent_forms, have_id_scans, \
     have_consent_ui, have_passport_numbers, have_nationality, require_diet, \
     require_dob, get_num_problems, get_marks_per_problem, \
     get_earliest_date_of_birth, get_sanity_date_of_birth, \
@@ -641,6 +641,22 @@ def audit_person_fields(db, cl, nodeid, newvalues):
                 file_creator = db.consent_form.get(file_id, 'creator')
                 if file_creator != userid:
                     raise ValueError('Consent form from another user')
+
+    if have_id_scans(db) and 'id_scan' in newvalues:
+        file_id = newvalues['id_scan']
+        if file_id is not None:
+            audit_file_format(db, 'id_scan', file_id, 'ID Scans',
+                              'id scans', ('pdf',), 'PDF')
+            file_person = db.id_scan.get(file_id, 'person')
+            if file_person is not None and file_person != nodeid:
+                raise ValueError('ID scan from another person')
+            if file_person is None:
+                # Ensure a race cannot occur linking to an ID scan
+                # uploaded by another user before the person reactor
+                # runs to set the person for that ID scan.
+                file_creator = db.id_scan.get(file_id, 'creator')
+                if file_creator != userid:
+                    raise ValueError('ID scan from another user')
 
     generic_url = get_new_value(db, cl, nodeid, newvalues, 'generic_url')
     if generic_url is not None and generic_url != '':
