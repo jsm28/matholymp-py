@@ -207,8 +207,7 @@ Registration system
 * Support upload of sound files with pronunciation of participant
   names.
 
-* Support other registration information (e.g., passport scan) where
-  useful.
+* Support other registration information where useful.
 
 * Use database to describe maximum / expected number of people in a
   given role from a country rather than hardcoding.
