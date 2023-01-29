@@ -66,9 +66,9 @@ from matholymp.roundupreg.bulkreg import bulk_csv_delimiter, bulk_csv_data, \
     bulk_csv_person_number_url
 from matholymp.roundupreg.cache import cached_text
 from matholymp.roundupreg.config import distinguish_official, \
-    get_consent_forms_date, have_consent_forms, have_id_scans, have_consent_ui, \
-    have_passport_numbers, have_nationality, require_diet, require_dob, \
-    get_language_numbers, get_earliest_date_of_birth, \
+    get_consent_forms_date, have_consent_forms, have_id_scans, \
+    have_consent_ui, have_passport_numbers, have_nationality, require_diet, \
+    require_dob, get_language_numbers, get_earliest_date_of_birth, \
     get_sanity_date_of_birth, get_arrdep_bounds, is_virtual_event, \
     is_hybrid_event, have_remote_participation, get_sars_cov2_cert_html, \
     get_sars_cov2_cert_bool, get_sars_cov2_doses_html, \

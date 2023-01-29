@@ -259,7 +259,7 @@ class RegSiteGenerator(SiteGenerator):
                     missing_list.append('consent form')
 
         if have_id_scans is not None and p.id_scan_url is None:
-            missing_list.append('id scan')
+            missing_list.append('ID scan')
 
         if p.badge_photo_url is None:
             missing_list.append('photo')
@@ -400,7 +400,8 @@ class RegSiteGenerator(SiteGenerator):
                        html.escape(', '.join(missing))))
         return ''
 
-    def missing_person_details_text(self, people, consent_forms_date, have_id_scans,
+    def missing_person_details_text(self, people, consent_forms_date,
+                                    have_id_scans,
                                     have_sars_cov2_cert, have_sars_cov2_doses,
                                     have_sars_cov2_after,
                                     have_consent_ui, show_country):
@@ -453,7 +454,8 @@ class RegSiteGenerator(SiteGenerator):
         """Return a form to scale down a person's photo."""
         raise NotImplementedError
 
-    def registration_status_text(self, consent_forms_date, have_id_scans, have_sars_cov2_cert,
+    def registration_status_text(self, consent_forms_date, have_id_scans,
+                                 have_sars_cov2_cert,
                                  have_sars_cov2_doses, have_sars_cov2_after,
                                  have_consent_ui,
                                  max_photo_size, nonce):
@@ -490,7 +492,7 @@ class RegSiteGenerator(SiteGenerator):
         text += ('<p>The system cannot tell automatically if not all'
                  ' staff have been registered.</p>\n')
 
-        text += self.missing_person_details_text(staff, consent_forms_date, 
+        text += self.missing_person_details_text(staff, consent_forms_date,
                                                  have_id_scans,
                                                  have_sars_cov2_cert,
                                                  have_sars_cov2_doses,

@@ -55,11 +55,11 @@
 """This module provides the Roundup registration schema."""
 
 from matholymp.roundupreg.config import distinguish_official, \
-    have_consent_forms, have_id_scans, have_consent_ui, have_passport_numbers, \
-    have_nationality, get_language_numbers, invitation_letter_register, \
-    is_virtual_event, have_remote_participation, allow_hybrid_countries, \
-    get_sars_cov2_cert_bool, get_sars_cov2_doses_bool, \
-    get_sars_cov2_after_bool, have_vaccine_status
+    have_consent_forms, have_id_scans, have_consent_ui, \
+    have_passport_numbers, have_nationality, get_language_numbers, \
+    invitation_letter_register, is_virtual_event, have_remote_participation, \
+    allow_hybrid_countries, get_sars_cov2_cert_bool, \
+    get_sars_cov2_doses_bool, get_sars_cov2_after_bool, have_vaccine_status
 
 __all__ = ['init_schema']
 
@@ -505,7 +505,7 @@ def init_schema(env):
     db.security.addPermissionToRole('SelfRegister', 'Create', 'id_scan')
 
     def own_country_id_scan(db, userid, itemid):
-        """Determine whether the userid matches the country of the ID 
+        """Determine whether the userid matches the country of the ID
         scan being accessed."""
         user_country = db.user.get(userid, 'country')
         file_person = db.id_scan.get(itemid, 'person')
@@ -517,7 +517,7 @@ def init_schema(env):
                 or (file_country is None and userid == file_creator))
 
     def own_person_id_scan(db, userid, itemid):
-        """Determine whether the userid matches the person of the ID 
+        """Determine whether the userid matches the person of the ID
         scan being accessed."""
         user_person = db.user.get(userid, 'person')
         file_person = db.id_scan.get(itemid, 'person')
@@ -530,7 +530,7 @@ def init_schema(env):
     db.security.addPermissionToRole('Register', p)
     p = db.security.addPermission(name='View', klass='id_scan',
                                   check=own_person_id_scan)
-    db.security.addPermissionToRole('Register', p)
+    db.security.addPermissionToRole('SelfRegister', p)
 
     # Registering users can create consent forms, and view them only
     # when from their own country or created by that user (the latter

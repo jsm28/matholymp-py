@@ -556,6 +556,11 @@ class RoundupTestSession:
         return self.get_download_zip('person?@action=consent_forms_zip',
                                      'consent-forms.zip')
 
+    def get_id_scans_zip(self):
+        """Get the ZIP file of ID scans."""
+        return self.get_download_zip('person?@action=id_scans_zip',
+                                     'id-scans.zip')
+
     def get_bytes(self, url):
         """Get the bytes contents of a non-HTML URL."""
         return self.check_get(url, html=False).content
@@ -957,8 +962,8 @@ class RegSystemTestCase(unittest.TestCase):
         """
         session = self.get_session()
         forbid_classes = {'event', 'rss', 'arrival', 'badge_type',
-                          'consent_form', 'gender', 'language', 'room_type',
-                          'tshirt', 'user'}
+                          'consent_form', 'id_scan', 'gender', 'language',
+                          'room_type', 'tshirt', 'user'}
         forbid_templates = {'country.bulkconfirm.html',
                             'country.bulkregister.html',
                             'country.retireconfirm.html',
@@ -982,8 +987,8 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.create_scoring_user()
         session = self.get_session('scoring')
         forbid_classes = {'event', 'rss', 'arrival', 'badge_type',
-                          'consent_form', 'gender', 'language', 'room_type',
-                          'tshirt'}
+                          'consent_form', 'id_scan', 'gender', 'language',
+                          'room_type', 'tshirt'}
         forbid_templates = {'country.bulkconfirm.html',
                             'country.bulkregister.html',
                             'country.prereg.html',
@@ -1033,7 +1038,8 @@ class RegSystemTestCase(unittest.TestCase):
         pdf_filename, dummy = self.gen_test_pdf()
         admin_session.create_person('XMO 2015 Staff', 'Coordinator',
                                     {'photo-1@content': photo_filename,
-                                     'consent_form-1@content': pdf_filename})
+                                     'consent_form-1@content': pdf_filename,
+                                     'id_scan-1@content': pdf_filename})
         # Set medal boundaries to create an rss item.
         admin_session.edit('event', '1',
                            {'registration_enabled': 'no',
@@ -1064,8 +1070,8 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session = self.get_session('admin')
         session = self.get_session()
         forbid_classes = {'event', 'rss', 'arrival', 'badge_type',
-                          'consent_form', 'gender', 'language', 'room_type',
-                          'tshirt', 'user'}
+                          'consent_form', 'id_scan', 'gender', 'language',
+                          'room_type', 'tshirt', 'user'}
         self.all_templates_item_test(admin_session, session,
                                      forbid_classes=forbid_classes)
 
@@ -1079,8 +1085,8 @@ class RegSystemTestCase(unittest.TestCase):
         session = self.get_session('scoring')
         # user1 is another user, so gives an error.
         forbid_classes = {'event', 'rss', 'arrival', 'badge_type',
-                          'consent_form', 'gender', 'language', 'room_type',
-                          'tshirt', 'user'}
+                          'consent_form', 'id_scan', 'gender', 'language',
+                          'room_type', 'tshirt', 'user'}
         self.all_templates_item_test(admin_session, session,
                                      forbid_classes=forbid_classes)
 
@@ -1092,9 +1098,10 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session = self.get_session('admin')
         admin_session.create_country_generic()
         session = self.get_session('ABC_reg')
-        # consent_form1 is for another country, so gives an error.
+        # consent_form1 and id_scan1 are for another country, so give errors.
         # user1 is another user, so gives an error.
-        forbid_classes = {'badge_type', 'consent_form', 'event', 'rss', 'user'}
+        forbid_classes = {'badge_type', 'consent_form', 'id_scan', 'event',
+                          'rss', 'user'}
         self.all_templates_item_test(admin_session, session,
                                      forbid_classes=forbid_classes)
 
@@ -4671,7 +4678,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '7ab558',
              'Badge Inner Colour': 'c9deb0', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
@@ -4691,6 +4698,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': 'd22027', 'Badge Inner Colour': 'eb9984',
              'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'ID Scan URL': '',
              'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 2',
              'Passport Family Name': 'Family 2', 'Event Photos Consent': '',
@@ -4710,7 +4718,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '9876543210', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
              'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 3',
              'Passport Family Name': 'Family 3', 'Event Photos Consent': '',
@@ -4778,6 +4786,71 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'ID Scan URL': '',
+             'Passport or Identity Card Number': '',
+             'Nationality': '', 'Passport Given Name': 'Given 1',
+             'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
+             'Remote Participant': 'No', 'Basic Data Missing': 'No',
+             'SARS-CoV-2 Vaccine Certificate': '',
+             'SARS-CoV-2 Vaccine Doses': '',
+             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [expected_cont])
+        self.assertEqual(admin_csv, [expected_cont_admin])
+        self.assertEqual(reg_csv, [expected_cont])
+
+    @_with_config(id_scans='No')
+    def test_person_csv_no_id_scans_forms(self):
+        """
+        Test CSV file of people, no ID scans in database schema.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create('arrival', {'name': 'Example Airport'})
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        anon_csv = session.get_people_csv()
+        admin_csv = admin_session.get_people_csv()
+        reg_csv = reg_session.get_people_csv()
+        self.assertEqual(anon_csv, [])
+        self.assertEqual(admin_csv, [])
+        self.assertEqual(reg_csv, [])
+        admin_session.create_person(
+            'Test First Country', 'Contestant 1',
+            {'arrival_place': 'Example Airport',
+             'arrival_date': '2 April 2015',
+             'arrival_time_hour': '13',
+             'arrival_time_minute': '30',
+             'arrival_flight': 'ABC123',
+             'room_number': '987'})
+        expected_cont = {'XMO Number': '2', 'Country Number': '3',
+                         'Person Number': '1',
+                         'Annual URL': self.instance.url + 'person1',
+                         'Country Name': 'Test First Country',
+                         'Country Code': 'ABC', 'Primary Role': 'Contestant 1',
+                         'Other Roles': '', 'Guide For': '',
+                         'Contestant Code': 'ABC1', 'Contestant Age': '15',
+                         'Given Name': 'Given 1', 'Family Name': 'Family 1',
+                         'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
+                         'P6': '', 'Total': '0', 'Award': '',
+                         'Extra Awards': '', 'Photo URL': '',
+                         'Generic Number': ''}
+        expected_cont_admin = expected_cont.copy()
+        expected_cont_admin.update(
+            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
+             'Languages': 'English',
+             'Allergies and Dietary Requirements': '', 'T-Shirt Size': 'S',
+             'Arrival Place': 'Example Airport', 'Arrival Date': '2015-04-02',
+             'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
+             'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
+             'Departure Flight': '', 'Room Type': 'Shared room',
+             'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
+             'Badge Photo URL': '', 'Badge Background': 'generic',
+             'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
+             'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'ID Scan URL': '',
              'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
@@ -4842,6 +4915,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'ID Scan URL': '',
              'Passport or Identity Card Number': '123456789',
              'Nationality': '', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
@@ -4906,6 +4980,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'ID Scan URL': '',
              'Passport or Identity Card Number': '',
              'Nationality': 'Matholympian', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
@@ -4970,6 +5045,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'ID Scan URL': '',
              'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
@@ -5054,6 +5130,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'ID Scan URL': '',
              'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
@@ -5118,6 +5195,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'ID Scan URL': '',
              'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
@@ -5204,6 +5282,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'ID Scan URL': '',
              'Passport or Identity Card Number': '123456789',
              'Nationality': 'Matholympian', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
@@ -5270,6 +5349,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'ID Scan URL': '',
              'Passport or Identity Card Number': '123456790',
              'Nationality': 'Other-olympian', 'Passport Given Name': 'Random',
              'Passport Family Name': 'Randomer', 'Event Photos Consent': '',
@@ -5337,6 +5417,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'ID Scan URL': '',
              'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1',
@@ -5406,6 +5487,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'ID Scan URL': '',
              'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 2',
              'Passport Family Name': 'Family 2', 'Event Photos Consent': 'No',
@@ -5478,6 +5560,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'ID Scan URL': '',
              'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1',
@@ -5546,6 +5629,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
              'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'ID Scan URL': '',
              'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 2',
              'Passport Family Name': 'Family 2', 'Event Photos Consent': 'No',
@@ -5620,7 +5704,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Room Number': '', 'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '7ab558',
              'Badge Inner Colour': 'c9deb0', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
@@ -5723,6 +5807,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': '2a3e92', 'Badge Inner Colour': '9c95cc',
              'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'ID Scan URL': '',
              'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
@@ -5820,7 +5905,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '7ab558',
              'Badge Inner Colour': 'c9deb0', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
@@ -5840,6 +5925,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': 'd22027', 'Badge Inner Colour': 'eb9984',
              'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'ID Scan URL': '',
              'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 2',
              'Passport Family Name': 'Family 2', 'Event Photos Consent': '',
@@ -5859,7 +5945,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '9876543210', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
              'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 3',
              'Passport Family Name': 'Family 3', 'Event Photos Consent': '',
@@ -5963,7 +6049,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '7ab558',
              'Badge Inner Colour': 'c9deb0', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
@@ -5983,6 +6069,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Photo URL': '', 'Badge Background': 'generic',
              'Badge Outer Colour': 'd22027', 'Badge Inner Colour': 'eb9984',
              'Badge Text Colour': '000000', 'Consent Form URL': '',
+             'ID Scan URL': '',
              'Passport or Identity Card Number': '',
              'Nationality': '', 'Passport Given Name': 'Given 2',
              'Passport Family Name': 'Family 2', 'Event Photos Consent': '',
@@ -6002,7 +6089,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '9876543210', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
              'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 3',
              'Passport Family Name': 'Family 3', 'Event Photos Consent': '',
@@ -8279,6 +8366,179 @@ class RegSystemTestCase(unittest.TestCase):
                                         error='You do not have permission to '
                                         'access consent forms', status=403)
 
+    def test_person_id_scan_create(self):
+        """
+        Test ID scans uploaded at person creation time.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        cf_filename, cf_bytes = self.gen_test_pdf()
+        admin_session.create_country_generic()
+        admin_session.create_country('DEF', 'Test Second Country')
+        reg_session = self.get_session('ABC_reg')
+        reg2_session = self.get_session('DEF_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'id_scan-1@content': cf_filename})
+        # Check the ID scan linked from the person page.
+        admin_session.check_open_relative('person1')
+        got_bytes = admin_session.get_link_contents(
+            'ID scan for this person')
+        self.assertEqual(got_bytes, cf_bytes)
+        admin_csv = admin_session.get_people_csv()
+        admin_csv[0] = {'ID Scan URL': admin_csv[0]['ID Scan URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        cf_url_csv = self.instance.url + 'id_scan1/id-scan.pdf'
+        expected = {'ID Scan URL': cf_url_csv, 'Generic Number': ''}
+        self.assertEqual(admin_csv, [expected])
+        # Check the ID scan from the URL in the .csv file.
+        admin_bytes = admin_session.get_bytes(cf_url_csv)
+        reg_bytes = reg_session.get_bytes(cf_url_csv)
+        self.assertEqual(admin_bytes, cf_bytes)
+        self.assertEqual(reg_bytes, cf_bytes)
+        # Check the form is not accessible anonymously or by
+        # registering users from other countries.
+        session.check_open(cf_url_csv,
+                           error='You are not allowed to view this file',
+                           status=403)
+        reg2_session.check_open(cf_url_csv,
+                                error='You are not allowed to view this file',
+                                status=403)
+
+    def test_person_id_scan_create_upper(self):
+        """
+        Test ID scans uploaded at person creation time, uppercase
+        .PDF suffix.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        cf_filename, cf_bytes = self.gen_test_pdf('.PDF')
+        admin_session.create_country_generic()
+        admin_session.create_country('DEF', 'Test Second Country')
+        reg_session = self.get_session('ABC_reg')
+        reg2_session = self.get_session('DEF_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'id_scan-1@content': cf_filename})
+        # Check the ID scan linked from the person page.
+        admin_session.check_open_relative('person1')
+        got_bytes = admin_session.get_link_contents(
+            'ID scan for this person')
+        self.assertEqual(got_bytes, cf_bytes)
+        admin_csv = admin_session.get_people_csv()
+        admin_csv[0] = {'ID Scan URL': admin_csv[0]['ID Scan URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        cf_url_csv = self.instance.url + 'id_scan1/id-scan.pdf'
+        expected = {'ID Scan URL': cf_url_csv, 'Generic Number': ''}
+        self.assertEqual(admin_csv, [expected])
+        # Check the ID scan from the URL in the .csv file.
+        admin_bytes = admin_session.get_bytes(cf_url_csv)
+        reg_bytes = reg_session.get_bytes(cf_url_csv)
+        self.assertEqual(admin_bytes, cf_bytes)
+        self.assertEqual(reg_bytes, cf_bytes)
+        # Check the form is not accessible anonymously or by
+        # registering users from other countries.
+        session.check_open(cf_url_csv,
+                           error='You are not allowed to view this file',
+                           status=403)
+        reg2_session.check_open(cf_url_csv,
+                                error='You are not allowed to view this file',
+                                status=403)
+
+    def test_person_id_scan_edit(self):
+        """
+        Test ID scans uploaded after person creation time.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        cf_filename, cf_bytes = self.gen_test_pdf()
+        admin_session.create_country_generic()
+        admin_session.create_country('DEF', 'Test Second Country')
+        reg_session = self.get_session('ABC_reg')
+        reg2_session = self.get_session('DEF_reg')
+        admin_session.create_person('Test First Country', 'Contestant 1')
+        admin_csv = admin_session.get_people_csv()
+        admin_csv[0] = {'ID Scan URL': admin_csv[0]['ID Scan URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        expected = {'ID Scan URL': '', 'Generic Number': ''}
+        self.assertEqual(admin_csv, [expected])
+        admin_session.edit('person', '1',
+                           {'id_scan-1@content': cf_filename})
+        cf_url_csv = self.instance.url + 'id_scan1/id-scan.jpg'
+        # Check the ID scan linked from the person page.
+        admin_session.check_open_relative('person1')
+        got_bytes = admin_session.get_link_contents(
+            'ID scan for this person')
+        self.assertEqual(got_bytes, cf_bytes)
+        admin_csv = admin_session.get_people_csv()
+        admin_csv[0] = {'ID Scan URL': admin_csv[0]['ID Scan URL'],
+                        'Generic Number': admin_csv[0]['Generic Number']}
+        cf_url_csv = self.instance.url + 'id_scan1/id-scan.pdf'
+        expected = {'ID Scan URL': cf_url_csv, 'Generic Number': ''}
+        self.assertEqual(admin_csv, [expected])
+        # Check the ID scan from the URL in the .csv file.
+        admin_bytes = admin_session.get_bytes(cf_url_csv)
+        reg_bytes = reg_session.get_bytes(cf_url_csv)
+        self.assertEqual(admin_bytes, cf_bytes)
+        self.assertEqual(reg_bytes, cf_bytes)
+        # Check the form is not accessible anonymously or by
+        # registering users from other countries.
+        session.check_open(cf_url_csv,
+                           error='You are not allowed to view this file',
+                           status=403)
+        reg2_session.check_open(cf_url_csv,
+                                error='You are not allowed to view this file',
+                                status=403)
+
+    def test_person_id_scan_zip(self):
+        """
+        Test ZIP file of ID scans.
+        """
+        admin_session = self.get_session('admin')
+        admin_zip_empty = admin_session.get_id_scans_zip()
+        admin_contents = [f.filename for f in admin_zip_empty.infolist()]
+        expected_contents = ['id-scans/README.txt']
+        self.assertEqual(admin_contents, expected_contents)
+        admin_zip_empty.close()
+        cf_filename, cf_bytes = self.gen_test_pdf()
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator',
+                                    {'id_scan-1@content': cf_filename})
+        admin_zip = admin_session.get_id_scans_zip()
+        admin_contents = [f.filename for f in admin_zip.infolist()]
+        expected_contents = ['id-scans/README.txt',
+                             'id-scans/person1/id-scan.pdf']
+        self.assertEqual(admin_contents, expected_contents)
+        self.assertEqual(
+            admin_zip.read('id-scans/person1/id-scan.pdf'),
+            cf_bytes)
+        admin_zip.close()
+
+    def test_person_id_scan_zip_errors(self):
+        """
+        Test errors from id_scans_zip action.
+        """
+        session = self.get_session()
+        admin_session = self.get_session('admin')
+        admin_session.create_person('XMO 2015 Staff', 'Coordinator')
+        admin_session.create_country_generic()
+        reg_session = self.get_session('ABC_reg')
+        session.check_open_relative('country?@action=id_scans_zip',
+                                    error='This action only applies '
+                                    'to people')
+        session.check_open_relative('person1?@action=id_scans_zip',
+                                    error='Node id specified for ZIP '
+                                    'generation')
+        admin_session.check_open_relative('country?@action=id_scans_zip',
+                                          error='This action only applies '
+                                          'to people')
+        admin_session.check_open_relative('person1?@action=id_scans_zip',
+                                          error='Node id specified for ZIP '
+                                          'generation')
+        session.check_open_relative('person?@action=id_scans_zip',
+                                    error='You do not have permission to '
+                                    'access ID scans', status=403)
+        reg_session.check_open_relative('person?@action=id_scans_zip',
+                                        error='You do not have permission to '
+                                        'access ID scans', status=403)
+
     def test_person_retire(self):
         """
         Test retiring people.
@@ -8549,6 +8809,14 @@ class RegSystemTestCase(unittest.TestCase):
                                   {'consent_form-1@content': cf_filename},
                                   error='Consent forms must be in PDF '
                                   'format')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'id_scan-1@content': cf_filename},
+                                    error='ID scans must be in PDF '
+                                    'format')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'id_scan-1@content': cf_filename},
+                                  error='ID scans must be in PDF '
+                                  'format')
         cf_filename, dummy = self.gen_test_pdf('.png')
         admin_session.create_person('Test First Country', 'Contestant 1',
                                     {'consent_form-1@content': cf_filename},
@@ -8558,6 +8826,14 @@ class RegSystemTestCase(unittest.TestCase):
                                   {'consent_form-1@content': cf_filename},
                                   error=r'Filename extension for consent '
                                   r'form must match contents \(pdf\)')
+        admin_session.create_person('Test First Country', 'Contestant 1',
+                                    {'id_scan-1@content': cf_filename},
+                                    error=r'Filename extension for ID '
+                                    r'scan must match contents \(pdf\)')
+        reg_session.create_person('Test First Country', 'Contestant 1',
+                                  {'id_scan-1@content': cf_filename},
+                                  error=r'Filename extension for ID '
+                                  r'scan must match contents \(pdf\)')
         admin_session.create_person(
             'Test First Country', 'Contestant 1',
             {'generic_url': 'https://www.example.invalid/test'},
@@ -9865,6 +10141,12 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session.edit('person', '4',
                          {'consent_form-1@content': cf_filename},
                          error='Consent forms must be in PDF format')
+        admin_session.edit('person', '4',
+                           {'id_scan-1@content': cf_filename},
+                           error='ID scans must be in PDF format')
+        reg_session.edit('person', '4',
+                         {'id_scan-1@content': cf_filename},
+                         error='ID scans must be in PDF format')
         cf_filename, dummy = self.gen_test_pdf('.png')
         admin_session.edit('person', '4',
                            {'consent_form-1@content': cf_filename},
@@ -9874,6 +10156,14 @@ class RegSystemTestCase(unittest.TestCase):
                          {'consent_form-1@content': cf_filename},
                          error=r'Filename extension for consent '
                          r'form must match contents \(pdf\)')
+        admin_session.edit('person', '4',
+                           {'id_scan-1@content': cf_filename},
+                           error=r'Filename extension for ID '
+                           r'scan must match contents \(pdf\)')
+        reg_session.edit('person', '4',
+                         {'id_scan-1@content': cf_filename},
+                         error=r'Filename extension for ID '
+                         r'scan must match contents \(pdf\)')
         admin_session.edit(
             'person', '4',
             {'generic_url': 'https://www.example.invalid/test'},
@@ -11698,6 +11988,8 @@ class RegSystemTestCase(unittest.TestCase):
                                                             'JPEG')
         cf_filename, cf_bytes = self.gen_test_pdf()
         cf2_filename, cf2_bytes = self.gen_test_pdf()
+        id_filename, id_bytes = self.gen_test_pdf()
+        id2_filename, id2_bytes = self.gen_test_pdf()
         admin_session.create('arrival', {'name': 'Example Airport'})
         admin_session.create_country_generic()
         reg_session = self.get_session('ABC_reg')
@@ -11758,6 +12050,7 @@ class RegSystemTestCase(unittest.TestCase):
                                 'nationality': 'Matholympian',
                                 'photo-1@content': photo_filename,
                                 'consent_form-1@content': cf_filename,
+                                'id_scan-1@content': id_filename,
                                 'event_photos_consent': 'yes',
                                 'diet_consent': 'yes',
                                 'photo_consent':
@@ -11794,6 +12087,7 @@ class RegSystemTestCase(unittest.TestCase):
                                 'phone_number': '9876543210',
                                 'photo-1@content': photo2_filename,
                                 'consent_form-1@content': cf2_filename,
+                                'id_scan-1@content': id2_filename,
                                 'event_photos_consent': 'yes',
                                 'diet_consent': 'yes',
                                 'photo_consent':
@@ -11802,6 +12096,8 @@ class RegSystemTestCase(unittest.TestCase):
         img2_url_csv = self.instance.url + 'photo2/photo.jpg'
         cf_url_csv = self.instance.url + 'consent_form1/consent-form.pdf'
         cf2_url_csv = self.instance.url + 'consent_form2/consent-form.pdf'
+        id_url_csv = self.instance.url + 'id_scan1/id-scan.pdf'
+        id2_url_csv = self.instance.url + 'id_scan2/id-scan.pdf'
         expected_leader = {'XMO Number': '2', 'Country Number': '3',
                            'Person Number': '1',
                            'Annual URL': self.instance.url + 'person1',
@@ -11845,6 +12141,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Background': 'generic', 'Badge Outer Colour': 'd22027',
              'Badge Inner Colour': 'eb9984', 'Badge Text Colour': '000000',
              'Consent Form URL': cf_url_csv,
+             'ID Scan URL': id_url_csv,
              'Passport or Identity Card Number': '123',
              'Nationality': 'Matholympian',
              'Passport Given Name': 'Passport given',
@@ -11868,6 +12165,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
              'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
              'Consent Form URL': cf2_url_csv,
+             'ID Scan URL': id2_url_csv,
              'Passport or Identity Card Number': '12345',
              'Nationality': 'Matholympian also',
              'Passport Given Name': 'Passport given 2',
@@ -11932,8 +12230,27 @@ class RegSystemTestCase(unittest.TestCase):
                                      error='You are not allowed to view this '
                                      'file',
                                      status=403)
+        # Check the ID scans from the URL in the .csv file.
+        admin_bytes = admin_session.get_bytes(id_url_csv)
+        selfreg_1_bytes = selfreg_1_session.get_bytes(id_url_csv)
+        self.assertEqual(admin_bytes, id_bytes)
+        self.assertEqual(selfreg_1_bytes, id_bytes)
+        # The scan is not accessible by the other self-registration user.
+        selfreg_2_session.check_open(id_url_csv,
+                                     error='You are not allowed to view this '
+                                     'file',
+                                     status=403)
+        admin_bytes = admin_session.get_bytes(id2_url_csv)
+        selfreg_2_bytes = selfreg_2_session.get_bytes(id2_url_csv)
+        self.assertEqual(admin_bytes, id2_bytes)
+        self.assertEqual(selfreg_2_bytes, id2_bytes)
+        # The scan is not accessible by the other self-registration user.
+        selfreg_1_session.check_open(id2_url_csv,
+                                     error='You are not allowed to view this '
+                                     'file',
+                                     status=403)
         # Another self-registration user from the same country cannot
-        # access the form either.
+        # access the form or scan either.
         admin_session.create_person(
             'XMO 2015 Staff', 'Guide',
             {'passport_number': '0',
@@ -11945,6 +12262,10 @@ class RegSystemTestCase(unittest.TestCase):
                                   {'person': '3'})
         selfreg_3_session = self.get_session('selfreg_3')
         selfreg_3_session.check_open(cf2_url_csv,
+                                     error='You are not allowed to view this '
+                                     'file',
+                                     status=403)
+        selfreg_3_session.check_open(id2_url_csv,
                                      error='You are not allowed to view this '
                                      'file',
                                      status=403)
@@ -12044,7 +12365,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '7ab558',
              'Badge Inner Colour': 'c9deb0', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1',
@@ -12065,7 +12386,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
              'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 2',
              'Passport Family Name': 'Family 2',
@@ -12337,7 +12658,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '7ab558',
              'Badge Inner Colour': 'c9deb0', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1',
@@ -12359,7 +12680,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
              'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given 2',
              'Passport Family Name': 'Family 2',
@@ -14077,7 +14398,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '0123456789', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': 'f78b11',
              'Badge Inner Colour': 'fccc8f', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given One',
              'Passport Family Name': 'Family One',
@@ -14098,7 +14419,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
              'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Test\u00fd',
              'Passport Family Name': 'Test',
@@ -14153,7 +14474,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
              'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Test\u00fd',
              'Passport Family Name': 'Doe',
@@ -14210,7 +14531,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': 'a9a9a9',
              'Badge Inner Colour': 'dcdcdc', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Test',
              'Passport Family Name': 'Doe',
@@ -14317,7 +14638,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': 'f78b11',
              'Badge Inner Colour': 'fccc8f', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given One',
              'Passport Family Name': 'Family One',
@@ -14338,7 +14659,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '231f20',
              'Badge Inner Colour': 'a7a6a6', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given Two',
              'Passport Family Name': 'Family Two',
@@ -14464,7 +14785,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '', 'Badge Photo URL': img_url_csv,
              'Badge Background': 'generic', 'Badge Outer Colour': 'f78b11',
              'Badge Inner Colour': 'fccc8f', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given One',
              'Passport Family Name': 'Family One',
@@ -14485,7 +14806,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
              'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Test\u00fd',
              'Passport Family Name': 'Test',
@@ -14506,7 +14827,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
              'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Test\u00fd',
              'Passport Family Name': 'Doe',
@@ -14609,7 +14930,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '', 'Badge Photo URL': img1_url_csv,
              'Badge Background': 'generic', 'Badge Outer Colour': 'f78b11',
              'Badge Inner Colour': 'fccc8f', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given One',
              'Passport Family Name': 'Family One',
@@ -14630,7 +14951,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '', 'Badge Photo URL': img2_url_csv,
              'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
              'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Test',
              'Passport Family Name': 'Test',
@@ -14719,7 +15040,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '', 'Badge Photo URL': img_url_csv,
              'Badge Background': 'generic', 'Badge Outer Colour': 'f78b11',
              'Badge Inner Colour': 'fccc8f', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given One',
              'Passport Family Name': 'Family One',
@@ -14839,7 +15160,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': 'f78b11',
              'Badge Inner Colour': 'fccc8f', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Given One',
              'Passport Family Name': 'Family One',
@@ -14860,7 +15181,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Phone Number': '', 'Badge Photo URL': '',
              'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
              'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
-             'Consent Form URL': '',
+             'Consent Form URL': '', 'ID Scan URL': '',
              'Passport or Identity Card Number': '', 'Nationality': '',
              'Passport Given Name': 'Test\u00fd',
              'Passport Family Name': 'Test',

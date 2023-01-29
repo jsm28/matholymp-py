@@ -38,7 +38,8 @@ import roundup.password
 
 from matholymp.fileutil import read_text_from_file
 from matholymp.roundupreg.cache import invalidate_cache
-from matholymp.roundupreg.config import have_consent_forms, have_id_scans, get_short_name_year
+from matholymp.roundupreg.config import have_consent_forms, have_id_scans, \
+    get_short_name_year
 from matholymp.roundupreg.roundupemail import send_email
 
 

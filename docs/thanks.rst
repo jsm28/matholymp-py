@@ -64,6 +64,8 @@ limited to:
 
 * Azer Kerimov
 
+* Lucijana Kračun Berc
+
 * Mikita Lappo
 
 * Charles Leytem

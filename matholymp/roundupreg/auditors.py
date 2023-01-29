@@ -645,8 +645,8 @@ def audit_person_fields(db, cl, nodeid, newvalues):
     if have_id_scans(db) and 'id_scan' in newvalues:
         file_id = newvalues['id_scan']
         if file_id is not None:
-            audit_file_format(db, 'id_scan', file_id, 'ID Scans',
-                              'id scans', ('pdf',), 'PDF')
+            audit_file_format(db, 'id_scan', file_id, 'ID scans',
+                              'ID scan', ('pdf',), 'PDF')
             file_person = db.id_scan.get(file_id, 'person')
             if file_person is not None and file_person != nodeid:
                 raise ValueError('ID scan from another person')

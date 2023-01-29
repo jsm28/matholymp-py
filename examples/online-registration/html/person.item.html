@@ -528,8 +528,8 @@ please inform the people you register of this information.
 </tal:block>
 </tal:block>
 </tal:block>
-<tal:block tal:condition="python:utils.have_id_scansdb._db)">
-<tal:block tal:condition="not:context/id">
+</tal:block>
+<tal:block tal:condition="python:utils.have_id_scans(db._db)">
  <tr>
   <th i18n:translate="">Upload ID scan</th>
   <td colspan=3><input type="file" name="id_scan-1@content" size="20">
@@ -538,6 +538,13 @@ please inform the people you register of this information.
  <tr>
   <td colspan="2">ID scans are required for all participants,
   and should be uploaded as PDF files.
+ </tr>
+<tal:block tal:condition="context/id_scan">
+ <tr>
+  <td colspan="2">An <a tal:attributes="href
+  context/id_scan/download_url">ID scan for this person</a>
+  has already been uploaded, but you may upload a new one to replace
+  it if you wish.</td>
  </tr>
 </tal:block>
 </tal:block>

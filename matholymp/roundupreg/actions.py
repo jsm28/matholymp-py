@@ -32,9 +32,9 @@
 __all__ = ['ScoreAction', 'RetireCountryAction', 'ScalePhotoAction',
            'CountryCSVAction', 'ScoresCSVAction', 'PeopleCSVAction',
            'MedalBoundariesCSVAction', 'FlagsZIPAction', 'PhotosZIPAction',
-           'ConsentFormsZIPAction', 'IDScanZIPAction', 'FlagThumbAction', 'PhotoThumbAction',
-           'ScoresRSSAction', 'DocumentGenerateAction', 'NameBadgeAction',
-           'InvitationLetterAction', 'BulkRegisterAction',
+           'ConsentFormsZIPAction', 'IDScansZIPAction', 'FlagThumbAction',
+           'PhotoThumbAction', 'ScoresRSSAction', 'DocumentGenerateAction',
+           'NameBadgeAction', 'InvitationLetterAction', 'BulkRegisterAction',
            'CountryBulkRegisterAction', 'PersonBulkRegisterAction',
            'register_actions']
 
@@ -337,6 +337,7 @@ class ConsentFormsZIPAction(Action):
         self.client.setHeader('Content-Disposition',
                               'attachment; filename=consent-forms.zip')
         return RoundupSiteGenerator(self.db).consent_forms_zip_bytes()
+
 
 class IDScansZIPAction(Action):
 
