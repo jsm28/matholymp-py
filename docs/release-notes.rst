@@ -98,6 +98,10 @@ Next version (unreleased)
   :file:`extensions/config.ini` and :file:`person.item.html` are
   changed.
 
+* The registration system now supports collecting billing addresses
+  for countries.  :file:`country.item.html` and
+  :file:`country.prereg.html` are changed.
+
 Version 2020.07.0 (22 July 2020)
 --------------------------------
 

@@ -200,6 +200,11 @@ define="edit_ok context/is_edit_ok"
   </tal:if>
  </tr>
 
+ <tr tal:define="name string:billing_address; label string:Billing address; value context/billing_address; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Billing address</th>
+  <td><textarea rows="5" cols="40" tal:replace="structure context/billing_address/multiline"></textarea></td>
+ </tr>
+
  <tal:block tal:condition="python:utils.is_hybrid_event(db._db)">
 
  <tr tal:define="name string:participation_type; label string:Participation type; value context/participation_type; edit_ok edit_ok">

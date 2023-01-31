@@ -2066,6 +2066,10 @@ class CountryEvent:
         role for this country at this event.
         """)
 
+    billing_address = _CountryEventPropertyDS(
+        'billing_address',
+        """The billing address for this country at this event.""")
+
     leader_email = _CountryEventPropertyDS(
         'leader_email',
         """The email address for the leader of this country at this event.""")

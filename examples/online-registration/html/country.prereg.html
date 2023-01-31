@@ -81,6 +81,17 @@ define="edit_ok context/is_edit_ok"
   <td><input name="code" metal:use-macro="normal_input"></td>
  </tr>
 
+ <tr>
+  <td colspan="2">Please provide the name and address of the
+  organisation to which invoices (e.g., for observers and single
+  rooms) should be addressed.</td>
+ </tr>
+
+ <tr tal:define="name string:billing_address; label string:Billing address; value context/billing_address; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Billing address</th>
+  <td><textarea rows="5" cols="40" tal:replace="structure context/billing_address/multiline"></textarea></td>
+ </tr>
+
  <tal:block tal:condition="python:utils.is_hybrid_event(db._db)">
 
  <tr>

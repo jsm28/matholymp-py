@@ -123,6 +123,7 @@ def init_schema(env):
                     expected_observers_c=String(),
                     expected_single_rooms=String(),
                     expected_numbers_confirmed=Boolean(),
+                    billing_address=String(),
                     **country_extra)
     country.setkey('name')
     country.setorderprop('code')
@@ -577,7 +578,8 @@ def init_schema(env):
     prereg_props = ['expected_leaders', 'expected_deputies',
                     'expected_contestants', 'expected_observers_a',
                     'expected_observers_b', 'expected_observers_c',
-                    'expected_single_rooms', 'expected_numbers_confirmed']
+                    'expected_single_rooms', 'expected_numbers_confirmed',
+                    'billing_address']
     if have_remote_participation(db):
         prereg_props.append('participation_type')
         prereg_props.append('leader_email')

@@ -509,8 +509,9 @@ class RoundupTestSession:
             del entry['Expected Observers with Contestants']
             del entry['Expected Single Rooms']
             del entry['Expected Numbers Confirmed']
-            del entry['Leader Email']
             del entry['Physical Address']
+            del entry['Billing Address']
+            del entry['Leader Email']
             del entry['Participation Type']
         return countries_csv
 
@@ -1165,6 +1166,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'Yes',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': 'in-person'})
@@ -1190,6 +1192,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': 'in-person'})
@@ -1333,6 +1336,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'Yes',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': 'virtual'})
@@ -1358,6 +1362,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': 'virtual'})
@@ -1401,6 +1406,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'Yes',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': ''})
@@ -1426,6 +1432,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': ''})
@@ -1466,6 +1473,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': 'in-person'})
@@ -1495,6 +1503,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': 'virtual'})
@@ -1526,6 +1535,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': 'hybrid'})
@@ -3031,6 +3041,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': 'in-person'})
@@ -3045,6 +3056,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': 'in-person'})
@@ -3059,6 +3071,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'Yes',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': 'in-person'})
@@ -3289,6 +3302,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': 'in-person'})
@@ -3303,6 +3317,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'Yes',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': 'in-person'})
@@ -3328,7 +3343,7 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.edit('event', '1', {'preregistration_enabled': 'no',
                                           'registration_enabled': 'no'})
         # Confirming unchanged numbers is OK even when preregistration
-        # is disabled.
+        # is disabled; so is changing the billing address.
         reg_session.edit_prereg('3',
                                 {})
         admin_session.edit('event', '1', {'preregistration_enabled': 'yes'})
@@ -3377,6 +3392,8 @@ class RegSystemTestCase(unittest.TestCase):
                                 'please contact the event organisers to '
                                 'change expected numbers of registered '
                                 'participants')
+        reg_session.edit_prereg('3',
+                                {'billing_address': 'some address'})
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv()
         self.assertEqual(anon_csv,
@@ -3392,6 +3409,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '2',
              'Expected Numbers Confirmed': 'Yes',
+             'Billing Address': 'some address',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': 'in-person'})
@@ -3406,6 +3424,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'Yes',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': 'in-person'})
@@ -3448,6 +3467,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': 'virtual'})
@@ -3462,6 +3482,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'Yes',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': 'virtual'})
@@ -3504,6 +3525,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': ''})
@@ -3518,6 +3540,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'Yes',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': ''})
@@ -3573,6 +3596,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': ''})
@@ -3587,6 +3611,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'Yes',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': ''})
@@ -3677,6 +3702,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'Yes',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': 'in-person'})
@@ -3702,6 +3728,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': 'in-person'})
@@ -3715,7 +3742,8 @@ class RegSystemTestCase(unittest.TestCase):
                                  'expected_observers_a': '5',
                                  'expected_observers_b': '7',
                                  'expected_observers_c': '11',
-                                 'expected_single_rooms': '13'})
+                                 'expected_single_rooms': '13',
+                                 'billing_address': 'our address'})
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv()
         reg_csv = reg_session.get_countries_csv()
@@ -3726,18 +3754,21 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Deputy': '7',
              'Expected Observers with Contestants': '11',
              'Expected Single Rooms': '13',
-             'Expected Numbers Confirmed': 'Yes'})
+             'Expected Numbers Confirmed': 'Yes',
+             'Billing Address': 'our address'})
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
         reg_session.edit_prereg('3',
                                 {'expected_leaders': '0',
-                                 'expected_deputies': '1'})
+                                 'expected_deputies': '1',
+                                 'billing_address': 'another address'})
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv()
         reg_csv = reg_session.get_countries_csv()
         expected_abc_admin['Expected Leaders'] = '0'
         expected_abc_admin['Expected Deputies'] = '1'
+        expected_abc_admin['Billing Address'] = 'another address'
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
@@ -3766,6 +3797,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'Yes',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': 'virtual'})
@@ -3791,6 +3823,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': 'virtual'})
@@ -3852,6 +3885,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'Yes',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': ''})
@@ -3877,6 +3911,7 @@ class RegSystemTestCase(unittest.TestCase):
              'Expected Observers with Contestants': '0',
              'Expected Single Rooms': '0',
              'Expected Numbers Confirmed': 'No',
+             'Billing Address': '',
              'Leader Email': '',
              'Physical Address': '',
              'Participation Type': ''})

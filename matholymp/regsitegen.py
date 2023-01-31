@@ -385,15 +385,16 @@ class RegSiteGenerator(SiteGenerator):
         """
         Return a description of missing details for a country.
         """
-        if c.participation_type == 'in-person':
-            return ''
         missing = []
-        if c.participation_type is None:
-            missing.append('whether remote or in-person')
-        if not c.leader_email:
-            missing.append('leader email')
-        if not c.physical_address:
-            missing.append('physical address')
+        if not c.billing_address:
+            missing.append('billing address')
+        if c.participation_type != 'in-person':
+            if c.participation_type is None:
+                missing.append('whether remote or in-person')
+            if not c.leader_email:
+                missing.append('leader email')
+            if not c.physical_address:
+                missing.append('physical address')
         if missing:
             return ('<p>Not specified for <strong>%s</strong>: %s.</p>\n'
                     % (html.escape(c.name_with_code),

@@ -421,6 +421,7 @@ class CSVDataSource(DataSource):
                                    'code': 'Code',
                                    'name': 'Name',
                                    'flag_url': 'Flag URL',
+                                   'billing_address': 'Billing Address',
                                    'leader_email': 'Leader Email',
                                    'physical_address': 'Physical Address',
                                    'participation_type': 'Participation Type'}
