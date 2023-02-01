@@ -28,6 +28,11 @@
   <a href="person?@action=consent_forms_zip">ZIP file of participant consent
   forms</a> is also available.</p>
 
+<p tal:condition="python:utils.have_id_scans(db._db) and
+  request.user.hasPermission('Omnivident')">A
+  <a href="person?@action=id_scans_zip">ZIP file of participant ID
+  scans</a> is also available.</p>
+
 <tal:block tal:condition="python:db._db.config.ext['MATHOLYMP_DOCGEN_DIRECTORY'] and request.user.hasPermission('GenerateNameBadges')">
 <form method="GET" tal:attributes="action context/designator">
 <table class="form">
