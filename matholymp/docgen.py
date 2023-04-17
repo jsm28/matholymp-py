@@ -475,7 +475,7 @@ class DocumentGenerator:
 
     def generate_award_certs(self, person_id, use_background):
         """Generate all award certificates requested by the command line."""
-        template_file_base = 'certificate-template'
+        template_file_base = 'certificate-template-award'
         contestants = sorted(self._event.contestant_list,
                              key=lambda x: x.sort_key)
         if person_id == 'gold':
@@ -520,7 +520,7 @@ class DocumentGenerator:
         """
         Generate all participation certificates requested by the command line.
         """
-        template_file_base = 'certificate-template'
+        template_file_base = 'certificate-template-participation'
         if person_id == 'all':
             people = sorted(self._event.person_list, key=lambda x: x.sort_key)
             output_file_base = 'participation-certificates'

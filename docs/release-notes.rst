@@ -102,6 +102,11 @@ Next version (unreleased)
   for countries.  :file:`country.item.html` and
   :file:`country.prereg.html` are changed.
 
+* Document generation now uses separate templates
+  :file:`certificate-template-award.tex` and
+  :file:`certificate-template-participation.tex` for generating
+  certificates instead of a single :file:`certificate-template.tex`.
+
 Version 2020.07.0 (22 July 2020)
 --------------------------------
 
