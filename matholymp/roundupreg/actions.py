@@ -989,7 +989,8 @@ class PersonBulkRegisterAction(BulkRegisterAction):
             realname = '%s %s' % (item['given_name'], item['family_name'])
             pw = roundup.password.generatePassword()
             self.db.user.create(username=username, realname=realname,
-                                password=roundup.password.Password(pw),
+                                password=roundup.password.Password(
+                                    pw, config=self.db.config),
                                 address=contact_list[0],
                                 country=item['country'], person=item_id,
                                 roles='User,SelfRegister')

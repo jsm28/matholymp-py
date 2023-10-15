@@ -76,7 +76,7 @@ def country_react(db, cl, nodeid, oldvalues):
         return
     pw = roundup.password.generatePassword()
     db.user.create(username=username, realname=realname,
-                   password=roundup.password.Password(pw),
+                   password=roundup.password.Password(pw, config=db.config),
                    address=email_addr, country=nodeid,
                    roles='User,Register')
     template_path = os.path.join(db.config.TRACKER_HOME, 'extensions',

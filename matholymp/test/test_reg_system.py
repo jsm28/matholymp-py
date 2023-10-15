@@ -259,7 +259,8 @@ class RoundupTestInstance:
             os.fork = wrap_fork
             os._exit = wrap_exit
         instance = roundup.instance.open(self.instance_dir)
-        instance.init(roundup.password.Password(self.passwords['admin']))
+        instance.init(roundup.password.Password(self.passwords['admin'],
+                                                config=instance.config))
         # Start up a server in a forked child, which reports back the
         # port number used to the parent (repeatedly trying random
         # ports as needed until one is free).

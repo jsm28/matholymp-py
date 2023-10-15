@@ -39,7 +39,7 @@ installing Roundup.  All these patches can be applied with
 :command:`patch -p1 -N -E` from within the Roundup source directory.
 
 These are located in the :file:`roundup-patches/` directory of the
-source distribution, and are relative to Roundup version 2.2.0 (so may
+source distribution, and are relative to Roundup version 2.3.0 (so may
 require changes to apply cleanly to later versions).  Details of the
 individual patches are:
 

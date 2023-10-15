@@ -79,7 +79,7 @@ Next version (unreleased)
 * The static site now describes virtual events as "organised by" not
   "in" their host countries.
 
-* The Roundup patches have been updated for Roundup 2.2.0, as has the
+* The Roundup patches have been updated for Roundup 2.3.0, as has the
   example :file:`config.ini`.
 
 * The registration system now supports collecting information about
