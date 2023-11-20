@@ -103,7 +103,6 @@ def init_schema(env):
         # include in the schema for virtual events as well, given the
         # possibility of a hybrid event turning into a virtual one.
         country_extra['participation_type'] = String()
-        country_extra['leader_email'] = String()
         country_extra['physical_address'] = String()
     country = Class(db, 'country',
                     code=String(),
@@ -124,6 +123,7 @@ def init_schema(env):
                     expected_single_rooms=String(),
                     expected_numbers_confirmed=Boolean(),
                     billing_address=String(),
+                    leader_email=String(),
                     **country_extra)
     country.setkey('name')
     country.setorderprop('code')
@@ -579,10 +579,9 @@ def init_schema(env):
                     'expected_contestants', 'expected_observers_a',
                     'expected_observers_b', 'expected_observers_c',
                     'expected_single_rooms', 'expected_numbers_confirmed',
-                    'billing_address']
+                    'billing_address', 'leader_email']
     if have_remote_participation(db):
         prereg_props.append('participation_type')
-        prereg_props.append('leader_email')
         prereg_props.append('physical_address')
     p = db.security.addPermission(name='View', klass='country',
                                   check=own_country, properties=prereg_props)

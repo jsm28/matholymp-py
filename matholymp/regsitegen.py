@@ -388,11 +388,11 @@ class RegSiteGenerator(SiteGenerator):
         missing = []
         if not c.billing_address:
             missing.append('billing address')
+        if not c.leader_email:
+            missing.append('leader email')
         if c.participation_type != 'in-person':
             if c.participation_type is None:
                 missing.append('whether remote or in-person')
-            if not c.leader_email:
-                missing.append('leader email')
             if not c.physical_address:
                 missing.append('physical address')
         if missing:

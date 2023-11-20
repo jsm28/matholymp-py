@@ -82,6 +82,24 @@ define="edit_ok context/is_edit_ok"
  </tr>
 
  <tr>
+  <td colspan="2">The email address for the leader may be used to
+  distribute the papers and for other communications during the event.</td>
+ </tr>
+
+ <tal:block tal:condition="python:utils.have_remote_participation(db._db)">
+ <tr>
+  <td colspan="2">The email address for the leader may be provided to
+  other leaders to allow coordination on preparing translations into
+  languages used by more than one country.</td>
+ </tr>
+ </tal:block>
+
+ <tr tal:define="name string:leader_email; label string:Leader email; value context/leader_email; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Leader email</th>
+  <td><input name="leader_email" metal:use-macro="normal_input"></td>
+ </tr>
+
+ <tr>
   <td colspan="2">Please provide the name and address of the
   organisation to which invoices (e.g., for observers and single
   rooms) should be addressed.</td>
@@ -116,17 +134,9 @@ define="edit_ok context/is_edit_ok"
  <tal:block tal:condition="python:utils.have_remote_participation(db._db)">
 
  <tr>
-  <td colspan="2">The email address for the leader will be used to
-  distribute the papers, and will be provided to other leaders to
-  allow coordination on preparing translations into languages used by
-  more than one country.  The physical address will be used after the
+  <td colspan="2">The physical address will be used after the
   event to ship a large box with certificates, medals and other
   materials from the event.</td>
- </tr>
-
- <tr tal:define="name string:leader_email; label string:Leader email; value context/leader_email; edit_ok edit_ok">
-  <th metal:use-macro="th_label">Leader email</th>
-  <td><input name="leader_email" metal:use-macro="normal_input"></td>
  </tr>
 
  <tr tal:define="name string:physical_address; label string:Physical address; value context/physical_address; edit_ok edit_ok">

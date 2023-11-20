@@ -200,6 +200,11 @@ define="edit_ok context/is_edit_ok"
   </tal:if>
  </tr>
 
+ <tr tal:define="name string:leader_email; label string:Leader email; value context/leader_email; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Leader email</th>
+  <td><input name="leader_email" metal:use-macro="normal_input"></td>
+ </tr>
+
  <tr tal:define="name string:billing_address; label string:Billing address; value context/billing_address; edit_ok edit_ok">
   <th metal:use-macro="th_label">Billing address</th>
   <td><textarea rows="5" cols="40" tal:replace="structure context/billing_address/multiline"></textarea></td>
@@ -220,11 +225,6 @@ define="edit_ok context/is_edit_ok"
  </tal:block>
 
  <tal:block tal:condition="python:utils.have_remote_participation(db._db)">
-
- <tr tal:define="name string:leader_email; label string:Leader email; value context/leader_email; edit_ok edit_ok">
-  <th metal:use-macro="th_label">Leader email</th>
-  <td><input name="leader_email" metal:use-macro="normal_input"></td>
- </tr>
 
  <tr tal:define="name string:physical_address; label string:Physical address; value context/physical_address; edit_ok edit_ok">
   <th metal:use-macro="th_label">Physical address</th>

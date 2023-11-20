@@ -1270,6 +1270,16 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # Test leader email in CSV file.
+        admin_session.edit('country', '3',
+                           {'leader_email': 'ABCleader@example.invalid'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc_admin['Leader Email'] = 'ABCleader@example.invalid'
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
 
     @_with_config(distinguish_official='Yes')
     def test_country_csv_official(self):
@@ -1375,12 +1385,10 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
         # Test virtual event data in CSV file.
         admin_session.edit('country', '3',
-                           {'leader_email': 'ABCleader@example.invalid',
-                            'physical_address': 'Maths HQ\nThis Country'})
+                           {'physical_address': 'Maths HQ\nThis Country'})
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv()
         reg_csv = reg_session.get_countries_csv()
-        expected_abc_admin['Leader Email'] = 'ABCleader@example.invalid'
         expected_abc_admin['Physical Address'] = 'Maths HQ\nThis Country'
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
@@ -1445,12 +1453,10 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
         # Test virtual event data in CSV file.
         admin_session.edit('country', '3',
-                           {'leader_email': 'ABCleader@example.invalid',
-                            'physical_address': 'Maths HQ\nThis Country'})
+                           {'physical_address': 'Maths HQ\nThis Country'})
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv()
         reg_csv = reg_session.get_countries_csv()
-        expected_abc_admin['Leader Email'] = 'ABCleader@example.invalid'
         expected_abc_admin['Physical Address'] = 'Maths HQ\nThis Country'
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
@@ -2698,6 +2704,9 @@ class RegSystemTestCase(unittest.TestCase):
              'https://www.example.invalid/countries/country1N/'},
             error=r'example.invalid URLs for previous participation must be '
             r'in the form https://www\.example\.invalid/countries/countryN/')
+        admin_session.create_country('ABC', 'Test First Country',
+                                     {'leader_email': 'bad_email'},
+                                     error='Email address syntax is invalid')
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv_public_only()
         self.assertEqual(anon_csv, [expected_staff])
@@ -2739,25 +2748,6 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv, [expected_staff])
         self.assertEqual(admin_csv, [expected_staff])
 
-    @_with_config(event_type='virtual')
-    def test_country_create_audit_errors_virtual(self):
-        """
-        Test errors from country creation auditor, virtual event.
-        """
-        session = self.get_session()
-        admin_session = self.get_session('admin')
-        expected_staff = {'XMO Number': '2', 'Country Number': '1',
-                          'Annual URL': self.instance.url + 'country1',
-                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
-                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
-        admin_session.create_country('ABC', 'Test First Country',
-                                     {'leader_email': 'bad_email'},
-                                     error='Email address syntax is invalid')
-        anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv_public_only()
-        self.assertEqual(anon_csv, [expected_staff])
-        self.assertEqual(admin_csv, [expected_staff])
-
     @_with_config(event_type='hybrid')
     def test_country_create_audit_errors_hybrid(self):
         """
@@ -2769,13 +2759,6 @@ class RegSystemTestCase(unittest.TestCase):
                           'Annual URL': self.instance.url + 'country1',
                           'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
                           'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
-        admin_session.create_country('ABC', 'Test First Country',
-                                     {'leader_email': 'bad_email'},
-                                     error='Email address syntax is invalid')
-        anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv_public_only()
-        self.assertEqual(anon_csv, [expected_staff])
-        self.assertEqual(admin_csv, [expected_staff])
         admin_session.check_open_relative('country?@template=item')
         admin_session.select_main_form()
         form = admin_session.b.get_current_form().form
@@ -3005,6 +2988,10 @@ class RegSystemTestCase(unittest.TestCase):
              'https://www.example.invalid/countries/country1N/'},
             error=r'example.invalid URLs for previous participation must be '
             r'in the form https://www\.example\.invalid/countries/countryN/')
+        admin_session.edit(
+            'country', '1',
+            {'leader_email': 'bad_email'},
+            error='Email address syntax is invalid')
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv_public_only()
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
@@ -3109,26 +3096,6 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc, expected_staff])
 
-    @_with_config(event_type='virtual')
-    def test_country_edit_audit_errors_virtual(self):
-        """
-        Test errors from country edit auditor, virtual event.
-        """
-        session = self.get_session()
-        admin_session = self.get_session('admin')
-        expected_staff = {'XMO Number': '2', 'Country Number': '1',
-                          'Annual URL': self.instance.url + 'country1',
-                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
-                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
-        admin_session.edit(
-            'country', '1',
-            {'leader_email': 'bad_email'},
-            error='Email address syntax is invalid')
-        anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv_public_only()
-        self.assertEqual(anon_csv, [expected_staff])
-        self.assertEqual(admin_csv, [expected_staff])
-
     @_with_config(event_type='hybrid')
     def test_country_edit_audit_errors_hybrid(self):
         """
@@ -3140,14 +3107,6 @@ class RegSystemTestCase(unittest.TestCase):
                           'Annual URL': self.instance.url + 'country1',
                           'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
                           'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
-        admin_session.edit(
-            'country', '1',
-            {'leader_email': 'bad_email'},
-            error='Email address syntax is invalid')
-        anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv_public_only()
-        self.assertEqual(anon_csv, [expected_staff])
-        self.assertEqual(admin_csv, [expected_staff])
         admin_session.check_open_relative('country1')
         admin_session.select_main_form()
         form = admin_session.b.get_current_form().form
@@ -3291,6 +3250,9 @@ class RegSystemTestCase(unittest.TestCase):
                                 {'expected_single_rooms': '1x'},
                                 error='Invalid expected number of single room '
                                 'requests')
+        reg_session.edit_prereg('3',
+                                {'leader_email': 'bad'},
+                                error='Email address syntax is invalid')
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv()
         self.assertEqual(anon_csv,
@@ -3435,64 +3397,6 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv,
                          [expected_abc_admin, expected_staff_admin])
 
-    @_with_config(event_type='virtual')
-    def test_country_edit_audit_errors_prereg_virtual(self):
-        """
-        Test errors from country edit auditor, preregistration virtual
-        event case.
-        """
-        session = self.get_session()
-        admin_session = self.get_session('admin')
-        expected_staff = {'XMO Number': '2', 'Country Number': '1',
-                          'Annual URL': self.instance.url + 'country1',
-                          'Code': 'ZZA', 'Name': 'XMO 2015 Staff',
-                          'Flag URL': '', 'Generic Number': '', 'Normal': 'No'}
-        admin_session.create_country_generic()
-        reg_session = self.get_session('ABC_reg')
-        expected_abc = {'XMO Number': '2', 'Country Number': '3',
-                        'Annual URL': self.instance.url + 'country3',
-                        'Code': 'ABC', 'Name': 'Test First Country',
-                        'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
-        reg_session.edit_prereg('3',
-                                {'leader_email': 'bad'},
-                                error='Email address syntax is invalid')
-        anon_csv = session.get_countries_csv()
-        admin_csv = admin_session.get_countries_csv()
-        self.assertEqual(anon_csv,
-                         [expected_abc, expected_staff])
-        expected_abc_admin = expected_abc.copy()
-        expected_abc_admin.update(
-            {'Contact Emails': '',
-             'Expected Leaders': '1',
-             'Expected Deputies': '1',
-             'Expected Contestants': '6',
-             'Expected Observers with Leader': '0',
-             'Expected Observers with Deputy': '0',
-             'Expected Observers with Contestants': '0',
-             'Expected Single Rooms': '0',
-             'Expected Numbers Confirmed': 'No',
-             'Billing Address': '',
-             'Leader Email': '',
-             'Physical Address': '',
-             'Participation Type': 'virtual'})
-        expected_staff_admin = expected_staff.copy()
-        expected_staff_admin.update(
-            {'Contact Emails': '',
-             'Expected Leaders': '0',
-             'Expected Deputies': '0',
-             'Expected Contestants': '0',
-             'Expected Observers with Leader': '0',
-             'Expected Observers with Deputy': '0',
-             'Expected Observers with Contestants': '0',
-             'Expected Single Rooms': '0',
-             'Expected Numbers Confirmed': 'Yes',
-             'Billing Address': '',
-             'Leader Email': '',
-             'Physical Address': '',
-             'Participation Type': 'virtual'})
-        self.assertEqual(admin_csv,
-                         [expected_abc_admin, expected_staff_admin])
-
     @_with_config(event_type='hybrid')
     def test_country_edit_audit_errors_prereg_hybrid(self):
         """
@@ -3511,9 +3415,6 @@ class RegSystemTestCase(unittest.TestCase):
                         'Annual URL': self.instance.url + 'country3',
                         'Code': 'ABC', 'Name': 'Test First Country',
                         'Flag URL': '', 'Generic Number': '', 'Normal': 'Yes'}
-        reg_session.edit_prereg('3',
-                                {'leader_email': 'bad'},
-                                error='Email address syntax is invalid')
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv()
         self.assertEqual(anon_csv,
@@ -3776,6 +3677,32 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # Test editing leader email.
+        reg_session.edit_prereg(
+            '3',
+            {'leader_email': 'gets-papers@example.invalid'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc_admin.update(
+            {'Expected Numbers Confirmed': 'Yes',
+             'Leader Email': 'gets-papers@example.invalid'})
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
+        # This data can be edited even when preregistration is disabled.
+        admin_session.edit('event', '1', {'preregistration_enabled': 'no'})
+        reg_session.edit_prereg('3',
+                                {'leader_email':
+                                 'gets-papers2@example.invalid'})
+        anon_csv = session.get_countries_csv()
+        admin_csv = admin_session.get_countries_csv()
+        reg_csv = reg_session.get_countries_csv()
+        expected_abc_admin.update(
+            {'Leader Email': 'gets-papers2@example.invalid'})
+        self.assertEqual(anon_csv, [expected_abc, expected_staff])
+        self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
+        self.assertEqual(reg_csv, [expected_abc, expected_staff])
 
     @_with_config(event_type='virtual')
     def test_country_prereg_virtual(self):
@@ -3836,14 +3763,12 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
         # Test editing virtual event data.
         reg_session.edit_prereg('3',
-                                {'leader_email': 'gets-papers@example.invalid',
-                                 'physical_address': 'Some Address\nCountry'})
+                                {'physical_address': 'Some Address\nCountry'})
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv()
         reg_csv = reg_session.get_countries_csv()
         expected_abc_admin.update(
             {'Expected Numbers Confirmed': 'Yes',
-             'Leader Email': 'gets-papers@example.invalid',
              'Physical Address': 'Some Address\nCountry'})
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
@@ -3851,16 +3776,13 @@ class RegSystemTestCase(unittest.TestCase):
         # This data can be edited even when preregistration is disabled.
         admin_session.edit('event', '1', {'preregistration_enabled': 'no'})
         reg_session.edit_prereg('3',
-                                {'leader_email':
-                                 'gets-papers2@example.invalid',
-                                 'physical_address':
+                                {'physical_address':
                                  'Some Address 2\nCountry'})
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv()
         reg_csv = reg_session.get_countries_csv()
         expected_abc_admin.update(
-            {'Leader Email': 'gets-papers2@example.invalid',
-             'Physical Address': 'Some Address 2\nCountry'})
+            {'Physical Address': 'Some Address 2\nCountry'})
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])
@@ -3926,7 +3848,6 @@ class RegSystemTestCase(unittest.TestCase):
         reg_session.edit_prereg('3',
                                 {'participation_type':
                                  'All participants present in person',
-                                 'leader_email': 'gets-papers@example.invalid',
                                  'physical_address': 'Some Address\nCountry'})
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv()
@@ -3934,7 +3855,6 @@ class RegSystemTestCase(unittest.TestCase):
         expected_abc_admin.update(
             {'Expected Numbers Confirmed': 'Yes',
              'Participation Type': 'in-person',
-             'Leader Email': 'gets-papers@example.invalid',
              'Physical Address': 'Some Address\nCountry'})
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
@@ -3955,16 +3875,13 @@ class RegSystemTestCase(unittest.TestCase):
         # This data can be edited even when preregistration is disabled.
         admin_session.edit('event', '1', {'preregistration_enabled': 'no'})
         reg_session.edit_prereg('3',
-                                {'leader_email':
-                                 'gets-papers2@example.invalid',
-                                 'physical_address':
+                                {'physical_address':
                                  'Some Address 2\nCountry'})
         anon_csv = session.get_countries_csv()
         admin_csv = admin_session.get_countries_csv()
         reg_csv = reg_session.get_countries_csv()
         expected_abc_admin.update(
-            {'Leader Email': 'gets-papers2@example.invalid',
-             'Physical Address': 'Some Address 2\nCountry'})
+            {'Physical Address': 'Some Address 2\nCountry'})
         self.assertEqual(anon_csv, [expected_abc, expected_staff])
         self.assertEqual(admin_csv, [expected_abc_admin, expected_staff_admin])
         self.assertEqual(reg_csv, [expected_abc, expected_staff])

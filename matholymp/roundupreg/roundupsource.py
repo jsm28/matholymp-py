@@ -435,9 +435,9 @@ class RoundupDataSource(DataSource):
         elif name == 'expected_numbers_confirmed':
             return self._db.country.get(country_id,
                                         'expected_numbers_confirmed')
-        elif name == 'billing_address':
-            return self._db.country.get(country_id, 'billing_address')
-        elif name in ('leader_email', 'physical_address'):
+        elif name in ('billing_address', 'leader_email'):
+            return self._db.country.get(country_id, name)
+        elif name == 'physical_address':
             if not have_remote_participation(self._db):
                 return None
             return self._db.country.get(country_id, name)
