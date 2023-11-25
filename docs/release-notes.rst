@@ -107,6 +107,11 @@ Next version (unreleased)
   :file:`certificate-template-participation.tex` for generating
   certificates instead of a single :file:`certificate-template.tex`.
 
+* Email addresses for leaders are collected unconditionally in
+  preregistration rather than only for virtual or hybrid events.
+  :file:`country.item.html` and :file:`country.prereg.html` are
+  changed.
+
 Version 2020.07.0 (22 July 2020)
 --------------------------------
 
