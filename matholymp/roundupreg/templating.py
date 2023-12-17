@@ -48,7 +48,7 @@ __all__ = ['people_from_country_internal', 'people_from_country',
            'show_prereg_reminder', 'bulk_csv_contents',
            'show_bulk_csv_country', 'show_bulk_csv_country_link_from_code',
            'show_bulk_csv_person', 'bulk_zip_ref', 'required_user_fields',
-           'registration_enabled']
+           'registration_enabled', 'show_scores']
 
 import base64
 import datetime
@@ -78,7 +78,7 @@ from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import person_date_of_birth, \
     contestant_age, person_is_contestant, contestant_code, pn_score, \
     scores_final, any_scores_missing, country_has_contestants, \
-    valid_country_problem, registration_enabled
+    valid_country_problem, registration_enabled, show_scores
 from matholymp.roundupreg.staticsite import static_site_event_group
 
 
@@ -756,3 +756,4 @@ def register_templating_utils(instance):
     instance.registerUtil('bulk_zip_ref', bulk_zip_ref)
     instance.registerUtil('required_user_fields', required_user_fields)
     instance.registerUtil('registration_enabled', registration_enabled)
+    instance.registerUtil('show_scores', show_scores)

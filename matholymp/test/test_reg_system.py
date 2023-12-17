@@ -717,6 +717,10 @@ class RoundupTestSession:
         """Create a scoring user."""
         self.create_user('scoring', 'XMO 2015 Staff', 'User,Score')
 
+    def create_viewscores_user(self):
+        """Create a user who can view hidden scores."""
+        self.create_user('viewscores', 'XMO 2015 Staff', 'User,ViewScores')
+
     def create_country(self, code, name, other=None, error=False):
         """Create a country and corresponding user account."""
         data = {'code': code, 'name': name}
@@ -4537,6 +4541,25 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.check_open_relative('person?@action=scores_rss',
                                           error='This action only applies '
                                           'to countries')
+        # Test hiding scores.
+        admin_session.edit('event', '1',
+                           {'hide_scores_message': 'Testing hiding scores.'})
+        admin_session.create_viewscores_user()
+        viewscores_session = self.get_session('viewscores')
+        admin_session.check_get(
+            self.instance.url + 'country?@action=scores_rss', html=False)
+        admin_session.check_get(
+            self.instance.url + 'country1?@action=scores_rss', html=False)
+        viewscores_session.check_get(
+            self.instance.url + 'country?@action=scores_rss', html=False)
+        viewscores_session.check_get(
+            self.instance.url + 'country1?@action=scores_rss', html=False)
+        session.check_open_relative('country?@action=scores_rss',
+                                    error='Scores are currently hidden',
+                                    status=403)
+        session.check_open_relative('country1?@action=scores_rss',
+                                    error='Scores are currently hidden',
+                                    status=403)
 
     def test_person_csv(self):
         """
@@ -12975,6 +12998,8 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session = self.get_session('admin')
         admin_session.create_scoring_user()
         score_session = self.get_session('scoring')
+        admin_session.create_viewscores_user()
+        viewscores_session = self.get_session('viewscores')
         admin_session.create_country_generic()
         admin_session.create_person('Test First Country', 'Contestant 1')
         admin_session.create_person('Test First Country', 'Contestant 2')
@@ -13126,6 +13151,46 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv_p, admin_csv)
         self.assertEqual(score_csv, admin_csv)
         self.assertEqual(score_csv_p, admin_csv)
+        # Test hiding scores.
+        admin_session.edit('event', '1',
+                           {'hide_scores_message': 'Testing hiding scores.'})
+        admin_csv_2 = admin_session.get_scores_csv()
+        admin_csv_p_2 = admin_session.get_people_csv_scores()
+        self.assertEqual(admin_csv_2, admin_csv)
+        self.assertEqual(admin_csv_p_2, admin_csv)
+        score_csv_2 = score_session.get_scores_csv()
+        score_csv_p_2 = score_session.get_people_csv_scores()
+        self.assertEqual(score_csv_2, admin_csv)
+        self.assertEqual(score_csv_p_2, admin_csv)
+        viewscores_csv_2 = viewscores_session.get_scores_csv()
+        viewscores_csv_p_2 = viewscores_session.get_people_csv_scores()
+        self.assertEqual(viewscores_csv_2, admin_csv)
+        self.assertEqual(viewscores_csv_p_2, admin_csv)
+        scores_csv_url = self.instance.url + 'person?@action=scores_csv'
+        session.check_open(scores_csv_url,
+                           error='Scores are currently hidden',
+                           status=403)
+        anon_csv_p_2 = session.get_people_csv_scores()
+        self.assertEqual(
+            anon_csv_p_2,
+            [{'Country Name': 'Test First Country',
+              'Country Code': 'ABC', 'Contestant Code': 'ABC1',
+              'Given Name': 'Given 1', 'Family Name': 'Family 1'},
+             {'Country Name': 'Test First Country',
+              'Country Code': 'ABC', 'Contestant Code': 'ABC2',
+              'Given Name': 'Given 2', 'Family Name': 'Family 2'},
+             {'Country Name': 'Test First Country',
+              'Country Code': 'ABC', 'Contestant Code': 'ABC4',
+              'Given Name': 'Given 3', 'Family Name': 'Family 3'},
+             {'Country Name': 'Test Second Country',
+              'Country Code': 'DEF', 'Contestant Code': 'DEF2',
+              'Given Name': 'Given 4', 'Family Name': 'Family 4'},
+             {'Country Name': 'Test Second Country',
+              'Country Code': 'DEF', 'Contestant Code': 'DEF3',
+              'Given Name': 'Given 5', 'Family Name': 'Family 5'},
+             {'Country Name': 'Test Second Country',
+              'Country Code': 'DEF', 'Contestant Code': 'DEF4',
+              'Given Name': 'Given 6', 'Family Name': 'Family 6'}])
 
     @_with_config(event_type='virtual')
     def test_person_score_virtual(self):

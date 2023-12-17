@@ -107,6 +107,11 @@ define="edit_ok context/is_edit_ok"
   <td><input name="bronze" metal:use-macro="normal_input"></td>
  </tr>
 
+ <tr tal:define="name string:hide_scores_message; label string:Message for hiding scores; value context/hide_scores_message; edit_ok edit_ok">
+  <th metal:use-macro="th_label">Message for hiding scores</th>
+  <td><input name="hide_scores_message" metal:use-macro="normal_input"></td>
+ </tr>
+
  <tr tal:condition="edit_ok">
   <td>
    &nbsp;

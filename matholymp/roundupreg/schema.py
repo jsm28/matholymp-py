@@ -60,6 +60,7 @@ from matholymp.roundupreg.config import distinguish_official, \
     invitation_letter_register, is_virtual_event, have_remote_participation, \
     allow_hybrid_countries, get_sars_cov2_cert_bool, \
     get_sars_cov2_doses_bool, get_sars_cov2_after_bool, have_vaccine_status
+from matholymp.roundupreg.rounduputil import show_scores
 
 __all__ = ['init_schema']
 
@@ -93,6 +94,7 @@ def init_schema(env):
           gold=String(),
           silver=String(),
           bronze=String(),
+          hide_scores_message=String(),
           **event_extra)
 
     country_extra = {}
@@ -449,13 +451,23 @@ def init_schema(env):
         person_photo = db.person.get(photo_person, 'photo')
         return person_photo == itemid
 
+    def can_view_scores(db, userid, itemid):
+        """Determine whether this user can view scores for this person."""
+        return (normal_can_view_person(db, userid, itemid)
+                and show_scores(db, userid))
+
     p = db.security.addPermission(name='View', klass='person',
                                   check=normal_can_view_person,
                                   properties=('country', 'given_name',
                                               'family_name', 'primary_role',
                                               'other_roles', 'guide_for',
-                                              'photo', 'scores',
-                                              'extra_awards', 'generic_url'))
+                                              'photo', 'extra_awards',
+                                              'generic_url'))
+    db.security.addPermissionToRole('User', p)
+    db.security.addPermissionToRole('Anonymous', p)
+    p = db.security.addPermission(name='View', klass='person',
+                                  check=can_view_scores,
+                                  properties=('scores',))
     db.security.addPermissionToRole('User', p)
     db.security.addPermissionToRole('Anonymous', p)
     p = db.security.addPermission(name='View', klass='photo',
@@ -717,3 +729,10 @@ def init_schema(env):
     # Downloading full person data has its own Permission.
     p = db.security.addPermission(name='Omnivident')
     db.security.addPermissionToRole('Admin', p)
+
+    # The display of non-final scores may be limited at some times.
+    p = db.security.addPermission(name='ViewScores')
+    db.security.addPermissionToRole('Admin', p)
+    db.security.addPermissionToRole('Score', p)
+    db.security.addRole(name='ViewScores', description='Viewing scores')
+    db.security.addPermissionToRole('ViewScores', p)

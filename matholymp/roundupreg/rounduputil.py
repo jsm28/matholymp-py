@@ -46,7 +46,8 @@ __all__ = ['scores_from_str', 'person_date_of_birth', 'contestant_age',
            'scores_final', 'any_scores_missing', 'country_has_contestants',
            'valid_country_problem', 'valid_int_str', 'create_rss',
            'db_file_format_contents', 'db_file_extension', 'db_file_url',
-           'country_from_code', 'person_is_remote', 'registration_enabled']
+           'country_from_code', 'person_is_remote', 'registration_enabled',
+           'show_scores']
 
 
 def scores_from_str(db, score_str):
@@ -266,3 +267,10 @@ def registration_enabled(db, userid):
     """
     return (db.security.hasPermission('RegisterAnyTime', userid)
             or db.event.get('1', 'registration_enabled'))
+
+
+def show_scores(db, userid):
+    """Determine whether scores are displayed."""
+    return (db.security.hasPermission('ViewScores', userid)
+            or not db.event.get('1', 'hide_scores_message')
+            or scores_final(db))

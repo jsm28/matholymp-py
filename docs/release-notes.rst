@@ -112,6 +112,15 @@ Next version (unreleased)
   :file:`country.item.html` and :file:`country.prereg.html` are
   changed.
 
+* There is now support for hiding scores before they are final.  To
+  use it, set "Message for hiding scores" to something nonempty under
+  :guilabel:`Set medal boundaries or disable registration`; that
+  message (possibly giving the time at which scores will stop being
+  hidden, for example) is displayed on the scoreboard page.
+  :file:`country.item.html, :file:`event.item.html`,
+  :file:`person.item.html`, :file:`person.scoreboard.html` and
+  :file:`person.scoredisplay.html` are changed.
+
 Version 2020.07.0 (22 July 2020)
 --------------------------------
 

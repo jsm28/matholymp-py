@@ -305,6 +305,7 @@ define="edit_ok context/is_edit_ok"
 			context.id)" />
 
 <tal:block tal:condition="python:utils.country_has_contestants(db._db, context.id)">
+<tal:block tal:condition="python:utils.show_scores(db._db, request.user.id)">
 <h2 tal:condition="python:utils.scores_final(db._db)">Final Scores</h2>
 <h2 tal:condition="python:not utils.scores_final(db._db)">Live Scores</h2>
 
@@ -316,6 +317,8 @@ define="edit_ok context/is_edit_ok"
 <tal:block tal:replace="structure
 			python:utils.country_scores_table(db._db,
 			context.id)" />
+</tal:block>
+
 </tal:block>
 
 </tal:block>

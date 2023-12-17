@@ -760,11 +760,13 @@ select the appropriate options.  You must select &ldquo;Yes&rdquo; or
 <tal:block tal:replace="python:utils.contestant_age(db._db,
 			context.id)" />.</p>
 <tal:block tal:condition="python:not db._db.person.is_retired(context.id)">
+<tal:block tal:condition="python:utils.show_scores(db._db, request.user.id)">
 <h2 tal:condition="python:utils.scores_final(db._db)">Final Scores</h2>
 <h2 tal:condition="python:not utils.scores_final(db._db)">Live Scores</h2>
 <tal:block tal:replace="structure
 			python:utils.person_scores_table(db._db,
 			context.id)" />
+</tal:block>
 </tal:block>
 </tal:block>
 </tal:block>

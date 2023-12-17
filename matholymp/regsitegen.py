@@ -72,10 +72,11 @@ class RegSiteGenerator(SiteGenerator):
         data = self.one_event_scores_csv_content(self.event, reg_system=True)
         return write_utf8_csv_bytes(data[0], data[1])
 
-    def people_csv_bytes(self, private_data):
+    def people_csv_bytes(self, private_data, show_scores):
         """Return the byte contents of the CSV of people."""
         data = self.one_event_people_csv_content(self.event, reg_system=True,
-                                                 private_data=private_data)
+                                                 private_data=private_data,
+                                                 show_scores=show_scores)
         return write_utf8_csv_bytes(data[0], data[1])
 
     def medal_boundaries_csv_bytes(self):

@@ -2128,18 +2128,21 @@ class SiteGenerator:
                                data[0], data[1])
 
     def people_csv_columns(self, num_problems, distinguish_official,
-                           reg_system=False, private_data=False):
+                           reg_system=False, private_data=False,
+                           show_scores=True):
         """Return list of headers for CSV file of people."""
         cols = [self._cfg['num_key'], 'Country Number', 'Person Number',
                 'Annual URL', 'Country Name', 'Country Code',
                 'Primary Role', 'Other Roles', 'Guide For',
                 'Contestant Code',
                 'Contestant Age', 'Given Name', 'Family Name']
-        cols.extend(self.pn_csv_header(num_problems))
-        cols.extend(['Total', 'Award', 'Extra Awards', 'Photo URL'])
+        if show_scores:
+            cols.extend(self.pn_csv_header(num_problems))
+            cols.extend(['Total', 'Award', 'Extra Awards'])
+        cols.extend(['Photo URL'])
         if reg_system:
             cols.extend(['Generic Number'])
-        if not reg_system:
+        if show_scores and not reg_system:
             cols.extend(['Rank'])
             if distinguish_official:
                 cols.extend(['%s Rank' % self._cfg['official_adj']])
@@ -2166,7 +2169,7 @@ class SiteGenerator:
 
     def person_csv_data(self, p, num_problems=None, distinguish_official=None,
                         scores_only=False, reg_system=False,
-                        private_data=False):
+                        private_data=False, show_scores=True):
         """Return the CSV data for a given person."""
         if num_problems is None:
             num_problems = p.event.num_problems
@@ -2198,39 +2201,41 @@ class SiteGenerator:
                     csv_out['Contestant Age'] = ''
                 else:
                     csv_out['Contestant Age'] = str(p.contestant_age)
-            for i in range(num_problems):
-                if i < p.event.num_problems:
-                    s = p.problem_scores[i]
-                    if s is None:
-                        s = ''
+            if show_scores:
+                for i in range(num_problems):
+                    if i < p.event.num_problems:
+                        s = p.problem_scores[i]
+                        if s is None:
+                            s = ''
+                        else:
+                            s = str(s)
+                        csv_out['P%d' % (i + 1)] = s
                     else:
-                        s = str(s)
-                    csv_out['P%d' % (i + 1)] = s
-                else:
-                    csv_out['P%d' % (i + 1)] = ''
-            csv_out['Total'] = str(p.total_score)
-            csv_out['Award'] = p.award or ''
-            csv_out['Extra Awards'] = comma_join(p.extra_awards)
-            if not reg_system:
-                csv_out['Rank'] = str(p.rank)
-                if distinguish_official:
-                    csv_out['%s Rank' % self._cfg['official_adj']] = (
-                        ''
-                        if p.rank_official is None
-                        else str(p.rank_official))
+                        csv_out['P%d' % (i + 1)] = ''
+                csv_out['Total'] = str(p.total_score)
+                csv_out['Award'] = p.award or ''
+                csv_out['Extra Awards'] = comma_join(p.extra_awards)
+                if not reg_system:
+                    csv_out['Rank'] = str(p.rank)
+                    if distinguish_official:
+                        csv_out['%s Rank' % self._cfg['official_adj']] = (
+                            ''
+                            if p.rank_official is None
+                            else str(p.rank_official))
         else:
             csv_out['Contestant Code'] = ''
             if not scores_only:
                 csv_out['Contestant Age'] = ''
-            for i in range(num_problems):
-                csv_out['P%d' % (i + 1)] = ''
-            csv_out['Total'] = ''
-            csv_out['Award'] = ''
-            csv_out['Extra Awards'] = ''
-            if not reg_system:
-                csv_out['Rank'] = ''
-                if distinguish_official:
-                    csv_out['%s Rank' % self._cfg['official_adj']] = ''
+            if show_scores:
+                for i in range(num_problems):
+                    csv_out['P%d' % (i + 1)] = ''
+                csv_out['Total'] = ''
+                csv_out['Award'] = ''
+                csv_out['Extra Awards'] = ''
+                if not reg_system:
+                    csv_out['Rank'] = ''
+                    if distinguish_official:
+                        csv_out['%s Rank' % self._cfg['official_adj']] = ''
         if reg_system and not scores_only:
             if p.generic_id is None:
                 csv_out['Generic Number'] = ''
@@ -2317,19 +2322,21 @@ class SiteGenerator:
                                people_data_output, people_columns)
 
     def one_event_people_csv_content(self, e, reg_system=False,
-                                     private_data=False):
+                                     private_data=False, show_scores=True):
         """
         Return a tuple of the data and column headers for the CSV file
         for people at one event.
         """
         e_people_sorted = sorted(e.person_list, key=lambda x: x.sort_key)
         e_people_data_output = [self.person_csv_data(p, reg_system=reg_system,
-                                                     private_data=private_data)
+                                                     private_data=private_data,
+                                                     show_scores=show_scores)
                                 for p in e_people_sorted]
         e_people_columns = self.people_csv_columns(e.num_problems,
                                                    e.distinguish_official,
                                                    reg_system=reg_system,
-                                                   private_data=private_data)
+                                                   private_data=private_data,
+                                                   show_scores=show_scores)
         return (e_people_data_output, e_people_columns)
 
     def generate_one_event_people_csv(self, e):
