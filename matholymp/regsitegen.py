@@ -259,7 +259,7 @@ class RegSiteGenerator(SiteGenerator):
                 if p.date_of_birth >= consent_forms_date:
                     missing_list.append('consent form')
 
-        if have_id_scans is not None and p.id_scan_url is None:
+        if have_id_scans and p.id_scan_url is None:
             missing_list.append('ID scan')
 
         if p.badge_photo_url is None:
