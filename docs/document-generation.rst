@@ -44,7 +44,9 @@ containing:
   will need updating for each year's event).
 
 * A subdirectory :file:`templates/` with various LaTeX templates for
-  documents and PDF backgrounds and logos.
+  documents and PDF backgrounds and logos.  These are built with
+  :command:`pdflatex`, unless they contain the string ``xelatex`` in
+  which case they are built with :command:`xelatex` instead.
 
 * A subdirectory :file:`papers/{year}/` containing LaTeX sources or
   PDFs of exam papers (from leaders, before headings and backgrounds

@@ -121,6 +121,11 @@ Next version (unreleased)
   :file:`person.item.html`, :file:`person.scoreboard.html` and
   :file:`person.scoredisplay.html` are changed.
 
+* Document generation now supports using :command:`xelatex` as an
+  alternative to :command:`pdflatex`.  If a template source file has a
+  comment mentioning ``xelatex``, that program will be used to compile
+  documents using that template.
+
 Version 2020.07.0 (22 July 2020)
 --------------------------------
 

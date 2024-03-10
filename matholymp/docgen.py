@@ -150,13 +150,16 @@ class DocumentGenerator:
 
     def subst_values_in_template_file(self, template_file_name,
                                       output_file_name, data, raw_fields):
-        """Substitute values from a dictionary in a LaTeX template file."""
+        """Substitute values from a dictionary in a LaTeX template file.
+        Return the LaTeX program to use."""
         template_text = read_text_from_file(template_file_name)
+        latex_prog = 'xelatex' if 'xelatex' in template_text else 'pdflatex'
         output_text = self.subst_values_in_template_text(template_text, data,
                                                          raw_fields)
         write_text_to_file(output_text, output_file_name)
+        return latex_prog
 
-    def pdflatex_file(self, output_file_name):
+    def pdflatex_file(self, output_file_name, latex_prog='pdflatex'):
         """Run pdflatex on a (generated) LaTeX file."""
         env = dict(os.environ)
         latex_dirs = []
@@ -168,7 +171,7 @@ class DocumentGenerator:
         latex_dirs.append('')
         env['TEXINPUTS'] = os.pathsep.join(latex_dirs)
         results = subprocess.run(  # pylint: disable=subprocess-run-check
-            ['pdflatex', output_file_name],
+            [latex_prog, output_file_name],
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
@@ -194,10 +197,10 @@ class DocumentGenerator:
                                           template_file_base + '.tex')
         output_file_name = os.path.join(self._out_dir,
                                         output_file_base + '.tex')
-        self.subst_values_in_template_file(template_file_name,
-                                           output_file_name, data,
-                                           raw_fields)
-        self.pdflatex_file(output_file_name)
+        latex_prog = self.subst_values_in_template_file(template_file_name,
+                                                        output_file_name, data,
+                                                        raw_fields)
+        self.pdflatex_file(output_file_name, latex_prog)
         self.pdflatex_cleanup(output_file_base)
 
     def get_person_by_id(self, person_id):
