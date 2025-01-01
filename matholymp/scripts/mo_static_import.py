@@ -132,8 +132,7 @@ def _import_from_dir(top_directory, input_directory, temp_dir):
     max_country_index = 0
     for c in countries_data:
         n = int(c['Country Number'])
-        if n > max_country_index:
-            max_country_index = n
+        max_country_index = max(max_country_index, n)
 
     new_countries_data = read_utf8_csv(input_countries_csv)
     country_index = {}
@@ -183,8 +182,7 @@ def _import_from_dir(top_directory, input_directory, temp_dir):
     max_person_index = 0
     for p in people_data:
         n = int(p['Person Number'])
-        if n > max_person_index:
-            max_person_index = n
+        max_person_index = max(max_person_index, n)
         i = max_num_problems + 1
         while ('P%d' % i) in p:
             max_num_problems = i
