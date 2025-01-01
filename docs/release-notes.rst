@@ -134,6 +134,9 @@ Next version (unreleased)
 * The obsolescent :py:mod:`imghdr` Python module is no longer used, so
   Python 3.13 and later are supported.
 
+* Building the matholympy documentation now supports Sphinx 2.0.0 and
+  later, and requires 1.7.0 or later.
+
 Version 2020.07.0 (22 July 2020)
 --------------------------------
 

@@ -38,7 +38,7 @@ import os
 import os.path
 import sys
 
-import sphinx
+import sphinx.cmd.build
 
 import matholymp
 
@@ -52,5 +52,6 @@ def main():
     parser.add_argument('--version', action='version',
                         version='%(prog)s ' + matholymp.__version__)
     parser.parse_args()
-    sys.exit(sphinx.main(['sphinx-build', '-b', 'dirhtml',
-                          os.path.join(sys.path[0], 'docs'), os.curdir]))
+    sys.exit(sphinx.cmd.build.main(['-b', 'dirhtml',
+                                    os.path.join(sys.path[0], 'docs'),
+                                    os.curdir]))

@@ -84,7 +84,8 @@ matholymp:
   built-in web server and its support for Python's :py:mod:`dbm`.)
 
 * To generate the formatted documentation, `Sphinx
-  <https://www.sphinx-doc.org/>`_ is needed.  This is not needed simply to
+  <https://www.sphinx-doc.org/>`_ is needed, version 1.7.0 or later.
+  This is not needed simply to
   use matholymp.  If you are reading this document online, note that
   it relates to version |release|; if you are using a different
   matholymp version (including if you are using the current
