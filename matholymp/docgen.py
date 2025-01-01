@@ -687,6 +687,8 @@ class DocumentGenerator:
                     self.generate_papers(c.contestant_code, day_opt,
                                          use_background, exam_order)
                 return
+            paper_draft = None
+            draft_text = None
         elif person_id == 'all-languages':
             contestants = []
             languages = all_languages
@@ -707,6 +709,8 @@ class DocumentGenerator:
             p = self.get_contestant_by_id(person_id)
             contestants = [p]
             languages = []
+            paper_draft = None
+            draft_text = None
             output_file_base = 'paper' + day_text + '-person' + person_id
 
         if languages:
