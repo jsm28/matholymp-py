@@ -128,6 +128,9 @@ Next version (unreleased)
   comment mentioning ``xelatex``, that program will be used to compile
   documents using that template.
 
+* Automated testing of the registration system now supports and
+  requires MechanicalSoup version 1.3.0 or later.
+
 Version 2020.07.0 (22 July 2020)
 --------------------------------
 

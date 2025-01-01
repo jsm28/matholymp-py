@@ -616,27 +616,6 @@ class RoundupTestSession:
         """Select the main form from the current page."""
         self.b.select_form(self.get_main_form())
 
-    def workaround_ms_issue_242(self):
-        """Work around MechanicalSoup issue 242."""
-        ms_version = mechanicalsoup.__version__.split('.')
-        if (int(ms_version[0]), int(ms_version[1])) > (0, 11):
-            # 0.11.0 buggy, later versions fixed.
-            return
-        # Dummy file upload to work around a MechanicalSoup issue when
-        # some field values are deliberately blank,
-        # <https://github.com/MechanicalSoup/MechanicalSoup/issues/242>).
-        form = self.b.get_current_form().form
-        dummy = form.find('input', attrs={'name': 'dummy'})
-        if dummy:
-            # Dummy input already present.
-            return
-        temp_file = tempfile.NamedTemporaryFile(dir=self.instance.temp_dir,
-                                                delete=False)
-        filename = temp_file.name
-        temp_file.close()
-        self.b.new_control('file', 'dummy', '')
-        self.b['dummy'] = filename
-
     def set(self, data):
         """Set the contents of fields in the selected form.
 
@@ -645,7 +624,6 @@ class RoundupTestSession:
 
         """
         form = self.b.get_current_form().form
-        any_empty = False
         for key in data:
             value = data[key]
             select = form.find('select', attrs={'name': key})
@@ -659,11 +637,10 @@ class RoundupTestSession:
                 if len(new_value) == 1:
                     new_value = new_value[0]
                 value = new_value
-            self.b[key] = value
-            if value == '':
-                any_empty = True
-        if any_empty:
-            self.workaround_ms_issue_242()
+            if key.endswith('@content') or key in ('csv_file', 'zip_file'):
+                self.b[key] = open(value, 'rb')
+            else:
+                self.b[key] = value
 
     def create(self, cls, data, error=False, mail=False):
         """Create some kind of entity through the corresponding form."""
@@ -786,7 +763,6 @@ class RoundupTestSession:
         for num, score in enumerate(scores, start=1):
             if score is not None:
                 self.set({'%s%d' % (country_code, num): score})
-        self.workaround_ms_issue_242()
         self.check_submit_selected(error=error)
 
     def edit_prereg(self, entity_id, data, error=False, mail=False):
@@ -4239,9 +4215,10 @@ class RegSystemTestCase(unittest.TestCase):
         form = admin_session.get_main_form()
         csv_file_input = form.find('input', attrs={'name': 'csv_file'})
         csv_file_input.extract()
-        admin_session.b.new_control('file', 'csv_contents', '')
+        admin_session.b.new_control('file', 'csv_contents',
+                                    open(os.devnull, 'rb'))
         csv_filename = self.gen_test_csv([{'Test': 'text'}], ['Test'])
-        admin_session.set({'csv_contents': csv_filename})
+        admin_session.set({'csv_contents': open(csv_filename, 'rb')})
         admin_session.check_submit_selected(error='csv_contents an uploaded '
                                             'file')
         # Errors with encoding of CSV data.
@@ -15277,9 +15254,10 @@ class RegSystemTestCase(unittest.TestCase):
         form = admin_session.get_main_form()
         csv_file_input = form.find('input', attrs={'name': 'csv_file'})
         csv_file_input.extract()
-        admin_session.b.new_control('file', 'csv_contents', '')
+        admin_session.b.new_control('file', 'csv_contents',
+                                    open(os.devnull, 'rb'))
         csv_filename = self.gen_test_csv([{'Test': 'text'}], ['Test'])
-        admin_session.set({'csv_contents': csv_filename})
+        admin_session.set({'csv_contents': open(csv_filename, 'rb')})
         admin_session.check_submit_selected(error='csv_contents an uploaded '
                                             'file')
         # Errors with encoding of CSV data.
@@ -15860,8 +15838,9 @@ class RegSystemTestCase(unittest.TestCase):
         admin_session.set({'csv_file': csv_filename})
         zip_file_input = form.find('input', attrs={'name': 'zip_file'})
         zip_file_input.extract()
-        admin_session.b.new_control('file', 'zip_ref', '')
-        admin_session.set({'zip_ref': csv_filename})
+        admin_session.b.new_control('file', 'zip_ref',
+                                    open(os.devnull, 'rb'))
+        admin_session.set({'zip_ref': open(csv_filename, 'rb')})
         admin_session.check_submit_selected(error='zip_ref an uploaded '
                                             'file')
         # Errors with invalid ZIP file.

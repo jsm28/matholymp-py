@@ -97,8 +97,8 @@ matholymp:
 
 * To run automated tests of the registration system, `MechanicalSoup
   <https://mechanicalsoup.readthedocs.io/>`_ (which in turn has some
-  other dependencies) is needed.  Those tests are only expected to
-  work on Unix-like operating systems.
+  other dependencies) is needed, version 1.3.0 or later.  Those tests
+  are only expected to work on Unix-like operating systems.
 
 * To measure the code coverage of the automated tests, `Coverage.py
   <https://coverage.readthedocs.io/en/latest/>`_ is needed.  This is
