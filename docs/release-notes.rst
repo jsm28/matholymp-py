@@ -79,8 +79,10 @@ Next version (unreleased)
 * The static site now describes virtual events as "organised by" not
   "in" their host countries.
 
-* The Roundup patches have been updated for Roundup 2.3.0, as has the
-  example :file:`config.ini`.
+* The Roundup patches have been updated for Roundup 2.4.0, as has the
+  example :file:`config.ini`.  The update includes corresponding
+  changes to :file:`dpage.html`, :file:`page.html` and
+  :file:`user.item.html`.
 
 * The registration system now supports collecting information about
   SARS-CoV-2 vaccination status for in-person participants.  There are

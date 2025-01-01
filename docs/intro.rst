@@ -57,10 +57,10 @@ matholymp:
   interface for editing databases for the online registration system;
   the issue-tracking parts of Roundup, and the email interface, are
   not used; Roundup is not needed if the online registration system is
-  not used).  Use of the current version of Roundup, 2.3.0 as of this
+  not used).  Use of the current version of Roundup, 2.4.0 as of this
   writing, is recommended; older versions will not work because of
   Roundup API changes.  Some bugs relevant to some uses of matholymp
-  are still present in 2.3.0, so you should consider applying the
+  are still present in 2.4.0, so you should consider applying the
   patches in the :file:`roundup-patches/` directory in the matholymp
   source distribution before installing Roundup.  See
   :ref:`roundup-patches` for more details of those patches.
