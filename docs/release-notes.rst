@@ -131,6 +131,9 @@ Next version (unreleased)
 * Automated testing of the registration system now supports and
   requires MechanicalSoup version 1.3.0 or later.
 
+* The obsolescent :py:mod:`imghdr` Python module is no longer used, so
+  Python 3.13 and later are supported.
+
 Version 2020.07.0 (22 July 2020)
 --------------------------------
 

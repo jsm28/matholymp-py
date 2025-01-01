@@ -33,7 +33,6 @@ This module provides file access support for matholymp use.
 
 import configparser
 import csv
-import imghdr
 import io
 import os
 import os.path
@@ -232,29 +231,24 @@ def remove_if_exists(file_name):
         os.remove(file_name)
 
 
-# Map file format names from imghdr to canonical extensions.
-_file_format_ext_map = {'jpeg': 'jpg',
-                        'png': 'png'}
-
-
 def file_format_contents(filename, contents=None):
     """
     Return the format of a file (in the form of a canonical filename
     extension) based on its contents, or None if not a known format
     that might be valid for some matholymp uses.
     """
-    fmt = imghdr.what(filename, contents)
-    if fmt in _file_format_ext_map:
-        return _file_format_ext_map[fmt]
-    else:
-        if contents is not None:
-            h = contents[:5]
-        else:
-            with open(filename, 'rb') as f:
-                h = f.read(5)
-        if h == b'%PDF-':
-            return 'pdf'
-        return None
+    if contents is None:
+        with open(filename, 'rb') as f:
+            contents = f.read(10)
+    if contents[6:10] in (b'JFIF', b'Exif'):
+        return 'jpg'
+    elif contents.startswith(b'\xff\xd8\xff\xdb'):
+        return 'jpg'
+    elif contents.startswith(b'\211PNG\r\n\032\n'):
+        return 'png'
+    elif contents.startswith(b'%PDF-'):
+        return 'pdf'
+    return None
 
 
 _ascii_tolower = str.maketrans(string.ascii_uppercase, string.ascii_lowercase)
