@@ -2127,7 +2127,7 @@ class SiteGenerator:
         self.write_csv_to_file(self.path_for_event_countries_csv(e),
                                data[0], data[1])
 
-    def people_csv_columns(self, num_problems, distinguish_official,
+    def people_csv_columns(self, num_problems, num_exams, distinguish_official,
                            reg_system=False, private_data=False,
                            show_scores=True):
         """Return list of headers for CSV file of people."""
@@ -2165,14 +2165,21 @@ class SiteGenerator:
                          'Passport Given Name', 'Passport Family Name',
                          'Event Photos Consent', 'Remote Participant',
                          'Basic Data Missing'])
+            cols.extend(['Script Scan P%d URL' % (i + 1)
+                         for i in range(num_problems)])
+            cols.extend(['Scratch Scan Day %d URL' % (i + 1)
+                         for i in range(num_exams)])
         return cols
 
-    def person_csv_data(self, p, num_problems=None, distinguish_official=None,
+    def person_csv_data(self, p, num_problems=None, num_exams=None,
+                        distinguish_official=None,
                         scores_only=False, reg_system=False,
                         private_data=False, show_scores=True):
         """Return the CSV data for a given person."""
         if num_problems is None:
             num_problems = p.event.num_problems
+        if num_exams is None:
+            num_exams = p.event.num_exams
         if distinguish_official is None:
             distinguish_official = p.event.distinguish_official
         csv_out = {}
@@ -2304,6 +2311,12 @@ class SiteGenerator:
                 csv_out['Basic Data Missing'] = ('Yes'
                                                  if p.basic_data_missing
                                                  else 'No')
+            for i in range(num_problems):
+                csv_out['Script Scan P%d URL' % (i + 1)] = (
+                    p.script_scan_urls[i] or '')
+            for i in range(num_exams):
+                csv_out['Scratch Scan Day %d URL' % (i + 1)] = (
+                    p.scratch_scan_urls[i] or '')
         return csv_out
 
     def generate_people_csv(self):
@@ -2313,10 +2326,12 @@ class SiteGenerator:
         people_data_output = [
             self.person_csv_data(
                 p, num_problems=self._data.max_num_problems,
+                num_exams=self._data.max_num_exams,
                 distinguish_official=self._data.distinguish_official)
             for p in people_sorted]
         people_columns = \
             self.people_csv_columns(self._data.max_num_problems,
+                                    self._data.max_num_exams,
                                     self._data.distinguish_official)
         self.write_csv_to_file(self.path_for_data_people(),
                                people_data_output, people_columns)
@@ -2333,6 +2348,7 @@ class SiteGenerator:
                                                      show_scores=show_scores)
                                 for p in e_people_sorted]
         e_people_columns = self.people_csv_columns(e.num_problems,
+                                                   e.num_exams,
                                                    e.distinguish_official,
                                                    reg_system=reg_system,
                                                    private_data=private_data,

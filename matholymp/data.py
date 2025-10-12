@@ -325,6 +325,14 @@ class EventGroup:
         'max_num_problems', _get_max_num_problems,
         """The maximum number of problems at any event.""")
 
+    def _get_max_num_exams(self):
+        return max([e.num_exams for e in self.event_list
+                    if e.num_exams is not None])
+
+    max_num_exams = _PropertyCached(
+        'max_num_exams', _get_max_num_exams,
+        """The maximum number of exams at any event.""")
+
 
 class _EventPropertyDS(_PropertyCached):
 
@@ -1576,6 +1584,34 @@ class PersonEvent:
         """
         The local filename of the ID scan of this person at this
         event.
+        """)
+
+    script_scan_urls = _PersonEventPropertyDS(
+        'script_scan_urls',
+        """
+        The URLs of the scans of scripts for this person at this event
+        (one per problem).
+        """)
+
+    script_scan_filenames = _PersonEventPropertyDS(
+        'script_scan_filenames',
+        """
+        The local filenames of the scans of scripts for this person at
+        this event (one per problem).
+        """)
+
+    scratch_scan_urls = _PersonEventPropertyDS(
+        'scratch_scan_urls',
+        """
+        The URLs of the scans of unsorted scratch paper for this
+        person at this event (one per exam).
+        """)
+
+    scratch_scan_filenames = _PersonEventPropertyDS(
+        'scratch_scan_filenames',
+        """
+        The local filenames of the scans of unsorted scratch paper for
+        this person at this event (one per exam).
         """)
 
     languages = _PersonEventPropertyDS(

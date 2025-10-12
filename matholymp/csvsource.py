@@ -381,6 +381,32 @@ class CSVDataSource(DataSource):
                 url_path = url[len(self._cfg['url_base']):]
                 url_dirs = url_path.split('/')
                 return os.path.join(self._local_dir, *url_dirs)
+        if name == 'script_scan_urls':
+            r = []
+            for n in range(int(self._events[event_id]['Number of Problems'])):
+                s = (self._people[event_id][person_id][country_id]
+                     ['Script Scan P%d URL' % (n + 1)])
+                if s == '':
+                    s = None
+                r.append(s)
+            return r
+        if name == 'script_scan_filenames':
+            # Not supported from CSV data.
+            return [None for n in range(int(
+                self._events[event_id]['Number of Problems']))]
+        if name == 'scratch_scan_urls':
+            r = []
+            for n in range(int(self._events[event_id]['Number of Exams'])):
+                s = (self._people[event_id][person_id][country_id]
+                     ['Scratch Scan Day %d URL' % (n + 1)])
+                if s == '':
+                    s = None
+                r.append(s)
+            return r
+        if name == 'scratch_scan_filenames':
+            # Not supported from CSV data.
+            return [None for n in range(int(
+                self._events[event_id]['Number of Exams']))]
         if name == 'languages':
             s = self._people[event_id][person_id][country_id]['Languages']
             return comma_split(s)

@@ -45,11 +45,12 @@ __all__ = ['get_config_var', 'get_config_var_bool', 'get_config_var_int',
            'have_id_scans',
            'have_consent_forms', 'have_consent_ui', 'have_passport_numbers',
            'have_nationality', 'require_diet', 'require_dob',
-           'get_num_problems', 'get_marks_per_problem', 'get_num_languages',
-           'get_language_numbers', 'get_earliest_date_of_birth',
-           'get_sanity_date_of_birth', 'get_earliest_date_of_birth_contestant',
-           'get_age_day_date', 'get_arrdep_bounds', 'get_short_name',
-           'get_year', 'get_short_name_year', 'get_staff_country_name',
+           'get_num_problems', 'get_num_exams', 'get_marks_per_problem',
+           'get_num_languages', 'get_language_numbers',
+           'get_earliest_date_of_birth', 'get_sanity_date_of_birth',
+           'get_earliest_date_of_birth_contestant', 'get_age_day_date',
+           'get_arrdep_bounds', 'get_short_name', 'get_year',
+           'get_short_name_year', 'get_staff_country_name',
            'invitation_letter_register', 'badge_use_background',
            'honourable_mentions_available', 'event_type', 'is_virtual_event',
            'is_hybrid_event', 'have_remote_participation',
@@ -173,6 +174,11 @@ def require_dob(db):
 def get_num_problems(db):
     """Return the number of problems at this event."""
     return get_config_var_int(db, 'MATHOLYMP_NUM_PROBLEMS')
+
+
+def get_num_exams(db):
+    """Return the number of exams at this event."""
+    return get_config_var_int(db, 'MATHOLYMP_NUM_EXAMS')
 
 
 def get_marks_per_problem(db):

@@ -4641,7 +4641,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         expected_leader_admin.update(
             {'Gender': 'Male', 'Date of Birth': '',
              'Languages': 'English,French',
@@ -4661,7 +4665,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         expected_staff_admin.update(
             {'Gender': 'Female', 'Date of Birth': '2000-01-01',
              'Languages': 'English',
@@ -4681,7 +4689,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -4749,7 +4761,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -4813,7 +4829,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -4878,7 +4898,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -4943,7 +4967,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5008,7 +5036,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': 'Yes',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5093,7 +5125,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '2',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5158,7 +5194,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': 'Yes'})
+             'SARS-CoV-2 Vaccine After Threshold Date': 'Yes',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5245,7 +5285,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5312,7 +5356,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5381,7 +5429,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5450,7 +5502,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5524,7 +5580,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': 'Yes',
              'SARS-CoV-2 Vaccine Doses': '3',
-             'SARS-CoV-2 Vaccine After Threshold Date': 'Yes'})
+             'SARS-CoV-2 Vaccine After Threshold Date': 'Yes',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5592,7 +5652,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5667,7 +5731,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         expected_cont2 = expected_cont1.copy()
         expected_cont2_admin = expected_cont1_admin.copy()
         expected_cont2.update(
@@ -5770,7 +5838,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5868,7 +5940,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'Yes', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         expected_leader_admin.update(
             {'Gender': 'Male', 'Date of Birth': '',
              'Languages': 'English,French',
@@ -5888,7 +5964,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'Yes', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         expected_staff_admin.update(
             {'Gender': 'Female', 'Date of Birth': '2000-01-01',
              'Languages': 'English',
@@ -5908,7 +5988,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'Yes', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -6012,7 +6096,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': '', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         expected_leader_admin.update(
             {'Gender': 'Male', 'Date of Birth': '',
              'Languages': 'English,French',
@@ -6032,7 +6120,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'Yes', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         expected_staff_admin.update(
             {'Gender': 'Female', 'Date of Birth': '2000-01-01',
              'Languages': 'English',
@@ -6052,7 +6144,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -12106,7 +12202,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         expected_staff_admin.update(
             {'Gender': 'Non-binary', 'Date of Birth': '1998-12-31',
              'Languages': 'French,English',
@@ -12130,7 +12230,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -12329,7 +12433,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'Yes',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         expected_staff_admin.update(
             {'Gender': '', 'Date of Birth': '', 'Languages': '',
              'Allergies and Dietary Requirements': '',
@@ -12350,7 +12458,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'Yes',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -12445,7 +12557,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         selfreg_2_session.edit('person', '2',
                                {'gender': 'Male',
                                 'date_of_birth_year': '2000',
@@ -12471,7 +12587,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'No',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -12622,7 +12742,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'Yes',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         expected_staff_admin.update(
             {'Gender': 'Female', 'Date of Birth': '2000-01-01',
              'Languages': 'English',
@@ -12644,7 +12768,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'Yes',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -14404,7 +14532,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'Yes',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         expected_p2_admin.update(
             {'Gender': '', 'Date of Birth': '', 'Languages': '',
              'Allergies and Dietary Requirements': 'Vegetarian',
@@ -14425,7 +14557,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'Yes',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         self.assertEqual(anon_csv, [expected_p1, expected_p2])
         self.assertEqual(admin_csv, [expected_p1_admin, expected_p2_admin])
         self.assertEqual(reg_csv, [expected_p1, expected_p2])
@@ -14480,7 +14616,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'Yes',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         self.assertEqual(anon_csv, [expected_p1, expected_p3, expected_p2])
         self.assertEqual(admin_csv,
                          [expected_p1_admin, expected_p3_admin,
@@ -14537,7 +14677,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'Yes',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         self.assertEqual(anon_csv, [expected_p1, expected_p3, expected_p2,
                                     expected_p4])
         self.assertEqual(admin_csv,
@@ -14644,7 +14788,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'Yes',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         expected_p2_admin.update(
             {'Gender': '', 'Date of Birth': '', 'Languages': '',
              'Allergies and Dietary Requirements': 'Pescetarian',
@@ -14665,7 +14813,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'Yes',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         self.assertEqual(anon_csv, [expected_p1, expected_p2])
         self.assertEqual(admin_csv, [expected_p1_admin, expected_p2_admin])
         self.assertEqual(reg_csv, [expected_p1, expected_p2])
@@ -14791,7 +14943,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'Yes',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         expected_p2_admin.update(
             {'Gender': '', 'Date of Birth': '', 'Languages': '',
              'Allergies and Dietary Requirements': '',
@@ -14812,7 +14968,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'Yes',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         expected_p3_admin.update(
             {'Gender': '', 'Date of Birth': '', 'Languages': '',
              'Allergies and Dietary Requirements': '',
@@ -14833,7 +14993,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'Yes',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         self.assertEqual(anon_csv, [expected_p1, expected_p3, expected_p2])
         self.assertEqual(admin_csv,
                          [expected_p1_admin, expected_p3_admin,
@@ -14936,7 +15100,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'Yes',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         expected_p2_admin.update(
             {'Gender': '', 'Date of Birth': '', 'Languages': '',
              'Allergies and Dietary Requirements': '',
@@ -14957,7 +15125,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'Yes',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         self.assertEqual(anon_csv, [expected_p1, expected_p2])
         self.assertEqual(admin_csv, [expected_p1_admin, expected_p2_admin])
         self.assertEqual(reg_csv, [expected_p1, expected_p2])
@@ -15046,7 +15218,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'Yes',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         self.assertEqual(anon_csv, [expected_p1])
         self.assertEqual(admin_csv, [expected_p1_admin])
         self.assertEqual(reg_csv, [expected_p1])
@@ -15166,7 +15342,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'Yes',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         expected_p2_admin.update(
             {'Gender': '', 'Date of Birth': '', 'Languages': '',
              'Allergies and Dietary Requirements': '',
@@ -15187,7 +15367,11 @@ class RegSystemTestCase(unittest.TestCase):
              'Basic Data Missing': 'Yes',
              'SARS-CoV-2 Vaccine Certificate': '',
              'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
+             'SARS-CoV-2 Vaccine After Threshold Date': '',
+             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
+             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
+             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
+             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
         self.assertEqual(anon_csv, [expected_p1, expected_p2])
         self.assertEqual(admin_csv, [expected_p1_admin, expected_p2_admin])
         self.assertEqual(reg_csv, [expected_p1, expected_p2])

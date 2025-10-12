@@ -137,6 +137,10 @@ Next version (unreleased)
 * Building the matholympy documentation now supports Sphinx 2.0.0 and
   later, and requires 1.7.0 or later.
 
+* There is partial support for handling scans of scripts.  The
+  registration system has a new configuration variable
+  ``matholymp_num_exams``.
+
 Version 2020.07.0 (22 July 2020)
 --------------------------------
 

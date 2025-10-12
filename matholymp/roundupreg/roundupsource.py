@@ -38,7 +38,7 @@ from matholymp.datetimeutil import date_from_ymd_iso, time_from_hhmm_str
 from matholymp.fileutil import comma_split
 from matholymp.roundupreg.config import distinguish_official, \
     have_consent_forms, have_id_scans, have_consent_ui, \
-    have_passport_numbers, have_nationality, get_num_problems, \
+    have_passport_numbers, have_nationality, get_num_problems, get_num_exams, \
     get_marks_per_problem, get_language_numbers, get_short_name, \
     honourable_mentions_available, event_type, have_remote_participation, \
     get_sars_cov2_cert_bool, get_sars_cov2_doses_bool, get_sars_cov2_after_bool
@@ -107,6 +107,8 @@ class RoundupDataSource(DataSource):
             return get_num_problems(self._db)
         elif name == 'marks_per_problem':
             return get_marks_per_problem(self._db)
+        elif name == 'num_exams':
+            return get_num_exams(self._db)
         elif name == 'gold_boundary':
             gold = self._db.event.get('1', 'gold')
             if gold is None or gold == '':
@@ -227,6 +229,12 @@ class RoundupDataSource(DataSource):
                 id_scan_filename = self._db.filename('id_scan',
                                                      id_scan_id)
             return id_scan_filename
+        elif name in ('script_scan_urls', 'script_scan_filenames'):
+            num_problems = get_num_problems(self._db)
+            return [None for n in range(num_problems)]
+        elif name in ('scratch_scan_urls', 'scratch_scan_filenames'):
+            num_exams = get_num_exams(self._db)
+            return [None for n in range(num_exams)]
         elif name == 'event_photos_consent':
             if not have_consent_ui(self._db):
                 return None
