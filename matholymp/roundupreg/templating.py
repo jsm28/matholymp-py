@@ -70,10 +70,7 @@ from matholymp.roundupreg.config import distinguish_official, \
     have_consent_ui, have_passport_numbers, have_nationality, require_diet, \
     require_dob, get_language_numbers, get_earliest_date_of_birth, \
     get_sanity_date_of_birth, get_arrdep_bounds, is_virtual_event, \
-    is_hybrid_event, have_remote_participation, get_sars_cov2_cert_html, \
-    get_sars_cov2_cert_bool, get_sars_cov2_doses_html, \
-    get_sars_cov2_doses_bool, get_sars_cov2_after_html, \
-    get_sars_cov2_after_bool, have_vaccine_status
+    is_hybrid_event, have_remote_participation
 from matholymp.roundupreg.roundupsitegen import RoundupSiteGenerator
 from matholymp.roundupreg.rounduputil import person_date_of_birth, \
     contestant_age, person_is_contestant, contestant_code, pn_score, \
@@ -272,9 +269,6 @@ def registration_status(db, nonce):
     max_photo_size = int(db.config.ext['MATHOLYMP_PHOTO_MAX_SIZE'])
     return sitegen.registration_status_text(consent_forms_date,
                                             have_id_scans(db),
-                                            get_sars_cov2_cert_bool(db),
-                                            get_sars_cov2_doses_bool(db),
-                                            get_sars_cov2_after_bool(db),
                                             have_consent_ui(db),
                                             max_photo_size, nonce)
 
@@ -287,9 +281,7 @@ def registration_status_country(db, country):
     consent_forms_date = get_consent_forms_date(db)
     c = sitegen.event.country_map[int(country)]
     return sitegen.registration_status_country_text(
-        c, consent_forms_date, have_id_scans(db), get_sars_cov2_cert_bool(db),
-        get_sars_cov2_doses_bool(db), get_sars_cov2_after_bool(db),
-        have_consent_ui(db))
+        c, consent_forms_date, have_id_scans(db), have_consent_ui(db))
 
 
 def edit_rooms(db):
@@ -480,12 +472,12 @@ def required_person_fields(db, person):
             req.append('date_of_birth_month')
             req.append('date_of_birth_day')
         if have_consent_ui(db):
-            # event_photos_consent, diet_consent and vaccine_consent
-            # not listed here because the JavaScript support for
-            # checking required fields are set (taken unmodified from
-            # Roundup) does not support radio-button fields (it
-            # requires a single <input> with an appropriate id, which
-            # must have a value).
+            # event_photos_consent and diet_consent not listed here
+            # because the JavaScript support for checking required
+            # fields are set (taken unmodified from Roundup) does not
+            # support radio-button fields (it requires a single
+            # <input> with an appropriate id, which must have a
+            # value).
             req.append('photo_consent')
         if not have_remote_participation(db):
             if have_passport_numbers(db):
@@ -702,13 +694,6 @@ def register_templating_utils(instance):
     instance.registerUtil('have_remote_participation',
                           have_remote_participation)
     instance.registerUtil('person_is_contestant', person_is_contestant)
-    instance.registerUtil('get_sars_cov2_cert_html', get_sars_cov2_cert_html)
-    instance.registerUtil('get_sars_cov2_cert_bool', get_sars_cov2_cert_bool)
-    instance.registerUtil('get_sars_cov2_doses_html', get_sars_cov2_doses_html)
-    instance.registerUtil('get_sars_cov2_doses_bool', get_sars_cov2_doses_bool)
-    instance.registerUtil('get_sars_cov2_after_html', get_sars_cov2_after_html)
-    instance.registerUtil('get_sars_cov2_after_bool', get_sars_cov2_after_bool)
-    instance.registerUtil('have_vaccine_status', have_vaccine_status)
     instance.registerUtil('people_from_country', people_from_country)
     instance.registerUtil('show_country_people', show_country_people)
     instance.registerUtil('country_people_table', country_people_table)

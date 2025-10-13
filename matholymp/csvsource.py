@@ -231,8 +231,6 @@ class CSVDataSource(DataSource):
                                   'badge_colour_inner': 'Badge Inner Colour',
                                   'badge_colour_text': 'Badge Text Colour',
                                   'diet': 'Allergies and Dietary Requirements',
-                                  'sars_cov2_doses':
-                                  'SARS-CoV-2 Vaccine Doses',
                                   'room_type': 'Room Type',
                                   'room_share_with': 'Share Room With',
                                   'room_number': 'Room Number',
@@ -263,12 +261,7 @@ class CSVDataSource(DataSource):
                                   'total_score': 'Total',
                                   'generic_id': 'Generic Number'}
 
-    _person_event_attr_map_bool_none = {'sars_cov2_cert':
-                                        'SARS-CoV-2 Vaccine Certificate',
-                                        'sars_cov2_after':
-                                        'SARS-CoV-2 Vaccine After Threshold '
-                                        'Date',
-                                        'event_photos_consent':
+    _person_event_attr_map_bool_none = {'event_photos_consent':
                                         'Event Photos Consent',
                                         'remote_participant':
                                         'Remote Participant',

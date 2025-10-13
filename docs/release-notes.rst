@@ -84,13 +84,6 @@ Next version (unreleased)
   changes to :file:`dpage.html`, :file:`page.html` and
   :file:`user.item.html`.
 
-* The registration system now supports collecting information about
-  SARS-CoV-2 vaccination status for in-person participants.  There are
-  new variables ``matholymp_sars_cov2_cert``,
-  ``matholymp_sars_cov2_doses`` and ``matholymp_sars_cov2_after`` in
-  :file:`extensions/config.ini`, and :file:`person.item.html` is
-  changed accordingly.
-
 * As part of changes to how enabling and disabling registration are
   handled, :file:`page.html` and :file:`person.item.html` are changed.
 

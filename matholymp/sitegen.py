@@ -2149,9 +2149,6 @@ class SiteGenerator:
         if private_data:
             cols.extend(['Gender', 'Date of Birth', 'Languages',
                          'Allergies and Dietary Requirements',
-                         'SARS-CoV-2 Vaccine Certificate',
-                         'SARS-CoV-2 Vaccine Doses',
-                         'SARS-CoV-2 Vaccine After Threshold Date',
                          'T-Shirt Size', 'Arrival Place', 'Arrival Date',
                          'Arrival Time', 'Arrival Flight', 'Departure Place',
                          'Departure Date', 'Departure Time',
@@ -2253,21 +2250,6 @@ class SiteGenerator:
             csv_out['Date of Birth'] = date_to_ymd_iso(p.date_of_birth)
             csv_out['Languages'] = comma_join(p.languages)
             csv_out['Allergies and Dietary Requirements'] = p.diet or ''
-            if p.sars_cov2_cert is None:
-                csv_out['SARS-CoV-2 Vaccine Certificate'] = ''
-            else:
-                csv_out['SARS-CoV-2 Vaccine Certificate'] = (
-                    'Yes'
-                    if p.sars_cov2_cert
-                    else 'No')
-            csv_out['SARS-CoV-2 Vaccine Doses'] = p.sars_cov2_doses or None
-            if p.sars_cov2_after is None:
-                csv_out['SARS-CoV-2 Vaccine After Threshold Date'] = ''
-            else:
-                csv_out['SARS-CoV-2 Vaccine After Threshold Date'] = (
-                    'Yes'
-                    if p.sars_cov2_after
-                    else 'No')
             csv_out['T-Shirt Size'] = p.tshirt or ''
             csv_out['Arrival Place'] = p.arrival_place or ''
             csv_out['Arrival Date'] = date_to_ymd_iso(p.arrival_date)

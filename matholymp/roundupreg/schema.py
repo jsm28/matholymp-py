@@ -58,8 +58,7 @@ from matholymp.roundupreg.config import distinguish_official, \
     have_consent_forms, have_id_scans, have_consent_ui, \
     have_passport_numbers, have_nationality, get_language_numbers, \
     invitation_letter_register, is_virtual_event, have_remote_participation, \
-    allow_hybrid_countries, get_sars_cov2_cert_bool, \
-    get_sars_cov2_doses_bool, get_sars_cov2_after_bool, have_vaccine_status
+    allow_hybrid_countries
 from matholymp.roundupreg.rounduputil import show_scores
 
 __all__ = ['init_schema']
@@ -181,8 +180,6 @@ def init_schema(env):
         # not_applicable, no, badge_only, yes.
         person_extra['photo_consent'] = String()
         person_extra['diet_consent'] = Boolean()
-        if have_vaccine_status(db):
-            person_extra['vaccine_consent'] = Boolean()
     if have_passport_numbers(db):
         person_extra['passport_number'] = String()
     if have_nationality(db):
@@ -195,15 +192,6 @@ def init_schema(env):
         # include in the schema for virtual events as well, given the
         # possibility of a hybrid event turning into a virtual one.
         person_extra['participation_type'] = String()
-    if get_sars_cov2_cert_bool(db):
-        # yes, no, or empty string if unknown.
-        person_extra['sars_cov2_cert'] = String()
-    if get_sars_cov2_doses_bool(db):
-        # Free text, but typically a number.
-        person_extra['sars_cov2_doses'] = String()
-    if get_sars_cov2_after_bool(db):
-        # yes, no, or empty string if unknown.
-        person_extra['sars_cov2_after'] = String()
     for i in get_language_numbers(db):
         person_extra['language_%d' % i] = Link('language')
     person = Class(db, 'person',
@@ -397,8 +385,6 @@ def init_schema(env):
         person_common_reg_props.append('event_photos_consent')
         person_common_reg_props.append('photo_consent')
         person_common_reg_props.append('diet_consent')
-        if have_vaccine_status(db):
-            person_common_reg_props.append('vaccine_consent')
     if have_passport_numbers(db):
         person_common_reg_props.append('passport_number')
     if have_nationality(db):
@@ -408,12 +394,6 @@ def init_schema(env):
         person_common_reg_props.append('passport_family_name')
     if have_remote_participation(db):
         person_common_reg_props.append('participation_type')
-    if get_sars_cov2_cert_bool(db):
-        person_common_reg_props.append('sars_cov2_cert')
-    if get_sars_cov2_doses_bool(db):
-        person_common_reg_props.append('sars_cov2_doses')
-    if get_sars_cov2_after_bool(db):
-        person_common_reg_props.append('sars_cov2_after')
     for i in get_language_numbers(db):
         person_common_reg_props.append('language_%d' % i)
     person_reg_props = person_common_reg_props.copy()

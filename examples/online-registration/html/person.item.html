@@ -281,60 +281,6 @@ please inform the people you register of this information.
  </tal:block></td>
  </tr>
 
-<tal:block tal:condition="python:context.is_edit_ok() and utils.have_vaccine_status(db._db) and not utils.is_virtual_event(db._db)">
-
-<tal:block tal:condition="python:utils.get_sars_cov2_cert_bool(db._db)">
- <tr>
- <td colspan="2">
- <tal:block tal:replace="structure python:utils.get_sars_cov2_cert_html(db._db)"></tal:block>
- </td>
- </tr>
-
- <tr tal:define="name string:sars_cov2_cert; label string:Vaccine certificate; edit_ok edit_ok">
-  <th metal:use-macro="th_label">Vaccine certificate</th>
-  <td tal:content="structure python:utils.yes_no_no_answer_select('sars_cov2_cert', context.sars_cov2_cert.plain())"></td>
- </tr>
-</tal:block>
-
-<tal:block tal:condition="python:utils.get_sars_cov2_doses_bool(db._db)">
- <tr>
- <td colspan="2">
- <tal:block tal:replace="structure python:utils.get_sars_cov2_doses_html(db._db)"></tal:block>
- </td>
- </tr>
-
- <tr tal:define="name string:sars_cov2_doses; label string:Vaccine doses; value context/sars_cov2_doses; edit_ok edit_ok">
-  <th metal:use-macro="th_label">Vaccine doses</th>
-  <td><input name="sars_cov2_doses" metal:use-macro="normal_input"></td>
- </tr>
-</tal:block>
-
-<tal:block tal:condition="python:utils.get_sars_cov2_after_bool(db._db)">
- <tr>
- <td colspan="2">
- <tal:block tal:replace="structure python:utils.get_sars_cov2_after_html(db._db)"></tal:block>
- </td>
- </tr>
-
- <tr tal:define="name string:sars_cov2_after; label string:Recent vaccine dose; edit_ok edit_ok">
-  <th metal:use-macro="th_label">Recent vaccine dose</th>
-  <td tal:content="structure python:utils.yes_no_no_answer_select('sars_cov2_after', context.sars_cov2_after.plain())"></td>
- </tr>
-</tal:block>
-
- <tr tal:condition="python:utils.have_consent_ui(db._db)">
- <td colspan="2">
- <strong>You must have permission from the participant (and their
- parents, if aged under 16) to enter vaccination status information,
- and must confirm that permission below.  If you do not have that
- permission, leave this information blank and enter &ldquo;No&rdquo;
- below.  Vaccination status information entered without confirming
- permission below will be discarded.</strong>
- </td>
- </tr>
-
-</tal:block>
-
  <tr tal:define="name string:tshirt; label string:T-shirt size; value context/tshirt; edit_ok edit_ok" tal:condition="context/is_edit_ok">
   <th metal:use-macro="th_label">T-shirt size</th>
   <td tal:content="structure python:context.tshirt.menu(html_kwargs =
@@ -571,7 +517,7 @@ please inform the people you register of this information.
 </tal:block>
 
 <tal:block tal:condition="context/is_edit_ok">
-<tal:block tal:condition="python:utils.have_consent_ui(db._db)" tal:define="required python:['event_photos_consent', 'photo_consent', 'diet_consent', 'vaccine_consent']">
+<tal:block tal:condition="python:utils.have_consent_ui(db._db)" tal:define="required python:['event_photos_consent', 'photo_consent', 'diet_consent']">
  <tr>
   <td colspan="2">Processing some personal data requires permission
 from the participant (and their parents, if aged under 16) under the
@@ -635,25 +581,6 @@ select the appropriate options.  You must select &ldquo;Yes&rdquo; or
    <td><input type="radio" name="diet_consent" value="yes">Yes<input type="radio" name="diet_consent" value="no">No</td>
   </tal:if>
  </tr>
-<tal:block tal:condition="python:utils.have_vaccine_status(db._db) and not utils.is_virtual_event(db._db)">
- <tr>
-  <td colspan="2">4. <strong>This participant has given permission for
-  processing information provided on their vaccination status as
-  needed for the purposes of running the event.</strong>  (In the case
-  of a participant younger than 16, the parents have given
-  permission.)  If you select &ldquo;No&rdquo;, any such information
-  provided will be discarded.</td>
- </tr>
- <tr tal:define="name string:vaccine_consent; label string:Permission for this information?; value context/vaccine_consent; edit_ok edit_ok">
-  <th class="required" metal:use-macro="th_label">Permission for this information?</th>
-  <tal:if condition="python:context.id and db._db.person.get(context.id, 'vaccine_consent') is not None">
-   <td tal:content="structure context/vaccine_consent/field">vaccine_consent</td>
-  </tal:if>
-  <tal:if condition="python:not (context.id and db._db.person.get(context.id, 'vaccine_consent') is not None)">
-   <td><input type="radio" name="vaccine_consent" value="yes">Yes<input type="radio" name="vaccine_consent" value="no">No</td>
-  </tal:if>
- </tr>
-</tal:block>
 </tal:block>
 </tal:block>
 

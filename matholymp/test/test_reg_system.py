@@ -4639,9 +4639,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -4663,9 +4660,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Nationality': '', 'Passport Given Name': 'Given 2',
              'Passport Family Name': 'Family 2', 'Event Photos Consent': '',
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -4687,9 +4681,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Given Name': 'Given 3',
              'Passport Family Name': 'Family 3', 'Event Photos Consent': '',
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -4759,9 +4750,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Nationality': '', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -4827,9 +4815,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Nationality': '', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -4896,9 +4881,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Nationality': '', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -4965,260 +4947,10 @@ class RegSystemTestCase(unittest.TestCase):
              'Nationality': 'Matholympian', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
              'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        self.assertEqual(anon_csv, [expected_cont])
-        self.assertEqual(admin_csv, [expected_cont_admin])
-        self.assertEqual(reg_csv, [expected_cont])
-
-    @_with_config(sars_cov2_cert='Some text')
-    def test_person_csv_sars_cov2_cert(self):
-        """
-        Test CSV file of people, SARS-CoV-2 certificate information collected.
-        """
-        session = self.get_session()
-        admin_session = self.get_session('admin')
-        admin_session.create('arrival', {'name': 'Example Airport'})
-        admin_session.create_country_generic()
-        reg_session = self.get_session('ABC_reg')
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        self.assertEqual(anon_csv, [])
-        self.assertEqual(admin_csv, [])
-        self.assertEqual(reg_csv, [])
-        admin_session.create_person(
-            'Test First Country', 'Contestant 1',
-            {'arrival_place': 'Example Airport',
-             'arrival_date': '2 April 2015',
-             'arrival_time_hour': '13',
-             'arrival_time_minute': '30',
-             'arrival_flight': 'ABC123',
-             'room_number': '987',
-             'sars_cov2_cert': 'Yes'})
-        expected_cont = {'XMO Number': '2', 'Country Number': '3',
-                         'Person Number': '1',
-                         'Annual URL': self.instance.url + 'person1',
-                         'Country Name': 'Test First Country',
-                         'Country Code': 'ABC', 'Primary Role': 'Contestant 1',
-                         'Other Roles': '', 'Guide For': '',
-                         'Contestant Code': 'ABC1', 'Contestant Age': '15',
-                         'Given Name': 'Given 1', 'Family Name': 'Family 1',
-                         'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
-                         'P6': '', 'Total': '0', 'Award': '',
-                         'Extra Awards': '', 'Photo URL': '',
-                         'Generic Number': ''}
-        expected_cont_admin = expected_cont.copy()
-        expected_cont_admin.update(
-            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
-             'Languages': 'English',
-             'Allergies and Dietary Requirements': '', 'T-Shirt Size': 'S',
-             'Arrival Place': 'Example Airport', 'Arrival Date': '2015-04-02',
-             'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
-             'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
-             'Departure Flight': '', 'Room Type': 'Shared room',
-             'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Badge Background': 'generic',
-             'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
-             'Badge Text Colour': '000000', 'Consent Form URL': '',
-             'ID Scan URL': '',
-             'Passport or Identity Card Number': '',
-             'Nationality': '', 'Passport Given Name': 'Given 1',
-             'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
-             'Remote Participant': 'No', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': 'Yes',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
-             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
-             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
-             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
-             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        self.assertEqual(anon_csv, [expected_cont])
-        self.assertEqual(admin_csv, [expected_cont_admin])
-        self.assertEqual(reg_csv, [expected_cont])
-        admin_session.edit('person', '1',
-                           {'sars_cov2_cert': 'No'})
-        expected_cont_admin.update(
-            {'SARS-CoV-2 Vaccine Certificate': 'No'})
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        self.assertEqual(anon_csv, [expected_cont])
-        self.assertEqual(admin_csv, [expected_cont_admin])
-        self.assertEqual(reg_csv, [expected_cont])
-        admin_session.edit('person', '1',
-                           {'sars_cov2_cert': '(no answer)'})
-        expected_cont_admin.update(
-            {'SARS-CoV-2 Vaccine Certificate': ''})
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        self.assertEqual(anon_csv, [expected_cont])
-        self.assertEqual(admin_csv, [expected_cont_admin])
-        self.assertEqual(reg_csv, [expected_cont])
-
-    @_with_config(sars_cov2_doses='Some text')
-    def test_person_csv_sars_cov2_doses(self):
-        """
-        Test CSV file of people, SARS-CoV-2 doses information collected.
-        """
-        session = self.get_session()
-        admin_session = self.get_session('admin')
-        admin_session.create('arrival', {'name': 'Example Airport'})
-        admin_session.create_country_generic()
-        reg_session = self.get_session('ABC_reg')
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        self.assertEqual(anon_csv, [])
-        self.assertEqual(admin_csv, [])
-        self.assertEqual(reg_csv, [])
-        admin_session.create_person(
-            'Test First Country', 'Contestant 1',
-            {'arrival_place': 'Example Airport',
-             'arrival_date': '2 April 2015',
-             'arrival_time_hour': '13',
-             'arrival_time_minute': '30',
-             'arrival_flight': 'ABC123',
-             'room_number': '987',
-             'sars_cov2_doses': '2'})
-        expected_cont = {'XMO Number': '2', 'Country Number': '3',
-                         'Person Number': '1',
-                         'Annual URL': self.instance.url + 'person1',
-                         'Country Name': 'Test First Country',
-                         'Country Code': 'ABC', 'Primary Role': 'Contestant 1',
-                         'Other Roles': '', 'Guide For': '',
-                         'Contestant Code': 'ABC1', 'Contestant Age': '15',
-                         'Given Name': 'Given 1', 'Family Name': 'Family 1',
-                         'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
-                         'P6': '', 'Total': '0', 'Award': '',
-                         'Extra Awards': '', 'Photo URL': '',
-                         'Generic Number': ''}
-        expected_cont_admin = expected_cont.copy()
-        expected_cont_admin.update(
-            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
-             'Languages': 'English',
-             'Allergies and Dietary Requirements': '', 'T-Shirt Size': 'S',
-             'Arrival Place': 'Example Airport', 'Arrival Date': '2015-04-02',
-             'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
-             'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
-             'Departure Flight': '', 'Room Type': 'Shared room',
-             'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Badge Background': 'generic',
-             'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
-             'Badge Text Colour': '000000', 'Consent Form URL': '',
-             'ID Scan URL': '',
-             'Passport or Identity Card Number': '',
-             'Nationality': '', 'Passport Given Name': 'Given 1',
-             'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
-             'Remote Participant': 'No', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '2',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
-             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
-             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
-             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
-             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        self.assertEqual(anon_csv, [expected_cont])
-        self.assertEqual(admin_csv, [expected_cont_admin])
-        self.assertEqual(reg_csv, [expected_cont])
-
-    @_with_config(sars_cov2_after='Some text')
-    def test_person_csv_sars_cov2_after(self):
-        """
-        Test CSV file of people, SARS-CoV-2 threshold information collected.
-        """
-        session = self.get_session()
-        admin_session = self.get_session('admin')
-        admin_session.create('arrival', {'name': 'Example Airport'})
-        admin_session.create_country_generic()
-        reg_session = self.get_session('ABC_reg')
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        self.assertEqual(anon_csv, [])
-        self.assertEqual(admin_csv, [])
-        self.assertEqual(reg_csv, [])
-        admin_session.create_person(
-            'Test First Country', 'Contestant 1',
-            {'arrival_place': 'Example Airport',
-             'arrival_date': '2 April 2015',
-             'arrival_time_hour': '13',
-             'arrival_time_minute': '30',
-             'arrival_flight': 'ABC123',
-             'room_number': '987',
-             'sars_cov2_after': 'Yes'})
-        expected_cont = {'XMO Number': '2', 'Country Number': '3',
-                         'Person Number': '1',
-                         'Annual URL': self.instance.url + 'person1',
-                         'Country Name': 'Test First Country',
-                         'Country Code': 'ABC', 'Primary Role': 'Contestant 1',
-                         'Other Roles': '', 'Guide For': '',
-                         'Contestant Code': 'ABC1', 'Contestant Age': '15',
-                         'Given Name': 'Given 1', 'Family Name': 'Family 1',
-                         'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
-                         'P6': '', 'Total': '0', 'Award': '',
-                         'Extra Awards': '', 'Photo URL': '',
-                         'Generic Number': ''}
-        expected_cont_admin = expected_cont.copy()
-        expected_cont_admin.update(
-            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
-             'Languages': 'English',
-             'Allergies and Dietary Requirements': '', 'T-Shirt Size': 'S',
-             'Arrival Place': 'Example Airport', 'Arrival Date': '2015-04-02',
-             'Arrival Time': '13:30', 'Arrival Flight': 'ABC123',
-             'Departure Place': '', 'Departure Date': '', 'Departure Time': '',
-             'Departure Flight': '', 'Room Type': 'Shared room',
-             'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Badge Background': 'generic',
-             'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
-             'Badge Text Colour': '000000', 'Consent Form URL': '',
-             'ID Scan URL': '',
-             'Passport or Identity Card Number': '',
-             'Nationality': '', 'Passport Given Name': 'Given 1',
-             'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
-             'Remote Participant': 'No', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': 'Yes',
-             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
-             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
-             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
-             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        self.assertEqual(anon_csv, [expected_cont])
-        self.assertEqual(admin_csv, [expected_cont_admin])
-        self.assertEqual(reg_csv, [expected_cont])
-        admin_session.edit('person', '1',
-                           {'sars_cov2_after': 'No'})
-        expected_cont_admin.update(
-            {'SARS-CoV-2 Vaccine After Threshold Date': 'No'})
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        self.assertEqual(anon_csv, [expected_cont])
-        self.assertEqual(admin_csv, [expected_cont_admin])
-        self.assertEqual(reg_csv, [expected_cont])
-        admin_session.edit('person', '1',
-                           {'sars_cov2_after': '(no answer)'})
-        expected_cont_admin.update(
-            {'SARS-CoV-2 Vaccine After Threshold Date': ''})
         anon_csv = session.get_people_csv()
         admin_csv = admin_session.get_people_csv()
         reg_csv = reg_session.get_people_csv()
@@ -5283,9 +5015,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Nationality': 'Matholympian', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -5354,9 +5083,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Nationality': 'Other-olympian', 'Passport Given Name': 'Random',
              'Passport Family Name': 'Randomer', 'Event Photos Consent': '',
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -5427,9 +5153,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Family Name': 'Family 1',
              'Event Photos Consent': 'Yes', 'Remote Participant': 'No',
              'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -5500,159 +5223,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Nationality': '', 'Passport Given Name': 'Given 2',
              'Passport Family Name': 'Family 2', 'Event Photos Consent': 'No',
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
-             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
-             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
-             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
-             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        self.assertEqual(anon_csv, [expected_cont, expected_cont2])
-        self.assertEqual(admin_csv, [expected_cont_admin,
-                                     expected_cont2_admin])
-        self.assertEqual(reg_csv, [expected_cont, expected_cont2])
-
-    @_with_config(consent_ui='Yes', sars_cov2_cert='Some text',
-                  sars_cov2_doses='Some text', sars_cov2_after='Some text')
-    def test_person_csv_consent_ui_vaccine(self):
-        """
-        Test CSV file of people, consent and vaccine information collected.
-        """
-        session = self.get_session()
-        admin_session = self.get_session('admin')
-        admin_session.create('arrival', {'name': 'Example Airport'})
-        admin_session.create_country_generic()
-        reg_session = self.get_session('ABC_reg')
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        self.assertEqual(anon_csv, [])
-        self.assertEqual(admin_csv, [])
-        self.assertEqual(reg_csv, [])
-        admin_session.create_person(
-            'Test First Country', 'Contestant 1',
-            {'arrival_place': 'Example Airport',
-             'arrival_date': '2 April 2015',
-             'arrival_time_hour': '13',
-             'arrival_time_minute': '30',
-             'arrival_flight': 'ABC123',
-             'room_number': '987',
-             'diet': 'Vegetarian',
-             'sars_cov2_cert': 'Yes',
-             'sars_cov2_doses': '3',
-             'sars_cov2_after': 'Yes',
-             'event_photos_consent': 'yes', 'diet_consent': 'yes',
-             'vaccine_consent': 'yes'})
-        expected_cont = {'XMO Number': '2', 'Country Number': '3',
-                         'Person Number': '1',
-                         'Annual URL': self.instance.url + 'person1',
-                         'Country Name': 'Test First Country',
-                         'Country Code': 'ABC', 'Primary Role': 'Contestant 1',
-                         'Other Roles': '', 'Guide For': '',
-                         'Contestant Code': 'ABC1', 'Contestant Age': '15',
-                         'Given Name': 'Given 1', 'Family Name': 'Family 1',
-                         'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
-                         'P6': '', 'Total': '0', 'Award': '',
-                         'Extra Awards': '', 'Photo URL': '',
-                         'Generic Number': ''}
-        expected_cont_admin = expected_cont.copy()
-        expected_cont_admin.update(
-            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
-             'Languages': 'English',
-             'Allergies and Dietary Requirements': 'Vegetarian',
-             'T-Shirt Size': 'S', 'Arrival Place': 'Example Airport',
-             'Arrival Date': '2015-04-02', 'Arrival Time': '13:30',
-             'Arrival Flight': 'ABC123', 'Departure Place': '',
-             'Departure Date': '', 'Departure Time': '',
-             'Departure Flight': '', 'Room Type': 'Shared room',
-             'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Badge Background': 'generic',
-             'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
-             'Badge Text Colour': '000000', 'Consent Form URL': '',
-             'ID Scan URL': '',
-             'Passport or Identity Card Number': '',
-             'Nationality': '', 'Passport Given Name': 'Given 1',
-             'Passport Family Name': 'Family 1',
-             'Event Photos Consent': 'Yes', 'Remote Participant': 'No',
-             'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': 'Yes',
-             'SARS-CoV-2 Vaccine Doses': '3',
-             'SARS-CoV-2 Vaccine After Threshold Date': 'Yes',
-             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
-             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
-             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
-             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        self.assertEqual(anon_csv, [expected_cont])
-        self.assertEqual(admin_csv, [expected_cont_admin])
-        self.assertEqual(reg_csv, [expected_cont])
-        # Test removing previously given consent for vaccine
-        # information clears that information.
-        admin_session.edit('person', '1', {'vaccine_consent': 'no'})
-        expected_cont_admin.update(
-            {'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': ''})
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        self.assertEqual(anon_csv, [expected_cont])
-        self.assertEqual(admin_csv, [expected_cont_admin])
-        self.assertEqual(reg_csv, [expected_cont])
-        # Test vaccine information specified without consent is
-        # discarded.
-        admin_session.create_person(
-            'Test First Country', 'Contestant 2',
-            {'arrival_place': 'Example Airport',
-             'arrival_date': '2 April 2015',
-             'arrival_time_hour': '13',
-             'arrival_time_minute': '30',
-             'arrival_flight': 'ABC123',
-             'room_number': '987',
-             'sars_cov2_cert': 'Yes',
-             'sars_cov2_doses': '3',
-             'sars_cov2_after': 'Yes',
-             'event_photos_consent': 'no', 'diet_consent': 'no',
-             'vaccine_consent': 'no'})
-        expected_cont2 = {'XMO Number': '2', 'Country Number': '3',
-                          'Person Number': '2',
-                          'Annual URL': self.instance.url + 'person2',
-                          'Country Name': 'Test First Country',
-                          'Country Code': 'ABC',
-                          'Primary Role': 'Contestant 2', 'Other Roles': '',
-                          'Guide For': '', 'Contestant Code': 'ABC2',
-                          'Contestant Age': '15', 'Given Name': 'Given 2',
-                          'Family Name': 'Family 2', 'P1': '', 'P2': '',
-                          'P3': '', 'P4': '', 'P5': '', 'P6': '', 'Total': '0',
-                          'Award': '', 'Extra Awards': '', 'Photo URL': '',
-                          'Generic Number': ''}
-        expected_cont2_admin = expected_cont2.copy()
-        expected_cont2_admin.update(
-            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
-             'Languages': 'English',
-             'Allergies and Dietary Requirements': 'Unknown',
-             'T-Shirt Size': 'S', 'Arrival Place': 'Example Airport',
-             'Arrival Date': '2015-04-02', 'Arrival Time': '13:30',
-             'Arrival Flight': 'ABC123', 'Departure Place': '',
-             'Departure Date': '', 'Departure Time': '',
-             'Departure Flight': '', 'Room Type': 'Shared room',
-             'Share Room With': '', 'Room Number': '987', 'Phone Number': '',
-             'Badge Photo URL': '', 'Badge Background': 'generic',
-             'Badge Outer Colour': '7ab558', 'Badge Inner Colour': 'c9deb0',
-             'Badge Text Colour': '000000', 'Consent Form URL': '',
-             'ID Scan URL': '',
-             'Passport or Identity Card Number': '',
-             'Nationality': '', 'Passport Given Name': 'Given 2',
-             'Passport Family Name': 'Family 2', 'Event Photos Consent': 'No',
-             'Remote Participant': 'No', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -5729,9 +5299,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -5836,9 +5403,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Nationality': '', 'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -5938,9 +5502,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
              'Remote Participant': 'Yes', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -5962,9 +5523,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Nationality': '', 'Passport Given Name': 'Given 2',
              'Passport Family Name': 'Family 2', 'Event Photos Consent': '',
              'Remote Participant': 'Yes', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -5986,9 +5544,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Given Name': 'Given 3',
              'Passport Family Name': 'Family 3', 'Event Photos Consent': '',
              'Remote Participant': 'Yes', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -6094,9 +5649,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Given Name': 'Given 1',
              'Passport Family Name': 'Family 1', 'Event Photos Consent': '',
              'Remote Participant': '', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -6118,9 +5670,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Nationality': '', 'Passport Given Name': 'Given 2',
              'Passport Family Name': 'Family 2', 'Event Photos Consent': '',
              'Remote Participant': 'Yes', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -6142,9 +5691,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Given Name': 'Given 3',
              'Passport Family Name': 'Family 3', 'Event Photos Consent': '',
              'Remote Participant': 'No', 'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -9300,25 +8846,6 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(anon_csv, [])
         self.assertEqual(admin_csv, [])
 
-    @_with_config(consent_ui='Yes', sars_cov2_cert='Some text',
-                  sars_cov2_doses='Some text', sars_cov2_after='Some text')
-    def test_person_create_audit_errors_missing_consent_vaccine(self):
-        """
-        Test errors from person creation auditor, missing required
-        consent information, vaccine information collected.
-        """
-        session = self.get_session()
-        admin_session = self.get_session('admin')
-        admin_session.create_person(
-            'XMO 2015 Staff', 'Coordinator',
-            {'event_photos_consent': 'yes',
-             'diet_consent': 'yes'},
-            error='No choice of consent for vaccine information specified')
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        self.assertEqual(anon_csv, [])
-        self.assertEqual(admin_csv, [])
-
     @_with_config(require_passport_number='Yes')
     def test_person_create_audit_errors_missing_passport_number(self):
         """
@@ -12200,9 +11727,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Family Name': 'Passport family',
              'Event Photos Consent': 'Yes', 'Remote Participant': 'No',
              'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -12228,9 +11752,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Family Name': 'Passport family 2',
              'Event Photos Consent': 'Yes', 'Remote Participant': 'No',
              'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -12431,9 +11952,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Family Name': 'Family 1',
              'Event Photos Consent': '', 'Remote Participant': 'No',
              'Basic Data Missing': 'Yes',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -12456,9 +11974,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Family Name': 'Family 2',
              'Event Photos Consent': '', 'Remote Participant': 'No',
              'Basic Data Missing': 'Yes',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -12555,9 +12070,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Nationality': 'Matholympian',
              'Event Photos Consent': 'No', 'Remote Participant': 'No',
              'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -12585,9 +12097,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Nationality': 'Matholympianish',
              'Event Photos Consent': 'Yes', 'Remote Participant': 'No',
              'Basic Data Missing': 'No',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -12654,221 +12163,6 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(selfreg_2_csv,
                          [expected_cont, expected_staff])
 
-    @_with_config(consent_ui='Yes', sars_cov2_cert='Some text',
-                  sars_cov2_doses='Some text', sars_cov2_after='Some text')
-    def test_person_incomplete_vaccine(self):
-        """
-        Test people with incomplete registrations, vaccine data collected.
-        """
-        session = self.get_session()
-        admin_session = self.get_session('admin')
-        admin_session.create('arrival', {'name': 'Example Airport'})
-        admin_session.create_country_generic()
-        reg_session = self.get_session('ABC_reg')
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        self.assertEqual(anon_csv, [])
-        self.assertEqual(admin_csv, [])
-        self.assertEqual(reg_csv, [])
-        admin_session.create_person(
-            'Test First Country', 'Contestant 1',
-            {'@required': '',
-             'event_photos_consent': 'no',
-             'diet_consent': 'yes',
-             'photo_consent': 'Yes, for website and name badge',
-             'incomplete': 'yes'})
-        admin_session.create_person(
-            'XMO 2015 Staff', 'Guide',
-            {'@required': '',
-             'event_photos_consent': 'no',
-             'diet_consent': 'yes',
-             'photo_consent': 'Yes, for website and name badge',
-             'incomplete': 'yes'})
-        admin_session.create_user('selfreg_1', 'Test First Country',
-                                  'User,SelfRegister',
-                                  {'person': '1'})
-        admin_session.create_user('selfreg_2', 'XMO 2015 Staff',
-                                  'User,SelfRegister',
-                                  {'person': '2'})
-        selfreg_1_session = self.get_session('selfreg_1')
-        selfreg_2_session = self.get_session('selfreg_2')
-        # Incomplete registrations do not have defaults of diet or
-        # room type.
-        expected_cont = {'XMO Number': '2', 'Country Number': '3',
-                         'Person Number': '1',
-                         'Annual URL': self.instance.url + 'person1',
-                         'Country Name': 'Test First Country',
-                         'Country Code': 'ABC', 'Primary Role': 'Contestant 1',
-                         'Other Roles': '', 'Guide For': '',
-                         'Contestant Code': 'ABC1', 'Contestant Age': '15',
-                         'Given Name': 'Given 1', 'Family Name': 'Family 1',
-                         'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
-                         'P6': '', 'Total': '0', 'Award': '',
-                         'Extra Awards': '', 'Photo URL': '',
-                         'Generic Number': ''}
-        expected_staff = {'XMO Number': '2', 'Country Number': '1',
-                          'Person Number': '2',
-                          'Annual URL': self.instance.url + 'person2',
-                          'Country Name': 'XMO 2015 Staff',
-                          'Country Code': 'ZZA', 'Primary Role': 'Guide',
-                          'Other Roles': '', 'Guide For': '',
-                          'Contestant Code': '', 'Contestant Age': '',
-                          'Given Name': 'Given 2', 'Family Name': 'Family 2',
-                          'P1': '', 'P2': '', 'P3': '', 'P4': '', 'P5': '',
-                          'P6': '', 'Total': '', 'Award': '',
-                          'Extra Awards': '', 'Photo URL': '',
-                          'Generic Number': ''}
-        expected_cont_admin = expected_cont.copy()
-        expected_staff_admin = expected_staff.copy()
-        expected_cont_admin.update(
-            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
-             'Languages': 'English',
-             'Allergies and Dietary Requirements': '',
-             'T-Shirt Size': 'S', 'Arrival Place': '',
-             'Arrival Date': '', 'Arrival Time': '',
-             'Arrival Flight': '', 'Departure Place': '',
-             'Departure Date': '', 'Departure Time': '',
-             'Departure Flight': '', 'Room Type': '',
-             'Share Room With': '', 'Room Number': '',
-             'Phone Number': '', 'Badge Photo URL': '',
-             'Badge Background': 'generic', 'Badge Outer Colour': '7ab558',
-             'Badge Inner Colour': 'c9deb0', 'Badge Text Colour': '000000',
-             'Consent Form URL': '', 'ID Scan URL': '',
-             'Passport or Identity Card Number': '', 'Nationality': '',
-             'Passport Given Name': 'Given 1',
-             'Passport Family Name': 'Family 1',
-             'Event Photos Consent': 'No', 'Remote Participant': 'No',
-             'Basic Data Missing': 'Yes',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
-             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
-             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
-             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
-             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
-        expected_staff_admin.update(
-            {'Gender': 'Female', 'Date of Birth': '2000-01-01',
-             'Languages': 'English',
-             'Allergies and Dietary Requirements': '',
-             'T-Shirt Size': 'S', 'Arrival Place': '',
-             'Arrival Date': '', 'Arrival Time': '',
-             'Arrival Flight': '', 'Departure Place': '',
-             'Departure Date': '', 'Departure Time': '',
-             'Departure Flight': '', 'Room Type': '',
-             'Share Room With': '', 'Room Number': '',
-             'Phone Number': '', 'Badge Photo URL': '',
-             'Badge Background': 'generic', 'Badge Outer Colour': '2a3e92',
-             'Badge Inner Colour': '9c95cc', 'Badge Text Colour': '000000',
-             'Consent Form URL': '', 'ID Scan URL': '',
-             'Passport or Identity Card Number': '', 'Nationality': '',
-             'Passport Given Name': 'Given 2',
-             'Passport Family Name': 'Family 2',
-             'Event Photos Consent': 'No', 'Remote Participant': 'No',
-             'Basic Data Missing': 'Yes',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
-             'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
-             'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
-             'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
-             'Scratch Scan Day 1 URL': '', 'Scratch Scan Day 2 URL': ''})
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        selfreg_1_csv = selfreg_1_session.get_people_csv()
-        selfreg_2_csv = selfreg_2_session.get_people_csv()
-        self.assertEqual(anon_csv,
-                         [expected_cont, expected_staff])
-        self.assertEqual(admin_csv,
-                         [expected_cont_admin, expected_staff_admin])
-        self.assertEqual(reg_csv,
-                         [expected_cont, expected_staff])
-        self.assertEqual(selfreg_1_csv,
-                         [expected_cont, expected_staff])
-        self.assertEqual(selfreg_2_csv,
-                         [expected_cont, expected_staff])
-        # Registration and self-registration users cannot edit those
-        # people without completing the incomplete data.
-        reg_session.edit('person', '1',
-                         {'@required': '',
-                          'arrival_place': 'Example Airport'},
-                         error='No choice of consent for vaccine information '
-                         'specified')
-        selfreg_1_session.edit('person', '1',
-                               {'@required': '',
-                                'arrival_place': 'Example Airport'},
-                               error='No choice of consent for vaccine '
-                               'information specified')
-        selfreg_2_session.edit('person', '2',
-                               {'@required': '',
-                                'arrival_place': 'Example Airport'},
-                               error='No choice of consent for vaccine '
-                               'information specified')
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        selfreg_1_csv = selfreg_1_session.get_people_csv()
-        selfreg_2_csv = selfreg_2_session.get_people_csv()
-        self.assertEqual(anon_csv,
-                         [expected_cont, expected_staff])
-        self.assertEqual(admin_csv,
-                         [expected_cont_admin, expected_staff_admin])
-        self.assertEqual(reg_csv,
-                         [expected_cont, expected_staff])
-        self.assertEqual(selfreg_1_csv,
-                         [expected_cont, expected_staff])
-        self.assertEqual(selfreg_2_csv,
-                         [expected_cont, expected_staff])
-        # Administrative users can edit those people without
-        # completing the incomplete data.
-        admin_session.edit('person', '1',
-                           {'arrival_place': 'Example Airport'})
-        expected_cont_admin['Arrival Place'] = 'Example Airport'
-        admin_session.edit('person', '2',
-                           {'departure_place': 'Example Airport'})
-        expected_staff_admin['Departure Place'] = 'Example Airport'
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        selfreg_1_csv = selfreg_1_session.get_people_csv()
-        selfreg_2_csv = selfreg_2_session.get_people_csv()
-        self.assertEqual(anon_csv,
-                         [expected_cont, expected_staff])
-        self.assertEqual(admin_csv,
-                         [expected_cont_admin, expected_staff_admin])
-        self.assertEqual(reg_csv,
-                         [expected_cont, expected_staff])
-        self.assertEqual(selfreg_1_csv,
-                         [expected_cont, expected_staff])
-        self.assertEqual(selfreg_2_csv,
-                         [expected_cont, expected_staff])
-        # Registration and self-registration users can edit those
-        # people if they do complete the incomplete data.
-        reg_session.edit('person', '1',
-                         {'vaccine_consent': 'yes'})
-        expected_cont_admin.update(
-            {'Room Type': 'Shared room', 'Basic Data Missing': 'No'})
-        selfreg_2_session.edit('person', '2',
-                               {'vaccine_consent': 'yes'})
-        expected_staff_admin.update(
-            {'Room Type': 'Shared room', 'Basic Data Missing': 'No'})
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        selfreg_1_csv = selfreg_1_session.get_people_csv()
-        selfreg_2_csv = selfreg_2_session.get_people_csv()
-        self.assertEqual(anon_csv,
-                         [expected_cont, expected_staff])
-        self.assertEqual(admin_csv,
-                         [expected_cont_admin, expected_staff_admin])
-        self.assertEqual(reg_csv,
-                         [expected_cont, expected_staff])
-        self.assertEqual(selfreg_1_csv,
-                         [expected_cont, expected_staff])
-        self.assertEqual(selfreg_2_csv,
-                         [expected_cont, expected_staff])
-
     @_with_config(require_diet='Yes', consent_ui='Yes', event_type='virtual',
                   require_passport_number='Yes', require_nationality='Yes')
     def test_person_virtual(self):
@@ -12917,41 +12211,6 @@ class RegSystemTestCase(unittest.TestCase):
         self.assertEqual(admin_csv[1]['Passport or Identity Card Number'], '')
         self.assertEqual(admin_csv[0]['Nationality'], '')
         self.assertEqual(admin_csv[1]['Nationality'], '')
-
-    @_with_config(require_diet='Yes', consent_ui='Yes', event_type='virtual',
-                  sars_cov2_cert='Some text', sars_cov2_doses='Some text',
-                  sars_cov2_after='Some text')
-    def test_person_virtual_vaccine(self):
-        """
-        Test person creation and editing for a virtual event, vaccine
-        data collected.
-        """
-        session = self.get_session()
-        admin_session = self.get_session('admin')
-        admin_session.create_country_generic()
-        reg_session = self.get_session('ABC_reg')
-        admin_session.create_person('Test First Country', 'Leader',
-                                    {'event_photos_consent': 'yes'})
-        reg_session.create_person('Test First Country', 'Contestant 1',
-                                  {'event_photos_consent': 'yes'})
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        self.assertEqual(len(anon_csv), 2)
-        self.assertEqual(len(admin_csv), 2)
-        self.assertEqual(len(reg_csv), 2)
-        self.assertEqual(admin_csv[0]['Room Type'], '')
-        self.assertEqual(admin_csv[1]['Room Type'], '')
-        admin_session.edit('person', '1', {'event_photos_consent': 'no'})
-        reg_session.edit('person', '2', {'primary_role': 'Contestant 2'})
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        self.assertEqual(len(anon_csv), 2)
-        self.assertEqual(len(admin_csv), 2)
-        self.assertEqual(len(reg_csv), 2)
-        self.assertEqual(admin_csv[0]['Room Type'], '')
-        self.assertEqual(admin_csv[1]['Room Type'], '')
 
     @_with_config(require_diet='Yes', consent_ui='Yes', event_type='hybrid',
                   require_passport_number='Yes', require_nationality='Yes')
@@ -13035,65 +12294,6 @@ class RegSystemTestCase(unittest.TestCase):
                                   error='No choice of consent for allergies '
                                   'and dietary requirements information '
                                   'specified')
-
-    @_with_config(require_diet='Yes', consent_ui='Yes', event_type='hybrid',
-                  sars_cov2_cert='Some text', sars_cov2_doses='Some text',
-                  sars_cov2_after='Some text')
-    def test_person_hybrid_vaccine(self):
-        """
-        Test person creation and editing for a hybrid event, vaccine
-        data collected.
-        """
-        session = self.get_session()
-        admin_session = self.get_session('admin')
-        admin_session.create_country_generic()
-        reg_session = self.get_session('ABC_reg')
-        admin_session.create_person('Test First Country', 'Leader',
-                                    {'event_photos_consent': 'yes'})
-        reg_session.create_person('Test First Country', 'Contestant 1',
-                                  {'event_photos_consent': 'yes',
-                                   'participation_type':
-                                   'Participating remotely'})
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        self.assertEqual(len(anon_csv), 2)
-        self.assertEqual(len(admin_csv), 2)
-        self.assertEqual(len(reg_csv), 2)
-        self.assertEqual(
-            admin_csv[0]['Allergies and Dietary Requirements'], '')
-        self.assertEqual(
-            admin_csv[1]['Allergies and Dietary Requirements'], '')
-        self.assertEqual(admin_csv[0]['Room Type'], '')
-        self.assertEqual(admin_csv[1]['Room Type'], '')
-        admin_session.edit('person', '1', {'event_photos_consent': 'no'})
-        reg_session.edit('person', '2', {'primary_role': 'Contestant 2'})
-        anon_csv = session.get_people_csv()
-        admin_csv = admin_session.get_people_csv()
-        reg_csv = reg_session.get_people_csv()
-        self.assertEqual(len(anon_csv), 2)
-        self.assertEqual(len(admin_csv), 2)
-        self.assertEqual(len(reg_csv), 2)
-        self.assertEqual(
-            admin_csv[0]['Allergies and Dietary Requirements'], '')
-        self.assertEqual(
-            admin_csv[1]['Allergies and Dietary Requirements'], '')
-        self.assertEqual(admin_csv[0]['Room Type'], '')
-        self.assertEqual(admin_csv[1]['Room Type'], '')
-        admin_session.create_person('Test First Country', 'Deputy Leader',
-                                    {'event_photos_consent': 'yes',
-                                     'participation_type': 'Present in person',
-                                     'diet': 'None',
-                                     'diet_consent': 'yes'},
-                                    error='No choice of consent for vaccine '
-                                    'information specified')
-        reg_session.create_person('Test First Country', 'Deputy Leader',
-                                  {'event_photos_consent': 'yes',
-                                   'participation_type': 'Present in person',
-                                   'diet': 'None',
-                                   'diet_consent': 'yes'},
-                                  error='No choice of consent for vaccine '
-                                  'information specified')
 
     def test_person_score(self):
         """
@@ -14530,9 +13730,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Family Name': 'Family One',
              'Event Photos Consent': '', 'Remote Participant': 'No',
              'Basic Data Missing': 'Yes',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -14555,9 +13752,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Family Name': 'Test',
              'Event Photos Consent': '', 'Remote Participant': 'No',
              'Basic Data Missing': 'Yes',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -14614,9 +13808,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Family Name': 'Doe',
              'Event Photos Consent': '', 'Remote Participant': 'No',
              'Basic Data Missing': 'Yes',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -14675,9 +13866,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Family Name': 'Doe',
              'Event Photos Consent': '', 'Remote Participant': 'No',
              'Basic Data Missing': 'Yes',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -14786,9 +13974,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Family Name': 'Family One',
              'Event Photos Consent': 'Yes', 'Remote Participant': 'No',
              'Basic Data Missing': 'Yes',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -14811,9 +13996,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Family Name': 'Family Two',
              'Event Photos Consent': 'Yes', 'Remote Participant': 'No',
              'Basic Data Missing': 'Yes',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -14941,9 +14123,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Family Name': 'Family One',
              'Event Photos Consent': '', 'Remote Participant': 'No',
              'Basic Data Missing': 'Yes',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -14966,9 +14145,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Family Name': 'Test',
              'Event Photos Consent': '', 'Remote Participant': 'No',
              'Basic Data Missing': 'Yes',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -14991,9 +14167,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Family Name': 'Doe',
              'Event Photos Consent': '', 'Remote Participant': 'No',
              'Basic Data Missing': 'Yes',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -15098,9 +14271,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Family Name': 'Family One',
              'Event Photos Consent': '', 'Remote Participant': 'No',
              'Basic Data Missing': 'Yes',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -15123,9 +14293,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Family Name': 'Test',
              'Event Photos Consent': '', 'Remote Participant': 'No',
              'Basic Data Missing': 'Yes',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -15216,9 +14383,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Family Name': 'Family One',
              'Event Photos Consent': '', 'Remote Participant': 'No',
              'Basic Data Missing': 'Yes',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -15340,9 +14504,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Family Name': 'Family One',
              'Event Photos Consent': '', 'Remote Participant': 'No',
              'Basic Data Missing': 'Yes',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',
@@ -15365,9 +14526,6 @@ class RegSystemTestCase(unittest.TestCase):
              'Passport Family Name': 'Test',
              'Event Photos Consent': '', 'Remote Participant': 'No',
              'Basic Data Missing': 'Yes',
-             'SARS-CoV-2 Vaccine Certificate': '',
-             'SARS-CoV-2 Vaccine Doses': '',
-             'SARS-CoV-2 Vaccine After Threshold Date': '',
              'Script Scan P1 URL': '', 'Script Scan P2 URL': '',
              'Script Scan P3 URL': '', 'Script Scan P4 URL': '',
              'Script Scan P5 URL': '', 'Script Scan P6 URL': '',

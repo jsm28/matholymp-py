@@ -40,8 +40,7 @@ from matholymp.roundupreg.config import distinguish_official, \
     have_consent_forms, have_id_scans, have_consent_ui, \
     have_passport_numbers, have_nationality, get_num_problems, get_num_exams, \
     get_marks_per_problem, get_language_numbers, get_short_name, \
-    honourable_mentions_available, event_type, have_remote_participation, \
-    get_sars_cov2_cert_bool, get_sars_cov2_doses_bool, get_sars_cov2_after_bool
+    honourable_mentions_available, event_type, have_remote_participation
 from matholymp.roundupreg.rounduputil import scores_from_str, \
     person_date_of_birth, contestant_age, db_file_url, person_is_remote
 
@@ -271,24 +270,6 @@ class RoundupDataSource(DataSource):
             return ret
         elif name == 'diet':
             return self._db.person.get(person_id, 'diet') or None
-        elif name == 'sars_cov2_cert':
-            if not get_sars_cov2_cert_bool(self._db):
-                return None
-            sars_cov2_cert = self._db.person.get(person_id, 'sars_cov2_cert')
-            if not sars_cov2_cert:
-                return None
-            return sars_cov2_cert == 'yes'
-        elif name == 'sars_cov2_doses':
-            if not get_sars_cov2_doses_bool(self._db):
-                return None
-            return self._db.person.get(person_id, 'sars_cov2_doses') or None
-        elif name == 'sars_cov2_after':
-            if not get_sars_cov2_after_bool(self._db):
-                return None
-            sars_cov2_after = self._db.person.get(person_id, 'sars_cov2_after')
-            if not sars_cov2_after:
-                return None
-            return sars_cov2_after == 'yes'
         elif name == 'room_type':
             room_type = self._db.person.get(person_id, 'room_type')
             if room_type is None:

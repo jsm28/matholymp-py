@@ -47,9 +47,7 @@ from matholymp.roundupreg.config import have_consent_forms, have_id_scans, \
     require_dob, get_num_problems, get_marks_per_problem, \
     get_earliest_date_of_birth, get_sanity_date_of_birth, \
     get_earliest_date_of_birth_contestant, get_arrdep_bounds, \
-    get_short_name_year, get_contestant_genders, get_invitation_letter_email, \
-    get_sars_cov2_cert_bool, get_sars_cov2_doses_bool, \
-    get_sars_cov2_after_bool, have_vaccine_status
+    get_short_name_year, get_contestant_genders, get_invitation_letter_email
 from matholymp.roundupreg.roundupemail import send_email
 from matholymp.roundupreg.rounduputil import any_scores_missing, \
     valid_int_str, create_rss, db_file_format_contents, db_file_extension, \
@@ -503,27 +501,6 @@ def audit_person_fields(db, cl, nodeid, newvalues):
                 # Remove any dietary requirements information
                 # specified, now or previously.
                 newvalues['diet'] = 'Unknown'
-        if have_vaccine_status(db):
-            vaccine_consent = get_new_value(db, cl, nodeid, newvalues,
-                                            'vaccine_consent')
-            if vaccine_consent is None and not allow_incomplete_remote:
-                raise ValueError('No choice of consent for vaccine '
-                                 'information specified')
-            if not vaccine_consent:
-                # Remove any vaccine status information specified, now
-                # or previously.
-                if get_sars_cov2_cert_bool(db):
-                    newvalues['sars_cov2_cert'] = None
-                    if nodeid is None:
-                        del newvalues['sars_cov2_cert']
-                if get_sars_cov2_doses_bool(db):
-                    newvalues['sars_cov2_doses'] = None
-                    if nodeid is None:
-                        del newvalues['sars_cov2_doses']
-                if get_sars_cov2_after_bool(db):
-                    newvalues['sars_cov2_after'] = None
-                    if nodeid is None:
-                        del newvalues['sars_cov2_after']
 
     # If passport numbers are collected, they are required.
     if have_passport_numbers(db):
@@ -541,18 +518,6 @@ def audit_person_fields(db, cl, nodeid, newvalues):
         require_value(db, cl, nodeid, newvalues, 'diet',
                       'Allergies and dietary requirements not specified',
                       allow_incomplete_remote)
-
-    # Vaccination status information must be valid.
-    if get_sars_cov2_cert_bool(db):
-        if ('sars_cov2_cert' in newvalues
-            and newvalues['sars_cov2_cert'] is not None
-            and newvalues['sars_cov2_cert'] not in ('yes', 'no')):
-            raise ValueError('invalid vaccine certificate status')
-    if get_sars_cov2_after_bool(db):
-        if ('sars_cov2_after' in newvalues
-            and newvalues['sars_cov2_after'] is not None
-            and newvalues['sars_cov2_after'] not in ('yes', 'no')):
-            raise ValueError('invalid vaccine date information')
 
     # If a participation type is specified, it must be valid.  (If the
     # event is in-person or virtual, the value specified ends up being
