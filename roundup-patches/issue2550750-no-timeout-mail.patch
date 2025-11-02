@@ -1,7 +1,7 @@
-diff -rupN roundup-2.4.0.orig/roundup/cgi/client.py roundup-2.4.0/roundup/cgi/client.py
---- roundup-2.4.0.orig/roundup/cgi/client.py	2024-07-09 13:36:08.000000000 +0000
-+++ roundup-2.4.0/roundup/cgi/client.py	2025-01-01 00:43:08.069311363 +0000
-@@ -2320,6 +2320,8 @@ class Client:
+diff -rupN roundup-2.5.0.orig/roundup/cgi/client.py roundup-2.5.0/roundup/cgi/client.py
+--- roundup-2.5.0.orig/roundup/cgi/client.py	2025-07-12 21:52:07.000000000 +0000
++++ roundup-2.5.0/roundup/cgi/client.py	2025-11-02 15:04:15.867623846 +0000
+@@ -2435,6 +2435,8 @@ class Client:
          """
          try:
              call(*args, **kwargs)

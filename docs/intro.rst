@@ -48,7 +48,8 @@ you're using it for your event and I'll add it to the list.
 The following prerequisite software should be installed to use
 matholymp:
 
-* `Python <https://www.python.org/>`_, version 3.5 or later.
+* `Python <https://www.python.org/>`_, version 3.7 or later (not
+  tested with versions older than 3.12).
 
 * `PyICU <https://pypi.org/project/PyICU/>`_ (which in turn
   requires `ICU <http://site.icu-project.org/>`_).
@@ -57,10 +58,10 @@ matholymp:
   interface for editing databases for the online registration system;
   the issue-tracking parts of Roundup, and the email interface, are
   not used; Roundup is not needed if the online registration system is
-  not used).  Use of the current version of Roundup, 2.4.0 as of this
+  not used).  Use of the current version of Roundup, 2.5.0 as of this
   writing, is recommended; older versions will not work because of
   Roundup API changes.  Some bugs relevant to some uses of matholymp
-  are still present in 2.4.0, so you should consider applying the
+  are still present in 2.5.0, so you should consider applying the
   patches in the :file:`roundup-patches/` directory in the matholymp
   source distribution before installing Roundup.  See
   :ref:`roundup-patches` for more details of those patches.
